@@ -9,6 +9,7 @@ import simplejson as json
 
 from colors import *
 from modules import libtcodpy as libtcod
+from modules.dmap import dMap
 from settings import *
 
 ######################################
@@ -33,6 +34,10 @@ with open(items_json) as json_data:
 
 # Game State
 game_state = 'playing'
+
+# Blindness
+blind = False
+blind_counter = 0
 
 # Player action
 player_action = None
@@ -101,242 +106,6 @@ class ConfusedMonster:
             self.owner.ai = self.old_ai
             message('The ' + self.owner.name + ' is no longer confused!',
                     libtcod.red)
-
-class dMap:
-    ''' Random map Generation '''
-    # Found it on RogueBasin, works a lot better than the tutorial one
-    def __init__(self):
-        self.roomList=[]
-        self.cList=[]
-
-    def makeMap(self,xsize,ysize,fail,b1,mrooms):
-        ''' Generate random layout of rooms, corridors and other features '''
-        # makeMap can be modified to accept arguments for values of failed,
-        #   and percentile of features.
-        # Create first room
-        self.size_x = xsize
-        self.size_y = ysize
-        # Initialize map to all walls
-        self.mapArr=[]
-        for y in range(ysize):
-            tmp = []
-            for x in range(xsize):
-                    tmp.append(1)
-            self.mapArr.append( tmp )
-
-        w,l,t=self.makeRoom()
-        while len(self.roomList)==0:
-            y=randrange(ysize-1-l)+1
-            x=randrange(xsize-1-w)+1
-            p=self.placeRoom(l,w,x,y,xsize,ysize,6,0)
-        failed=0
-        # The lower the value that failed< , the smaller the dungeon
-        while failed<fail:
-            chooseRoom=randrange(len(self.roomList))
-            ex,ey,ex2,ey2,et=self.makeExit(chooseRoom)
-            feature=randrange(100)
-            # Begin feature choosing (more features to be added here)
-            if feature<b1:
-                    w,l,t=self.makeCorridor()
-            else:
-                    w,l,t=self.makeRoom()
-            roomDone=self.placeRoom(l,w,ex2,ey2,xsize,ysize,t,et)
-            # If placement failed increase possibility map is full
-            if roomDone==0:
-                    failed+=1
-            # Possiblilty of linking rooms
-            elif roomDone==2:
-                    if self.mapArr[ey2][ex2]==0:
-                        if randrange(100)<7:
-                            self.makePortal(ex,ey)
-                        failed+=1
-            # Otherwise, link up the 2 rooms
-            else:
-                    self.makePortal(ex,ey)
-                    failed=0
-                    if t<5:
-                        tc=[len(self.roomList)-1,ex2,ey2,t]
-                        self.cList.append(tc)
-                        self.joinCorridor(len(self.roomList)-1,ex2,ey2,t,50)
-            if len(self.roomList)==mrooms:
-                    failed=fail
-        self.finalJoins()
-
-    def makeRoom(self):
-        ''' Randomly produce room size '''
-        rtype=5
-        rwide=randrange(8)+3
-        rlong=randrange(8)+3
-        return rwide,rlong,rtype
-
-    def makeCorridor(self):
-        ''' Randomly produce corridor length and heading '''
-        clength=randrange(18)+3
-        heading=randrange(4)
-        if heading==0: #North
-            wd=1
-            lg=-clength
-        elif heading==1: #East
-            wd=clength
-            lg=1
-        elif heading==2: #South
-            wd=1
-            lg=clength
-        elif heading==3: #West
-            wd=-clength
-            lg=1
-        return wd,lg,heading
-
-    def placeRoom(self,ll,ww,xposs,yposs,xsize,ysize,rty,ext):
-        ''' Place feature if enough space and return canPlace as
-        true or false '''
-        #Arrange for heading
-        xpos=xposs
-        ypos=yposs
-        if ll<0:
-            ypos+=ll+1
-            ll=abs(ll)
-        if ww<0:
-            xpos+=ww+1
-            ww=abs(ww)
-        #Make offset if type is room
-        if rty==5:
-            if ext==0 or ext==2:
-                    offset=randrange(ww)
-                    xpos-=offset
-            else:
-                    offset=randrange(ll)
-                    ypos-=offset
-        #Then check if there is space
-        canPlace=1
-        if ww+xpos+1>xsize-1 or ll+ypos+1>ysize:
-            canPlace=0
-            return canPlace
-        elif xpos<1 or ypos<1:
-            canPlace=0
-            return canPlace
-        else:
-            for j in range(ll):
-                    for k in range(ww):
-                        if self.mapArr[(ypos)+j][(xpos)+k]!=1:
-                            canPlace=2
-        #If there is space, add to list of rooms
-        if canPlace==1:
-            temp=[ll,ww,xpos,ypos]
-            self.roomList.append(temp)
-            for j in range(ll+2): #Then build walls
-                    for k in range(ww+2):
-                        self.mapArr[(ypos-1)+j][(xpos-1)+k]=2
-            for j in range(ll): #Then build floor
-                    for k in range(ww):
-                        self.mapArr[ypos+j][xpos+k]=0
-        return canPlace #Return whether placed is true/false
-
-    def makeExit(self,rn):
-        ''' Pick random wall and random point along that wall '''
-        room=self.roomList[rn]
-        while True:
-            rw=randrange(4)
-            if rw==0: #North wall
-                    rx=randrange(room[1])+room[2]
-                    ry=room[3]-1
-                    rx2=rx
-                    ry2=ry-1
-            elif rw==1: #East wall
-                    ry=randrange(room[0])+room[3]
-                    rx=room[2]+room[1]
-                    rx2=rx+1
-                    ry2=ry
-            elif rw==2: #South wall
-                    rx=randrange(room[1])+room[2]
-                    ry=room[3]+room[0]
-                    rx2=rx
-                    ry2=ry+1
-            elif rw==3: #West wall
-                    ry=randrange(room[0])+room[3]
-                    rx=room[2]-1
-                    rx2=rx-1
-                    ry2=ry
-            if self.mapArr[ry][rx]==2: #If space is a wall, exit
-                    break
-        return rx,ry,rx2,ry2,rw
-
-    def makePortal(self,px,py):
-        '''Create doors in walls'''
-        ptype=randrange(100)
-        if ptype>90: #Secret door
-            self.mapArr[py][px]=0
-            return
-        elif ptype>75: #Closed door
-            self.mapArr[py][px]=0
-            return
-        elif ptype>40: #Open door
-            self.mapArr[py][px]=0
-            return
-        else: #Hole in the wall
-            self.mapArr[py][px]=0
-
-    def joinCorridor(self,cno,xp,yp,ed,psb):
-        ''' Check corridor endpoint and make an exit if it
-        links to another room '''
-        cArea=self.roomList[cno]
-        if xp!=cArea[2] or yp!=cArea[3]: #Find the corridor endpoint
-            endx=xp-(cArea[1]-1)
-            endy=yp-(cArea[0]-1)
-        else:
-            endx=xp+(cArea[1]-1)
-            endy=yp+(cArea[0]-1)
-        checkExit=[]
-        if ed==0: #North corridor
-            if endx>1:
-                    coords=[endx-2,endy,endx-1,endy]
-                    checkExit.append(coords)
-            if endy>1:
-                    coords=[endx,endy-2,endx,endy-1]
-                    checkExit.append(coords)
-            if endx<self.size_x-2:
-                    coords=[endx+2,endy,endx+1,endy]
-                    checkExit.append(coords)
-        elif ed==1: #East corridor
-            if endy>1:
-                    coords=[endx,endy-2,endx,endy-1]
-                    checkExit.append(coords)
-            if endx<self.size_x-2:
-                    coords=[endx+2,endy,endx+1,endy]
-                    checkExit.append(coords)
-            if endy<self.size_y-2:
-                    coords=[endx,endy+2,endx,endy+1]
-                    checkExit.append(coords)
-        elif ed==2: #South corridor
-            if endx<self.size_x-2:
-                    coords=[endx+2,endy,endx+1,endy]
-                    checkExit.append(coords)
-            if endy<self.size_y-2:
-                    coords=[endx,endy+2,endx,endy+1]
-                    checkExit.append(coords)
-            if endx>1:
-                    coords=[endx-2,endy,endx-1,endy]
-                    checkExit.append(coords)
-        elif ed==3: #West corridor
-            if endx>1:
-                    coords=[endx-2,endy,endx-1,endy]
-                    checkExit.append(coords)
-            if endy>1:
-                    coords=[endx,endy-2,endx,endy-1]
-                    checkExit.append(coords)
-            if endy<self.size_y-2:
-                    coords=[endx,endy+2,endx,endy+1]
-                    checkExit.append(coords)
-        for xxx,yyy,xxx1,yyy1 in checkExit: #Loop through possible exits
-            if self.mapArr[yyy][xxx]==0: #If joins to a room
-                    if randrange(100)<psb: #Possibility of linking rooms
-                        self.makePortal(xxx1,yyy1)
-
-    def finalJoins(self):
-        ''' Final stage, loops through all the corridors to see if any can be
-        joined to other rooms '''
-        for x in self.cList:
-            self.joinCorridor(x[0],x[1],x[2],x[3],10)
 
 class TalkingMonster:
     ''' An AI that says things '''
@@ -526,8 +295,8 @@ class Fighter:
     def siphon(self):
         ''' Steal life. Sort of like a regeneration system '''
         if self.mana - SIPHON_COST < 0:
-            message('You try to siphon any life away, but you aren\'t \
-                    edgy enough', libtcod.light_red)
+            message('You try to siphon any life away, but you aren\'t edgy enough',
+                    libtcod.light_red)
             return 'cancelled'
 
         self.mana -= SIPHON_COST
@@ -546,8 +315,8 @@ class Fighter:
 
         # Fire a magic missile
         if self.mana - MISSILE_COST < 0:
-            message('You try to fire an edge missile, but you aren\'t \
-                    edgy enough', libtcod.light_red)
+            message('You try to fire an edge missile, but you aren\'t edgy enough',
+                    libtcod.light_red)
             return 'cancelled'
 
         self.mana -= MISSILE_COST
@@ -870,8 +639,8 @@ def cast_confuse():
 
 def cast_fireball():
     ''' Ask the player for a target tile to throw a fireball at '''
-    message('Left-click a target tile for the fireball, or right-click \
-            to cancel.', libtcod.light_cyan)
+    message('Left-click a target tile for the fireball, or right-click to cancel.',
+            libtcod.light_cyan)
     (x, y) = target_tile()
     if x is None: return 'cancelled'
     message('The fireball explodes, burning everything within ' +
@@ -908,6 +677,11 @@ def cast_heal():
 
     message('Your wounds start to feel better!', libtcod.light_violet)
     player.fighter.heal(HEAL_AMOUNT)
+
+def cast_inflict_blindness():
+    global blind, blind_counter
+    blind = True
+    blind_counter = 0
 
 def cast_mana():
     ''' Give some mana back '''
@@ -1269,6 +1043,8 @@ def generate_monster(monster_id, x, y):
     # Select a death function
     if monster_data[monster_id]['death_func'] == 'normal':
         death = monster_death
+    elif monster_data[monster_id]['death_func'] == 'slock':
+        death = monster_death_slock
     else:
         print('Error: death function does not exist')
         exit()
@@ -1602,7 +1378,8 @@ def json_get_color(color_str):
         'white': libtcod.white,
         'dark_crimson': libtcod.dark_crimson,
         'crimson': libtcod.crimson,
-        'chartreuse': libtcod.chartreuse
+        'chartreuse': libtcod.chartreuse,
+        'black': libtcod.black
     }
 
     return colors[color_str]
@@ -1852,6 +1629,26 @@ def monster_death(monster):
     monster.send_to_back()
     monster.name = ' '.join(['remains of', monster.name])
 
+def monster_death_slock(monster):
+    ''' Function called when monster dies. Blinds player '''
+    # transform it into a nasty corpse! it doesn't block, can't be
+    # Attacked and doesn't move
+    message(' '.join([monster.name.capitalize(), 'is dead!']),
+            libtcod.darker_red)
+    message('You gain ' + str(monster.fighter.xp) + ' experience points.',
+            libtcod.orange)
+    message(' '.join([monster.name.capitalize(),
+            'casts a final spell in its dying moments!']))
+    monster.char = '%'
+    monster.color = libtcod.dark_red
+    monster.blocks = False
+    monster.fighter = None
+    monster.ai = None
+    monster.send_to_back()
+    monster.name = ' '.join(['remains of', monster.name])
+    # Blind
+    cast_inflict_blindness()
+
 def monster_occupy_check(dx, dy):
     ''' If a monster is in that location, return true '''
     for obj in objects:
@@ -1927,8 +1724,8 @@ def next_level():
 
     dungeon_level += 1
 
-    message('After a rare moment of peace, you descend deeper into the \
-            heart of the dungeon...', libtcod.red)
+    message('After a rare moment of peace, you descend deeper into the heart of the dungeon...',
+            libtcod.red)
     make_map()  # Create a fresh new level!
     initialize_fov()
 
@@ -2000,7 +1797,7 @@ def place_objects():
 
 def play_game():
     ''' Main game loop '''
-    global key, mouse, player_action, timer
+    global key, mouse, player_action, timer, blind_counter
 
     player_action = None
 
@@ -2028,6 +1825,8 @@ def play_game():
             for obj in objects:
                 if obj.ai:
                     obj.ai.take_turn()
+            if blind:
+                blind_counter += 1
             timer += 1
 
 def player_death(player):
@@ -2090,8 +1889,8 @@ def previous_level():
                             ['Continue'], 30)
 
     else:
-        message('After a rare moment of peace, you ascend \
-                upwards towards the surface...', libtcod.red)
+        message('After a rare moment of peace, you ascend upwards towards the surface...',
+                libtcod.red)
         make_map()  # Create a fresh new level!
         initialize_fov()
 
@@ -2121,26 +1920,34 @@ def random_choice_index(chances):
 
 def render_all():
     ''' Draw everything to the screen '''
-    global check_fov, camera_x, camera_y
+    global check_fov, camera_x, camera_y, blind, blind_counter
 
     move_camera(player.x, player.y)
 
-    if check_fov:
-        check_fov = False
-        fov_recompute()
+    if not blind:
+        if check_fov:
+            check_fov = False
+            fov_recompute()
 
-    for obj in objects:
-        obj.draw()
-
-    # Draw all objects in the list, except the player. we want it to
-    # Always appear over all other objects! so it's drawn later.
-    for obj in objects:
-        if obj != player:
-            obj.draw()
+        # Draw all objects in the list, except the player. we want it to
+        # Always appear over all other objects! so it's drawn later.
+        for obj in objects:
+            if obj != player:
+                obj.draw()
+    else:
+        if blind_counter == BLIND_LENGTH:
+            blind = False
+            blind_counter = 0
     player.draw()
 
-    # blit the contents of 'con' to the root console
-    libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+    if not blind:
+        # blit the contents of 'con' to the root console
+        libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+    else:
+        libtcod.console_clear(con)
+        libtcod.console_set_default_background(con, libtcod.black)
+        player.draw()
+        libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
 
     # Prepare to render the GUI panel
     libtcod.console_set_default_background(panel, libtcod.black)
@@ -2176,7 +1983,7 @@ def render_all():
     monsters_in_room = 0
     for obj in objects:
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.fighter and \
-        obj.name != 'player':
+        obj.name != 'player' and not blind:
             monsters_in_room += 1
             libtcod.console_set_default_foreground(panel, obj.color)
             libtcod.console_print_ex(panel, 1, 7+(2*monsters_in_room),
@@ -2187,9 +1994,10 @@ def render_all():
                                 libtcod.red, libtcod.dark_red)
 
     # Display names of objects under the mouse
-    libtcod.console_set_default_foreground(msg_panel, libtcod.light_gray)
-    libtcod.console_print_ex(msg_panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
-                            get_names_under_mouse())
+    if not blind:
+        libtcod.console_set_default_foreground(msg_panel, libtcod.light_gray)
+        libtcod.console_print_ex(msg_panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
+                                get_names_under_mouse())
 
     # Print the game messages, one line at a time
     y = 1

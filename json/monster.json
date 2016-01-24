@@ -245,6 +245,21 @@
         "mana":0,
         "death_func":"normal",
         "ai": "normal"
+    },
+
+    "slocker": {
+        "name":"Slocker",
+        "id":"slocker",
+        "char":"S",
+        "color": "black",
+        "chance":[[15, 3], [30, 5]],
+        "hp":40,
+        "defense":2,
+        "power":9,
+        "xp":60,
+        "mana":0,
+        "death_func":"slock",
+        "ai": "normal"
     }
 
 }

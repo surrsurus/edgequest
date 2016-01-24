@@ -93,6 +93,9 @@ FIREBALL_DAMAGE = 25
 LEVEL_UP_BASE = 200
 LEVEL_UP_FACTOR = 150
 
+# Blindness
+BLIND_LENGTH = 10
+
 ######################################
 # Debug Options
 ######################################
