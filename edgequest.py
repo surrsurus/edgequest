@@ -1045,6 +1045,8 @@ def generate_monster(monster_id, x, y):
         death = monster_death
     elif monster_data[monster_id]['death_func'] == 'slock':
         death = monster_death_slock
+    elif monster_data[monster_id]['death_func'] == 'talk':
+        death = monster_death_talk
     else:
         print('Error: death function does not exist')
         exit()
@@ -1648,6 +1650,27 @@ def monster_death_slock(monster):
     monster.name = ' '.join(['remains of', monster.name])
     # Blind
     cast_inflict_blindness()
+
+def monster_death_talk(monster):
+    ''' Function called when monster dies. Says dying words '''
+    # transform it into a nasty corpse! it doesn't block, can't be
+    # Attacked and doesn't move
+    for mon in monster_data:
+        if monster.name == monster_data[mon]['name']:
+            death_speech = monster_data[mon]['death_talk']
+    message(''.join([monster.name.capitalize(), ' says "', death_speech,
+            '"']), libtcod.darker_red)
+    message(' '.join([monster.name.capitalize(), 'is dead!']),
+            libtcod.darker_red)
+    message('You gain ' + str(monster.fighter.xp) + ' experience points.',
+            libtcod.orange)
+    monster.char = '%'
+    monster.color = libtcod.dark_red
+    monster.blocks = False
+    monster.fighter = None
+    monster.ai = None
+    monster.send_to_back()
+    monster.name = ' '.join(['remains of', monster.name])
 
 def monster_occupy_check(dx, dy):
     ''' If a monster is in that location, return true '''
