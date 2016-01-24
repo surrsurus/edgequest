@@ -10,5 +10,7 @@ Roguelike in Python based on the [Roguebasin Tutorial](http://www.roguebasin.com
 
 ## Run Edgequest
 It should be as simple as running:
+
 `python2.7 edgequest.py`
+
 in the edgequest directory

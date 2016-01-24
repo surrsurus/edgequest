@@ -14,43 +14,6 @@ from settings import *
 # JSON
 ######################################
 
-'''
-JSON is used to store monster and item data
-
-Here is an example JSON object
-
-    'example': {
-        'name': 'Example Item', # Name of the item
-        'id': 'example',        # ID of the item
-        'char': '!',            # Character used when drawn on map
-        'color': 'light_green', # Color of character on map
-        'chance': [[45, 1]],    # Chance value beyond level, explained later
-        'type': 'item',         # Item type
-        'effect': 'heal'        # Item effect
-        'slot': 'right hand',   # Item slot
-        'power': 10,            # Bonus to power
-        'defense': 0,           # Bonus to defense
-        'hp': 0,                # Bonus to HP
-        'mana': 0               # Bonus to Edge
-        ---------------------------------------
-        Alternatively for monsters
-		'hp':99,                # Health
-		'defense':1,            # Defense
-		'power':5,              # Power
-		'xp':500,               # Experience
-        'mana':0,               # Edge
-		'death_func':'normal',  # Death function
-        'ai': 'talk',           # AI Type
-        'speech': [
-            'I'm a test item!'  # Speech text
-        ],
-        'rate': 65              # Rate of speech
-    },
-
-Not all of these options are used for each object, clearly
-
-'''
-
 # Monster JSON
 monster_json = 'json/monster.json'
 # Load monsters
@@ -146,12 +109,13 @@ class dMap:
         self.cList=[]
 
     def makeMap(self,xsize,ysize,fail,b1,mrooms):
-        '''Generate random layout of rooms, corridors and other features'''
-        # makeMap can be modified to accept arguments for values of failed, and percentile of features.
+        ''' Generate random layout of rooms, corridors and other features '''
+        # makeMap can be modified to accept arguments for values of failed,
+        #   and percentile of features.
         # Create first room
         self.size_x = xsize
         self.size_y = ysize
-        # initialize map to all walls
+        # Initialize map to all walls
         self.mapArr=[]
         for y in range(ysize):
             tmp = []
@@ -165,23 +129,28 @@ class dMap:
             x=randrange(xsize-1-w)+1
             p=self.placeRoom(l,w,x,y,xsize,ysize,6,0)
         failed=0
-        while failed<fail: #The lower the value that failed< , the smaller the dungeon
+        # The lower the value that failed< , the smaller the dungeon
+        while failed<fail:
             chooseRoom=randrange(len(self.roomList))
             ex,ey,ex2,ey2,et=self.makeExit(chooseRoom)
             feature=randrange(100)
-            if feature<b1: #Begin feature choosing (more features to be added here)
+            # Begin feature choosing (more features to be added here)
+            if feature<b1:
                     w,l,t=self.makeCorridor()
             else:
                     w,l,t=self.makeRoom()
             roomDone=self.placeRoom(l,w,ex2,ey2,xsize,ysize,t,et)
-            if roomDone==0: #If placement failed increase possibility map is full
+            # If placement failed increase possibility map is full
+            if roomDone==0:
                     failed+=1
-            elif roomDone==2: #Possiblilty of linking rooms
+            # Possiblilty of linking rooms
+            elif roomDone==2:
                     if self.mapArr[ey2][ex2]==0:
                         if randrange(100)<7:
                             self.makePortal(ex,ey)
                         failed+=1
-            else: #Otherwise, link up the 2 rooms
+            # Otherwise, link up the 2 rooms
+            else:
                     self.makePortal(ex,ey)
                     failed=0
                     if t<5:
@@ -193,14 +162,14 @@ class dMap:
         self.finalJoins()
 
     def makeRoom(self):
-        '''Randomly produce room size'''
+        ''' Randomly produce room size '''
         rtype=5
         rwide=randrange(8)+3
         rlong=randrange(8)+3
         return rwide,rlong,rtype
 
     def makeCorridor(self):
-        '''Randomly produce corridor length and heading'''
+        ''' Randomly produce corridor length and heading '''
         clength=randrange(18)+3
         heading=randrange(4)
         if heading==0: #North
@@ -218,7 +187,8 @@ class dMap:
         return wd,lg,heading
 
     def placeRoom(self,ll,ww,xposs,yposs,xsize,ysize,rty,ext):
-        '''Place feature if enough space and return canPlace as true or false'''
+        ''' Place feature if enough space and return canPlace as
+        true or false '''
         #Arrange for heading
         xpos=xposs
         ypos=yposs
@@ -262,7 +232,7 @@ class dMap:
         return canPlace #Return whether placed is true/false
 
     def makeExit(self,rn):
-        '''Pick random wall and random point along that wall'''
+        ''' Pick random wall and random point along that wall '''
         room=self.roomList[rn]
         while True:
             rw=randrange(4)
@@ -306,7 +276,8 @@ class dMap:
             self.mapArr[py][px]=0
 
     def joinCorridor(self,cno,xp,yp,ed,psb):
-        '''Check corridor endpoint and make an exit if it links to another room'''
+        ''' Check corridor endpoint and make an exit if it
+        links to another room '''
         cArea=self.roomList[cno]
         if xp!=cArea[2] or yp!=cArea[3]: #Find the corridor endpoint
             endx=xp-(cArea[1]-1)
@@ -361,7 +332,8 @@ class dMap:
                         self.makePortal(xxx1,yyy1)
 
     def finalJoins(self):
-        '''Final stage, loops through all the corridors to see if any can be joined to other rooms'''
+        ''' Final stage, loops through all the corridors to see if any can be
+        joined to other rooms '''
         for x in self.cList:
             self.joinCorridor(x[0],x[1],x[2],x[3],10)
 
@@ -387,7 +359,8 @@ class TalkingMonster:
             elif player.fighter.hp > 0:
                 monster.fighter.attack(player)
 
-            # Depending on the rate of speech set in the json, the monster may talk
+            # Depending on the rate of speech set in the json,
+            #   the monster may talk
             if libtcod.random_get_int(0, 0, 100) > self.rate:
                 r = libtcod.random_get_int(0, 0, len(self.speech)-1)
                 message(''.join([monster.name, ' says ', '\'',
@@ -472,21 +445,23 @@ class Fighter:
 
     @property
     def power(self):
-    # Return actual power, by summing up the bonuses from all equipped items
+        # Return actual power, by summing up the bonuses from all equipped items
         bonus = sum(equipment.power_bonus for equipment in \
                 get_all_equipped(self.owner))
         return self.base_power + bonus
 
     @property
     def defense(self):
-        # Return actual defense, by summing up the bonuses from all equipped items
+        # Return actual defense, by summing up the bonuses from
+        #   all equipped items
         bonus = sum(equipment.defense_bonus for equipment in \
                 get_all_equipped(self.owner))
         return self.base_defense + bonus
 
     @property
     def max_hp(self):
-        # Return actual max_hp, by summing up the bonuses from all equipped items
+        # Return actual max_hp, by summing up the bonuses from
+        #   all equipped items
         bonus = sum(equipment.max_hp_bonus for equipment in \
                 get_all_equipped(self.owner))
         return self.base_max_hp + bonus
@@ -549,8 +524,8 @@ class Fighter:
     def siphon(self):
         ''' Steal life. Sort of like a regeneration system '''
         if self.mana - SIPHON_COST < 0:
-            message('You try to siphon any life away, but you aren\'t edgy enough',
-                libtcod.light_red)
+            message('You try to siphon any life away, but you aren\'t \
+                    edgy enough', libtcod.light_red)
             return 'cancelled'
 
         self.mana -= SIPHON_COST
@@ -563,7 +538,8 @@ class Fighter:
         # Find closest monster
         monster = closest_monster(MISSILE_RANGE)
         if monster is None:  # No enemy found within maximum range
-            message('No enemy is close enough to strike with your edge missile', libtcod.light_red)
+            message('No enemy is close enough to strike with your edge missile',
+                    libtcod.light_red)
             return 'cancelled'
 
         # Fire a magic missile
