@@ -7,11 +7,20 @@ Roguelike in Python based on the [Roguebasin Tutorial](http://www.roguebasin.com
 3. 10 minutes of free time
 
 ## Run Edgequest
+
+### Linux
+
 It should be as simple as running:
 
 `python2.7 edgequest.py`
 
-in the edgequest directory
+in the edgequest directory from a terminal
+
+All imports are from the standard library, so you should have no problem with running this on a linux machine
+
+### Windows
+
+You should be able to open the python2.7 IDLE from the start menu and open `edgequest.py`, then press the F5 key to run it.
 
 ## Wiki
 
