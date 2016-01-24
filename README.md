@@ -20,7 +20,7 @@ All imports are from the standard library, so you should have no problem with ru
 
 ### Windows
 
-You should be able to open the python2.7 IDLE from the start menu and open `edgequest.py`, then press the F5 key to run it.
+Currently does not run on windows
 
 ## Wiki
 
