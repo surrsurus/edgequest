@@ -697,6 +697,7 @@ def cast_heal():
     player.fighter.heal(HEAL_AMOUNT)
 
 def cast_inflict_blindness():
+    ''' Inflict blindness. Basically just limit what gets rendered '''
     global blind, blind_counter
     blind = True
     blind_counter = 0
@@ -876,6 +877,7 @@ def choose_name():
     key = libtcod.Key()
     name = ''
 
+    # Dispbox style key getting
     while True:
         # Check for keypresses
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
@@ -883,20 +885,24 @@ def choose_name():
             # Enter submits name
             if key.vk == libtcod.KEY_ENTER:
                 break
-            # Backspace deletes a character
+            # Backspace deletes line
             elif key.vk == libtcod.KEY_BACKSPACE:
                 name = ''
             if key_char:
                 name = ''.join([name, key_char])
 
+        # Clear screen
         libtcod.console_clear(con)
+        # Set the screen to black
         libtcod.console_set_default_background(con, libtcod.black)
 
+        # Prompt for name
         libtcod.console_set_default_foreground(con, libtcod.light_yellow)
         libtcod.console_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
                                 libtcod.BKGND_NONE, libtcod.CENTER,
                                 'Choose a name for the hero')
 
+        # Blit to screen
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
 
         dispbox('\n' + name + '\n', len(name))
@@ -946,7 +952,7 @@ def debug_spawn_console(json_list):
             # Enter submits name
             if key.vk == libtcod.KEY_ENTER:
                 break
-            # Backspace deletes a character
+            # Backspace deletes line
             elif key.vk == libtcod.KEY_BACKSPACE:
                 if name != '':
                     name = name[:-1]
@@ -2277,6 +2283,7 @@ def target_tile(max_range=None):
             return x, y
 
 def taunt():
+    ''' Taunt enemies. Mostly just fluff '''
     taunts = [
         'Nothin\' personnel, kid',
         'M\'lady',
