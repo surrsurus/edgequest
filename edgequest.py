@@ -125,16 +125,21 @@ class ConfusedMonster:
     def take_turn(self):
         """ Monster takes a turn, but moves randomly """
         if self.num_turns > 0:  # Still confused...
-            # Move in a random direction, and decrease the number of turns confused
-            self.owner.move(libtcod.random_get_int(0, -1, 1), libtcod.random_get_int(0, -1, 1))
+            # Move in a random direction, and decrease the number of
+            #   turns confused
+            self.owner.move(libtcod.random_get_int(0, -1, 1),
+                            libtcod.random_get_int(0, -1, 1))
             self.num_turns -= 1
 
-        else:  # Restore the previous AI (this one will be deleted because it's not referenced anymore)
+        # Restore the previous AI
+        #   (this one will be deleted because it's not referenced anymore)
+        else:
             self.owner.ai = self.old_ai
-            message('The ' + self.owner.name + ' is no longer confused!', libtcod.red)
+            message('The ' + self.owner.name + ' is no longer confused!',
+                    libtcod.red)
 
 class dMap:
-    # Black box map generation
+    """ Random map Generation """
     # Found it on RogueBasin, works a lot better than the tutorial one
     def __init__(self):
         self.roomList=[]
@@ -385,7 +390,8 @@ class TalkingMonster:
             # Depending on the rate of speech set in the json, the monster may talk
             if libtcod.random_get_int(0, 0, 100) > self.rate:
                 r = libtcod.random_get_int(0, 0, len(self.speech)-1)
-                message("".join([monster.name, " says ", "\"", self.speech[r], "\""]), monster.color)
+                message("".join([monster.name, " says ", "\"",
+                        self.speech[r], "\""]), monster.color)
 
 class Equipment:
     """ An object that can be equipped, yielding bonuses.
@@ -412,7 +418,8 @@ class Equipment:
         except for dual weilding """
         old_equipment = get_equipped_in_slot(self.slot)
         if old_equipment is not None:
-            # If the item is to be equiped in the hands, find a free hand and equip it there
+            # If the item is to be equiped in the hands, find a
+            #   free hand and equip it there
             # Essentially, this is dual weilding
             if self.slot == "left hand" or self.slot == "right hand":
                 # Switch hands on equipment
@@ -421,12 +428,15 @@ class Equipment:
                 elif self.slot == "right hand":
                     self.slot = "left hand"
 
-                message("You use your free hand to equip the " + self.owner.name)
+                message("You use your free hand to equip the " +
+                        self.owner.name)
 
-            # If both hands are full, dequip something or else the player somehow
-            # grows a new hand spontaneously
+            # If both hands are full, dequip something or else the player
+            #   somehow grows a new hand spontaneously
             if get_equipped_in_slot(self.slot) is not None:
-                message(("But something is already there, so take off the " + old_equipment.owner.name + " for the " + self.owner.name), libtcod.light_red)
+                message(("But something is already there, so take off the " + \
+                        old_equipment.owner.name + " for the " +
+                        self.owner.name), libtcod.light_red)
 
                 # Switch the hands back on the equipment
                 if self.slot == "left hand":
@@ -438,13 +448,15 @@ class Equipment:
 
         # Equip object and show a message about it
         self.is_equipped = True
-        message('Equipped ' + self.owner.name + ' on your ' + self.slot + '.', libtcod.light_green)
+        message('Equipped ' + self.owner.name + ' on your ' + self.slot + '.',
+                libtcod.light_green)
 
     def dequip(self):
         """ Dequip object and show a message about it """
         if not self.is_equipped: return
         self.is_equipped = False
-        message('Dequipped ' + self.owner.name + ' from ' + self.slot + '.', libtcod.light_yellow)
+        message('Dequipped ' + self.owner.name + ' from ' + self.slot + '.',
+                libtcod.light_yellow)
 
 class Fighter:
     """ Combat-related properties and methods (monster, player, NPC) """
@@ -459,26 +471,35 @@ class Fighter:
         self.base_max_mana = mana
 
     @property
-    def power(self):  # Return actual power, by summing up the bonuses from all equipped items
-        bonus = sum(equipment.power_bonus for equipment in get_all_equipped(self.owner))
+    def power(self):
+    # Return actual power, by summing up the bonuses from all equipped items
+        bonus = sum(equipment.power_bonus for equipment in \
+                get_all_equipped(self.owner))
         return self.base_power + bonus
 
     @property
-    def defense(self):  # Return actual defense, by summing up the bonuses from all equipped items
-        bonus = sum(equipment.defense_bonus for equipment in get_all_equipped(self.owner))
+    def defense(self):
+        # Return actual defense, by summing up the bonuses from all equipped items
+        bonus = sum(equipment.defense_bonus for equipment in \
+                get_all_equipped(self.owner))
         return self.base_defense + bonus
 
     @property
-    def max_hp(self):  # Return actual max_hp, by summing up the bonuses from all equipped items
-        bonus = sum(equipment.max_hp_bonus for equipment in get_all_equipped(self.owner))
+    def max_hp(self):
+        # Return actual max_hp, by summing up the bonuses from all equipped items
+        bonus = sum(equipment.max_hp_bonus for equipment in \
+                get_all_equipped(self.owner))
         return self.base_max_hp + bonus
 
     @property
-    def max_mana(self):  # Return actual mana, by summing up the bonuses from all equipped items
-        bonus = sum(equipment.max_mana_bonus for equipment in get_all_equipped(self.owner))
+    def max_mana(self):
+        # Return actual mana, by summing up the bonuses from all equipped items
+        bonus = sum(equipment.max_mana_bonus for equipment in \
+                    get_all_equipped(self.owner))
         return self.base_max_mana + bonus
 
     def take_damage(self, damage):
+        """ Harm self by certain amount of damage """
         global kill_count
         # Apply damage if possible
         if damage > 0:
@@ -490,14 +511,15 @@ class Fighter:
             function = self.death_function
             if function is not None:
                 function(self.owner)
-            # Yield experience to the player, take some mana and give some health
+            # Yield experience to the player, take some mana
+            #   and give some health
             if self.owner != player:
                 player.fighter.xp += self.xp
-                # player.fighter.siphon() # Try to siphon life
+                player.fighter.siphon() # Try to siphon life
                 kill_count += 1 # Increment kill count
 
     def attack(self, target):
-        # A simple formula for attack damage
+        """ A simple formula for attack damage """
         damage = self.power - target.fighter.defense
 
         if damage > 0:
@@ -512,20 +534,20 @@ class Fighter:
                     libtcod.light_red)
 
     def heal(self, amount):
-        # Heal by the given amount, without going over the maximum
+        """ Heal by the given amount, without going over the maximum """
         self.hp += amount
         if self.hp > self.max_hp:
             self.hp = self.max_hp
 
     def cast(self, cost):
-        # Not used. Not sure what this can be used for in the future
+        """ Not used. Not sure what this can be used for in the future """
         if self.mana - cost < 0:
             message("You don't have enough mana to cast this!", libtcod.red)
         else:
             self.mana -= cost
 
     def siphon(self):
-        # Steal life. Sort of like a regeneration system
+        """ Steal life. Sort of like a regeneration system """
         if self.mana - SIPHON_COST < 0:
             message("You try to siphon any life away, but you aren't edgy enough",
                 libtcod.light_red)
@@ -537,6 +559,7 @@ class Fighter:
         message("You siphon life from the deceased", libtcod.fuchsia)
 
     def magic_missile(self):
+        """ Fire a magic missile """
         # Find closest monster
         monster = closest_monster(MISSILE_RANGE)
         if monster is None:  # No enemy found within maximum range
@@ -553,38 +576,40 @@ class Fighter:
         cast_magic_missile()
 
     def restore(self, ammount):
-        # Give some mana back to the player
+        """ Give some mana back to the player """
         self.mana += ammount
         if self.mana > self.max_mana:
             self.mana = self.max_mana
 
 class Item:
-    # An item that can be picked up and used.
+    """ An item that can be picked up and used. """
     def __init__(self, use_function=None):
         self.use_function = use_function
 
     def pick_up(self):
-        # Add to the player"s inventory and remove from the map
+        """ Add to the player"s inventory and remove from the map """
         if len(inventory) >= 26:
-            message("Your inventory is full, cannot pick up " + self.owner.name +
-                ".", libtcod.dark_fuchsia)
+            message("Your inventory is full, cannot pick up " +
+                self.owner.name + ".", libtcod.dark_fuchsia)
 
         else:
             inventory.append(self.owner)
             objects.remove(self.owner)
-            message("You picked up a " + self.owner.name + "!", libtcod.light_green)
+            message("You picked up a " + self.owner.name + "!",
+                    libtcod.light_green)
 
         # Special case: automatically equip, if the corresponding equipment
         # slot is unused
         equipment = self.owner.equipment
         if equipment is not None:
             if (equipment and get_equipped_in_slot(equipment.slot) is None) or \
-                    (equipment.slot == "right hand" or equipment.slot == "left hand"):
+            (equipment.slot == "right hand" or equipment.slot == "left hand"):
                 equipment.equip()
 
     def drop(self):
+        """ Drops an item """
         # Special case: if the object has the Equipment component,
-        # dequip it before dropping
+        #   dequip it before dropping
         if self.owner.equipment:
             self.owner.equipment.dequip()
 
@@ -597,11 +622,13 @@ class Item:
         message('You dropped a ' + self.owner.name + '.', libtcod.yellow)
 
     def use(self):
-        # Special case: if the object has the Equipment component, the "use"
-        # action is to equip/dequip
+        """ Use an item """
+        # pecial case: if the object has the Equipment component, the "use"
+        #   action is to equip/dequip
         if self.owner.equipment:
             self.owner.equipment.toggle_equip()
             return
+
         # Just call the "use_function" if it is defined
         if self.use_function is None:
             message("The " + self.owner.name + " cannot be used.", libtcod.gray)
@@ -616,7 +643,9 @@ class Object:
     It's always represented by a character on screen
     """
 
-    def __init__(self, x, y, char, name, color, blocks=False, always_visible=False, fighter=None, ai=None, item=None, gold=None, equipment=None):
+    def __init__(self, x, y, char, name, color, blocks=False,
+                always_visible=False, fighter=None, ai=None, item=None,
+                gold=None, equipment=None):
         self.always_visible = always_visible
         self.char = char
         self.name = name
@@ -644,38 +673,44 @@ class Object:
         self.equipment = equipment
         if self.equipment:  # Let the Equipment component know who owns it
             self.equipment.owner = self
-            # There must be an Item component for the Equipment component to work properly
+            # There must be an Item component for the
+            #   Equipment component to work properly
             self.item = Item()
             self.item.owner = self
 
     def clear(self):
-        # Erase the character that represents this object
+        """ Erase the character that represents this object """
         (x, y) = to_camera_coordinates(self.x, self.y)
         if x is not None:
             libtcod.console_put_char(con, x, y, ' ', libtcod.BKGND_NONE)
 
     def distance(self, x, y):
-        # return the distance to some coordinates
+        """ Return the distance to some coordinates """
         return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
 
     def distance_to(self, other):
-        # Return the distance to another object
+        """ Return the distance to another object """
         dx = other.x - self.x
         dy = other.y - self.y
         return math.sqrt(dx ** 2 + dy ** 2)
 
     def draw(self):
-        # Only show if it's visible to the player; or it's set to "always visible" and on an explored tile
-        if ((libtcod.map_is_in_fov(fov_map, self.x, self.y)) or (self.always_visible and world[self.x][self.y].explored)):
+        """ Draw object. Only show if it's visible to the player; or it's set to
+        "always visible" and on an explored tile """
+        if ((libtcod.map_is_in_fov(fov_map, self.x, self.y)) or \
+        (self.always_visible and world[self.x][self.y].explored)):
             (x, y) = to_camera_coordinates(self.x, self.y)
 
             if x is not None:
-                # Set the color and then draw the character that represents this object at its position
+                # Set the color and then draw the character that
+                #   represents this object at its position
                 libtcod.console_set_default_foreground(con, self.color)
-                libtcod.console_put_char(con, x, y, self.char, libtcod.BKGND_NONE)
+                libtcod.console_put_char(con, x, y, self.char,
+                                        libtcod.BKGND_NONE)
 
     def drop(self):
-        # Add to the map and remove from the player's inventory. also, place it at the player's coordinates
+        """ Add to the map and remove from the player's inventory.
+        also, place it at the player's coordinates """
         objects.append(self.owner)
         inventory.remove(self.owner)
         self.owner.x = player.x
@@ -683,18 +718,20 @@ class Object:
         message('You dropped a ' + self.owner.name + '.', libtcod.yellow)
 
     def move(self, dx, dy):
-        # Move by a given amount
+        """ Move by a given amount """
         try:
             if self.name == "player" and WALL_HACK:
                 self.x += dx
                 self.y += dy
-            elif not world[self.x + dx][self.y + dy].blocked and not monster_occupy_check(self.x+dx, self.y+dy):
+            elif not world[self.x + dx][self.y + dy].blocked and not \
+            monster_occupy_check(self.x+dx, self.y+dy):
                 self.x += dx
                 self.y += dy
         except IndexError:
             pass
 
     def move_towards(self, target_x, target_y):
+        """ Move towards a target """
         dx = 0
         dy = 0
 
@@ -722,40 +759,21 @@ class Object:
         if world[self.x][self.y + dy].blocked:
             dy = 0
 
-        # The result is an Ai that follows the player around turns, but it doesn't capitalize on diagonal movements
-        # However, it's a good start compared to the crap vector tracing bullshit
+        # The result is an Ai that follows the player around turns,
+        #   but it doesn't capitalize on diagonal movements
         self.move(dx, dy)
 
-        """
-        # The crap vector tracing bullshit in question
-        # this piece of shit can't even get the monsters to go around corners
-
-        # Vector from this object to the target, and distance
-        dx = target_x - self.x
-        dy = target_y - self.y
-        distance = math.sqrt(dx ** 2 + dy ** 2)
-
-        # Normalize it to length 1 (preserving direction), then round it and
-        # Convert to integer so the movement is restricted to the map grid
-        dx = int(round(dx / distance))
-        dy = int(round(dy / distance))
-        if world[self.x + dx][self.y + dy].blocked:
-            dx = int(math.floor(dx/distance))
-            dy = int(math.floor(dy/distance))
-            if world[self.x + dx][self.y + dy].blocked:
-                dx = int(math.ceil(dx/distance))
-                dy = int(math.ceil(dy/distance))
-        """
-
     def send_to_back(self):
-        # Make this object be drawn first, so all others appear above it if they're in the same tile.
+        # Make this object be drawn first, so all others appear
+        #   above it if they're in the same tile.
         global objects
         objects.remove(self)
         objects.insert(0, self)
 
 class Rect:
-    # This will take top-left coordinates for a rectangle (in tiles, of course),
-    # and its size, to define it in terms of two points: top-left (x1, y1) and bottom-right (x2, y2)
+    """ This will take top-left coordinates for a rectangle
+    (in tiles, of course), and its size, to define it in terms of two points:
+    top-left (x1, y1) and bottom-right (x2, y2) """
     def __init__(self, x, y, w, h):
         self.x1 = x
         self.y1 = y
@@ -763,19 +781,21 @@ class Rect:
         self.y2 = y + h
 
     def center(self):
+        """ Get center of rectangle """
         center_x = (self.x1 + self.x2) / 2
         center_y = (self.y1 + self.y2) / 2
         return center_x, center_y
 
     def intersect(self, other):
-        # returns true if this rectangle intersects with another one
+        """ Returns true if this rectangle intersects with another one """
         return (self.x1 <= other.x2 and self.x2 >= other.x1 and
                 self.y1 <= other.y2 and self.y2 >= other.y1)
 
 class Tile:
-    # A tile of the map and its properties
+    """ A tile of the map and its properties """
     def __init__(self, blocked, block_sight=None):
         self.blocked = blocked
+
         if FOG_OF_WAR_ENABLED:
             self.explored = False
         else:
@@ -785,6 +805,70 @@ class Tile:
         if block_sight is None:
             block_sight = blocked
         self.block_sight = block_sight
+
+######################################
+# Objects
+######################################
+
+# Player object
+player = None
+
+# Object List
+objects = []
+
+# Create the list of game messages and their colors, starts empty
+game_msgs = []
+
+# Inventory
+inventory = []
+
+# Map
+world = None
+
+# FOV Map
+fov_map = None
+
+# Check FOV if true
+check_fov = True
+
+# Stairs objects
+dstairs = None
+ustairs = None
+
+######################################
+# GUI Objects
+######################################
+
+panel = libtcod.console_new(PANEL_WIDTH, SCREEN_HEIGHT)
+msg_panel = libtcod.console_new(SCREEN_WIDTH, PANEL_HEIGHT)
+
+######################################
+# Tcod and Init
+######################################
+
+# Font
+libtcod.console_set_custom_font("images/terminal8x12_gs_tc.png",
+    libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+
+# Initialize root console
+libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, "
+                            Edgequest Pre-Alpha", False)
+
+# And another
+con = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
+
+# And one for a player-centered focus
+dcon = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+# FPS Limit (Not Essential)
+libtcod.sys_set_fps(LIMIT_FPS)
+
+# Mouse and Keyboard detection
+mouse = libtcod.Mouse()
+key = libtcod.Key()
+
+# Camera coordinates
+(camera_x, camera_y) = (0, 0)
 
 ######################################
 # Functions
@@ -2179,70 +2263,6 @@ def to_camera_coordinates(x, y):
         return None, None  # If it's outside the view, return nothing
 
     return x, y
-
-######################################
-# Objects
-######################################
-
-# Player object
-player = None
-
-# Object List
-objects = []
-
-# Create the list of game messages and their colors, starts empty
-game_msgs = []
-
-# Inventory
-inventory = []
-
-# Map
-world = None
-
-# FOV Map
-fov_map = None
-
-# Check FOV if true
-check_fov = True
-
-# Stairs objects
-dstairs = None
-ustairs = None
-
-######################################
-# GUI Objects
-######################################
-
-panel = libtcod.console_new(PANEL_WIDTH, SCREEN_HEIGHT)
-msg_panel = libtcod.console_new(SCREEN_WIDTH, PANEL_HEIGHT)
-
-######################################
-# Tcod and Init
-######################################
-
-# Font
-# !!! Implement user font selection
-libtcod.console_set_custom_font("images/terminal8x12_gs_tc.png",
-    libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
-
-# Initialize root console
-libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, "Edgequest Pre-Alpha", False)
-
-# And another
-con = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
-
-# And one for a player-centered focus
-dcon = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
-
-# FPS Limit (Not Essential)
-libtcod.sys_set_fps(LIMIT_FPS)
-
-# Mouse and Keyboard detection
-mouse = libtcod.Mouse()
-key = libtcod.Key()
-
-# Camera coordinates
-(camera_x, camera_y) = (0, 0)
 
 ######################################
 # Main Loop
