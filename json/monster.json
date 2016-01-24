@@ -12,6 +12,7 @@
 		"xp":35,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"",
         "ai": "normal"
     },
 
@@ -28,6 +29,7 @@
         "mana":0,
 		"death_func":"talk",
         "death_talk":"I hope I don't get deranked again...",
+        "attack_msg":"rushes",
         "ai": "talk",
         "speech": [
             "Fucked up that nade, whoops",
@@ -54,6 +56,7 @@
 		"xp":35,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"hardscopes",
         "ai": "normal"
     },
 
@@ -69,6 +72,7 @@
 		"xp":75,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"knifes",
         "ai": "normal"
     },
 
@@ -84,6 +88,7 @@
 		"xp":130,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"360 no-scopes",
         "ai": "normal"
     },
 
@@ -99,6 +104,7 @@
 		"xp":55,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"",
         "ai": "normal"
     },
 
@@ -114,6 +120,7 @@
 		"xp":100,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"",
         "ai": "normal"
     },
 
@@ -129,6 +136,7 @@
 		"xp":300,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"harvests the organs of",
         "ai": "normal"
     },
 
@@ -145,6 +153,7 @@
         "mana":0,
 		"death_func":"talk",
         "death_talk":"I fell for the meme, kiddo...",
+        "attack_msg":"flicks",
         "ai": "talk",
         "speech": [
             "Scratch is the best programming language",
@@ -179,6 +188,7 @@
         "mana":0,
 		"death_func":"talk",
         "death_talk":"I'll be back... swift-ly",
+        "attack_msg":"Javas",
         "ai": "talk",
         "speech": [
             "Python is just a scripting language.",
@@ -206,6 +216,7 @@
 		"xp":400,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"",
         "ai": "normal"
     },
 
@@ -221,6 +232,7 @@
 		"xp":50,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"",
         "ai": "normal"
     },
 
@@ -236,6 +248,7 @@
 		"xp":400,
         "mana":0,
 		"death_func":"normal",
+        "attack_msg":"RKOs",
         "ai": "normal"
     },
 
@@ -252,6 +265,7 @@
         "mana":0,
 		"death_func":"talk",
         "death_talk":"I curse you... with the R8",
+        "attack_msg":"VAC bans",
         "ai": "talk",
         "speech": [
             "I think you need a VACation",
@@ -275,6 +289,7 @@
         "xp":60,
         "mana":0,
         "death_func":"normal",
+        "attack_msg":"spits salty brine at",
         "ai": "normal"
     },
 
@@ -290,6 +305,7 @@
         "xp":60,
         "mana":0,
         "death_func":"slock",
+        "attack_msg":"installs slock to",
         "ai": "normal"
     }
 

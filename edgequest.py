@@ -39,6 +39,9 @@ game_state = 'playing'
 blind = False
 blind_counter = 0
 
+# Siphon
+activate_siphon = True
+
 # Player action
 player_action = None
 
@@ -140,11 +143,13 @@ class Equipment:
     ''' An object that can be equipped, yielding bonuses.
     automatically adds the Item component. '''
     def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0,
-                max_mana_bonus=0):
+                max_mana_bonus=0, attack_msg=None):
         self.power_bonus = power_bonus
         self.defense_bonus = defense_bonus
         self.max_hp_bonus = max_hp_bonus
         self.max_mana_bonus = max_mana_bonus
+
+        self.attack_msg = attack_msg
 
         self.slot = slot
         self.is_equipped = False
@@ -173,6 +178,11 @@ class Equipment:
 
                 message('You use your free hand to equip the ' +
                         self.owner.name)
+
+                if self.attack_msg:
+                    player.fighter.attack_msg = self.attack_msg
+                else:
+                    player.fighter.attack_msg = None
 
             # If both hands are full, dequip something or else the player
             #   somehow grows a new hand spontaneously
@@ -203,7 +213,7 @@ class Equipment:
 
 class Fighter:
     ''' Combat-related properties and methods (monster, player, NPC) '''
-    def __init__(self, hp, defense, power, xp, mana, death_function=None):
+    def __init__(self, hp, defense, power, xp, mana, death_function=None, attack_msg=None):
         self.base_max_hp = hp
         self.hp = hp
         self.base_defense = defense
@@ -212,6 +222,7 @@ class Fighter:
         self.death_function = death_function
         self.mana = mana
         self.base_max_mana = mana
+        self.attack_msg = attack_msg
 
     @property
     def power(self):
@@ -261,7 +272,8 @@ class Fighter:
             if self.owner != player:
                 player.fighter.xp += self.xp
                 check_level_up()
-                player.fighter.siphon() # Try to siphon life
+                if activate_siphon:
+                    player.fighter.siphon() # Try to siphon life
                 kill_count += 1 # Increment kill count
 
     def attack(self, target):
@@ -270,13 +282,18 @@ class Fighter:
 
         if damage > 0:
             # Make the target take some damage
-            message(' '.join([self.owner.name.capitalize(), 'attacks',
-                target.name, 'for', str(damage), 'hit points.']),
-                    libtcod.red)
+            if self.attack_msg:
+                message(' '.join([self.owner.name.capitalize(), self.attack_msg,
+                        target.name.capitalize(), 'for', str(damage), 'hit points.']),
+                        libtcod.red)
+            else:
+                message(' '.join([self.owner.name.capitalize(), 'attacks',
+                        target.name.capitalize(), 'for', str(damage), 'hit points.']),
+                        libtcod.red)
             target.fighter.take_damage(damage)
         else:
             message(' '.join([self.owner.name.capitalize(), 'attacks',
-                target.name, 'but it has no effect!']),
+                target.name.capitalize(), 'but it has no effect!']),
                     libtcod.light_red)
 
     def heal(self, amount):
@@ -559,6 +576,7 @@ class Tile:
 
 # Player object
 player = None
+player_name = None
 
 # Object List
 objects = []
@@ -847,6 +865,47 @@ def check_timer():
             player.fighter.heal(1)
             timer += 1
 
+def choose_name():
+    ''' Choose a name for the hero '''
+    global player_name
+
+    libtcod.console_clear(con)
+    libtcod.console_set_default_background(con, libtcod.black)
+    libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+
+    key = libtcod.Key()
+    name = ''
+
+    while True:
+        # Check for keypresses
+        if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
+            key_char = chr(key.c)
+            # Enter submits name
+            if key.vk == libtcod.KEY_ENTER:
+                break
+            # Backspace deletes a character
+            elif key.vk == libtcod.KEY_BACKSPACE:
+                name = ''
+            if key_char:
+                name = ''.join([name, key_char])
+
+        libtcod.console_clear(con)
+        libtcod.console_set_default_background(con, libtcod.black)
+
+        libtcod.console_set_default_foreground(con, libtcod.light_yellow)
+        libtcod.console_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
+                                libtcod.BKGND_NONE, libtcod.CENTER,
+                                'Choose a name for the hero')
+
+        libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+
+        dispbox('\n' + name + '\n', len(name))
+
+    if name == '':
+        name = 'player'
+
+    player_name = name.capitalize()
+
 def closest_monster(max_range):
     # Find closest enemy, up to a maximum range, and in the player's FOV
     closest_enemy = None
@@ -882,8 +941,7 @@ def debug_spawn_console(json_list):
     # Loop to show input from player
     while True:
         # Check for keypresses
-        if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | \
-                                        libtcod.EVENT_MOUSE, key, mouse):
+        if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
             key_char = chr(key.c)
             # Enter submits name
             if key.vk == libtcod.KEY_ENTER:
@@ -902,7 +960,7 @@ def debug_spawn_console(json_list):
         # Render before drawing a new dispbox
         render_all()
 
-        dispbox('\n' + name + '\n', 24)
+        dispbox('\n' + name + '\n', len(name))
 
     # Names have the ability to not exist, considering player is giving input
     found = False
@@ -1076,7 +1134,8 @@ def generate_monster(monster_id, x, y):
                             power=int(monster_data[monster_id]['power']),
                             xp=int(monster_data[monster_id]['xp']),
                             mana=int(monster_data[monster_id]['mana']),
-                            death_function=death)
+                            death_function=death,
+                            attack_msg=monster_data[monster_id]['attack_msg'])
 
     monster = Object(x, y, monster_data[monster_id]['char'],
                     monster_data[monster_id]['name'], color, blocks=True,
@@ -1118,10 +1177,18 @@ def generate_item(item_id, x, y):
                         items_data[item_id]['name'], color, item=item_component)
 
     elif items_data[item_id]['type'] == 'equipment':
-        equip_component = Equipment(slot=items_data[item_id]['slot'],
-            power_bonus=items_data[item_id]['power'],
-                        defense_bonus=items_data[item_id]['defense'],
-            max_hp_bonus=items_data[item_id]['hp'],
+        if items_data[item_id]['subtype'] == 'weapon':
+            equip_component = Equipment(slot=items_data[item_id]['slot'],
+                            power_bonus=items_data[item_id]['power'],
+                            defense_bonus=items_data[item_id]['defense'],
+                            max_hp_bonus=items_data[item_id]['hp'],
+                            max_mana_bonus=items_data[item_id]['mana'],
+                            attack_msg=items_data[item_id]['attack_msg'])
+        else:
+            equip_component = Equipment(slot=items_data[item_id]['slot'],
+                            power_bonus=items_data[item_id]['power'],
+                            defense_bonus=items_data[item_id]['defense'],
+                            max_hp_bonus=items_data[item_id]['hp'],
                             max_mana_bonus=items_data[item_id]['mana'])
 
         item = Object(x, y, items_data[item_id]['char'],
@@ -1290,6 +1357,16 @@ def handle_keys():
                     '\nKillstreak: ' + str(kill_count),
                     CHARACTER_SCREEN_WIDTH)
 
+        elif key_char == 'q':
+            toggle_siphon()
+            player_action = 'didnt-take-turn'
+
+        elif key_char == 't':
+            taunt()
+            player_action = 'taunt'
+
+        # Debug commands
+
         elif key_char == 'z':
             debug_spawn_console('monster')
             player_action = 'didnt-take-turn'
@@ -1390,7 +1467,7 @@ def load_game():
     ''' Open the previously saved shelve and load the game data '''
     # I have no idea how shelve works but it's magic
     global world, objects, player, inventory, game_msgs, game_state, \
-            dungeon_level, dstairs, ustairs
+            dungeon_level, dstairs, ustairs, blind, blind_counter
 
     file = shelve.open('savegame', 'r')
     world = file['world']
@@ -1403,9 +1480,14 @@ def load_game():
     ustairs = objects[file['ustairs_index']]
     dungeon_level = file['dungeon_level']
     kill_count = file['kill_count']
+    blind = file['blind']
+    blind_counter = file['blind_counter']
     file.close()
 
-    initialize_fov()
+    if not blind:
+        initialize_fov()
+    else:
+        player.draw()
 
 def main_menu():
     ''' Show the main menu '''
@@ -1433,6 +1515,7 @@ def main_menu():
                         'Quit'], 24)
 
         if choice == 0:  # New game
+            choose_name()
             new_game()
             play_game()
         if choice == 1:  # Load last game
@@ -1712,7 +1795,7 @@ def new_game():
     # create object representing the player
     fighter_component = Fighter(hp=100, defense=1, power=4, xp=0, mana=100,
                                 death_function=player_death,)
-    player = Object(0, 0, '@', 'player', libtcod.white, blocks=True,
+    player = Object(0, 0, '@', player_name, libtcod.white, blocks=True,
                     fighter=fighter_component)
 
     player.level = 1
@@ -1870,7 +1953,7 @@ def player_death(player):
 
         game_over()
     else:
-        message("...But it refused!", libtcod.crimson)
+        message('...But it refused!', libtcod.crimson)
         player.fighter.hp = player.fighter.max_hp
 
 def player_move(dx, dy):
@@ -1981,38 +2064,41 @@ def render_all():
     libtcod.console_clear(msg_panel)
 
     # Show the player's stats
-    render_bar(1, 1, BAR_WIDTH, 'HP', player.fighter.hp, player.fighter.max_hp,
+    libtcod.console_print_ex(panel, 1 + BAR_WIDTH / 2, 1, libtcod.BKGND_NONE,
+                            libtcod.CENTER, player.name)
+
+    render_bar(1, 2, BAR_WIDTH, 'HP', player.fighter.hp, player.fighter.max_hp,
                libtcod.light_red, libtcod.darker_red)
 
     # Self-explanatory bars
-    render_bar(1, 2, BAR_WIDTH, 'Edge', player.fighter.mana,
+    render_bar(1, 3, BAR_WIDTH, 'Edge', player.fighter.mana,
                 player.fighter.max_mana, libtcod.dark_fuchsia,
                 libtcod.darker_fuchsia)
 
-    render_bar(1, 3, BAR_WIDTH, 'XP', player.fighter.xp, (LEVEL_UP_BASE +
+    render_bar(1, 4, BAR_WIDTH, 'XP', player.fighter.xp, (LEVEL_UP_BASE +
                 player.level * LEVEL_UP_FACTOR),
                 libtcod.dark_yellow, libtcod.darker_yellow)
 
-    render_bar_simple(1, 4, BAR_WIDTH, 'Level', str(dungeon_level),
+    render_bar_simple(1, 5, BAR_WIDTH, 'Level', str(dungeon_level),
                                                     libtcod.light_blue)
 
 
-    render_bar_simple(1, 6, BAR_WIDTH, 'Attack', str(player.fighter.power),
+    render_bar_simple(1, 7, BAR_WIDTH, 'Attack', str(player.fighter.power),
                         libtcod.dark_chartreuse)
-    render_bar_simple(1, 7, BAR_WIDTH, 'Defense', str(player.fighter.defense),
+    render_bar_simple(1, 8, BAR_WIDTH, 'Defense', str(player.fighter.defense),
                         libtcod.flame)
 
     # Show all the monsters that the player can see and shows their health
     monsters_in_room = 0
     for obj in objects:
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.fighter and \
-        obj.name != 'player' and not blind:
+        obj.name != player.name and not blind:
             monsters_in_room += 1
             libtcod.console_set_default_foreground(panel, obj.color)
-            libtcod.console_print_ex(panel, 1, 7+(2*monsters_in_room),
+            libtcod.console_print_ex(panel, 1, 9+(2*monsters_in_room),
                                     libtcod.BKGND_NONE, libtcod.LEFT,
                                     ''.join([obj.char, ' ', obj.name]))
-            render_health_bar(1, 8+(2*monsters_in_room), BAR_WIDTH,
+            render_health_bar(1, 10+(2*monsters_in_room), BAR_WIDTH,
                                 obj.fighter.hp, obj.fighter.base_max_hp,
                                 libtcod.red, libtcod.dark_red)
 
@@ -2119,6 +2205,8 @@ def save_game():
         file['ustairs_index'] = objects.index(ustairs)
         file['dungeon_level'] = dungeon_level
         file['kill_count'] = kill_count
+        file['blind'] = blind
+        file['blind_counter'] = blind_counter
         file.close()
         render_all()
         libtcod.console_flush()
@@ -2187,6 +2275,27 @@ def target_tile(max_range=None):
         if (mouse.lbutton_pressed and libtcod.map_is_in_fov(fov_map, x, y) and \
         (max_range is None or player.distance(x, y) <= max_range)):
             return x, y
+
+def taunt():
+    taunts = [
+        'Nothin\' personnel, kid',
+        'M\'lady',
+        'Notice me senpai',
+        'Filthy gaijin go home',
+        'Get rekt'
+    ]
+
+    message(''.join(['You say \'', taunts[randint(0,len(taunts)-1)], '\'']))
+
+def toggle_siphon():
+    ''' Toggle the siphon spell '''
+    global activate_siphon
+    if activate_siphon:
+        activate_siphon = False
+        message('You deativate your siphon ability', libtcod.magenta)
+    else:
+        activate_siphon = True
+        message('You activate your siphon ability', libtcod.magenta)
 
 def to_camera_coordinates(x, y):
     ''' convert coordinates on the map to coordinates on the screen '''
