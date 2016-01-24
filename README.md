@@ -14,3 +14,7 @@ It should be as simple as running:
 `python2.7 edgequest.py`
 
 in the edgequest directory
+
+## Wiki
+
+Please check the [wiki](https://github.com/TriangularEgg/edgequest/wiki) for further information
