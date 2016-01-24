@@ -5,7 +5,7 @@ import textwrap
 import time
 from random import *
 
-import simplejson as json
+import json as json
 
 from colors import *
 from modules import libtcodpy as libtcod
