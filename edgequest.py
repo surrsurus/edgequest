@@ -210,6 +210,18 @@ class Equipment:
         self.is_equipped = False
         message('Dequipped ' + self.owner.name + ' from ' + self.slot + '.',
                 libtcod.light_yellow)
+        if self.slot == 'left hand':
+            item = get_equipped_in_slot('right hand')
+            if item != None:
+                player.fighter.attack_msg = item.attack_msg
+            else:
+                player.fighter.attack_msg = 'punches'
+        elif self.slot == 'right hand':
+            item = get_equipped_in_slot('left hand')
+            if item != None:
+                player.fighter.attack_msg = item.attack_msg
+            else:
+                player.fighter.attack_msg = 'punches'
 
 class Fighter:
     ''' Combat-related properties and methods (monster, player, NPC) '''
@@ -1207,6 +1219,36 @@ def generate_item(item_id, x, y):
 
     return item
 
+def generate_item_to_equip(item_id):
+    ''' Generate items from json '''
+    color = json_get_color(items_data[item_id]['color'])
+
+    '''
+    Example:
+    # Create a sword
+    equipment_component = Equipment(slot='right hand', power_bonus=1)
+    item = Object(x, y, '/', 'katana', libtcod.sky,
+                    equipment=equipment_component)
+
+    * Items MUST use Item class and item_component
+    * Equipmnt MUST use Equipment class and equip_component
+
+    Please look at the json for more info on properties of both
+    '''
+
+    equip_component = Equipment(slot=items_data[item_id]['slot'],
+                            power_bonus=items_data[item_id]['power'],
+                            defense_bonus=items_data[item_id]['defense'],
+                            max_hp_bonus=items_data[item_id]['hp'],
+                            max_mana_bonus=items_data[item_id]['mana'],
+                            attack_msg=items_data[item_id]['attack_msg'])
+
+    item = Object(0, 0, items_data[item_id]['char'],
+                    items_data[item_id]['name'], color,
+                    equipment=equip_component)
+
+    item.equipment.equip()
+
 def get_equipped_in_slot(slot):
     ''' Returns the equipment in a slot, or None if it's empty '''
     for obj in inventory:
@@ -1564,10 +1606,10 @@ def make_map():
     Lastly, the number of maximum rooms. Multiply the max_rooms by 4 because
     the rooms are pretty.
     '''
-    themap.makeMap(MAP_WIDTH,MAP_HEIGHT,250,1,MAX_ROOMS*4)
+    themap.makeMap(MAP_WIDTH,MAP_HEIGHT-2,250,1,MAX_ROOMS*4)
 
     # Turn ones and zeros into magic
-    for y in range(MAP_HEIGHT):
+    for y in range(MAP_HEIGHT-2):
             for x in range(MAP_WIDTH):
                     if themap.mapArr[y][x]==0:
                             world[x][y].blocked = False
@@ -1817,12 +1859,8 @@ def new_game():
     inventory = []
 
     # Initial equipment: a dagger
-    equipment_component = Equipment(slot='right hand', power_bonus=1)
-    obj = Object(0, 0, '-', 'dagger', libtcod.sky,
-                equipment=equipment_component)
-    inventory.append(obj)
-    equipment_component.equip()
-    obj.always_visible = True
+    generate_item_to_equip('dagger')
+    player.fighter.attack_msg = items_data['dagger']['attack_msg']
 
     # Create the list of game messages and their colors, starts empty
     game_msgs = []
