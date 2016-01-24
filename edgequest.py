@@ -882,15 +882,11 @@ def choose_name():
     ''' Choose a name for the hero '''
     global player_name
 
-    libtcod.console_clear(con)
-    libtcod.console_set_default_background(con, libtcod.black)
-    libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
-
     key = libtcod.Key()
     name = ''
 
     # Dispbox style key getting
-    while True:
+    while not libtcod.console_is_window_closed():
         # Check for keypresses
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
             key_char = chr(key.c)
@@ -900,7 +896,7 @@ def choose_name():
             # Backspace deletes line
             elif key.vk == libtcod.KEY_BACKSPACE:
                 name = ''
-            if key_char:
+            elif key_char:
                 name = ''.join([name, key_char])
 
         # Clear screen
@@ -1450,6 +1446,80 @@ def initialize_fov():
                                         not world[x][y].block_sight,
                                         not world[x][y].blocked)
 
+def intro_cutscene():
+    ''' Show a cutscene '''
+    # Text to be displayed in the intro
+    intro = [
+        "You are an edgelord",
+        "","","","","","","",
+        "You have trained all your life",
+        "","",
+        "in the arts of fedora tipping,",
+        "","",
+        "katana wielding,",
+        "","",
+        "and no-scoping with the AWP",
+        "","","","","","","","","","","",
+        "Today your diety, Carl Sagan. has called upon you.",
+        "","","","","","","",
+        "You, his chosen servant, have been tasked with the ultimate feat",
+        "","","",
+        "You must summon all of your edge and delve into",
+        "",
+        "the stygian catacombs of mount myr",
+        "",
+        "and retrieve the sacred artifact:",
+        "","","","","","","","","","",
+        "The StatTrak Fedora | Fade (Factory New)",
+        "","","","","","","","","",
+        "Carl Sagan informs you that the journey will not be easy",
+        "","","",
+        "It will be perilous,",
+        "","","","",
+        "Full of danger,",
+        "","","","",
+        "full of monstrous enemies,",
+        "","","","",
+        "and full of people who personally prefer ruby over python",
+        "","","","","","","","",
+        "Go! Young hero!",
+        "","","","",
+        "Retrive the Fedora of Fade!",
+        "","","","","","",
+        "May enlightenment and edge be ever at your heels"
+    ]
+
+    # Buffer so that text appears to crawl from the bottom
+    buff = ["" for x in range(SCREEN_HEIGHT)]
+
+    intro_wall = buff + intro
+
+    # Set Colors
+    libtcod.console_set_default_background(con, libtcod.black)
+    libtcod.console_set_default_foreground(con, libtcod.light_yellow)
+
+    key = libtcod.Key()
+    # We take the y and subtract it from the y val so that the text moves up
+    #   the screen
+    for y in range(len(intro_wall)+1):
+        # Able to break in the middle of the cutscene
+        if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
+            if key.vk == libtcod.KEY_ENTER:
+                break
+
+        if libtcod.console_is_window_closed():
+            exit()
+
+        libtcod.console_clear(con)
+        # Draw the wall at the y coord
+        for i, line in enumerate(intro_wall):
+            libtcod.console_print_ex(con, SCREEN_WIDTH / 2, i-y,
+                                    libtcod.BKGND_NONE, libtcod.CENTER,
+                                    line)
+        libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+        libtcod.console_flush()
+        time.sleep(.75)
+
 def inventory_menu(header):
     ''' Show a menu with each item of the inventory as an option '''
     if len(inventory) == 0:
@@ -1563,6 +1633,7 @@ def main_menu():
                         'Quit'], 24)
 
         if choice == 0:  # New game
+            intro_cutscene()
             choose_name()
             new_game()
             play_game()
