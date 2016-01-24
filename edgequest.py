@@ -1097,46 +1097,6 @@ def closest_monster(max_range):
                 closest_dist = dist
     return closest_enemy
 
-def create_h_tunnel(x1, x2, y):
-    global world
-    # Horizontal tunnel
-    for x in range(min(x1, x2), max(x1, x2) + 1):
-        world[x][y].blocked = False
-        world[x][y].block_sight = False
-
-def create_v_tunnel(y1, y2, x):
-    global world
-    # Vertical tunnel
-    for y in range(min(y1, y2), max(y1, y2) + 1):
-        world[x][y].blocked = False
-        world[x][y].block_sight = False
-
-def create_room(room):
-    global world
-    # go through the tiles in the rectangle and make them passable
-    for x in range(room.x1 + 1, room.x2):
-        for y in range(room.y1 + 1, room.y2):
-            world[x][y].blocked = False
-            world[x][y].block_sight = False
-
-def debug_spawn_monster():
-    options = []
-    ids = []
-    for item in monster_data:
-        options.append(monster_data[item]['name'])
-        ids.append(monster_data[item]['id'])
-
-    # If an item was chosen, return it
-    index = menu('Choose a monster', options, INVENTORY_WIDTH)
-
-    if index is not None:
-        mon_id = ids[index]
-
-        monster = generate_monster(ids[index], player.x+2, player.y)
-
-        # Add monster to object list
-        objects.append(monster)
-
 def debug_spawn_console(json_list):
     ''' Spawn a mini-console to spawn-in monsters or items '''
     # Needs to have JSON data
@@ -1151,6 +1111,7 @@ def debug_spawn_console(json_list):
 
     key = libtcod.Key()
     name = ''
+    check = True
 
     # Loop to show input from player
     while True:
@@ -1164,6 +1125,10 @@ def debug_spawn_console(json_list):
             elif key.vk == libtcod.KEY_BACKSPACE:
                 if name != '':
                     name = name[:-1]
+            # Esc quits
+            elif key.vk == libtcod.KEY_ESCAPE:
+                break
+                check = False
             if key_char:
                 name = ''.join([name, key_char])
 
@@ -1174,7 +1139,7 @@ def debug_spawn_console(json_list):
 
     # Names have the ability to not exist, considering player is giving input
     found = False
-    if json_list == 'monster':
+    if json_list == 'monster' and check:
         for mon in monster_data:
             if monster_data[mon]['name'] == name or \
             monster_data[mon]['id'] == name:
@@ -1184,7 +1149,7 @@ def debug_spawn_console(json_list):
                 objects.append(obj)
                 message('Spawned a ' + name)
                 found = True
-    elif json_list == 'item':
+    elif json_list == 'item' and check:
         for item in items_data:
             if items_data[item]['name'] == name or \
             items_data[item]['id'] == name:
@@ -1198,24 +1163,6 @@ def debug_spawn_console(json_list):
 
     if not found:
         message('Failed to find a ' + name)
-
-def debug_spawn_item():
-    options = []
-    ids = []
-    for item in items_data:
-        options.append(items_data[item]['name'])
-        ids.append(items_data[item]['id'])
-
-    # If an item was chosen, return it
-    index = menu('Choose an item', options, INVENTORY_WIDTH)
-
-    if index is not None:
-        item_id = ids[index]
-
-        item = generate_item(item_id, player.x+2, player.y)
-
-        # Add item to object list
-        objects.append(item)
 
 def debug_kill_all():
     for obj in objects:
@@ -1285,7 +1232,7 @@ def from_dungeon_level(table):
     #          chance ----/    \----- beyond this dungeon level
     # All of the chances are totalled and then it's that chance out of that total
     # It sort of made sense when I first heard about it but now it's basically
-    # just magic coding black box stuff
+    # just magic
     for (value, level) in reversed(table):
         if dungeon_level >= level:
             return value
@@ -1405,10 +1352,6 @@ def get_all_equipped(obj):
         return equipped_list
     else:
         return []  #other objects have no equipment
-
-def get_gold(ammount):
-    # Not sure how to implement gold
-    player.gold += ammount
 
 def get_names_under_mouse():
     global mouse
@@ -1626,10 +1569,6 @@ def json_get_color(color_str):
     }
 
     return colors[color_str]
-
-def letter_to_number(letter):
-    number = ord(letter) - 96
-    return number
 
 def load_game():
     # Open the previously saved shelve and load the game data
