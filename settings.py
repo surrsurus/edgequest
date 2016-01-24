@@ -114,3 +114,26 @@ STAIR_HACK = False
 
 # Coordinates show all the time
 COORDS_UNDER_MOUSE = False
+
+######################################
+# Lists
+######################################
+
+movement_keys = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '6',
+    '7',
+    '8',
+    '9',
+    'y',
+    'u',
+    'h',
+    'j',
+    'k',
+    'l',
+    'b',
+    'n'
+]

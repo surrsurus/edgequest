@@ -14,42 +14,42 @@ from settings import *
 # JSON
 ######################################
 
-"""
+'''
 JSON is used to store monster and item data
 
 Here is an example JSON object
 
-    "example": {
-        "name": "Example Item", # Name of the item
-        "id": "example",        # ID of the item
-        "char": "!",            # Character used when drawn on map
-        "color": "light_green", # Color of character on map
-        "chance": [[45, 1]],    # Chance value beyond level, explained later
-        "type": "item",         # Item type
-        "effect": "heal"        # Item effect
-        "slot": "right hand",   # Item slot
-        "power": 10,            # Bonus to power
-        "defense": 0,           # Bonus to defense
-        "hp": 0,                # Bonus to HP
-        "mana": 0               # Bonus to Edge
+    'example': {
+        'name': 'Example Item', # Name of the item
+        'id': 'example',        # ID of the item
+        'char': '!',            # Character used when drawn on map
+        'color': 'light_green', # Color of character on map
+        'chance': [[45, 1]],    # Chance value beyond level, explained later
+        'type': 'item',         # Item type
+        'effect': 'heal'        # Item effect
+        'slot': 'right hand',   # Item slot
+        'power': 10,            # Bonus to power
+        'defense': 0,           # Bonus to defense
+        'hp': 0,                # Bonus to HP
+        'mana': 0               # Bonus to Edge
         ---------------------------------------
         Alternatively for monsters
-		"hp":99,                # Health
-		"defense":1,            # Defense
-		"power":5,              # Power
-		"xp":500,               # Experience
-        "mana":0,               # Edge
-		"death_func":"normal",  # Death function
-        "ai": "talk",           # AI Type
-        "speech": [
-            "I'm a test item!"  # Speech text
+		'hp':99,                # Health
+		'defense':1,            # Defense
+		'power':5,              # Power
+		'xp':500,               # Experience
+        'mana':0,               # Edge
+		'death_func':'normal',  # Death function
+        'ai': 'talk',           # AI Type
+        'speech': [
+            'I'm a test item!'  # Speech text
         ],
-        "rate": 65              # Rate of speech
+        'rate': 65              # Rate of speech
     },
 
 Not all of these options are used for each object, clearly
 
-"""
+'''
 
 # Monster JSON
 monster_json = 'json/monster.json'
@@ -68,7 +68,7 @@ with open(items_json) as json_data:
 ######################################
 
 # Game State
-game_state = "playing"
+game_state = 'playing'
 
 # Player action
 player_action = None
@@ -91,12 +91,12 @@ kill_count = 0
 ######################################
 
 class BasicMonster:
-    """ AI for a basic monster. """
+    ''' AI for a basic monster. '''
     def __init__(self):
         pass
 
     def take_turn(self):
-        """Monster takes its turn. If you can see it, it can see you """
+        '''Monster takes its turn. If you can see it, it can see you '''
         monster = self.owner
         # If it's in the player's fov then it approaches them
         if libtcod.map_is_in_fov(fov_map, monster.x, monster.y):
@@ -116,14 +116,14 @@ class BasicMonster:
             monster.move(x, y)
 
 class ConfusedMonster:
-    """ AI for a temporarily confused monster
-    (reverts to previous AI after a while). """
+    ''' AI for a temporarily confused monster
+    (reverts to previous AI after a while). '''
     def __init__(self, old_ai, num_turns=CONFUSE_NUM_TURNS):
         self.old_ai = old_ai
         self.num_turns = num_turns
 
     def take_turn(self):
-        """ Monster takes a turn, but moves randomly """
+        ''' Monster takes a turn, but moves randomly '''
         if self.num_turns > 0:  # Still confused...
             # Move in a random direction, and decrease the number of
             #   turns confused
@@ -139,14 +139,14 @@ class ConfusedMonster:
                     libtcod.red)
 
 class dMap:
-    """ Random map Generation """
+    ''' Random map Generation '''
     # Found it on RogueBasin, works a lot better than the tutorial one
     def __init__(self):
         self.roomList=[]
         self.cList=[]
 
     def makeMap(self,xsize,ysize,fail,b1,mrooms):
-        """Generate random layout of rooms, corridors and other features"""
+        '''Generate random layout of rooms, corridors and other features'''
         # makeMap can be modified to accept arguments for values of failed, and percentile of features.
         # Create first room
         self.size_x = xsize
@@ -193,14 +193,14 @@ class dMap:
         self.finalJoins()
 
     def makeRoom(self):
-        """Randomly produce room size"""
+        '''Randomly produce room size'''
         rtype=5
         rwide=randrange(8)+3
         rlong=randrange(8)+3
         return rwide,rlong,rtype
 
     def makeCorridor(self):
-        """Randomly produce corridor length and heading"""
+        '''Randomly produce corridor length and heading'''
         clength=randrange(18)+3
         heading=randrange(4)
         if heading==0: #North
@@ -218,7 +218,7 @@ class dMap:
         return wd,lg,heading
 
     def placeRoom(self,ll,ww,xposs,yposs,xsize,ysize,rty,ext):
-        """Place feature if enough space and return canPlace as true or false"""
+        '''Place feature if enough space and return canPlace as true or false'''
         #Arrange for heading
         xpos=xposs
         ypos=yposs
@@ -262,7 +262,7 @@ class dMap:
         return canPlace #Return whether placed is true/false
 
     def makeExit(self,rn):
-        """Pick random wall and random point along that wall"""
+        '''Pick random wall and random point along that wall'''
         room=self.roomList[rn]
         while True:
             rw=randrange(4)
@@ -291,7 +291,7 @@ class dMap:
         return rx,ry,rx2,ry2,rw
 
     def makePortal(self,px,py):
-        """Create doors in walls"""
+        '''Create doors in walls'''
         ptype=randrange(100)
         if ptype>90: #Secret door
             self.mapArr[py][px]=0
@@ -306,7 +306,7 @@ class dMap:
             self.mapArr[py][px]=0
 
     def joinCorridor(self,cno,xp,yp,ed,psb):
-        """Check corridor endpoint and make an exit if it links to another room"""
+        '''Check corridor endpoint and make an exit if it links to another room'''
         cArea=self.roomList[cno]
         if xp!=cArea[2] or yp!=cArea[3]: #Find the corridor endpoint
             endx=xp-(cArea[1]-1)
@@ -361,18 +361,18 @@ class dMap:
                         self.makePortal(xxx1,yyy1)
 
     def finalJoins(self):
-        """Final stage, loops through all the corridors to see if any can be joined to other rooms"""
+        '''Final stage, loops through all the corridors to see if any can be joined to other rooms'''
         for x in self.cList:
             self.joinCorridor(x[0],x[1],x[2],x[3],10)
 
 class TalkingMonster:
-    """ An AI that says things """
+    ''' An AI that says things '''
     def __init__(self, speech, rate):
         self.speech = speech
         self.rate = rate
 
     def take_turn(self):
-        """ Monster takes a normal turn, but says something """
+        ''' Monster takes a normal turn, but says something '''
         # A basic monster takes its turn. If you can see it, it can see you
         monster = self.owner
 
@@ -390,12 +390,12 @@ class TalkingMonster:
             # Depending on the rate of speech set in the json, the monster may talk
             if libtcod.random_get_int(0, 0, 100) > self.rate:
                 r = libtcod.random_get_int(0, 0, len(self.speech)-1)
-                message("".join([monster.name, " says ", "\"",
-                        self.speech[r], "\""]), monster.color)
+                message(''.join([monster.name, ' says ', '\'',
+                        self.speech[r], '\'']), monster.color)
 
 class Equipment:
-    """ An object that can be equipped, yielding bonuses.
-    automatically adds the Item component. """
+    ''' An object that can be equipped, yielding bonuses.
+    automatically adds the Item component. '''
     def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0,
                 max_mana_bonus=0):
         self.power_bonus = power_bonus
@@ -407,42 +407,42 @@ class Equipment:
         self.is_equipped = False
 
     def toggle_equip(self):
-        """ Toggle equip/dequip status """
+        ''' Toggle equip/dequip status '''
         if self.is_equipped:
             self.dequip()
         else:
             self.equip()
 
     def equip(self):
-        """ If the slot is already being used do nothing,
-        except for dual weilding """
+        ''' If the slot is already being used do nothing,
+        except for dual weilding '''
         old_equipment = get_equipped_in_slot(self.slot)
         if old_equipment is not None:
             # If the item is to be equiped in the hands, find a
             #   free hand and equip it there
             # Essentially, this is dual weilding
-            if self.slot == "left hand" or self.slot == "right hand":
+            if self.slot == 'left hand' or self.slot == 'right hand':
                 # Switch hands on equipment
-                if self.slot == "left hand":
-                    self.slot = "right hand"
-                elif self.slot == "right hand":
-                    self.slot = "left hand"
+                if self.slot == 'left hand':
+                    self.slot = 'right hand'
+                elif self.slot == 'right hand':
+                    self.slot = 'left hand'
 
-                message("You use your free hand to equip the " +
+                message('You use your free hand to equip the ' +
                         self.owner.name)
 
             # If both hands are full, dequip something or else the player
             #   somehow grows a new hand spontaneously
             if get_equipped_in_slot(self.slot) is not None:
-                message(("But something is already there, so take off the " + \
-                        old_equipment.owner.name + " for the " +
+                message(('But something is already there, so take off the ' + \
+                        old_equipment.owner.name + ' for the ' +
                         self.owner.name), libtcod.light_red)
 
                 # Switch the hands back on the equipment
-                if self.slot == "left hand":
-                    self.slot = "right hand"
-                elif self.slot == "right hand":
-                    self.slot = "left hand"
+                if self.slot == 'left hand':
+                    self.slot = 'right hand'
+                elif self.slot == 'right hand':
+                    self.slot = 'left hand'
 
                 old_equipment.dequip()
 
@@ -452,14 +452,14 @@ class Equipment:
                 libtcod.light_green)
 
     def dequip(self):
-        """ Dequip object and show a message about it """
+        ''' Dequip object and show a message about it '''
         if not self.is_equipped: return
         self.is_equipped = False
         message('Dequipped ' + self.owner.name + ' from ' + self.slot + '.',
                 libtcod.light_yellow)
 
 class Fighter:
-    """ Combat-related properties and methods (monster, player, NPC) """
+    ''' Combat-related properties and methods (monster, player, NPC) '''
     def __init__(self, hp, defense, power, xp, mana, death_function=None):
         self.base_max_hp = hp
         self.hp = hp
@@ -499,7 +499,7 @@ class Fighter:
         return self.base_max_mana + bonus
 
     def take_damage(self, damage):
-        """ Harm self by certain amount of damage """
+        ''' Harm self by certain amount of damage '''
         global kill_count
         # Apply damage if possible
         if damage > 0:
@@ -519,83 +519,83 @@ class Fighter:
                 kill_count += 1 # Increment kill count
 
     def attack(self, target):
-        """ A simple formula for attack damage """
+        ''' A simple formula for attack damage '''
         damage = self.power - target.fighter.defense
 
         if damage > 0:
             # Make the target take some damage
-            message(" ".join([self.owner.name.capitalize(), "attacks",
-                target.name, "for", str(damage), "hit points."]),
+            message(' '.join([self.owner.name.capitalize(), 'attacks',
+                target.name, 'for', str(damage), 'hit points.']),
                     libtcod.red)
             target.fighter.take_damage(damage)
         else:
-            message(" ".join([self.owner.name.capitalize(), "attacks",
-                target.name, "but it has no effect!"]),
+            message(' '.join([self.owner.name.capitalize(), 'attacks',
+                target.name, 'but it has no effect!']),
                     libtcod.light_red)
 
     def heal(self, amount):
-        """ Heal by the given amount, without going over the maximum """
+        ''' Heal by the given amount, without going over the maximum '''
         self.hp += amount
         if self.hp > self.max_hp:
             self.hp = self.max_hp
 
     def cast(self, cost):
-        """ Not used. Not sure what this can be used for in the future """
+        ''' Not used. Not sure what this can be used for in the future '''
         if self.mana - cost < 0:
-            message("You don't have enough mana to cast this!", libtcod.red)
+            message('You don\'t have enough mana to cast this!', libtcod.red)
         else:
             self.mana -= cost
 
     def siphon(self):
-        """ Steal life. Sort of like a regeneration system """
+        ''' Steal life. Sort of like a regeneration system '''
         if self.mana - SIPHON_COST < 0:
-            message("You try to siphon any life away, but you aren't edgy enough",
+            message('You try to siphon any life away, but you aren\'t edgy enough',
                 libtcod.light_red)
-            return "cancelled"
+            return 'cancelled'
 
         self.mana -= SIPHON_COST
         self.heal(SIPHON_AMOUNT)
 
-        message("You siphon life from the deceased", libtcod.fuchsia)
+        message('You siphon life from the deceased', libtcod.fuchsia)
 
     def magic_missile(self):
-        """ Fire a magic missile """
+        ''' Fire a magic missile '''
         # Find closest monster
         monster = closest_monster(MISSILE_RANGE)
         if monster is None:  # No enemy found within maximum range
             message('No enemy is close enough to strike with your edge missile', libtcod.light_red)
-            return "cancelled"
+            return 'cancelled'
 
         # Fire a magic missile
         if self.mana - MISSILE_COST < 0:
-            message("You try to fire an edge missile, but you aren't edgy enough",
+            message('You try to fire an edge missile, but you aren\'t edgy enough',
                 libtcod.light_red)
-            return "cancelled"
+            return 'cancelled'
 
         self.mana -= MISSILE_COST
         cast_magic_missile()
 
     def restore(self, ammount):
-        """ Give some mana back to the player """
+        ''' Give some mana back to the player '''
         self.mana += ammount
         if self.mana > self.max_mana:
             self.mana = self.max_mana
 
 class Item:
-    """ An item that can be picked up and used. """
+    ''' An item that can be picked up and used. '''
     def __init__(self, use_function=None):
         self.use_function = use_function
 
     def pick_up(self):
-        """ Add to the player"s inventory and remove from the map """
+        ''' Add to the player's inventory and remove from the map '''
         if len(inventory) >= 26:
-            message("Your inventory is full, cannot pick up " +
-                self.owner.name + ".", libtcod.dark_fuchsia)
+            message('Your inventory is full, cannot pick up ' +
+                self.owner.name + '.', libtcod.dark_fuchsia)
 
         else:
             inventory.append(self.owner)
             objects.remove(self.owner)
-            message("You picked up a " + self.owner.name + "!",
+            message('You picked up a ' + self.owner.name + '!',
                     libtcod.light_green)
 
         # Special case: automatically equip, if the corresponding equipment
@@ -603,11 +603,11 @@ class Item:
         equipment = self.owner.equipment
         if equipment is not None:
             if (equipment and get_equipped_in_slot(equipment.slot) is None) or \
-            (equipment.slot == "right hand" or equipment.slot == "left hand"):
+            (equipment.slot == 'right hand' or equipment.slot == 'left hand'):
                 equipment.equip()
 
     def drop(self):
-        """ Drops an item """
+        ''' Drops an item '''
         # Special case: if the object has the Equipment component,
         #   dequip it before dropping
         if self.owner.equipment:
@@ -622,26 +622,26 @@ class Item:
         message('You dropped a ' + self.owner.name + '.', libtcod.yellow)
 
     def use(self):
-        """ Use an item """
-        # pecial case: if the object has the Equipment component, the "use"
+        ''' Use an item '''
+        # pecial case: if the object has the Equipment component, the 'use'
         #   action is to equip/dequip
         if self.owner.equipment:
             self.owner.equipment.toggle_equip()
             return
 
-        # Just call the "use_function" if it is defined
+        # Just call the 'use_function' if it is defined
         if self.use_function is None:
-            message("The " + self.owner.name + " cannot be used.", libtcod.gray)
+            message('The ' + self.owner.name + ' cannot be used.', libtcod.gray)
         else:
-            if self.use_function() != "cancelled":
+            if self.use_function() != 'cancelled':
                 # Destroy after use, unless it was cancelled for some reason
                 inventory.remove(self.owner)
 
 class Object:
-    """
+    '''
     This is a generic object: the player, a monster, an item, the stairs...
     It's always represented by a character on screen
-    """
+    '''
 
     def __init__(self, x, y, char, name, color, blocks=False,
                 always_visible=False, fighter=None, ai=None, item=None,
@@ -679,24 +679,24 @@ class Object:
             self.item.owner = self
 
     def clear(self):
-        """ Erase the character that represents this object """
+        ''' Erase the character that represents this object '''
         (x, y) = to_camera_coordinates(self.x, self.y)
         if x is not None:
             libtcod.console_put_char(con, x, y, ' ', libtcod.BKGND_NONE)
 
     def distance(self, x, y):
-        """ Return the distance to some coordinates """
+        ''' Return the distance to some coordinates '''
         return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
 
     def distance_to(self, other):
-        """ Return the distance to another object """
+        ''' Return the distance to another object '''
         dx = other.x - self.x
         dy = other.y - self.y
         return math.sqrt(dx ** 2 + dy ** 2)
 
     def draw(self):
-        """ Draw object. Only show if it's visible to the player; or it's set to
-        "always visible" and on an explored tile """
+        ''' Draw object. Only show if it's visible to the player; or it's set to
+        'always visible' and on an explored tile '''
         if ((libtcod.map_is_in_fov(fov_map, self.x, self.y)) or \
         (self.always_visible and world[self.x][self.y].explored)):
             (x, y) = to_camera_coordinates(self.x, self.y)
@@ -709,8 +709,8 @@ class Object:
                                         libtcod.BKGND_NONE)
 
     def drop(self):
-        """ Add to the map and remove from the player's inventory.
-        also, place it at the player's coordinates """
+        ''' Add to the map and remove from the player's inventory.
+        also, place it at the player's coordinates '''
         objects.append(self.owner)
         inventory.remove(self.owner)
         self.owner.x = player.x
@@ -718,9 +718,9 @@ class Object:
         message('You dropped a ' + self.owner.name + '.', libtcod.yellow)
 
     def move(self, dx, dy):
-        """ Move by a given amount """
+        ''' Move by a given amount '''
         try:
-            if self.name == "player" and WALL_HACK:
+            if self.name == 'player' and WALL_HACK:
                 self.x += dx
                 self.y += dy
             elif not world[self.x + dx][self.y + dy].blocked and not \
@@ -731,7 +731,7 @@ class Object:
             pass
 
     def move_towards(self, target_x, target_y):
-        """ Move towards a target """
+        ''' Move towards a target '''
         dx = 0
         dy = 0
 
@@ -771,9 +771,9 @@ class Object:
         objects.insert(0, self)
 
 class Rect:
-    """ This will take top-left coordinates for a rectangle
+    ''' This will take top-left coordinates for a rectangle
     (in tiles, of course), and its size, to define it in terms of two points:
-    top-left (x1, y1) and bottom-right (x2, y2) """
+    top-left (x1, y1) and bottom-right (x2, y2) '''
     def __init__(self, x, y, w, h):
         self.x1 = x
         self.y1 = y
@@ -781,18 +781,18 @@ class Rect:
         self.y2 = y + h
 
     def center(self):
-        """ Get center of rectangle """
+        ''' Get center of rectangle '''
         center_x = (self.x1 + self.x2) / 2
         center_y = (self.y1 + self.y2) / 2
         return center_x, center_y
 
     def intersect(self, other):
-        """ Returns true if this rectangle intersects with another one """
+        ''' Returns true if this rectangle intersects with another one '''
         return (self.x1 <= other.x2 and self.x2 >= other.x1 and
                 self.y1 <= other.y2 and self.y2 >= other.y1)
 
 class Tile:
-    """ A tile of the map and its properties """
+    ''' A tile of the map and its properties '''
     def __init__(self, blocked, block_sight=None):
         self.blocked = blocked
 
@@ -847,12 +847,12 @@ msg_panel = libtcod.console_new(SCREEN_WIDTH, PANEL_HEIGHT)
 ######################################
 
 # Font
-libtcod.console_set_custom_font("images/terminal8x12_gs_tc.png",
+libtcod.console_set_custom_font('images/terminal8x12_gs_tc.png',
     libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
 # Initialize root console
-libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, "
-                            Edgequest Pre-Alpha", False)
+libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT,
+                            'Edgequest Pre-Alpha', False)
 
 # And another
 con = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
@@ -880,7 +880,7 @@ def cast_confuse():
     monster = target_monster(CONFUSE_RANGE)
     if monster is None: return 'cancelled'
 
-    # Replace the monster's AI with a "confused" one; after some turns it will restore the old AI
+    # Replace the monster's AI with a 'confused' one; after some turns it will restore the old AI
     old_ai = monster.ai
     monster.ai = ConfusedMonster(old_ai)
     monster.ai.owner = monster  # Tell the new component who owns it
@@ -901,38 +901,39 @@ def cast_fireball():
                 + ' hit points.', libtcod.orange)
             obj.fighter.take_damage(FIREBALL_DAMAGE)
 
-    # Trash fucking animation like wow its shit
-    (x, y) = to_camera_coordinates(x, y) # This is literally magical I still have no idea how it works
+    # This is literally magical I still have no idea how it works
+    (x, y) = to_camera_coordinates(x, y)
+    # Really bad animation
     libtcod.console_set_default_foreground(con, libtcod.red)
     for i in range(FIREBALL_RADIUS):
-        libtcod.console_put_char(con, x, y, "4", libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x+i, y, "4", libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x-i, y, "4", libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x, y+i, "4", libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x, y-i, "4", libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x+i, y+i, "4", libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x-i, y-i, "4", libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x+i, y-i, "4", libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x-i, y+i, "4", libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, x, y, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, x+i, y, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, x-i, y, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, x, y+i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, x, y-i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, x+i, y+i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, x-i, y-i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, x+i, y-i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, x-i, y+i, '4', libtcod.BKGND_NONE)
 
     libtcod.console_flush()
 
 def cast_heal():
     # Heal the player
     if player.fighter.hp == player.fighter.max_hp:
-        message("You are already at full health.", libtcod.light_gray)
-        return "cancelled"
+        message('You are already at full health.', libtcod.light_gray)
+        return 'cancelled'
 
-    message("Your wounds start to feel better!", libtcod.light_violet)
+    message('Your wounds start to feel better!', libtcod.light_violet)
     player.fighter.heal(HEAL_AMOUNT)
 
 def cast_mana():
     # Give some mana back
     if player.fighter.mana == player.fighter.max_mana:
-        message("You already have enough edge.")
-        return "cancelled"
+        message('You already have enough edge.')
+        return 'cancelled'
 
-    message("You begin to feel edgy!", libtcod.light_flame)
+    message('You begin to feel edgy!', libtcod.light_flame)
     player.fighter.restore(MANA_AMOUNT)
 
 def cast_magic_missile():
@@ -953,15 +954,15 @@ def cast_magic_missile():
     # The one cool this is that the lightning bolt changes depending on where
     # the monster is
     if (dx < monster.x and dy < monster.y) or (dx > monster.x and dy > monster.y):
-        char = "\\"
+        char = '\\'
     elif (dx < monster.x and dy > monster.y) or (dx > monster.x and dy < monster.y):
-        char = "/"
+        char = '/'
     elif (dx == monster.x and dy != monster.y):
-        char = "|"
+        char = '|'
     elif (dx != monster.x and dy == monster.y):
-        char = "-"
+        char = '-'
     else:
-        char = "z"
+        char = 'z'
 
     # While, the distance to the monster is greater than 2
     # Aka go towards it until it's one space away
@@ -1007,15 +1008,15 @@ def cast_lightning():
     # The one cool this is that the lightning bolt changes depending on where
     # the monster is
     if (dx < monster.x and dy < monster.y) or (dx > monster.x and dy > monster.y):
-        char = "\\"
+        char = '\\'
     elif (dx < monster.x and dy > monster.y) or (dx > monster.x and dy < monster.y):
-        char = "/"
+        char = '/'
     elif (dx == monster.x and dy != monster.y):
-        char = "|"
+        char = '|'
     elif (dx != monster.x and dy == monster.y):
-        char = "-"
+        char = '-'
     else:
-        char = "z"
+        char = 'z'
 
     while (dx, dy) != (monster.x, monster.y):
         libtcod.console_flush()
@@ -1122,11 +1123,11 @@ def debug_spawn_monster():
     options = []
     ids = []
     for item in monster_data:
-        options.append(monster_data[item]["name"])
-        ids.append(monster_data[item]["id"])
+        options.append(monster_data[item]['name'])
+        ids.append(monster_data[item]['id'])
 
     # If an item was chosen, return it
-    index = menu("Choose a monster", options, INVENTORY_WIDTH)
+    index = menu('Choose a monster', options, INVENTORY_WIDTH)
 
     if index is not None:
         mon_id = ids[index]
@@ -1136,59 +1137,110 @@ def debug_spawn_monster():
         # Add monster to object list
         objects.append(monster)
 
-def debug_spawn_console():
+def debug_spawn_console(json_list):
+    ''' Spawn a mini-console to spawn-in monsters or items '''
+    # Needs to have JSON data
+    if json_list not in ['monster', 'item']:
+        raise Exception('NoDataForObject')
+
+    # Message displaying what will be spawned
+    if json_list == 'monster':
+        message('Enter a monster name', libtcod.red)
+    elif json_list == 'item':
+        message('Enter an item name', libtcod.red)
+
     key = libtcod.Key()
-    monster_name = ""
-    message("Enter a monster name", libtcod.red)
+    name = ''
+
+    # Loop to show input from player
     while True:
-        # render the screen
+        # Check for keypresses
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse):
             key_char = chr(key.c)
+            # Enter submits name
             if key.vk == libtcod.KEY_ENTER:
                 break
+            # Backspace deletes a character
+            elif key.vk == libtcod.KEY_BACKSPACE:
+                if name != '':
+                    name = name[:-1]
             if key_char:
-                if key.vk == libtcod.KEY_BACKSPACE:
-                    if monster_name != "":
-                        monster_name = monster_name[:-1]
-                else:
-                    monster_name = "".join([monster_name, key_char])
-                message(monster_name, libtcod.red)
+                name = ''.join([name, key_char])
 
+        # Render before drawing a new dispbox
         render_all()
 
-        libtcod.console_flush()
+        dispbox('\n' + name + '\n', 24)
 
-    try:
-        for item in monster_data:
-            if monster_data[item]["name"] == monster_name or monster_data[item]["id"] == monster_name:
-                monster = generate_monster(monster_data[item]["id"], player.x+2, player.y)
+    # Names have the ability to not exist, considering player is giving input
+    found = False
+    if json_list == 'monster':
+        for mon in monster_data:
+            if monster_data[mon]['name'] == name or \
+            monster_data[mon]['id'] == name:
+                obj = generate_monster(monster_data[mon]['id'], player.x+2,
+                                        player.y)
                 # Add monster to object list
-                objects.append(monster)
-    except:
-        message("Failure", libtcod.blue)
+                objects.append(obj)
+                message('Spawned a ' + name)
+                found = True
+    elif json_list == 'item':
+        for item in items_data:
+            if items_data[item]['name'] == name or \
+            items_data[item]['id'] == name:
+                obj = generate_item(items_data[item]['id'], player.x+2,
+                                    player.y)
+
+                # Add item to object list
+                objects.append(obj)
+                message('Spawned a ' + name)
+                found = True
+
+    if not found:
+        message('Failed to find a ' + name)
 
 def debug_spawn_item():
     options = []
     ids = []
     for item in items_data:
-        options.append(items_data[item]["name"])
-        ids.append(items_data[item]["id"])
+        options.append(items_data[item]['name'])
+        ids.append(items_data[item]['id'])
 
     # If an item was chosen, return it
-    index = menu("Choose an item", options, INVENTORY_WIDTH)
+    index = menu('Choose an item', options, INVENTORY_WIDTH)
 
     if index is not None:
         item_id = ids[index]
 
         item = generate_item(item_id, player.x+2, player.y)
 
-        # Add monster to object list
+        # Add item to object list
         objects.append(item)
 
 def debug_kill_all():
     for obj in objects:
         if obj.ai:
             obj.fighter.take_damage(3000000000000)
+
+def dispbox(header, width=50):
+    ''' Like a msgbox but only lasts for one frame '''
+    # Calculate total height for the header
+    height = libtcod.console_get_height_rect(con, 0, 0, width, SCREEN_HEIGHT, header)
+
+    # Create an off-screen console that represents the menu's window
+    window = libtcod.console_new(width, height)
+
+    # Print the header, with auto-wrap
+    libtcod.console_set_default_foreground(window, libtcod.white)
+    libtcod.console_print_rect_ex(window, 0, 0, width, height, libtcod.BKGND_NONE, libtcod.LEFT, header)
+
+    # Blit the contents of 'window' to the root console
+    x = SCREEN_WIDTH / 2 - width / 2
+    y = SCREEN_HEIGHT / 2 - height / 2
+    libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
+
+    # Present the root console to the player and wait for a key-press
+    libtcod.console_flush()
 
 def fov_recompute():
     global world
@@ -1233,7 +1285,7 @@ def from_dungeon_level(table):
     #          chance ----/    \----- beyond this dungeon level
     # All of the chances are totalled and then it's that chance out of that total
     # It sort of made sense when I first heard about it but now it's basically
-    # just magic coding black box bullshit
+    # just magic coding black box stuff
     for (value, level) in reversed(table):
         if dungeon_level >= level:
             return value
@@ -1242,7 +1294,7 @@ def from_dungeon_level(table):
 def game_over():
     # Wow you lost the game
 
-    # Show some stats and shit who cares really
+    # Show some stats and stuff
     msgbox('You Died!\n\n \
     Level: ' + str(player.level) + '\n \
     Experience: ' + str(player.fighter.xp) + '\n \
@@ -1257,45 +1309,45 @@ def game_over():
 
 def generate_monster(monster_id, x, y):
     # Read color
-    color = json_get_color(monster_data[monster_id]["color"])
+    color = json_get_color(monster_data[monster_id]['color'])
 
     # Select a death function
-    if monster_data[monster_id]["death_func"] == "normal":
+    if monster_data[monster_id]['death_func'] == 'normal':
         death = monster_death
     else:
-        print("Error: death function does not exist")
+        print('Error: death function does not exist')
         exit()
 
     # Select an AI
-    if monster_data[monster_id]["ai"] == "normal":
+    if monster_data[monster_id]['ai'] == 'normal':
         ai = BasicMonster()
-    elif monster_data[monster_id]["ai"] == "talk":
-        ai = TalkingMonster(monster_data[monster_id]["speech"], monster_data[monster_id]["rate"])
+    elif monster_data[monster_id]['ai'] == 'talk':
+        ai = TalkingMonster(monster_data[monster_id]['speech'], monster_data[monster_id]['rate'])
     else:
-        print("Error: ai does not exist")
+        print('Error: ai does not exist')
         exit()
 
-    """
+    '''
     Example:
     # Create an orc
     fighter_component = Fighter(hp=20, defense=0, power=4, xp=35, death_function=monster_death)
     ai_component = BasicMonster()
     monster = Object(x, y, 'o', 'orc', libtcod.desaturated_green,
         blocks=True, fighter=fighter_component, ai=ai_component)
-    """
+    '''
 
-    fighter_component = Fighter(hp=int(monster_data[monster_id]["hp"]), defense=int(monster_data[monster_id]["defense"]),
-        power=int(monster_data[monster_id]["power"]), xp=int(monster_data[monster_id]["xp"]), mana=int(monster_data[monster_id]["mana"]), death_function=death)
+    fighter_component = Fighter(hp=int(monster_data[monster_id]['hp']), defense=int(monster_data[monster_id]['defense']),
+        power=int(monster_data[monster_id]['power']), xp=int(monster_data[monster_id]['xp']), mana=int(monster_data[monster_id]['mana']), death_function=death)
 
-    monster = Object(x, y, monster_data[monster_id]["char"], monster_data[monster_id]["name"], color,
+    monster = Object(x, y, monster_data[monster_id]['char'], monster_data[monster_id]['name'], color,
         blocks=True, fighter = fighter_component, ai=ai)
 
     return monster
 
 def generate_item(item_id, x, y):
-    color = json_get_color(items_data[item_id]["color"])
+    color = json_get_color(items_data[item_id]['color'])
 
-    """
+    '''
     Example:
     # Create a sword
     equipment_component = Equipment(slot='right hand', power_bonus=1)
@@ -1305,34 +1357,34 @@ def generate_item(item_id, x, y):
     * Equipmnt MUST use Equipment class and equip_component
 
     Please look at the json for more info on properties of both
-    """
+    '''
 
-    if items_data[item_id]["type"] == "item":
+    if items_data[item_id]['type'] == 'item':
 
-        if items_data[item_id]["effect"] == "heal":
+        if items_data[item_id]['effect'] == 'heal':
             item_component = Item(use_function=cast_heal)
-        elif items_data[item_id]["effect"] == "fireball":
+        elif items_data[item_id]['effect'] == 'fireball':
             item_component = Item(use_function=cast_fireball)
-        elif items_data[item_id]["effect"] == "confuse":
+        elif items_data[item_id]['effect'] == 'confuse':
             item_component = Item(use_function=cast_confuse)
-        elif items_data[item_id]["effect"] == "lightning":
+        elif items_data[item_id]['effect'] == 'lightning':
             item_component = Item(use_function=cast_lightning)
-        elif items_data[item_id]["effect"] == "mana":
+        elif items_data[item_id]['effect'] == 'mana':
             item_component = Item(use_function=cast_mana)
 
-        item = Object(x, y, items_data[item_id]["char"], items_data[item_id]["name"],
+        item = Object(x, y, items_data[item_id]['char'], items_data[item_id]['name'],
             color, item=item_component)
 
-    elif items_data[item_id]["type"] == "equipment":
-        equip_component = Equipment(slot=items_data[item_id]["slot"],
-            power_bonus=items_data[item_id]["power"], defense_bonus=items_data[item_id]["defense"],
-            max_hp_bonus=items_data[item_id]["hp"], max_mana_bonus=items_data[item_id]["mana"])
+    elif items_data[item_id]['type'] == 'equipment':
+        equip_component = Equipment(slot=items_data[item_id]['slot'],
+            power_bonus=items_data[item_id]['power'], defense_bonus=items_data[item_id]['defense'],
+            max_hp_bonus=items_data[item_id]['hp'], max_mana_bonus=items_data[item_id]['mana'])
 
-        item = Object(x, y, items_data[item_id]["char"], items_data[item_id]["name"],
+        item = Object(x, y, items_data[item_id]['char'], items_data[item_id]['name'],
             color, equipment=equip_component)
 
-    elif items_data[item_id]["type"] == "gold":
-        item = Object(x, y, items_data[item_id]["char"], items_data[item_id]["name"], color)
+    elif items_data[item_id]['type'] == 'gold':
+        item = Object(x, y, items_data[item_id]['char'], items_data[item_id]['name'], color)
 
     return item
 
@@ -1369,63 +1421,64 @@ def get_names_under_mouse():
     names = [obj.name for obj in objects
              if obj.x == x and obj.y == y and libtcod.map_is_in_fov(fov_map, obj.x, obj.y)]
 
-    names = ", ".join(names)  # Join the names, separated by commas
+    names = ', '.join(names)  # Join the names, separated by commas
 
     # Read Coords. Debug
     if COORDS_UNDER_MOUSE:
-        names += "( " + str(x) + ", " + str(y) + " )"
+        names += '( ' + str(x) + ', ' + str(y) + ' )'
 
     return names.capitalize()
 
 def handle_keys():
-    # Handle keypresses sent to the console. Executes other things, makes game playable
+    ''' Handle keypresses sent to the console. Executes other things,
+    makes game playable '''
     global check_fov, game_state, objects, player_action, key, timer
 
     # Alt-Enter for Fullscreen
     if key.vk == libtcod.KEY_ENTER and key.lalt:
         libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
-    if game_state == "playing":
+    if game_state == 'playing':
         # End game with escape
         if key.vk == libtcod.KEY_ESCAPE:
-            player_action = "didnt-take-turn"
+            player_action = 'didnt-take-turn'
             save_game()
 
         key_char = chr(key.c)
 
         # Movement keys
-        if key_char in ("1", "2", "3", "4", "6", "7", "8", "9"):
-            if key_char == "8":
+        if key_char in movement_keys:
+            if key_char in ('8', 'k'): # N
                 player_move(0, -1)
-            elif key_char == "2":
+            elif key_char in ('2', 'j'): # S
                 player_move(0, 1)
-            elif key_char == "4":
+            elif key_char in ('4', 'h'): # W
                 player_move(-1, 0)
-            elif key_char == "6":
+            elif key_char in ('6', 'l'): # E
                 player_move(1, 0)
-            elif key_char == "7":
+            elif key_char in ('7', 'y'): # NW
                 player_move(-1, -1)
-            elif key_char == "9":
+            elif key_char in ('9', 'u'): # NE
                 player_move(1, -1)
-            elif key_char == "1":
+            elif key_char in ('1', 'b'): # SW
                 player_move(-1, 1)
-            elif key_char == "3":
+            elif key_char in ('3', 'n'): # SE
                 player_move(1, 1)
 
             check_fov = True
 
             for obj in objects:  # Look for an item in the player's tile
                 if obj.x == player.x and obj.y == player.y and obj.item:
-                    message(" ".join(["You see a", obj.name, "here."]), libtcod.white)
+                    message(' '.join(['You see a', obj.name, 'here.']), libtcod.white)
 
-            player_action = "move"
+            player_action = 'move'
 
-        elif key_char in ["5", "."]:
+        elif key_char in ('5', '.'):
             check_fov = True
-            message("You wait", libtcod.gray)
-            player_action = "wait"
+            message('You wait', libtcod.gray)
+            player_action = 'wait'
 
-        elif key_char == "g":
+        elif key_char == 'g':
             # Pick up an item
             for obj in objects:  # Look for an item in the player's tile
                 if obj.x == player.x and obj.y == player.y and obj.item:
@@ -1433,17 +1486,17 @@ def handle_keys():
                     player_action = 'pickup'
                     break
             else:
-                message("There is nothing there to pick up", libtcod.gray)
-                player_action = "didnt-take-turn"
+                message('There is nothing there to pick up', libtcod.gray)
+                player_action = 'didnt-take-turn'
 
-        elif key_char == "i":
+        elif key_char == 'i':
             # Show the inventory
-            chosen_item = inventory_menu("Press the key next to an item to use it, or any other to cancel.\n")
+            chosen_item = inventory_menu('Press the key next to an item to use it, or any other to cancel.\n')
             if chosen_item is not None:
                 chosen_item.use()
                 player_action = 'use'
 
-        elif key_char == "d":
+        elif key_char == 'd':
             # Show the inventory; if an item is selected, drop it
             chosen_item = inventory_menu('Press the key next to an item to drop it, or any other to cancel.\n')
             if chosen_item is not None:
@@ -1451,7 +1504,7 @@ def handle_keys():
                 player_action = 'drop'
 
         # Reset the map (DEBUG)
-        elif key_char == "r":
+        elif key_char == 'r':
             # Empty objects and re-add the player so the game is playable
             objects = []
             objects.insert(0, player)
@@ -1459,19 +1512,19 @@ def handle_keys():
             # Clear screen
             for x in range(SCREEN_WIDTH):
                 for y in range(SCREEN_HEIGHT):
-                    libtcod.console_put_char(con, x, y, " ", libtcod.BKGND_BURN)
+                    libtcod.console_put_char(con, x, y, ' ', libtcod.BKGND_BURN)
 
             # Make a new map
             make_map()
             fov_recompute()
-            player_action = "didnt-take-turn"
+            player_action = 'didnt-take-turn'
 
-        elif key_char == ">":
+        elif key_char == '>':
             #go down stairs, if the player is on them
             if (dstairs.x == player.x and dstairs.y == player.y) or STAIR_HACK:
                 next_level()
 
-        elif key_char == "<":
+        elif key_char == '<':
             #go up stairs, if the player is on them
             if (ustairs.x == player.x and ustairs.y == player.y) or STAIR_HACK:
                 previous_level()
@@ -1483,31 +1536,27 @@ def handle_keys():
                 '\nExperience to level up: ' + str(level_up_xp) + '\n\nMaximum HP: ' + str(player.fighter.max_hp) +
                 '\nAttack: ' + str(player.fighter.power) + '\nDefense: ' + str(player.fighter.defense), CHARACTER_SCREEN_WIDTH)
 
-        elif key_char == 'b':
-            debug_spawn_monster()
+        elif key_char == 'z':
+            debug_spawn_console('monster')
+            player_action = 'didnt-take-turn'
+
+        elif key_char == 'x':
+            debug_spawn_console('item')
             player_action = 'didnt-take-turn'
 
         elif key_char == 'v':
             debug_kill_all()
             player_action = 'didnt-take-turn'
 
-        elif key_char == 'h':
-            debug_spawn_item()
-            player_action = 'didnt-take-turn'
-
-        elif key_char == 'l':
-            debug_spawn_console()
-            player_action = 'didnt-take-turn'
-
-        elif key_char == "m":
+        elif key_char == 'm':
             status = player.fighter.magic_missile()
-            if status != "cancelled":
-                player_action = "casting"
+            if status != 'cancelled':
+                player_action = 'casting'
             else:
-                player_action = "didnt-take-turn"
+                player_action = 'didnt-take-turn'
 
         else:
-            player_action = "didnt-take-turn"
+            player_action = 'didnt-take-turn'
 
 def initialize_fov():
     global check_fov, fov_map
@@ -1555,25 +1604,25 @@ def is_blocked(x, y):
 def json_get_color(color_str):
     # Get some swag ass colors from a string to some color. mind blow
     colors = {
-        "desaturated_green": libtcod.desaturated_green,
-        "darker_green": libtcod.darker_green,
-        "lime": libtcod.lime,
-        "violet": libtcod.violet,
-        "light_yellow": libtcod.light_yellow,
-        "sky": libtcod.sky,
-        "azure": libtcod.azure,
-        "light_turquoise": libtcod.light_turquoise,
-        "light_sea": libtcod.light_sea,
-        "light_red": libtcod.light_red,
-        "dark_gray": libtcod.dark_gray,
-        "light_green": libtcod.light_green,
-        "gray": libtcod.gray,
-        "darker_orange": libtcod.darker_orange,
-        "silver": libtcod.silver,
-        "white": libtcod.white,
-        "dark_crimson": libtcod.dark_crimson,
-        "crimson": libtcod.crimson,
-        "chartreuse": libtcod.chartreuse
+        'desaturated_green': libtcod.desaturated_green,
+        'darker_green': libtcod.darker_green,
+        'lime': libtcod.lime,
+        'violet': libtcod.violet,
+        'light_yellow': libtcod.light_yellow,
+        'sky': libtcod.sky,
+        'azure': libtcod.azure,
+        'light_turquoise': libtcod.light_turquoise,
+        'light_sea': libtcod.light_sea,
+        'light_red': libtcod.light_red,
+        'dark_gray': libtcod.dark_gray,
+        'light_green': libtcod.light_green,
+        'gray': libtcod.gray,
+        'darker_orange': libtcod.darker_orange,
+        'silver': libtcod.silver,
+        'white': libtcod.white,
+        'dark_crimson': libtcod.dark_crimson,
+        'crimson': libtcod.crimson,
+        'chartreuse': libtcod.chartreuse
     }
 
     return colors[color_str]
@@ -1584,13 +1633,14 @@ def letter_to_number(letter):
 
 def load_game():
     # Open the previously saved shelve and load the game data
-    # I have no idea how this shelve shit works but it's magic
-    global world, objects, player, inventory, game_msgs, game_state, dungeon_level, dstairs, ustairs
+    # I have no idea how shelve works but it's magic
+    global world, objects, player, inventory, game_msgs, game_state, \
+            dungeon_level, dstairs, ustairs
 
     file = shelve.open('savegame', 'r')
     world = file['world']
     objects = file['objects']
-    player = objects[file['player_index']]  # Get index of player in objects list and access it
+    player = objects[file['player_index']]
     inventory = file['inventory']
     game_msgs = file['game_msgs']
     game_state = file['game_state']
@@ -1643,7 +1693,7 @@ def make_map():
     # The list of objects with just the player
     objects = [player]
 
-    # fill map with "blocked" tiles
+    # fill map with 'blocked' tiles
     world = [[Tile(True) for y in range(MAP_HEIGHT)] for x in range(MAP_WIDTH)]
 
     rooms = []
@@ -1656,11 +1706,11 @@ def make_map():
     # a ton of cool maps with it.
     #
     # the first two values are the dimensions of the map (x and y for all
-    # you stupid people out there). The second one is the "fail" rating
-    # Not sure what the fuck that means but the higher it is, the more rooms you get
-    # Then the fourth is the "b1" value. Like what the fuck is a b1?
+    # you stupid people out there). The second one is the 'fail' rating
+    # Not sure what the heck that means but the higher it is, the more rooms you get
+    # Then the fourth is the 'b1' value. Like what the heck is a b1?
     # Apparently it controlls the frequency of corridors
-    # Corridors are shit so I keep it at 1
+    # I don't like corridors so I keep it at 1
     # Lastly, the number of maximum rooms. Multiply the max_rooms by 4 because
     # the rooms are pretty small
     themap.makeMap(MAP_WIDTH,MAP_HEIGHT,250,1,MAX_ROOMS*4)
@@ -1678,7 +1728,7 @@ def make_map():
                             world[x][y].blocked = True
                             world[x][y].block_sight = True
 
-    # Put shit everywhere
+    # Put stuff everywhere
     place_objects()
 
     # Make an FOV map
@@ -1740,7 +1790,7 @@ def menu(header, options, width):
         y += 1
         letter_index += 1
 
-    # Blit the contents of "window" to the root console
+    # Blit the contents of 'window' to the root console
     x = SCREEN_WIDTH / 2 - width / 2
     y = SCREEN_HEIGHT / 2 - height / 2
     libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
@@ -1757,7 +1807,7 @@ def menu(header, options, width):
         return None
 
 def msgbox(text, width=50):
-    menu(text, [], width)  # use menu() as a sort of "message box"
+    menu(text, [], width)  # use menu() as a sort of 'message box'
 
 def message(new_msg, color=libtcod.white):
     global old_msg, msg_counter
@@ -1765,7 +1815,7 @@ def message(new_msg, color=libtcod.white):
     # If the same message is going to be re-outputted, add a convenient counter
     if old_msg == new_msg:
         msg_counter += 1
-        alt_msg = "".join([new_msg, " <x", str(msg_counter), ">"])
+        alt_msg = ''.join([new_msg, ' <x', str(msg_counter), '>'])
     # Otherwise reset the counter
     else:
         msg_counter = 1
@@ -1792,7 +1842,7 @@ def message(new_msg, color=libtcod.white):
 def monster_death(monster):
     # transform it into a nasty corpse! it doesn't block, can't be
     # Attacked and doesn't move
-    message(" ".join([monster.name.capitalize(), "is dead!"]), libtcod.darker_red)
+    message(' '.join([monster.name.capitalize(), 'is dead!']), libtcod.darker_red)
     message('You gain ' + str(monster.fighter.xp) + ' experience points.', libtcod.orange)
     monster.char = '%'
     monster.color = libtcod.dark_red
@@ -1800,7 +1850,7 @@ def monster_death(monster):
     monster.fighter = None
     monster.ai = None
     monster.send_to_back()
-    monster.name = " ".join(["remains of", monster.name])
+    monster.name = ' '.join(['remains of', monster.name])
 
 def monster_occupy_check(dx, dy):
     # If a monster is in that location, return true
@@ -1862,14 +1912,14 @@ def new_game():
     game_msgs = []
 
     # A warm welcoming message!
-    message("Welcome!", libtcod.lighter_yellow)
+    message('Welcome!', libtcod.lighter_yellow)
 
 def next_level():
     global dungeon_level, max_dungeon_level
 
     dungeon_level += 1
 
-    message("After a rare moment of peace, you descend deeper into the heart of the dungeon...", libtcod.red)
+    message('After a rare moment of peace, you descend deeper into the heart of the dungeon...', libtcod.red)
     make_map()  # Create a fresh new level!
     initialize_fov()
 
@@ -1880,7 +1930,7 @@ def place_objects():
     # Chance of each monster
     monster_chances = {}
     for item in monster_data: # Monster name then chance. Chance works like this [chance, from this level], [chance, from this level]
-        monster_chances[str(monster_data[item]["id"])] = from_dungeon_level(monster_data[item]["chance"])
+        monster_chances[str(monster_data[item]['id'])] = from_dungeon_level(monster_data[item]['chance'])
 
     # Maximum number of items per level
     max_items = from_dungeon_level([[15, 1], [20, 4]])
@@ -1888,7 +1938,7 @@ def place_objects():
     # Chance of each item (by default they have a chance of 0 at level 1, which then goes up)
     item_chances = {}
     for item in items_data: # Item name then chance. Chance works like this [chance, from this level], [chance, from this level]
-        item_chances[str(items_data[item]["id"])] = from_dungeon_level(items_data[item]["chance"])
+        item_chances[str(items_data[item]['id'])] = from_dungeon_level(items_data[item]['chance'])
 
     # Choose random number of monsters
     num_monsters = libtcod.random_get_int(0, 0, max_monsters)
@@ -1968,13 +2018,13 @@ def player_death(player):
     # The game ended!
     global game_state
     if not GOD_MODE:
-        message("You died!", libtcod.dark_red)
+        message('You died!', libtcod.dark_red)
 
         # For added effect, transform the player into a corpse!
-        player.char = "%"
+        player.char = '%'
         player.color = libtcod.dark_red
 
-        game_state = "dead"
+        game_state = 'dead'
 
         render_all()
         libtcod.console_flush()
@@ -2017,7 +2067,7 @@ def previous_level():
             choice = menu('You head back down into the depths...', ['Continue'], 30)
 
     else:
-        message("After a rare moment of peace, you descend ascend upwards towards the surface...", libtcod.red)
+        message('After a rare moment of peace, you descend ascend upwards towards the surface...', libtcod.red)
         make_map()  # Create a fresh new level!
         initialize_fov()
 
@@ -2065,7 +2115,7 @@ def render_all():
             obj.draw()
     player.draw()
 
-    # blit the contents of "con" to the root console
+    # blit the contents of 'con' to the root console
     libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
 
     # Prepare to render the GUI panel
@@ -2078,29 +2128,29 @@ def render_all():
 
     # Show the player's stats
     # Health bar
-    render_bar(1, 1, BAR_WIDTH, "HP", player.fighter.hp, player.fighter.max_hp,
+    render_bar(1, 1, BAR_WIDTH, 'HP', player.fighter.hp, player.fighter.max_hp,
                libtcod.light_red, libtcod.darker_red)
 
     # Mana bar
-    render_bar(1, 2, BAR_WIDTH, "Edge", player.fighter.mana, player.fighter.max_mana,
+    render_bar(1, 2, BAR_WIDTH, 'Edge', player.fighter.mana, player.fighter.max_mana,
         libtcod.dark_fuchsia, libtcod.darker_fuchsia)
 
     # Show the level too, because I'm in a giving mood
-    render_bar_simple(1, 3, BAR_WIDTH, "Level", str(dungeon_level), libtcod.light_blue)
+    render_bar_simple(1, 3, BAR_WIDTH, 'Level', str(dungeon_level), libtcod.light_blue)
 
     # Show stats
-    render_bar_simple(1, 5, BAR_WIDTH, "Attack", str(player.fighter.power), libtcod.dark_chartreuse)
-    render_bar_simple(1, 6, BAR_WIDTH, "Defense", str(player.fighter.defense), libtcod.flame)
+    render_bar_simple(1, 5, BAR_WIDTH, 'Attack', str(player.fighter.power), libtcod.dark_chartreuse)
+    render_bar_simple(1, 6, BAR_WIDTH, 'Defense', str(player.fighter.defense), libtcod.flame)
 
     # This is actually kind of cool. It shows all the monsters that the player
     # can see and shows their health
     monsters_in_room = 0
     for obj in objects:
-        if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.fighter and obj.name != "player":
+        if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.fighter and obj.name != 'player':
             monsters_in_room += 1
             libtcod.console_set_default_foreground(panel, obj.color)
             libtcod.console_print_ex(panel, 1, 6+(2*monsters_in_room), libtcod.BKGND_NONE,
-                libtcod.LEFT, "".join([obj.char, " ", obj.name]))
+                libtcod.LEFT, ''.join([obj.char, ' ', obj.name]))
             render_health_bar(1, 7+(2*monsters_in_room), BAR_WIDTH, obj.fighter.hp,
                 obj.fighter.base_max_hp, libtcod.red, libtcod.dark_red)
 
@@ -2116,7 +2166,7 @@ def render_all():
         libtcod.console_print_ex(msg_panel, MSG_X, y, libtcod.BKGND_NONE, libtcod.LEFT, line)
         y += 1
 
-    # Blit the contents of "panel" and "msg_panel" to the root console
+    # Blit the contents of 'panel' and 'msg_panel' to the root console
     libtcod.console_blit(panel, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, 0, SCREEN_WIDTH-PANEL_WIDTH, PANEL_Y)
     libtcod.console_blit(msg_panel, 0, 0, SCREEN_WIDTH, PANEL_HEIGHT, 0, 0, MSG_PANEL_Y)
 
@@ -2136,10 +2186,10 @@ def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color):
     # Finally, some centered text with the values
     libtcod.console_set_default_foreground(panel, libtcod.white)
     libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE, libtcod.CENTER,
-                             name + ": " + str(value) + "/" + str(maximum))
+                             name + ': ' + str(value) + '/' + str(maximum))
 
 def render_bar_simple(x, y, total_width, name, value, color):
-    # I wanted a bar that just has one thing in it without all that fancy shit
+    # I wanted a bar that just has one thing in it without all that fancy stuff
 
     # Render the background first
     libtcod.console_set_default_background(panel, color)
@@ -2153,7 +2203,7 @@ def render_bar_simple(x, y, total_width, name, value, color):
     # Finally, some centered text with the values
     libtcod.console_set_default_foreground(panel, libtcod.white)
     libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE, libtcod.CENTER,
-                             name + ": " + str(value))
+                             name + ': ' + str(value))
 
 def render_health_bar(x, y, total_width, value, maximum, bar_color, back_color):
     # This is a bar that doesn't show any values in it. #Minimalism
@@ -2172,7 +2222,7 @@ def render_health_bar(x, y, total_width, value, maximum, bar_color, back_color):
 
     # Finally, some centered text with the values
     libtcod.console_set_default_foreground(panel, libtcod.white)
-    libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE, libtcod.CENTER, "")
+    libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE, libtcod.CENTER, '')
 
 def save_game():
     choice = menu('Save and Quit?', ['Yes', 'No'], 24)
@@ -2212,8 +2262,8 @@ def sort_inventory():
             items.append(item)
 
     # Sort them...
-        # Sweet jesus up in heaven i have no fucking clue what black magic this lambda
-        # shit is but lordy oh lordy it's beautiful
+        # Sweet jesus up in heaven i have no clue what black magic this lambda
+        #   stuff is but lordy oh lordy it's beautiful
     equips = sorted(equips, key=lambda obj: obj.name)
     items = sorted(items, key=lambda obj: obj.name)
 
