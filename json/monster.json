@@ -1,0 +1,250 @@
+{
+
+    "silverelite": {
+        "name": "silver elite",
+        "id":"silverelite",
+        "char": "S",
+        "color": "silver",
+        "chance":[[15, 1]],
+		"hp":20,
+		"defense":1,
+		"power":5,
+		"xp":35,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "silver2": {
+        "name": "silver 2",
+        "id":"silver2",
+        "char": "s",
+        "color": "silver",
+        "chance":[[10, 1],[0, 3]],
+		"hp":15,
+		"defense":0,
+		"power":2,
+		"xp":20,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "talk",
+        "speech": [
+            "Fucked up that nade, whoops",
+            "Reported",
+            "My mouse settings are fine I swear",
+            "I only use the P90",
+            "P90 rush B no stop",
+            "de_zoo is the best map",
+            "My Xbox controller won't work",
+            "Ever since I stared CS:GO, I'm fluent in Russian"
+        ],
+        "rate":10
+    },
+
+    "fcrecruit": {
+        "name": "faze clan recruit",
+        "id":"fcrecruit",
+        "char": "f",
+        "color": "crimson",
+        "chance":[[20, 1], [10, 3], [0, 4]],
+		"hp":30,
+		"defense":0,
+		"power":3,
+		"xp":35,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "fcveteran": {
+        "name": "faze clan veteran",
+        "id":"fcveteran",
+        "char": "f",
+        "color": "dark_crimson",
+        "chance":[[20, 4]],
+		"hp":50,
+		"defense":2,
+		"power":5,
+		"xp":75,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "fcnoscoper": {
+        "name": "faze clan no-scoper",
+        "id":"fcnoscoper",
+        "char": "F",
+        "color": "dark_crimson",
+        "chance":[[2, 4], [4, 5], [30, 7]],
+		"hp":60,
+		"defense":3,
+		"power":9,
+		"xp":130,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "gainsgoblin": {
+        "name": "gains goblin",
+        "id":"gainsgoblin",
+        "char": "g",
+        "color": "desaturated_green",
+        "chance":[[20, 2]],
+		"hp":30,
+		"defense":1,
+		"power":5,
+		"xp":55,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "nova3": {
+        "name":"nova 3",
+        "id":"nova3",
+        "char":"N",
+        "color": "violet",
+		"chance":[[15, 3], [30, 5], [60, 7]],
+		"hp":50,
+		"defense":1,
+		"power":8,
+		"xp":100,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "alvin": {
+        "name":"Alvin Mai",
+        "id":"alvin",
+        "char":"@",
+        "color": "light_yellow",
+		"chance":[[3, 1]],
+		"hp":40,
+		"defense":3,
+		"power":6,
+		"xp":300,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "fleck": {
+        "name":"Fleck",
+        "id":"fleck",
+        "char":"@",
+        "color": "azure",
+		"chance":[[1, 3]],
+		"hp":150,
+		"defense":99,
+		"power":0,
+		"xp":9000,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "talk",
+        "speech": [
+            "Scratch is the best programming language",
+            "Python 2.7 is better than Python 3.4",
+            "Nova 3 is no better than Silver Elite",
+            "The decoy grenade is the best grenade in CS:GO",
+            "Scott is the best builder on the team",
+            "Minecraft just a copy of roblox",
+            "Halo multiplayer killed the game forever",
+            "The Riot Shield is the best weapon in CS:GO",
+            "de_dust2 is a trash map",
+            "Tablet computers are better than desktops",
+            "Dell is a good computer company",
+            "Games for Windows Live is better than Steam",
+            "Sonic 06 was a genuinely good idea",
+            "7/11 is better than Wawa",
+            "C9 is just a bandwagon"
+        ],
+        "rate":60
+    },
+
+    "n0thing": {
+        "name":"n0thing",
+        "id":"n0thing",
+        "char":"@",
+        "color": "light_turquoise",
+		"chance":[[1, 5]],
+		"hp":40,
+		"defense":4,
+		"power":10,
+		"xp":400,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "c9fanboy": {
+        "name":"C9 Fan Boy",
+        "id":"c9fanboy",
+        "char":"c",
+        "color": "light_sea",
+		"chance":[[20, 1]],
+		"hp":30,
+		"defense":0,
+		"power":5,
+		"xp":50,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "cena": {
+        "name":"John Cena",
+        "id":"cena",
+        "char":"@",
+        "color": "crimson",
+		"chance":[[1, 5]],
+		"hp":69,
+		"defense":5,
+		"power":12,
+		"xp":400,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "normal"
+    },
+
+    "Gaben": {
+        "name":"Gaben, Lord of Steam",
+        "id":"Gaben",
+        "char":"@",
+        "color": "chartreuse",
+		"chance":[[1, 3]],
+		"hp":80,
+		"defense":9,
+		"power":20,
+		"xp":4200,
+        "mana":0,
+		"death_func":"normal",
+        "ai": "talk",
+        "speech": [
+            "I think you need a VACation",
+            "Hi, Gaben here",
+            "Do I smell aimbot hacks?",
+            "This server is VAC secured",
+            "Remember to gamble all your knives on C9"
+        ],
+        "rate":90
+    },
+
+    "saltelemental": {
+        "name":"Salt Elemental",
+        "id":"saltelemental",
+        "char":"E",
+        "color": "white",
+        "chance":[[15, 3], [30, 5]],
+        "hp":40,
+        "defense":2,
+        "power":9,
+        "xp":60,
+        "mana":0,
+        "death_func":"normal",
+        "ai": "normal"
+    }
+
+}
