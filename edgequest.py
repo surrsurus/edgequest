@@ -1283,6 +1283,23 @@ def game_over():
 
     exit()
 
+def game_win():
+    ''' Win the game! '''
+
+    # Show some stats and stuff
+    msgbox('You Win!\n\n \
+    Level: ' + str(player.level) + '\n \
+    Floor: ' + str(dungeon_level) + '\n \
+    Experience: ' + str(player.fighter.xp) + '\n \
+    Maximum HP: ' + str(player.fighter.max_hp) + '\n \
+    Attack: ' + str(player.fighter.power) + '\n \
+    Defense: ' + str(player.fighter.defense) + '\n \
+    Total Kills: ' + str(kill_count) + '\n\n \
+    Press any key to continue...',
+    CHARACTER_SCREEN_WIDTH)
+
+    exit()
+
 def generate_monster(monster_id, x, y):
     ''' Generate monster from json '''
     # Read color
@@ -2328,16 +2345,20 @@ def previous_level():
     dungeon_level -= 1
 
     if dungeon_level == 0:
-        choice = menu('Leave the Dungeon?', ['Yes', 'No'], 30)
-
-        if choice == 0:
-            game_over()
+        for item in inventory:
+            if item.name == 'StatTrak Fedora | Fade (Fac New)':
+                game_win()
         else:
-            render_all()
-            # Present the root console
-            libtcod.console_flush()
-            choice = menu('You head back down into the depths...',
-                            ['Continue'], 30)
+            choice = menu('Leave the Dungeon?', ['Yes', 'No'], 30)
+
+            if choice == 0:
+                game_over()
+            else:
+                render_all()
+                # Present the root console
+                libtcod.console_flush()
+                choice = menu('You head back down into the depths...',
+                                ['Continue'], 30)
 
     else:
         message('After a rare moment of peace, you ascend upwards towards the surface...',
