@@ -1610,7 +1610,7 @@ def load_game():
 
     if not blind:
         initialize_fov()
-	else:
+    else:
 	    player.draw()
 
 def main_menu():
