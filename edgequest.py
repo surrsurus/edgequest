@@ -1088,23 +1088,22 @@ def fov_recompute():
                 if world[map_x][map_y].explored:
                     # It's out of the player's FOV
                     if wall:
-                        libtcod.console_set_char_background(con, x, y,
-                                                            color_dark_wall,
-                                                            libtcod.BKGND_SET)
+                        libtcod.console_put_char_ex(con, x, y, '#',
+                                                    libtcod.darker_azure,
+                                                    color_dark_wall)
                     else:
                         libtcod.console_set_char_background(con, x, y,
-                                                            color_dark_ground,
-                                                            libtcod.BKGND_SET)
+                                                color_dark_ground,
+                                                libtcod.BKGND_SET)
             else:
                 # It's visible
                 if wall:
-                    libtcod.console_set_char_background(con, x, y,
-                                                        color_light_wall,
-                                                        libtcod.BKGND_SET)
+                    libtcod.console_put_char_ex(con, x, y, '#',
+                                                libtcod.white,
+                                                libtcod.light_gray)
                 else:
-                    libtcod.console_set_char_background(con, x, y,
-                                                        color_light_ground,
-                                                        libtcod.BKGND_SET)
+                    libtcod.console_set_char_background(con, x, y, libtcod.gray,
+                                            libtcod.BKGND_SET)
                 # Since it's visible, explore it
                 world[map_x][map_y].explored = True
 
