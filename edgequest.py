@@ -75,7 +75,7 @@ class BasicMonster:
 
             # Move towards player if far away
             if monster.distance_to(player) >= 2:
-                monster.move_astar(player)
+                monster.move_astar(player.x, player.y)
 
             # Close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
@@ -517,7 +517,7 @@ class Object:
         except IndexError:
             pass
 
-    def move_astar(self, target):
+    def move_astar(self, tx, ty):
         ''' A* Algorithm for pathfinding towards target '''
         # Create a FOV map that has the dimensions of the map
         fov = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
@@ -536,7 +536,7 @@ class Object:
         # The AI class handles the situation if self is next to the target
         #   so it will not use this A* function anyway
         for obj in objects:
-            if obj.blocks and obj != self and obj != target:
+            if obj.blocks and obj != self and (obj.x, obj.y) != (tx, ty):
                 # Set the tile as a wall so it must be navigated around
                 libtcod.map_set_properties(fov, obj.x, obj.y, True, False)
 
@@ -547,7 +547,7 @@ class Object:
 
         # Compute the path between self's coordinates and the
         # target's coordinates
-        libtcod.path_compute(my_path, self.x, self.y, target.x, target.y)
+        libtcod.path_compute(my_path, self.x, self.y, tx, ty)
 
         # Check if the path exists, and in this case, also the path is
         #   shorter than 25 tiles
@@ -569,7 +569,7 @@ class Object:
             #   paths (for example another monster blocks a corridor)
             # it will still try to move towards the
             # player (closer to the corridor opening)
-            self.move_towards(target.x, target.y)
+            self.move_towards(tx, ty)
 
     def move_towards(self, target_x, target_y):
         ''' Move towards a target '''
@@ -1409,9 +1409,9 @@ def get_names_under_mouse():
     ''' Self explanatory name '''
     global mouse
 
-    # Return a string with the names of all objects under the mouse
-    (x, y) = (mouse.cx, mouse.cy)
-    (x, y) = (camera_x + x, camera_y + y)  # From screen to map coordinates
+    # Return a string with the names of all objects under the mouses
+    # From screen to map coordinates
+    (x, y) = (camera_x + mouse.cx, camera_y + mouse.cy)
 
     # Create a list with the names of all objects at the mouse's
     #   coordinates and in FOV
@@ -1945,10 +1945,6 @@ def menu(header, options, width):
     else:
         return None
 
-def msgbox(text, width=50):
-    ''' use menu() as a sort of \'message box\' '''
-    menu(text, [], width)
-
 def message(new_msg, color=libtcod.white):
     ''' Send a message to the console at the bottom '''
     global old_msg, msg_counter
@@ -2044,6 +2040,42 @@ def monster_occupy_check(dx, dy):
         if (obj.x, obj.y) == (dx, dy) and obj.blocks:
             return True
     return False
+
+def mouse_move_astar(tx, ty):
+    ''' Click on a space to send player there '''
+    monster = False
+
+    if world[tx][ty].blocked:
+        message('Cannot travel there', libtcod.pink)
+    elif blind:
+        message('That\'s not a good idea considering your blindness',
+            libtcod.pink)
+    else:
+        while not libtcod.console_is_window_closed() and not monster and \
+        (player.x, player.y) != (tx, ty):
+            render_all()
+            libtcod.console_flush()
+            # Present the root console
+            libtcod.console_flush()
+
+            for obj in objects:
+                if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
+                obj.fighter and \
+                obj.name != player.name:
+                    message('Monster in view!', libtcod.pink)
+                    monster = True
+                    continue
+
+            player.move_astar(tx, ty)
+            fov_recompute()
+
+            for obj in objects:
+                if obj.ai:
+                    obj.ai.take_turn()
+
+def msgbox(text, width=50):
+    ''' use menu() as a sort of \'message box\' '''
+    menu(text, [], width)
 
 def move_camera(target_x, target_y):
     ''' Move camera to coordinates '''
@@ -2205,6 +2237,10 @@ def play_game():
 
         # Handle keys
         handle_keys()
+
+        # Handle mouse
+        if mouse.lbutton_pressed:
+            mouse_move_astar(mouse.cx + camera_x, mouse.cy + camera_y)
 
         # Let monsters take their turn
         if game_state == 'playing' and player_action != 'didnt-take-turn':
