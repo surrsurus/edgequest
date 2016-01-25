@@ -134,9 +134,12 @@ class TalkingMonster:
 
             # Depending on the rate of speech set in the json,
             #   the monster may talk
+            # Rate must be a value from 0 - 99
+            # The higher rate is, the less frequent the monster will talk
             if libtcod.random_get_int(0, 0, 100) > self.rate:
+                # Say a random line
                 r = libtcod.random_get_int(0, 0, len(self.speech)-1)
-                message(''.join([monster.name, ' says ', '\'',
+                message(''.join([monster.name.capitalize(), ' says ', '\'',
                         self.speech[r], '\'']), monster.color)
 
 class Equipment:
@@ -425,7 +428,6 @@ class Object:
     This is a generic object: the player, a monster, an item, the stairs...
     It's always represented by a character on screen
     '''
-
     def __init__(self, x, y, char, name, color, blocks=False,
                 always_visible=False, fighter=None, ai=None, item=None,
                 gold=None, equipment=None):
@@ -503,7 +505,7 @@ class Object:
     def move(self, dx, dy):
         ''' Move by a given amount '''
         try:
-            if self.name == 'player' and WALL_HACK:
+            if self.name == player_name and WALL_HACK:
                 self.x += dx
                 self.y += dy
             elif not world[self.x + dx][self.y + dy].blocked and not \
@@ -526,10 +528,6 @@ class Object:
         elif target_x > self.x:
             dx = 1
 
-        # But if a wall is there, don't move that way
-        if world[self.x + dx][self.y].blocked:
-            dx = 0
-
         # Second, try to move towards player by column
         if target_y == self.y:
             pass
@@ -538,13 +536,23 @@ class Object:
         elif target_y > self.y:
             dy = 1
 
-        # But if a wall is there, don't move that way
-        if world[self.x][self.y + dy].blocked:
-            dy = 0
-
-        # The result is an Ai that follows the player around turns,
-        #   but it doesn't capitalize on diagonal movements
-        self.move(dx, dy)
+        # If the space the monster wants to go is open go there
+        if not world[self.x + dx][self.y + dy].blocked and not \
+        monster_occupy_check(self.x+dx, self.y+dy):
+            self.move(dx, dy)
+        # Otherwise if the space adjacent to the monster on the y axis is open
+        #   go there
+        elif not world[self.x][self.y + dy].blocked and \
+        not monster_occupy_check(self.x, self.y + dy):
+            self.move(0, dy)
+        # Otherwise if the space adjacent to the monster on the x axis is open
+        #   go there
+        elif not world[self.x + dx][self.y].blocked and \
+        not monster_occupy_check(self.x + dx, self.y):
+            self.move(dx, 0)
+        # Otherwise do nothing
+        else:
+            pass
 
     def send_to_back(self):
         # Make this object be drawn first, so all others appear
@@ -873,8 +881,6 @@ def check_level_up():
                                     libtcod.EVENT_MOUSE, key, mouse)
         render_all()
 
-        libtcod.console_flush()
-
 def check_timer():
     global timer
     # Timer based commands
@@ -892,6 +898,12 @@ def choose_name():
     key = libtcod.Key()
     name = ''
 
+    # Set the screen to black
+    libtcod.console_set_default_background(con, libtcod.black)
+
+    # Set text color to yellow
+    libtcod.console_set_default_foreground(con, libtcod.light_yellow)
+
     # Dispbox style key getting
     while not libtcod.console_is_window_closed():
         # Check for keypresses
@@ -906,18 +918,18 @@ def choose_name():
             # Backspace deletes line
             elif key.vk == libtcod.KEY_BACKSPACE:
                 name = ''
+            # Shift causes a problem in libtcod so make sure nothing happens if
+            #   pressed
             elif key.vk == libtcod.KEY_SHIFT:
                 pass
+            # Add char to string
             elif key_char:
                 name = ''.join([name, key_char])
 
         # Clear screen
         libtcod.console_clear(con)
-        # Set the screen to black
-        libtcod.console_set_default_background(con, libtcod.black)
 
         # Prompt for name
-        libtcod.console_set_default_foreground(con, libtcod.light_yellow)
         libtcod.console_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
                                 libtcod.BKGND_NONE, libtcod.CENTER,
                                 'Choose a name for the hero')
@@ -925,8 +937,10 @@ def choose_name():
         # Blit to screen
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
 
+        # Show name
         dispbox('\n' + name + '\n', len(name))
 
+    # In case if the name isn't anything
     if name == '':
         name = 'player'
 
@@ -977,11 +991,11 @@ def debug_spawn_console(json_list):
                 name = ''
             # Esc quits
             elif key.vk == libtcod.KEY_ESCAPE:
-                break
                 check = False
+                break
             elif key.vk == libtcod.KEY_SHIFT:
                 pass
-            if key_char:
+            elif key_char:
                 name = ''.join([name, key_char])
 
         # Render before drawing a new dispbox
@@ -1314,6 +1328,7 @@ def handle_keys():
             elif key_char in ('3', 'n'): # SE
                 player_move(1, 1)
 
+            # Recompute the fov if moved
             check_fov = True
 
             for obj in objects:  # Look for an item in the player's tile
@@ -1323,6 +1338,7 @@ def handle_keys():
 
             player_action = 'move'
 
+        # Wait
         elif key_char in ('5', '.'):
             check_fov = True
             message('You wait', libtcod.gray)
@@ -1394,14 +1410,17 @@ def handle_keys():
                     CHARACTER_SCREEN_WIDTH)
 
         elif key_char == 'q':
+            # Toggle the siphon ability
             toggle_siphon()
             player_action = 'didnt-take-turn'
 
         elif key_char == 't':
+            # Taunt
             taunt()
             player_action = 'taunt'
 
         elif key_char == 'f':
+            # Activate weapon
             right = get_equipped_in_slot('right hand')
             left = get_equipped_in_slot('left hand')
             if left:
@@ -1451,47 +1470,47 @@ def intro_cutscene():
     ''' Show a cutscene '''
     # Text to be displayed in the intro
     intro = [
-        "You are an edgelord.",
-        "","","","","","","",
-        "You have trained all your life",
-        "","",
-        "in the arts of fedora tipping,",
-        "","",
-        "katana wielding,",
-        "","",
-        "and no-scoping with the AWP.",
-        "","","","","","","","","","","",
-        "Today your diety, Carl Sagan, has called upon you.",
-        "","","","","","","",
-        "You, his chosen servant, have been tasked with the ultimate feat",
-        "","","",
-        "You must summon all of your edge and delve into",
-        "",
-        "the stygian catacombs of mount myr",
-        "",
-        "and retrieve the sacred artifact:",
-        "","","","","","","","","","",
-        "The StatTrak Fedora | Fade (Factory New)",
-        "","","","","","","","","",
-        "Carl Sagan informs you that the journey will not be easy",
-        "","","",
-        "It will be perilous,",
-        "","","","",
-        "Full of danger,",
-        "","","","",
-        "full of monstrous enemies,",
-        "","","","",
-        "and full of people who personally prefer ruby over python.",
-        "","","","","","","","",
-        "Go! Young hero!",
-        "","","","",
-        "Retrive the Fedora of Fade!",
-        "","","","","","",
-        "May enlightenment and edge be ever at your heels"
+        'You are an edgelord.',
+        '','','','','','','',
+        'You have trained all your life',
+        '','',
+        'in the arts of fedora tipping,',
+        '','',
+        'katana wielding,',
+        '','',
+        'and no-scoping with the AWP.',
+        '','','','','','','','','','','',
+        'Today your diety, Carl Sagan, has called upon you.',
+        '','','','','','','',
+        'You, his chosen servant, have been tasked with the ultimate feat',
+        '','','',
+        'You must summon all of your edge and delve into',
+        '',
+        'the stygian catacombs of mount myr',
+        '',
+        'and retrieve the sacred artifact:',
+        '','','','','','','','','','',
+        'The StatTrak Fedora | Fade (Factory New)',
+        '','','','','','','','','',
+        'Carl Sagan informs you that the journey will not be easy',
+        '','','',
+        'It will be perilous,',
+        '','','','',
+        'Full of danger,',
+        '','','','',
+        'full of monstrous enemies,',
+        '','','','',
+        'and full of people who personally prefer ruby over python.',
+        '','','','','','','','',
+        'Go! Young hero!',
+        '','','','',
+        'Retrive the Fedora of Fade!',
+        '','','','','','',
+        'May enlightenment and edge be ever at your heels'
     ]
 
     # Buffer so that text appears to crawl from the bottom
-    buff = ["" for x in range(SCREEN_HEIGHT)]
+    buff = ['' for x in range(SCREEN_HEIGHT)]
 
     intro_wall = buff + intro
 
@@ -1737,7 +1756,8 @@ def make_map():
     ustairs = Object(player.x, player.y, '<', 'up stairs', libtcod.white,
                     always_visible=True)
     objects.append(ustairs)
-    ustairs.send_to_back()  #so it's drawn below the monsters
+    # So it's drawn below the monsters
+    ustairs.send_to_back()
 
 def menu(header, options, width):
     ''' Create a menu that options can be selected from using the alphabet '''
@@ -1940,7 +1960,6 @@ def new_game():
     message('Welcome!', libtcod.lighter_yellow)
 
     render_all()
-    libtcod.console_flush()
 
 def next_level():
     ''' Go to next level '''
@@ -2033,7 +2052,6 @@ def play_game():
                                     libtcod.EVENT_MOUSE, key, mouse)
 
         render_all()
-        libtcod.console_flush()
 
         check_timer()
 
@@ -2067,7 +2085,6 @@ def player_death(player):
         game_state = 'dead'
 
         render_all()
-        libtcod.console_flush()
 
         game_over()
     else:
@@ -2108,7 +2125,6 @@ def previous_level():
             game_over()
         else:
             render_all()
-            libtcod.console_flush()
             choice = menu('You head back down into the depths...',
                             ['Continue'], 30)
 
@@ -2215,7 +2231,7 @@ def render_all():
             libtcod.console_set_default_foreground(panel, obj.color)
             libtcod.console_print_ex(panel, 1, 9+(2*monsters_in_room),
                                     libtcod.BKGND_NONE, libtcod.LEFT,
-                                    ''.join([obj.char, ' ', obj.name]))
+                                    ''.join([obj.char, ' ', obj.name.capitalize()]))
             render_health_bar(1, 10+(2*monsters_in_room), BAR_WIDTH,
                                 obj.fighter.hp, obj.fighter.base_max_hp,
                                 libtcod.red, libtcod.dark_red)
@@ -2239,6 +2255,9 @@ def render_all():
                         SCREEN_WIDTH-PANEL_WIDTH, PANEL_Y)
     libtcod.console_blit(msg_panel, 0, 0, SCREEN_WIDTH, PANEL_HEIGHT, 0, 0,
                         MSG_PANEL_Y)
+
+    # Show changes
+    libtcod.console_flush()
 
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color):
     ''' Render a bar (HP, experience). '''
@@ -2327,7 +2346,6 @@ def save_game():
         file['blind_counter'] = blind_counter
         file.close()
         render_all()
-        libtcod.console_flush()
         choice = menu('Bye!', [], 6)
         exit()
     elif choice == 1:  # No
@@ -2427,17 +2445,21 @@ def to_camera_coordinates(x, y):
     return x, y
 
 def weapon_action_katana(weapon):
-    message("You examine the fine steel of the katana, surely folded over 1000 times")
+    ''' Katana action '''
+    message('You examine the fine steel of the katana, surely folded over 1000 times')
 
 def weapon_action_knife(weapon):
-    message("You flaunt your latest knife")
+    ''' Knife action '''
+    message('You flaunt your latest knife')
 
 def weapon_action_awp(weapon):
-    message("You no-scope with the AWP")
+    ''' AWP action '''
+    message('You no-scope with the AWP')
     cast_lightning()
 
 def weapon_action_else(weapon):
-    message("You stare deeply at your weapon")
+    ''' Emergency reserve action '''
+    message('You stare deeply at your ' + weapon.name)
 
 ######################################
 # Main Loop

@@ -157,6 +157,21 @@
         "mana": 0
     },
 
+    "stattrakfedora": {
+        "name": "StatTrak Fedora | Fade (Fac New)",
+        "id": "stattrakfedora",
+        "char": "^",
+        "color": "dark_crimson",
+        "chance": [[1, 10]],
+        "type": "equipment",
+        "subtype": "armor",
+        "slot": "head",
+        "power": 5,
+        "defense": 10,
+        "hp": 100,
+        "mana": 50
+    },
+
     "fgloves": {
         "name": "fingerless gloves",
         "id": "fgloves",
