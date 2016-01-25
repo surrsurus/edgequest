@@ -96,6 +96,9 @@ LEVEL_UP_FACTOR = 150
 # Blindness
 BLIND_LENGTH = 10
 
+# Firearms
+FIREARM_RANGE = 8
+
 ######################################
 # Debug Options
 ######################################

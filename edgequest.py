@@ -75,7 +75,7 @@ class BasicMonster:
 
             # Move towards player if far away
             if monster.distance_to(player) >= 2:
-                monster.move_towards(player.x, player.y)
+                monster.move_astar(player)
 
             # Close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
@@ -146,11 +146,13 @@ class Equipment:
     ''' An object that can be equipped, yielding bonuses.
     automatically adds the Item component. '''
     def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0,
-                max_mana_bonus=0, attack_msg=None, weapon_func=None):
+                max_mana_bonus=0, attack_msg=None, weapon_func=None,
+                ranged_bonus=0):
         self.power_bonus = power_bonus
         self.defense_bonus = defense_bonus
         self.max_hp_bonus = max_hp_bonus
         self.max_mana_bonus = max_mana_bonus
+        self.ranged_bonus = ranged_bonus
 
         self.attack_msg = attack_msg
         self.weapon_func = weapon_func
@@ -515,6 +517,60 @@ class Object:
         except IndexError:
             pass
 
+    def move_astar(self, target):
+        ''' A* Algorithm for pathfinding towards target '''
+        # Create a FOV map that has the dimensions of the map
+        fov = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
+
+        # Scan the current map each turn and set all the walls as unwalkable
+        for y1 in range(MAP_HEIGHT):
+            for x1 in range(MAP_WIDTH):
+                libtcod.map_set_properties(fov, x1, y1, not \
+                                            world[x1][y1].block_sight, not \
+                                            world[x1][y1].blocked)
+
+        # Scan all the objects to see if there are objects that must be
+        #   navigated around
+        # Check also that the object isn't self or the target
+        #   (so that the start and the end points are free)
+        # The AI class handles the situation if self is next to the target
+        #   so it will not use this A* function anyway
+        for obj in objects:
+            if obj.blocks and obj != self and obj != target:
+                # Set the tile as a wall so it must be navigated around
+                libtcod.map_set_properties(fov, obj.x, obj.y, True, False)
+
+        # Allocate a A* path
+        # The 1.41 is the normal diagonal cost of moving,
+        #   it can be set as 0.0 if diagonal moves are prohibited
+        my_path = libtcod.path_new_using_map(fov, 1.41)
+
+        # Compute the path between self's coordinates and the
+        # target's coordinates
+        libtcod.path_compute(my_path, self.x, self.y, target.x, target.y)
+
+        # Check if the path exists, and in this case, also the path is
+        #   shorter than 25 tiles
+        # The path size matters if you want the monster to use alternative
+        #   longer paths (for example through other rooms) if for example
+        #   the player is in a corridor
+        # It makes sense to keep path size relatively low to keep the monsters
+        #   from running around the map if there's an alternative path really
+        #   far away
+        if not libtcod.path_is_empty(my_path) and libtcod.path_size(my_path) < 25:
+            #Find the next coordinates in the computed full path
+            x, y = libtcod.path_walk(my_path, True)
+            if x or y:
+                #Set self's coordinates to the next path tile
+                self.x = x
+                self.y = y
+        else:
+            # Keep the old move function as a backup so that if there are no
+            #   paths (for example another monster blocks a corridor)
+            # it will still try to move towards the
+            # player (closer to the corridor opening)
+            self.move_towards(target.x, target.y)
+
     def move_towards(self, target_x, target_y):
         ''' Move towards a target '''
         dx = 0
@@ -683,6 +739,8 @@ def cast_confuse():
             libtcod.light_green)
 
     render_all()
+    # Present the root console
+    libtcod.console_flush()
 
 def cast_fireball():
     ''' Ask the player for a target tile to throw a fireball at '''
@@ -855,6 +913,11 @@ def check_level_up():
     ''' See if the player's experience is enough to level-up '''
     level_up_xp = LEVEL_UP_BASE + player.level * LEVEL_UP_FACTOR
     if player.fighter.xp >= level_up_xp:
+
+        render_all()
+        # Present the root console
+        libtcod.console_flush()
+
         # It is! level up
         player.level += 1
         player.fighter.xp -= level_up_xp
@@ -879,12 +942,8 @@ def check_level_up():
         elif choice == 2:
             player.fighter.defense += 1
 
-        render_all()
-
-        # render the screen
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | \
-                                    libtcod.EVENT_MOUSE, key, mouse)
-        render_all()
+        # Pause
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
 def check_timer():
     global timer
@@ -944,6 +1003,9 @@ def choose_name():
 
         # Show name
         dispbox('\n' + name + '\n', len(name))
+
+        # Present the root console
+        libtcod.console_flush()
 
     # In case if the name isn't anything
     if name == '':
@@ -1024,7 +1086,7 @@ def debug_spawn_console(json_list):
         for item in items_data:
             if items_data[item]['name'] == name or \
             items_data[item]['id'] == name:
-                obj = generate_item(items_data[item]['id'], player.x+2,
+                obj = generate_item(items_data[item]['id'], player.x,
                                     player.y)
 
                 # Add item to object list
@@ -1060,7 +1122,62 @@ def dispbox(header, width=50):
     y = SCREEN_HEIGHT / 2 - height / 2
     libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
-    # Present the root console to the player and wait for a key-press
+    # Present the root console
+    libtcod.console_flush()
+
+def fire_weapon(power):
+    ''' Find closest enemy and shoot it '''
+    monster = closest_monster(LIGHTNING_RANGE)
+    if monster is None:  # No enemy found within maximum range
+        message('No enemy is close enough to shoot.', libtcod.red)
+        return 'cancelled'
+
+    # Zap it!
+    message(player_name + ' shoots the ' + monster.name +
+            ' with a loud bang! The damage is ' + str(power) +
+            ' hit points.', libtcod.light_red)
+    monster.fighter.take_damage(power)
+
+    # Animation test, courtesy of Trash Animation Studios(tm)
+    dx = player.x
+    dy = player.y
+    # The one cool this is that the lightning bolt changes depending on where
+    # the monster is
+    if (dx < monster.x and dy < monster.y) or \
+    (dx > monster.x and dy > monster.y):
+        char = '\\'
+    elif (dx < monster.x and dy > monster.y) or \
+    (dx > monster.x and dy < monster.y):
+        char = '/'
+    elif (dx == monster.x and dy != monster.y):
+        char = '|'
+    elif (dx != monster.x and dy == monster.y):
+        char = '-'
+    else:
+        char = 'z'
+
+    while (dx, dy) != (monster.x, monster.y):
+        libtcod.console_flush()
+        # First, try to move towards monster by row
+        if monster.x == dx:
+            pass
+        elif monster.x < dx:
+            dx += -1
+        elif monster.x > dx:
+            dx += 1
+
+        # Second, try to move towards player by column
+        if monster.y == dy:
+            pass
+        elif monster.y < dy:
+            dy += -1
+        elif monster.y > dy:
+            dy += 1
+
+        (x, y) = to_camera_coordinates(dx, dy)
+        libtcod.console_set_default_foreground(con, libtcod.yellow)
+        libtcod.console_put_char(con, x, y, char, libtcod.BKGND_NONE)
+
     libtcod.console_flush()
 
 def fov_recompute():
@@ -1221,7 +1338,7 @@ def generate_item(item_id, x, y):
         item = Object(x, y, items_data[item_id]['char'],
                         items_data[item_id]['name'], color, item=item_component)
 
-    elif items_data[item_id]['type'] == 'equipment':
+    elif items_data[item_id]['type'] in ('equipment', 'firearm'):
 
         if items_data[item_id]['subtype'] == 'weapon':
             if items_data[item_id]['weapon_func'] == 'knife':
@@ -1239,6 +1356,19 @@ def generate_item(item_id, x, y):
                             max_mana_bonus=items_data[item_id]['mana'],
                             attack_msg=items_data[item_id]['attack_msg'],
                             weapon_func=func)
+        elif items_data[item_id]['subtype'] == 'firearm':
+            if items_data[item_id]['weapon_func'] == 'firearm':
+                func = weapon_action_firearm
+            else:
+                func = weapon_action_else
+            equip_component = Equipment(slot=items_data[item_id]['slot'],
+                            power_bonus=items_data[item_id]['power'],
+                            defense_bonus=items_data[item_id]['defense'],
+                            max_hp_bonus=items_data[item_id]['hp'],
+                            max_mana_bonus=items_data[item_id]['mana'],
+                            attack_msg=items_data[item_id]['attack_msg'],
+                            weapon_func=func,
+                            ranged_bonus=items_data[item_id]['ranged'])
         else:
             equip_component = Equipment(slot=items_data[item_id]['slot'],
                             power_bonus=items_data[item_id]['power'],
@@ -1431,9 +1561,11 @@ def handle_keys():
             left = get_equipped_in_slot('left hand')
             if left:
                 left.weapon_function()
+                player_action = 'activating'
 
             if right:
                 right.weapon_function()
+                player_action = 'activating'
 
         # Debug commands
 
@@ -1605,7 +1737,9 @@ def json_get_color(color_str):
         'dark_crimson': libtcod.dark_crimson,
         'crimson': libtcod.crimson,
         'chartreuse': libtcod.chartreuse,
-        'black': libtcod.black
+        'black': libtcod.black,
+        'orange': libtcod.orange,
+        'red': libtcod.red
     }
 
     return colors[color_str]
@@ -1966,6 +2100,8 @@ def new_game():
     message('Welcome!', libtcod.lighter_yellow)
 
     render_all()
+    # Present the root console
+    libtcod.console_flush()
 
 def next_level():
     ''' Go to next level '''
@@ -2058,6 +2194,8 @@ def play_game():
                                     libtcod.EVENT_MOUSE, key, mouse)
 
         render_all()
+        # Present the root console
+        libtcod.console_flush()
 
         check_timer()
 
@@ -2091,6 +2229,8 @@ def player_death(player):
         game_state = 'dead'
 
         render_all()
+        # Present the root console
+        libtcod.console_flush()
 
         game_over()
     else:
@@ -2131,6 +2271,8 @@ def previous_level():
             game_over()
         else:
             render_all()
+            # Present the root console
+            libtcod.console_flush()
             choice = menu('You head back down into the depths...',
                             ['Continue'], 30)
 
@@ -2263,9 +2405,6 @@ def render_all():
     libtcod.console_blit(msg_panel, 0, 0, SCREEN_WIDTH, PANEL_HEIGHT, 0, 0,
                         MSG_PANEL_Y)
 
-    # Show changes
-    libtcod.console_flush()
-
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color):
     ''' Render a bar (HP, experience). '''
     # first calculate the width of the bar
@@ -2353,6 +2492,8 @@ def save_game():
         file['blind_counter'] = blind_counter
         file.close()
         render_all()
+        # Present the root console
+        libtcod.console_flush()
         choice = menu('Bye!', [], 6)
         exit()
     elif choice == 1:  # No
@@ -2406,6 +2547,8 @@ def target_tile(max_range=None):
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS |
                                     libtcod.EVENT_MOUSE, key, mouse)
         render_all()
+        # Present the root console
+        libtcod.console_flush()
         (x, y) = (mouse.cx, mouse.cy)
         (x, y) = (camera_x + x, camera_y + y)  # From screen to map coordinates
 
@@ -2463,6 +2606,10 @@ def weapon_action_awp(weapon):
     ''' AWP action '''
     message('You no-scope with the AWP')
     cast_lightning()
+
+def weapon_action_firearm(weapon):
+    ''' Firearm action '''
+    fire_weapon(weapon.equipment.ranged_bonus)
 
 def weapon_action_else(weapon):
     ''' Emergency reserve action '''

@@ -127,6 +127,60 @@
         "mana": 0
     },
 
+    "p90": {
+        "name": "P90",
+        "id": "p90",
+        "char": ",",
+        "color": "orange",
+        "chance":[[15, 2]],
+        "type": "equipment",
+        "subtype": "firearm",
+        "slot": "right hand",
+        "attack_msg": "bashes",
+        "weapon_func": "firearm",
+        "power": 2,
+        "defense": 0,
+        "hp": 0,
+        "mana": 0,
+        "ranged": 15
+    },
+
+    "r8nerf": {
+        "name": "R8 Revolver",
+        "id": "r8nerf",
+        "char": ",",
+        "color": "red",
+        "chance":[[15, 1]],
+        "type": "equipment",
+        "subtype": "firearm",
+        "slot": "right hand",
+        "attack_msg": "bashes",
+        "weapon_func": "firearm",
+        "power": 1,
+        "defense": 0,
+        "hp": 0,
+        "mana": 0,
+        "ranged": 10
+    },
+
+    "r8": {
+        "name": "R8 Revolver",
+        "id": "r8",
+        "char": ",",
+        "color": "red",
+        "chance":[[1, 3]],
+        "type": "equipment",
+        "subtype": "firearm",
+        "slot": "right hand",
+        "attack_msg": "bashes",
+        "weapon_func": "firearm",
+        "power": 1,
+        "defense": 0,
+        "hp": 0,
+        "mana": 0,
+        "ranged": 30
+    },
+
     "trenchcoat": {
         "name": "trenchcoat",
         "id": "trenchcoat",
