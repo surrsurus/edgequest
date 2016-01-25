@@ -143,13 +143,14 @@ class Equipment:
     ''' An object that can be equipped, yielding bonuses.
     automatically adds the Item component. '''
     def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0,
-                max_mana_bonus=0, attack_msg=None):
+                max_mana_bonus=0, attack_msg=None, weapon_func=None):
         self.power_bonus = power_bonus
         self.defense_bonus = defense_bonus
         self.max_hp_bonus = max_hp_bonus
         self.max_mana_bonus = max_mana_bonus
 
         self.attack_msg = attack_msg
+        self.weapon_func = weapon_func
 
         self.slot = slot
         self.is_equipped = False
@@ -222,6 +223,12 @@ class Equipment:
                 player.fighter.attack_msg = item.attack_msg
             else:
                 player.fighter.attack_msg = 'punches'
+
+    def weapon_function(self):
+        ''' Weapons have a special function that can be activated '''
+        function = self.weapon_func
+        if function is not None:
+            function(self.owner)
 
 class Fighter:
     ''' Combat-related properties and methods (monster, player, NPC) '''
@@ -967,8 +974,7 @@ def debug_spawn_console(json_list):
                 break
             # Backspace deletes line
             elif key.vk == libtcod.KEY_BACKSPACE:
-                if name != '':
-                    name = name[:-1]
+                name = ''
             # Esc quits
             elif key.vk == libtcod.KEY_ESCAPE:
                 break
@@ -1127,8 +1133,7 @@ def generate_monster(monster_id, x, y):
     elif monster_data[monster_id]['death_func'] == 'talk':
         death = monster_death_talk
     else:
-        print('Error: death function does not exist')
-        exit()
+        death = monster_death
 
     # Select an AI
     if monster_data[monster_id]['ai'] == 'normal':
@@ -1198,13 +1203,23 @@ def generate_item(item_id, x, y):
                         items_data[item_id]['name'], color, item=item_component)
 
     elif items_data[item_id]['type'] == 'equipment':
+
         if items_data[item_id]['subtype'] == 'weapon':
+            if items_data[item_id]['weapon_func'] == 'knife':
+                func = weapon_action_knife
+            elif items_data[item_id]['weapon_func'] == 'katana':
+                func = weapon_action_katana
+            elif items_data[item_id]['weapon_func'] == 'awp':
+                func = weapon_action_awp
+            else:
+                func = weapon_action_else
             equip_component = Equipment(slot=items_data[item_id]['slot'],
                             power_bonus=items_data[item_id]['power'],
                             defense_bonus=items_data[item_id]['defense'],
                             max_hp_bonus=items_data[item_id]['hp'],
                             max_mana_bonus=items_data[item_id]['mana'],
-                            attack_msg=items_data[item_id]['attack_msg'])
+                            attack_msg=items_data[item_id]['attack_msg'],
+                            weapon_func=func)
         else:
             equip_component = Equipment(slot=items_data[item_id]['slot'],
                             power_bonus=items_data[item_id]['power'],
@@ -1221,36 +1236,6 @@ def generate_item(item_id, x, y):
                         items_data[item_id]['name'], color)
 
     return item
-
-def generate_item_to_equip(item_id):
-    ''' Generate items from json '''
-    color = json_get_color(items_data[item_id]['color'])
-
-    '''
-    Example:
-    # Create a sword
-    equipment_component = Equipment(slot='right hand', power_bonus=1)
-    item = Object(x, y, '/', 'katana', libtcod.sky,
-                    equipment=equipment_component)
-
-    * Items MUST use Item class and item_component
-    * Equipmnt MUST use Equipment class and equip_component
-
-    Please look at the json for more info on properties of both
-    '''
-
-    equip_component = Equipment(slot=items_data[item_id]['slot'],
-                            power_bonus=items_data[item_id]['power'],
-                            defense_bonus=items_data[item_id]['defense'],
-                            max_hp_bonus=items_data[item_id]['hp'],
-                            max_mana_bonus=items_data[item_id]['mana'],
-                            attack_msg=items_data[item_id]['attack_msg'])
-
-    item = Object(0, 0, items_data[item_id]['char'],
-                    items_data[item_id]['name'], color,
-                    equipment=equip_component)
-
-    item.equipment.equip()
 
 def get_equipped_in_slot(slot):
     ''' Returns the equipment in a slot, or None if it's empty '''
@@ -1415,6 +1400,15 @@ def handle_keys():
         elif key_char == 't':
             taunt()
             player_action = 'taunt'
+
+        elif key_char == 'f':
+            right = get_equipped_in_slot('right hand')
+            left = get_equipped_in_slot('left hand')
+            if left:
+                left.weapon_function()
+
+            if right:
+                right.weapon_function()
 
         # Debug commands
 
@@ -1939,10 +1933,6 @@ def new_game():
     game_state = 'playing'
     inventory = []
 
-    # Initial equipment: a dagger
-    generate_item_to_equip('dagger')
-    player.fighter.attack_msg = items_data['dagger']['attack_msg']
-
     # Create the list of game messages and their colors, starts empty
     game_msgs = []
 
@@ -1966,7 +1956,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[10, 1], [20, 4], [25, 6]])
+    max_monsters = from_dungeon_level([[15, 1], [30, 4], [35, 6]])
 
     # Chance of each monster
     monster_chances = {}
@@ -1976,7 +1966,7 @@ def place_objects():
             from_dungeon_level(monster_data[item]['chance'])
 
     # Maximum number of items per level
-    max_items = from_dungeon_level([[5, 1], [7, 3], [10, 4]])
+    max_items = from_dungeon_level([[10, 1], [20, 3], [25, 4]])
 
     # Chance of each item (by default they have a chance of 0 at level 1,
     #   which then goes up)
@@ -1987,7 +1977,7 @@ def place_objects():
             from_dungeon_level(items_data[item]['chance'])
 
     # Choose random number of monsters
-    num_monsters = libtcod.random_get_int(0, 0, max_monsters)
+    num_monsters = libtcod.random_get_int(0, 0, max_monsters+dungeon_level)
 
     for i in range(num_monsters):
         # Choose random spot for this monster
@@ -2007,7 +1997,7 @@ def place_objects():
             objects.append(monster)
 
     # Choose random number of items
-    num_items = libtcod.random_get_int(0, 0, max_items)
+    num_items = libtcod.random_get_int(0, 0, max_items+dungeon_level)
 
     for i in range(num_items):
         # Choose random spot for this monster
@@ -2435,6 +2425,19 @@ def to_camera_coordinates(x, y):
         return None, None
 
     return x, y
+
+def weapon_action_katana(weapon):
+    message("You examine the fine steel of the katana, surely folded over 1000 times")
+
+def weapon_action_knife(weapon):
+    message("You flaunt your latest knife")
+
+def weapon_action_awp(weapon):
+    message("You no-scope with the AWP")
+    cast_lightning()
+
+def weapon_action_else(weapon):
+    message("You stare deeply at your weapon")
 
 ######################################
 # Main Loop
