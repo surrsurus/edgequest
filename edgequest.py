@@ -890,7 +890,7 @@ def choose_name():
         # Check for keypresses
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
             key_char = chr(key.c)
-            if key.vk == (libtcod.KEY_ENTER and key.lalt) or libtcod.KEY_F4:
+            if key.vk == (libtcod.KEY_ENTER and key.lalt) or key.vk == libtcod.KEY_F4:
                 libtcod.console_set_fullscreen(not \
                                                 libtcod.console_is_fullscreen())
             # Enter submits name
@@ -1453,7 +1453,7 @@ def intro_cutscene():
     ''' Show a cutscene '''
     # Text to be displayed in the intro
     intro = [
-        "You are an edgelord",
+        "You are an edgelord.",
         "","","","","","","",
         "You have trained all your life",
         "","",
@@ -1461,9 +1461,9 @@ def intro_cutscene():
         "","",
         "katana wielding,",
         "","",
-        "and no-scoping with the AWP",
+        "and no-scoping with the AWP.",
         "","","","","","","","","","","",
-        "Today your diety, Carl Sagan. has called upon you.",
+        "Today your diety, Carl Sagan, has called upon you.",
         "","","","","","","",
         "You, his chosen servant, have been tasked with the ultimate feat",
         "","","",
@@ -1483,7 +1483,7 @@ def intro_cutscene():
         "","","","",
         "full of monstrous enemies,",
         "","","","",
-        "and full of people who personally prefer ruby over python",
+        "and full of people who personally prefer ruby over python.",
         "","","","","","","","",
         "Go! Young hero!",
         "","","","",

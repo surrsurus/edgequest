@@ -1,6 +1,8 @@
 # edgequest
 Roguelike in Python based on the [Roguebasin Tutorial](http://www.roguebasin.com/index.php?title=Complete_Roguelike_Tutorial,_using_python%2Blibtcod) but with several key differences, namely being the feature to store items and monsters inside of JSON files, making modular additions possible without needing to alter the python source in any way.
 
+Some say making a roguelike in python is pointless, due to the slow speeds that may come as a part of constant A* pathfinding, FOV, djikstra maps, and dynamic lighting, but to the naysayers I say "Eh, you're probably right"
+
 ## Requirements
 1. Python 2.7
 2. Enough edge to cut yourself on
@@ -20,7 +22,7 @@ All imports are from the standard library, so you should have no problem with ru
 
 #### Windows
 
-Currently does not run on windows
+Currently does not run on windows, but you will need the 32 bit version of python2.7 to start.
 
 ## Wiki
 
