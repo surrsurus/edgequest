@@ -2089,33 +2089,36 @@ def mouse_move_astar(tx, ty):
     ''' Click on a space to send player there '''
     monster = False
 
-    if world[tx][ty].blocked:
-        message('Cannot travel there', libtcod.pink)
-    elif blind:
-        message('That\'s not a good idea considering your blindness',
-            libtcod.pink)
-    else:
-        while not libtcod.console_is_window_closed() and not monster and \
-        (player.x, player.y) != (tx, ty):
-            render_all()
-            libtcod.console_flush()
-            # Present the root console
-            libtcod.console_flush()
+    try:
+        if world[tx][ty].blocked:
+            message('Cannot travel there', libtcod.pink)
+        elif blind:
+            message('That\'s not a good idea considering your blindness',
+                libtcod.pink)
+        else:
+            while not libtcod.console_is_window_closed() and not monster and \
+            (player.x, player.y) != (tx, ty):
+                render_all()
+                libtcod.console_flush()
+                # Present the root console
+                libtcod.console_flush()
 
-            for obj in objects:
-                if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
-                obj.fighter and \
-                obj.name != player.name:
-                    message('Monster in view!', libtcod.pink)
-                    monster = True
-                    continue
+                for obj in objects:
+                    if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
+                    obj.fighter and \
+                    obj.name != player.name:
+                        message('Monster in view!', libtcod.pink)
+                        monster = True
+                        continue
 
-            player.move_astar(tx, ty)
-            fov_recompute()
+                player.move_astar(tx, ty)
+                fov_recompute()
 
-            for obj in objects:
-                if obj.ai:
-                    obj.ai.take_turn()
+                for obj in objects:
+                    if obj.ai:
+                        obj.ai.take_turn()
+    except IndexError:
+        message('Out of range', libtcod.pink)
 
 def msgbox(text, width=50):
     ''' use menu() as a sort of \'message box\' '''
