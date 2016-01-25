@@ -1,3 +1,4 @@
+
 import math
 import shelve
 import sys
@@ -9,6 +10,7 @@ import simplejson as json
 
 from colors import *
 from modules import libtcodpy as libtcod
+from modules.wallselect import wallselect
 from modules.dmap import dMap
 from settings import *
 
@@ -970,18 +972,25 @@ def choose_name():
 
     # Dispbox style key getting
     while not libtcod.console_is_window_closed():
+        # Limit FPS
+        time.sleep(1/LIMIT_FPS)
+
         # Check for keypresses
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
+
             key_char = chr(key.c)
             if key.vk == libtcod.KEY_F4:
                 libtcod.console_set_fullscreen(not \
                                                 libtcod.console_is_fullscreen())
             # Enter submits name
-            if key.vk == libtcod.KEY_ENTER:
+            elif key.vk == libtcod.KEY_ENTER:
                 break
             # Backspace deletes line
             elif key.vk == libtcod.KEY_BACKSPACE:
-                name = ''
+                if len(name) == 1:
+                    name = ''
+                else:
+                    name = name[:-1]
             # Shift causes a problem in libtcod so make sure nothing happens if
             #   pressed
             elif key.vk == libtcod.KEY_SHIFT:
@@ -1041,34 +1050,48 @@ def debug_spawn_console(json_list):
     elif json_list == 'item':
         message('Enter an item name', libtcod.red)
 
+    # Show new message
+    render_all()
+    libtcod.console_flush()
+
     key = libtcod.Key()
     name = ''
     check = True
 
     # Loop to show input from player
-    while True:
+    while not libtcod.console_is_window_closed():
+
+        # This loop has a tendency to eat all the cpu
+        time.sleep(1/LIMIT_FPS)
+
+        # Render before drawing a new dispbox
+        render_all()
+
         # Check for keypresses
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
-            key_char = chr(key.c)
             # Enter submits name
+            key_char = chr(key.c)
             if key.vk == libtcod.KEY_ENTER:
                 break
-            # Backspace deletes line
+            elif key.vk == libtcod.KEY_F4:
+                libtcod.console_set_fullscreen(not \
+                                                libtcod.console_is_fullscreen())
+            # Backspace deletes character
             elif key.vk == libtcod.KEY_BACKSPACE:
-                name = ''
+                if len(name) == 1:
+                    name = ''
+                else:
+                    name = name[:-1]
             # Esc quits
             elif key.vk == libtcod.KEY_ESCAPE:
                 check = False
                 break
             elif key.vk == libtcod.KEY_SHIFT:
                 pass
-            elif key_char:
+            elif key_char != '':
                 name = ''.join([name, key_char])
 
-        # Render before drawing a new dispbox
-        render_all()
-
-        dispbox('\n' + name + '\n', len(name))
+            dispbox('\n' + name + '\n', len(name))
 
     # Names have the ability to not exist, considering player is giving input
     found = False
@@ -1094,8 +1117,10 @@ def debug_spawn_console(json_list):
                 message('Spawned a ' + name)
                 found = True
 
-    if not found:
+    if not found and check:
         message('Failed to find a ' + name)
+    else:
+        message('Aborted')
 
 def debug_kill_all():
     ''' Kill everything with an ai '''
@@ -1205,9 +1230,10 @@ def fov_recompute():
                 if world[map_x][map_y].explored:
                     # It's out of the player's FOV
                     if wall:
-                        libtcod.console_put_char_ex(con, x, y, '#',
-                                                    libtcod.darker_azure,
-                                                    color_dark_wall)
+                        c = wallselect(world, map_x, map_y)
+                        libtcod.console_set_char_background(con, x, y,
+                                                    color_dark_wall,
+                                                    libtcod.BKGND_SET)
                     else:
                         libtcod.console_set_char_background(con, x, y,
                                                 color_dark_ground,
@@ -1215,7 +1241,8 @@ def fov_recompute():
             else:
                 # It's visible
                 if wall:
-                    libtcod.console_put_char_ex(con, x, y, '#',
+                    c = wallselect(world, map_x, map_y)
+                    libtcod.console_put_char_ex(con, x, y, c,
                                                 libtcod.white,
                                                 libtcod.light_gray)
                 else:
