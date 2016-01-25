@@ -899,6 +899,8 @@ def choose_name():
             # Backspace deletes line
             elif key.vk == libtcod.KEY_BACKSPACE:
                 name = ''
+            elif key.vk == libtcod.KEY_SHIFT:
+                pass
             elif key_char:
                 name = ''.join([name, key_char])
 
@@ -971,6 +973,8 @@ def debug_spawn_console(json_list):
             elif key.vk == libtcod.KEY_ESCAPE:
                 break
                 check = False
+            elif key.vk == libtcod.KEY_SHIFT:
+                pass
             if key_char:
                 name = ''.join([name, key_char])
 
@@ -1962,7 +1966,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[25, 1], [30, 4], [40, 6]])
+    max_monsters = from_dungeon_level([[10, 1], [30, 4], [40, 6]])
 
     # Chance of each monster
     monster_chances = {}
