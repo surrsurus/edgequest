@@ -682,6 +682,8 @@ def cast_confuse():
             ' look vacant, as he starts to stumble around!',
             libtcod.light_green)
 
+    render_all()
+
 def cast_fireball():
     ''' Ask the player for a target tile to throw a fireball at '''
     message('Left-click a target tile for the fireball, or right-click to cancel.',
@@ -728,6 +730,7 @@ def cast_inflict_blindness():
     global blind, blind_counter
     blind = True
     blind_counter = 0
+    message("You are blinded!", libtcod.dark_sea)
 
 def cast_mana():
     ''' Give some mana back '''
@@ -875,6 +878,8 @@ def check_level_up():
             player.fighter.power += 1
         elif choice == 2:
             player.fighter.defense += 1
+
+        render_all()
 
         # render the screen
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | \
@@ -1124,6 +1129,7 @@ def game_over():
     # Show some stats and stuff
     msgbox('You Died!\n\n \
     Level: ' + str(player.level) + '\n \
+    Floor: ' + str(dungeon_level) + '\n \
     Experience: ' + str(player.fighter.xp) + '\n \
     Maximum HP: ' + str(player.fighter.max_hp) + '\n \
     Attack: ' + str(player.fighter.power) + '\n \
@@ -1401,7 +1407,8 @@ def handle_keys():
             # Show character information
             level_up_xp = LEVEL_UP_BASE + player.level * LEVEL_UP_FACTOR
             msgbox('Character Information\n\nLevel: ' + str(player.level) +
-                    '\nExperience: ' + str(player.fighter.xp) +
+                    '\nFloor: ' + str(dungeon_level) +
+                    '\n\nExperience: ' + str(player.fighter.xp) +
                     '\nExperience to level up: ' + str(level_up_xp) +
                     '\n\nMaximum HP: ' + str(player.fighter.max_hp) +
                     '\nAttack: ' + str(player.fighter.power) +
@@ -2178,6 +2185,7 @@ def render_all():
         if blind_counter == BLIND_LENGTH:
             blind = False
             blind_counter = 0
+            message("Your vision returns!", libtcod.light_sea)
     player.draw()
 
     if not blind:
@@ -2213,7 +2221,7 @@ def render_all():
                 player.level * LEVEL_UP_FACTOR),
                 libtcod.dark_yellow, libtcod.darker_yellow)
 
-    render_bar_simple(1, 5, BAR_WIDTH, 'Level', str(dungeon_level),
+    render_bar_simple(1, 5, BAR_WIDTH, 'Floor', str(dungeon_level),
                                                     libtcod.light_blue)
 
 

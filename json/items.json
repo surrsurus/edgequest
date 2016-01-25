@@ -68,7 +68,7 @@
         "type": "equipment",
         "subtype": "weapon",
         "slot": "right hand",
-        "attack_msg": "strikes with the power of flowing water",
+        "attack_msg": "slashes",
         "weapon_func": "katana",
         "power": 3,
         "defense": 0,
