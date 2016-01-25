@@ -1966,7 +1966,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[10, 1], [30, 4], [40, 6]])
+    max_monsters = from_dungeon_level([[10, 1], [20, 4], [25, 6]])
 
     # Chance of each monster
     monster_chances = {}
@@ -1976,7 +1976,7 @@ def place_objects():
             from_dungeon_level(monster_data[item]['chance'])
 
     # Maximum number of items per level
-    max_items = from_dungeon_level([[15, 1], [20, 4]])
+    max_items = from_dungeon_level([[5, 1], [7, 3], [10, 4]])
 
     # Chance of each item (by default they have a chance of 0 at level 1,
     #   which then goes up)
