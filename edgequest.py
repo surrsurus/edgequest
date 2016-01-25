@@ -5,7 +5,7 @@ import textwrap
 import time
 from random import *
 
-import json as json
+import simplejson as json
 
 from colors import *
 from modules import libtcodpy as libtcod
@@ -890,7 +890,7 @@ def choose_name():
         # Check for keypresses
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
             key_char = chr(key.c)
-            if key.vk == (libtcod.KEY_ENTER and key.lalt) or key.vk == libtcod.KEY_F4:
+            if key.vk == libtcod.KEY_F4:
                 libtcod.console_set_fullscreen(not \
                                                 libtcod.console_is_fullscreen())
             # Enter submits name
@@ -1294,7 +1294,7 @@ def handle_keys():
     makes game playable '''
     global check_fov, game_state, objects, player_action, key, timer
 
-    # Alt-Enter for Fullscreen
+    # F4 for Fullscreen
     if key.vk == libtcod.KEY_F4:
         libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
@@ -1507,7 +1507,7 @@ def intro_cutscene():
     for y in range(len(intro_wall)+1):
         # Able to break in the middle of the cutscene
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
-            if key.vk == (libtcod.KEY_ENTER and key.lalt) or key.vk == libtcod.KEY_F4:
+            if key.vk == libtcod.KEY_F4:
                 libtcod.console_set_fullscreen(not \
                                                 libtcod.console_is_fullscreen())
             if key.vk == libtcod.KEY_ENTER:
@@ -1610,8 +1610,8 @@ def load_game():
 
     if not blind:
         initialize_fov()
-    else:
-        player.draw()
+	else:
+	    player.draw()
 
 def main_menu():
     ''' Show the main menu '''
@@ -1945,6 +1945,9 @@ def new_game():
     # A warm welcoming message!
     message('Welcome!', libtcod.lighter_yellow)
 
+    render_all()
+    libtcod.console_flush()
+
 def next_level():
     ''' Go to next level '''
     global dungeon_level, max_dungeon_level
@@ -2165,13 +2168,16 @@ def render_all():
         if blind_counter == BLIND_LENGTH:
             blind = False
             blind_counter = 0
+    player.draw()
 
-    if blind:
+    if not blind:
+        # blit the contents of 'con' to the root console
+        libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+    else:
         libtcod.console_clear(con)
         libtcod.console_set_default_background(con, libtcod.black)
-
-    player.draw()
-    libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+        player.draw()
+        libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
 
     # Prepare to render the GUI panel
     libtcod.console_set_default_background(panel, libtcod.black)
