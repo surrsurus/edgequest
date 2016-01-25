@@ -890,6 +890,9 @@ def choose_name():
         # Check for keypresses
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
             key_char = chr(key.c)
+            if key.vk == (libtcod.KEY_ENTER and key.lalt) or libtcod.KEY_F4:
+                libtcod.console_set_fullscreen(not \
+                                                libtcod.console_is_fullscreen())
             # Enter submits name
             if key.vk == libtcod.KEY_ENTER:
                 break
@@ -1292,7 +1295,7 @@ def handle_keys():
     global check_fov, game_state, objects, player_action, key, timer
 
     # Alt-Enter for Fullscreen
-    if key.vk == libtcod.KEY_ENTER and key.lalt:
+    if key.vk == (libtcod.KEY_ENTER and key.lalt) or libtcod.KEY_F4:
         libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
     if game_state == 'playing':
@@ -1504,6 +1507,9 @@ def intro_cutscene():
     for y in range(len(intro_wall)+1):
         # Able to break in the middle of the cutscene
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
+            if key.vk == (libtcod.KEY_ENTER and key.lalt) or libtcod.KEY_F4:
+                libtcod.console_set_fullscreen(not \
+                                                libtcod.console_is_fullscreen())
             if key.vk == libtcod.KEY_ENTER:
                 break
 

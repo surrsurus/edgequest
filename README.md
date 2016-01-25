@@ -8,7 +8,7 @@ Roguelike in Python based on the [Roguebasin Tutorial](http://www.roguebasin.com
 
 ## Run Edgequest
 
-### Linux
+#### Linux
 
 It should be as simple as running:
 
@@ -18,7 +18,7 @@ in the edgequest directory from a terminal
 
 All imports are from the standard library, so you should have no problem with running this on a linux machine
 
-### Windows
+#### Windows
 
 Currently does not run on windows
 
