@@ -1660,6 +1660,10 @@ def handle_keys():
                 right.weapon_function()
                 player_action = 'activating'
 
+        elif key_char == '?':
+            how_to_play()
+            player_action = 'didnt-take-turn'
+
         # Debug commands
 
         elif key_char == 'z':
@@ -1683,6 +1687,29 @@ def handle_keys():
 
         else:
             player_action = 'didnt-take-turn'
+
+def how_to_play():
+    msgbox(
+    'How To Play\n\n \
+    Numpad/Arrowkeys/Vim keys: Move \n \
+    Click: Move to spot \n \
+    i - Open Inventory \n \
+    e - Open Equipment\n \
+    g - Grab item below you\n \
+    d - Drop item\n \
+    > - Go Down Stairs\n \
+    < - Go Up Stairs\n \
+    c - View Stats\n \
+    m - Fire Edge missile\n \
+    q - Toggle siphon spell\n \
+    ? - Open this menu\n\n \
+    Debug Commands\n\n \
+    r - Reload a new map\n \
+    z - Spawn monster console\n \
+    x - Spawn item console\n \
+    v - Kill all on level\n\n \
+    Press any key to continue...',
+    CHARACTER_SCREEN_WIDTH)
 
 def initialize_fov():
     ''' Initialize the fov '''
@@ -1876,9 +1903,9 @@ def main_menu():
         libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
                                 libtcod.BKGND_NONE, libtcod.CENTER,
                                 'Edgequest')
-        libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 3,
+        libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 4,
                                 libtcod.BKGND_NONE, libtcod.CENTER,
-                                'What hath God wrought?')
+                                'What hath God wrought?'
 
         libtcod.console_set_default_foreground(0, libtcod.black)
         libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 2,
@@ -1886,7 +1913,7 @@ def main_menu():
 
         # Show options and wait for the player's choice
         choice = menu('Options', ['Play a new game', 'Continue last game',
-                        'Quit'], 24)
+                        'How to play', 'Quit'], 24)
 
         if choice == 0:  # New game
             intro_cutscene()
@@ -1900,7 +1927,9 @@ def main_menu():
                 msgbox('\n No saved game to load.\n', 24)
                 continue
             play_game()
-        elif choice == 2:  # Quit
+        if choice == 2:  # How to play
+            how_to_play()
+        elif choice == 3:  # Quit
             exit()
 
 def make_map():
