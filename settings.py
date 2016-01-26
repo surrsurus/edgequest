@@ -1,6 +1,15 @@
+import modules.libtcodpy as libtcod
+
 ######################################
 # Settings
 ######################################
+
+######### Full Screen Key
+
+FULLSCREEN_KEYS = [
+    libtcod.KEY_TAB,
+    libtcod.KEY_F4
+    ]
 
 ######### Map
 

@@ -983,7 +983,7 @@ def choose_name():
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
 
             key_char = chr(key.c)
-            if key.vk == libtcod.KEY_F4:
+            if key.vk in FULLSCREEN_KEYS:
                 libtcod.console_set_fullscreen(not \
                                                 libtcod.console_is_fullscreen())
             # Enter submits name
@@ -1511,8 +1511,9 @@ def handle_keys():
     global check_fov, game_state, objects, player_action, key, timer
 
     # F4 for Fullscreen
-    if key.vk == libtcod.KEY_F4 or key.vk == libtcod.KEY_TAB:
-        libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+    if key.vk in FULLSCREEN_KEYS:
+        libtcod.console_set_fullscreen(not \
+                                        libtcod.console_is_fullscreen())
 
     if game_state == 'playing':
         # End game with escape
@@ -1754,10 +1755,10 @@ def intro_cutscene():
     for y in range(len(intro_wall)+1):
         # Able to break in the middle of the cutscene
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
-            if key.vk == libtcod.KEY_F4:
+            if key.vk in FULLSCREEN_KEYS:
                 libtcod.console_set_fullscreen(not \
                                                 libtcod.console_is_fullscreen())
-            if key.vk == libtcod.KEY_ENTER:
+            elif key.vk == libtcod.KEY_ENTER:
                 break
 
         if libtcod.console_is_window_closed():
@@ -2537,7 +2538,8 @@ def render_all():
         'neck',
         'torso',
         'hands',
-        'legs'
+        'legs',
+        'accessory'
     ]
     for y, slot in enumerate(slot_list):
         render_equips(SCREEN_HEIGHT - len(slot_list) + y, slot)
@@ -2548,7 +2550,7 @@ def render_all():
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.fighter and \
         obj.name != player.name and not blind:
             monsters_in_room += 1
-            if monsters_in_room > (SCREEN_HEIGHT - 16) / 2:
+            if monsters_in_room > (SCREEN_HEIGHT - 17) / 2:
                 continue
             else:
                 libtcod.console_set_default_foreground(panel, obj.color)
