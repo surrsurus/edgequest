@@ -2214,7 +2214,7 @@ def new_game():
     # create object representing the player
     fighter_component = Fighter(hp=100, defense=1, power=4, xp=0, mana=100,
                                 death_function=player_death,)
-    player = Object(0, 0, '@', player_name, libtcod.white, blocks=True,
+    player = Object(0, 0, PLAYER_CHARACTER, player_name, PLAYER_COLOR, blocks=True,
                     fighter=fighter_component)
 
     player.level = 1

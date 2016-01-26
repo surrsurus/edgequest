@@ -42,6 +42,10 @@ TORCH_RADIUS = 10
 
 ######### UI
 
+# Player
+PLAYER_COLOR = libtcod.gold
+PLAYER_CHARACTER = '@'
+
 # Inventory Screen width
 INVENTORY_WIDTH = 50
 
