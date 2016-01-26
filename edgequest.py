@@ -6,7 +6,11 @@ import textwrap
 import time
 from random import *
 
-import simplejson as json
+try:
+    import simplejson as json
+except:
+    print("You need to install python-simplejson in your package manager")
+    exit()
 
 from colors import *
 from modules import libtcodpy as libtcod
@@ -2493,8 +2497,9 @@ def render_all():
         # Draw all objects in the list, except the player. we want it to
         # Always appear over all other objects! so it's drawn later.
         for obj in objects:
-            if obj != player:
+            if obj.name != player.name:
                 obj.draw()
+
     else:
         if blind_counter == BLIND_LENGTH:
             blind = False
