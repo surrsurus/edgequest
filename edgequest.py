@@ -149,7 +149,7 @@ class Equipment:
     automatically adds the Item component. '''
     def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0,
                 max_mana_bonus=0, attack_msg=None, weapon_func=None,
-                ranged_bonus=0):
+                ranged_bonus=0, short_name=None):
         self.power_bonus = power_bonus
         self.defense_bonus = defense_bonus
         self.max_hp_bonus = max_hp_bonus
@@ -161,6 +161,8 @@ class Equipment:
 
         self.slot = slot
         self.is_equipped = False
+
+        self.short_name = short_name
 
     def toggle_equip(self):
         ''' Toggle equip/dequip status '''
@@ -1119,8 +1121,6 @@ def debug_spawn_console(json_list):
 
     if not found and check:
         message('Failed to find a ' + name)
-    else:
-        message('Aborted')
 
 def debug_kill_all():
     ''' Kill everything with an ai '''
@@ -1149,6 +1149,31 @@ def dispbox(header, width=50):
 
     # Present the root console
     libtcod.console_flush()
+
+def equipment_menu(header):
+    ''' Show a menu with each equipment item as an option '''
+    if len(inventory) == 0:
+        options = ['Inventory is empty.']
+    else:
+        options = []
+        sort_inventory()
+        for item in inventory:
+            # Only get equipment
+            if item.equipment:
+                text = item.name
+                if item.equipment.is_equipped:
+                    text = text + ' (on ' + item.equipment.slot + ')'
+                options.append(text)
+
+    if len(options) == 0:
+        options = ['No equipment']
+
+    index = menu(header, options, INVENTORY_WIDTH)
+
+    # If an item was chosen, return it
+    if index is None or len(inventory) == 0:
+        return None
+    return inventory[index].item
 
 def fire_weapon(power):
     ''' Find closest enemy and shoot it '''
@@ -1399,7 +1424,8 @@ def generate_item(item_id, x, y):
                             max_hp_bonus=items_data[item_id]['hp'],
                             max_mana_bonus=items_data[item_id]['mana'],
                             attack_msg=items_data[item_id]['attack_msg'],
-                            weapon_func=func)
+                            weapon_func=func,
+                            short_name=items_data[item_id]['short_name'])
         elif items_data[item_id]['subtype'] == 'firearm':
             if items_data[item_id]['weapon_func'] == 'firearm':
                 func = weapon_action_firearm
@@ -1536,16 +1562,27 @@ def handle_keys():
 
         elif key_char == 'i':
             # Show the inventory
-            chosen_item = inventory_menu('Press the key next to an item to \
-                                        use it, or any other to cancel.\n')
+            chosen_item = inventory_menu(
+            'Press the key next to an item to use it, or any other to cancel.\
+            \n')
+            if chosen_item is not None:
+                chosen_item.use()
+                player_action = 'use'
+
+        elif key_char == 'e':
+            # Show equipment
+            chosen_item = equipment_menu(
+            'Press the key next to an item to equip/dequip it, or any other to cancel.\
+            \n')
             if chosen_item is not None:
                 chosen_item.use()
                 player_action = 'use'
 
         elif key_char == 'd':
             # Show the inventory; if an item is selected, drop it
-            chosen_item = inventory_menu('Press the key next to an item to \
-                                        drop it, or any other to cancel.\n')
+            chosen_item = inventory_menu(
+            'Press the key next to an item to drop it, or any other to cancel.\
+            \n')
             if chosen_item is not None:
                 chosen_item.drop()
                 player_action = 'drop'
@@ -2089,8 +2126,16 @@ def mouse_move_astar(tx, ty):
     ''' Click on a space to send player there '''
     monster = False
 
+    # Initially check for monsters
+    for obj in objects:
+        if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
+        obj.fighter and \
+        obj.name != player.name:
+            message('Monster in view!', libtcod.pink)
+            monster = True
+
     try:
-        if world[tx][ty].blocked:
+        if world[tx][ty].blocked or not world[tx][ty].explored:
             message('Cannot travel there', libtcod.pink)
         elif blind:
             message('That\'s not a good idea considering your blindness',
@@ -2417,8 +2462,12 @@ def render_all():
     player.draw()
 
     if not blind:
+        # Display a cursor under mouse coords
+        libtcod.console_set_char_background(con, mouse.cx, mouse.cy,
+                                            color_light_ground)
         # blit the contents of 'con' to the root console
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+        fov_recompute()
     else:
         libtcod.console_clear(con)
         libtcod.console_set_default_background(con, libtcod.black)
@@ -2436,6 +2485,16 @@ def render_all():
     # Show the player's stats
     libtcod.console_print_ex(panel, 1 + BAR_WIDTH / 2, 1, libtcod.BKGND_NONE,
                             libtcod.CENTER, player.name)
+
+    # Cool distinctions
+    libtcod.console_set_default_foreground(panel, libtcod.gray)
+    for y in range(SCREEN_HEIGHT):
+        libtcod.console_print_ex(panel, 0, y, libtcod.BKGND_NONE,
+                                    libtcod.CENTER, '|')
+    libtcod.console_set_default_foreground(msg_panel, libtcod.gray)
+    for x in range(SCREEN_WIDTH):
+        libtcod.console_print_ex(msg_panel, x, 0, libtcod.BKGND_NONE,
+                                    libtcod.CENTER, '-')
 
     render_bar(1, 2, BAR_WIDTH, 'HP', player.fighter.hp, player.fighter.max_hp,
                libtcod.light_red, libtcod.darker_red)
@@ -2458,19 +2517,37 @@ def render_all():
     render_bar_simple(1, 8, BAR_WIDTH, 'Defense', str(player.fighter.defense),
                         libtcod.flame)
 
+    # Render equipment
+    slot_list = [
+        'right hand',
+        'left hand',
+        'head',
+        'face',
+        'neck',
+        'torso',
+        'hands',
+        'legs'
+    ]
+    for y, slot in enumerate(slot_list):
+        render_equips(SCREEN_HEIGHT - len(slot_list) + y, slot)
+
     # Show all the monsters that the player can see and shows their health
     monsters_in_room = 0
     for obj in objects:
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.fighter and \
         obj.name != player.name and not blind:
             monsters_in_room += 1
-            libtcod.console_set_default_foreground(panel, obj.color)
-            libtcod.console_print_ex(panel, 1, 9+(2*monsters_in_room),
-                                    libtcod.BKGND_NONE, libtcod.LEFT,
-                                    ''.join([obj.char, ' ', obj.name.capitalize()]))
-            render_health_bar(1, 10+(2*monsters_in_room), BAR_WIDTH,
-                                obj.fighter.hp, obj.fighter.base_max_hp,
-                                libtcod.red, libtcod.dark_red)
+            if monsters_in_room > (SCREEN_HEIGHT - 16) / 2:
+                continue
+            else:
+                libtcod.console_set_default_foreground(panel, obj.color)
+                libtcod.console_print_ex(panel, 1, 9+(2*monsters_in_room),
+                                        libtcod.BKGND_NONE, libtcod.LEFT,
+                                        ''.join([obj.char, ' ',
+                                        obj.name.capitalize()]))
+                render_health_bar(1, 10+(2*monsters_in_room), BAR_WIDTH,
+                                    obj.fighter.hp, obj.fighter.base_max_hp,
+                                    libtcod.red, libtcod.dark_red)
 
     # Display names of objects under the mouse
     if not blind:
@@ -2487,10 +2564,10 @@ def render_all():
         y += 1
 
     # Blit the contents of 'panel' and 'msg_panel' to the root console
-    libtcod.console_blit(panel, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, 0,
-                        SCREEN_WIDTH-PANEL_WIDTH, PANEL_Y)
     libtcod.console_blit(msg_panel, 0, 0, SCREEN_WIDTH, PANEL_HEIGHT, 0, 0,
                         MSG_PANEL_Y)
+    libtcod.console_blit(panel, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, 0,
+                            SCREEN_WIDTH-PANEL_WIDTH, PANEL_Y)
 
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color):
     ''' Render a bar (HP, experience). '''
@@ -2534,6 +2611,24 @@ def render_bar_simple(x, y, total_width, name, value, color):
     libtcod.console_set_default_foreground(panel, libtcod.white)
     libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
                             libtcod.CENTER, name + ': ' + str(value))
+
+def render_equips(y_offset, slot):
+    equip = get_equipped_in_slot(slot)
+    if not equip:
+        equip = "None"
+    else:
+        if len(equip.owner.name) > 15:
+            equip = equip.short_name
+        else:
+            equip = equip.owner.name
+
+    if slot == 'right hand':
+        slot = 'RH'
+    elif slot == 'left hand':
+        slot = 'LH'
+
+    render_bar_simple(1, y_offset, BAR_WIDTH, slot.capitalize(), equip,
+                        libtcod.black)
 
 def render_health_bar(x, y, total_width, value, maximum, bar_color, back_color):
     ''' This is a bar that doesn't show any values in it. Useful for enemy

@@ -61,6 +61,7 @@
 
     "katana": {
         "name": "katana",
+        "short_name": "",
         "id": "katana",
         "char": "/",
         "color": "sky",
@@ -78,6 +79,7 @@
 
     "dagger": {
         "name": "dagger",
+        "short_name": "",
         "id": "dagger",
         "char": "-",
         "color": "sky",
@@ -95,6 +97,7 @@
 
     "m9bayonet": {
         "name": "StatTrak M9 Bayonet | Crimson Web (Factory New)",
+        "short_name": "M9 Bayonet",
         "id": "m9bayonet",
         "char": "-",
         "color": "dark_crimson",
@@ -112,6 +115,7 @@
 
     "awp": {
         "name": "AWP",
+        "short_name": "",
         "id": "awp",
         "char": ";",
         "color": "dark_crimson",
@@ -129,6 +133,7 @@
 
     "p90": {
         "name": "P90",
+        "short_name": "",
         "id": "p90",
         "char": ",",
         "color": "orange",
@@ -147,6 +152,7 @@
 
     "r8nerf": {
         "name": "R8 Revolver",
+        "short_name": "",
         "id": "r8nerf",
         "char": ",",
         "color": "red",
@@ -165,6 +171,7 @@
 
     "r8": {
         "name": "R8 Revolver",
+        "short_name": "",
         "id": "r8",
         "char": ",",
         "color": "red",
@@ -213,6 +220,7 @@
 
     "stattrakfedora": {
         "name": "StatTrak Fedora | Fade (Fac New)",
+        "short_name": "Fedora of Fade",
         "id": "stattrakfedora",
         "char": "^",
         "color": "dark_crimson",
