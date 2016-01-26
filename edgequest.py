@@ -1438,13 +1438,15 @@ def generate_item(item_id, x, y):
                             max_mana_bonus=items_data[item_id]['mana'],
                             attack_msg=items_data[item_id]['attack_msg'],
                             weapon_func=func,
-                            ranged_bonus=items_data[item_id]['ranged'])
+                            ranged_bonus=items_data[item_id]['ranged'],
+                            short_name=items_data[item_id]['short_name'])
         else:
             equip_component = Equipment(slot=items_data[item_id]['slot'],
                             power_bonus=items_data[item_id]['power'],
                             defense_bonus=items_data[item_id]['defense'],
                             max_hp_bonus=items_data[item_id]['hp'],
-                            max_mana_bonus=items_data[item_id]['mana'])
+                            max_mana_bonus=items_data[item_id]['mana'],
+                            short_name=items_data[item_id]['short_name'])
 
         item = Object(x, y, items_data[item_id]['char'],
                         items_data[item_id]['name'], color,
@@ -1515,14 +1517,17 @@ def handle_keys():
         key_char = chr(key.c)
 
         # Movement keys
-        if key_char in movement_keys:
-            if key_char in ('8', 'k'): # N
+        if key_char in movement_keys or key.vk in (libtcod.KEY_UP,
+                                                    libtcod.KEY_DOWN,
+                                                    libtcod.KEY_LEFT,
+                                                    libtcod.KEY_RIGHT):
+            if key_char in ('8', 'k') or key.vk == libtcod.KEY_UP: # N
                 player_move(0, -1)
-            elif key_char in ('2', 'j'): # S
+            elif key_char in ('2', 'j') or key.vk == libtcod.KEY_DOWN: # S
                 player_move(0, 1)
-            elif key_char in ('4', 'h'): # W
+            elif key_char in ('4', 'h') or key.vk == libtcod.KEY_LEFT: # W
                 player_move(-1, 0)
-            elif key_char in ('6', 'l'): # E
+            elif key_char in ('6', 'l') or key.vk == libtcod.KEY_RIGHT: # E
                 player_move(1, 0)
             elif key_char in ('7', 'y'): # NW
                 player_move(-1, -1)

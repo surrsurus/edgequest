@@ -152,7 +152,7 @@
 
     "r8nerf": {
         "name": "R8 Revolver",
-        "short_name": "",
+        "short_name": "R8",
         "id": "r8nerf",
         "char": ",",
         "color": "red",
@@ -171,7 +171,7 @@
 
     "r8": {
         "name": "R8 Revolver",
-        "short_name": "",
+        "short_name": "R8",
         "id": "r8",
         "char": ",",
         "color": "red",
@@ -190,6 +190,7 @@
 
     "trenchcoat": {
         "name": "trenchcoat",
+        "short_name": "",
         "id": "trenchcoat",
         "char": "[",
         "color": "darker_orange",
@@ -205,6 +206,7 @@
 
     "fedora": {
         "name": "fedora",
+        "short_name": "",
         "id": "fedora",
         "char": "^",
         "color": "dark_gray",
@@ -220,7 +222,7 @@
 
     "stattrakfedora": {
         "name": "StatTrak Fedora | Fade (Fac New)",
-        "short_name": "Fedora of Fade",
+        "short_name": "FedoraFade",
         "id": "stattrakfedora",
         "char": "^",
         "color": "dark_crimson",
@@ -236,6 +238,7 @@
 
     "fgloves": {
         "name": "fingerless gloves",
+        "short_name": "fgloves",
         "id": "fgloves",
         "char": "\"",
         "color": "gray",
@@ -251,6 +254,7 @@
 
     "cargoshorts": {
         "name": "cargo shorts",
+        "short_name": "",
         "id": "cargoshorts",
         "char": "n",
         "color": "darker_orange",
@@ -266,6 +270,7 @@
 
     "neckbeard": {
         "name": "neckbeard",
+        "short_name": "",
         "id": "neckbeard",
         "char": "#",
         "color": "darker_orange",
@@ -281,6 +286,7 @@
 
     "fawkesmask": {
         "name": "Guy Fawkes Mask",
+        "short_name": "",
         "id": "fawkesmask",
         "char": ")",
         "color": "white",
