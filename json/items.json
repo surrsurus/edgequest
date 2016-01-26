@@ -199,7 +199,7 @@
         "subtype": "armor",
         "slot": "torso",
         "power": 0,
-        "defense": 1,
+        "defense": 2,
         "hp": 0,
         "mana": 0
     },
@@ -215,7 +215,7 @@
         "subtype": "armor",
         "slot": "head",
         "power": 0,
-        "defense": 1,
+        "defense": 2,
         "hp": 0,
         "mana": 0
     },
@@ -247,7 +247,7 @@
         "subtype": "armor",
         "slot": "hands",
         "power": 0,
-        "defense": 1,
+        "defense": 2,
         "hp": 0,
         "mana": 0
     },

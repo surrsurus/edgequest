@@ -1177,7 +1177,7 @@ def equipment_menu(header):
         return None
     return inventory[index].item
 
-def fire_weapon(power):
+def fire_weapon(equipment):
     ''' Find closest enemy and shoot it '''
     monster = closest_monster(LIGHTNING_RANGE)
     if monster is None:  # No enemy found within maximum range
@@ -1186,9 +1186,10 @@ def fire_weapon(power):
 
     # Zap it!
     message(player_name + ' shoots the ' + monster.name +
-            ' with a loud bang! The damage is ' + str(power) +
+            ' with the ' + equipment.owner.name+ '! The damage is ' +
+            str(equipment.ranged_bonus) +
             ' hit points.', libtcod.light_red)
-    monster.fighter.take_damage(power)
+    monster.fighter.take_damage(equipment.ranged_bonus)
 
     # Animation test, courtesy of Trash Animation Studios(tm)
     dx = player.x
@@ -1442,7 +1443,7 @@ def generate_item(item_id, x, y):
                             weapon_func=func,
                             ranged_bonus=items_data[item_id]['ranged'],
                             short_name=items_data[item_id]['short_name'])
-        else:
+        elif items_data[item_id]['subtype'] == 'armor':
             equip_component = Equipment(slot=items_data[item_id]['slot'],
                             power_bonus=items_data[item_id]['power'],
                             defense_bonus=items_data[item_id]['defense'],
@@ -1499,7 +1500,10 @@ def get_names_under_mouse():
     if COORDS_UNDER_MOUSE:
         names += '( ' + str(x) + ', ' + str(y) + ' )'
 
-    return names.capitalize()
+    if names:
+        return '['+names.capitalize()+']'
+    else:
+        return ''
 
 def handle_keys():
     ''' Handle keypresses sent to the console. Executes other things,
@@ -1507,7 +1511,7 @@ def handle_keys():
     global check_fov, game_state, objects, player_action, key, timer
 
     # F4 for Fullscreen
-    if key.vk == libtcod.KEY_F4:
+    if key.vk == libtcod.KEY_F4 or key.vk == libtcod.KEY_TAB:
         libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
     if game_state == 'playing':
@@ -2758,7 +2762,8 @@ def taunt():
         'M\'lady',
         'Notice me senpai',
         'Filthy gaijin go home',
-        'Get rekt'
+        'Get rekt',
+        'You fell for the meme, kiddo'
     ]
 
     message(''.join(['You say \'', taunts[randint(0,len(taunts)-1)], '\'']))
@@ -2798,7 +2803,7 @@ def weapon_action_awp(weapon):
 
 def weapon_action_firearm(weapon):
     ''' Firearm action '''
-    fire_weapon(weapon.equipment.ranged_bonus)
+    fire_weapon(weapon.equipment)
 
 def weapon_action_else(weapon):
     ''' Emergency reserve action '''
