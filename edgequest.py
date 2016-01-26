@@ -1905,7 +1905,7 @@ def main_menu():
                                 'Edgequest')
         libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 4,
                                 libtcod.BKGND_NONE, libtcod.CENTER,
-                                'What hath God wrought?'
+                                'What hath God wrought?')
 
         libtcod.console_set_default_foreground(0, libtcod.black)
         libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 2,
