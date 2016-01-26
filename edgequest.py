@@ -10,9 +10,11 @@ import simplejson as json
 
 from colors import *
 from modules import libtcodpy as libtcod
-from modules.wallselect import wallselect
 from modules.dmap import dMap
+from modules.wallselect import wallselect
 from settings import *
+
+sys.dont_write_bytecode = True
 
 ######################################
 # JSON
