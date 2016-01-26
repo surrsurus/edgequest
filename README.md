@@ -20,6 +20,12 @@ in the edgequest directory from a terminal
 
 All imports are from the standard library, so you should have no problem with running this on a linux machine
 
+If it doesn't work try running
+
+`sudo apt-get install python-simplejson`
+
+`sudo apt-get --reinstall libsdl1.2debian`
+
 #### Windows
 
 Currently does not run on windows, but you will need the 32 bit version of python2.7 to start.
