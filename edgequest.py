@@ -2205,6 +2205,9 @@ def mouse_move_astar(tx, ty):
     ''' Click on a space to send player there '''
     monster = False
 
+    if player_action == 'use':
+        return None
+
     # Initially check for monsters
     for obj in objects:
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
