@@ -28,6 +28,11 @@ If you get an SDL error along the lines of `libsdl1.2.0 not found` try:
 
 Currently does not run on windows, but you will need the 32 bit version of python2.7 to start.
 
+#### Mac OS
+
+Kevin playtested it on his Macbook Air and he used a live USB of linux mint.
+Considering he's the only one I know with a mac, and he found a way to circumvent this problem, so there is no planned mac version.
+
 ## Wiki
 
 Please check the [wiki](https://github.com/TriangularEgg/edgequest/wiki) for further information
