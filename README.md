@@ -12,16 +12,17 @@ Utilizes the [simplejson python library](https://github.com/simplejson/simplejso
 
 ## Run Edgequest
 
-#### Linux
+#### Linux (Debian-based)
 
 It should be as simple as running the `run` script included with the repository
 
 All imports are from the standard library (with the exception of simplejson, included with edgequest), so you should have no problem with running this on a linux machine
 
-
 If you get an SDL error along the lines of `libsdl1.2.0 not found` try:
 
 `sudo apt-get --reinstall libsdl1.2debian`
+
+Max tried to run the code in Manjaro Linux and it didn't work so there is an issue with pacman-based distros.
 
 #### Windows
 
