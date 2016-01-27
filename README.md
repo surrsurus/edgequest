@@ -12,17 +12,15 @@ Some say making a roguelike in python is pointless, due to the slow speeds that 
 
 #### Linux
 
-It should be as simple as running:
-
-`python2.7 edgequest.py`
-
-in the edgequest directory from a terminal
+It should be as simple as running the `run` script included with the repository
 
 All imports are from the standard library, so you should have no problem with running this on a linux machine
 
-If it doesn't work try running
+If it doesn't work install python-simplejson:
 
 `sudo apt-get install python-simplejson`
+
+If you get an SDL error along the lines of `libsdl1.2.0 not found` try:
 
 `sudo apt-get --reinstall libsdl1.2debian`
 
