@@ -9,7 +9,7 @@ from random import *
 try:
     import simplejson as json
 except:
-    print("You need to install python-simplejson in your package manager")
+    print("You need to install python-simplejson")
     exit()
 
 from colors import *
@@ -718,7 +718,7 @@ con = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
 # And one for a player-centered focus
 dcon = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-# FPS Limit (Not Essential)
+# FPS Limit
 libtcod.sys_set_fps(LIMIT_FPS)
 
 # Mouse and Keyboard detection
@@ -981,7 +981,7 @@ def choose_name():
     # Dispbox style key getting
     while not libtcod.console_is_window_closed():
         # Limit FPS
-        time.sleep(1/LIMIT_FPS)
+        time.sleep(1/LIMIT_FPS*2)
 
         # Check for keypresses
         if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
@@ -1070,7 +1070,7 @@ def debug_spawn_console(json_list):
     while not libtcod.console_is_window_closed():
 
         # This loop has a tendency to eat all the cpu
-        time.sleep(1/LIMIT_FPS)
+        time.sleep(1/LIMIT_FPS*2)
 
         # Render before drawing a new dispbox
         render_all()
@@ -1183,7 +1183,7 @@ def equipment_menu(header):
 
 def fire_weapon(equipment):
     ''' Find closest enemy and shoot it '''
-    monster = closest_monster(LIGHTNING_RANGE)
+    monster = closest_monster(FIREARM_RANGE)
     if monster is None:  # No enemy found within maximum range
         message('No enemy is close enough to shoot.', libtcod.red)
         return 'cancelled'
@@ -1707,6 +1707,7 @@ def how_to_play():
     'How To Play\n\n \
     Numpad/Arrowkeys/Vim keys: Move \n \
     Click: Move to spot \n \
+    . - Wait \n \
     i - Open Inventory \n \
     e - Open Equipment\n \
     g - Grab item below you\n \
