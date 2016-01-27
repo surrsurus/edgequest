@@ -83,7 +83,7 @@ class BasicMonster:
 
             # Move towards player if far away
             if monster.distance_to(player) >= 2:
-                monster.move_astar(player.x, player.y)
+                monster.move_astar(player.x, player.y, False)
 
             # Close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
@@ -527,7 +527,7 @@ class Object:
         except IndexError:
             pass
 
-    def move_astar(self, tx, ty):
+    def move_astar(self, tx, ty, player_move):
         ''' A* Algorithm for pathfinding towards target '''
         # Create a FOV map that has the dimensions of the map
         fov = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
@@ -567,7 +567,9 @@ class Object:
         # It makes sense to keep path size relatively low to keep the monsters
         #   from running around the map if there's an alternative path really
         #   far away
-        if not libtcod.path_is_empty(my_path) and libtcod.path_size(my_path) < 25:
+        if not libtcod.path_is_empty(my_path) and \
+        libtcod.path_size(my_path) < 25 \
+        or player_move:
             #Find the next coordinates in the computed full path
             x, y = libtcod.path_walk(my_path, True)
             if x or y:
@@ -1505,8 +1507,7 @@ def get_names_under_mouse():
     # Create a list with the names of all objects at the mouse's
     #   coordinates and in FOV
     names = [obj.name for obj in objects
-             if obj.x == x and obj.y == y and libtcod.map_is_in_fov(fov_map,
-             obj.x, obj.y)]
+             if obj.x == x and obj.y == y]
 
     names = ', '.join(names)  # Join the names, separated by commas
 
@@ -2219,6 +2220,7 @@ def mouse_move_astar(tx, ty):
             message('That\'s not a good idea considering your blindness',
                 libtcod.pink)
         else:
+            message('Moving...', libtcod.pink)
             while not libtcod.console_is_window_closed() and not monster and \
             (player.x, player.y) != (tx, ty):
                 render_all()
@@ -2234,7 +2236,7 @@ def mouse_move_astar(tx, ty):
                         monster = True
                         continue
 
-                player.move_astar(tx, ty)
+                player.move_astar(tx, ty, True)
                 fov_recompute()
 
                 for obj in objects:
