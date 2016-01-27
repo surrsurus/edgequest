@@ -175,6 +175,35 @@
         "rate":60
     },
 
+    "gray": {
+      "name":"Gray",
+      "id":"gray",
+      "char":"@",
+      "color": "gray",
+    	"chance":[[50, 10]],
+    	"hp":100,
+    	"defens2":10,
+    	"power":10,
+    	"xp":1000,
+      "mana":0,
+  		"death_func":"talk",
+      "death_talk":"Python is better than ruby...",
+      "attack_msg":"StatTraks",
+      "ai": "talk",
+      "speech": [
+            "You're about to get scammed",
+            "You fell for the meme, kiddo",
+            "Ruby is objectively worse than do loops in java",
+            "Python isn't a scripting language",
+            "I'll have Cena RKO you",
+            "Salty m8?",
+            "I'll unnerf the R8, and John Cena",
+            "You'll never find the StatTrak fedora!",
+            "You won't be so (Factory New) after this"
+        ],
+        "rate":60
+    },
+
     "kevin": {
         "name":"Kevin",
         "id":"kevin",
