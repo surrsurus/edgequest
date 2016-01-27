@@ -6,11 +6,7 @@ import textwrap
 import time
 from random import *
 
-try:
-    import simplejson as json
-except:
-    print("You need to install python-simplejson")
-    exit()
+import modules.simplejson as json
 
 from colors import *
 from modules import libtcodpy as libtcod

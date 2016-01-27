@@ -3,6 +3,8 @@ Roguelike in Python based on the [Roguebasin Tutorial](http://www.roguebasin.com
 
 Some say making a roguelike in python is pointless, due to the slow speeds that may come as a part of constant A* pathfinding, FOV, djikstra maps, and dynamic lighting, but to the naysayers I say "Eh, you're probably right"
 
+Utilizes the [simplejson python library](https://github.com/simplejson/simplejson)
+
 ## Requirements
 1. Python 2.7
 2. Enough edge to cut yourself on
@@ -14,11 +16,8 @@ Some say making a roguelike in python is pointless, due to the slow speeds that 
 
 It should be as simple as running the `run` script included with the repository
 
-All imports are from the standard library, so you should have no problem with running this on a linux machine
+All imports are from the standard library (with the exception of simplejson, included with edgequest), so you should have no problem with running this on a linux machine
 
-If it doesn't work install python-simplejson:
-
-`sudo apt-get install python-simplejson`
 
 If you get an SDL error along the lines of `libsdl1.2.0 not found` try:
 
