@@ -816,7 +816,7 @@ def cast_magic_missile():
 
     # Zap it!
     message('A missile of pure edge strikes the ' + monster.name +
-            ' with a loud airhorn! The damage is ' + str(LIGHTNING_DAMAGE) +
+            ' with a loud airhorn! The damage is ' + str(MISSILE_DAMAGE) +
             ' hit points.', libtcod.light_blue)
 
     monster.fighter.take_damage(MISSILE_DAMAGE)
