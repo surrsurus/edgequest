@@ -396,13 +396,13 @@ class Item:
             message('You picked up a ' + self.owner.name + '!',
                     libtcod.light_green)
 
-        # Special case: automatically equip, if the corresponding equipment
-        # slot is unused
-        equipment = self.owner.equipment
-        if equipment is not None:
-            if (equipment and get_equipped_in_slot(equipment.slot) is None) or \
-            (equipment.slot == 'right hand' or equipment.slot == 'left hand'):
-                equipment.equip()
+            # Special case: automatically equip, if the corresponding equipment
+            # slot is unused
+            equipment = self.owner.equipment
+            if equipment is not None:
+                if (equipment and get_equipped_in_slot(equipment.slot) is None) or \
+                (equipment.slot == 'right hand' or equipment.slot == 'left hand'):
+                    equipment.equip()
 
     def drop(self):
         ''' Drops an item '''
