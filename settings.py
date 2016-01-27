@@ -92,7 +92,7 @@ MISSILE_RANGE = 5
 
 # Lightning Scroll
 LIGHTNING_DAMAGE = 40
-LIGHTNING_RANGE = 5
+LIGHTNING_RANGE = 2
 
 # Confusion scroll
 CONFUSE_RANGE = 8

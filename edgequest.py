@@ -1188,12 +1188,22 @@ def fire_weapon(equipment):
         message('No enemy is close enough to shoot.', libtcod.red)
         return 'cancelled'
 
-    # Zap it!
-    message(player_name + ' shoots the ' + monster.name +
-            ' with the ' + equipment.owner.name+ '! The damage is ' +
-            str(equipment.ranged_bonus) +
-            ' hit points.', libtcod.light_red)
-    monster.fighter.take_damage(equipment.ranged_bonus)
+    damage = equipment.ranged_bonus - monster.fighter.defense
+
+    if damage > 0:
+
+        # Zap it!
+        message(player_name + ' shoots the ' + monster.name +
+                ' with the ' + equipment.owner.name + '! The damage is ' +
+                str(damage) +
+                ' hit points.', libtcod.light_red)
+        monster.fighter.take_damage(damage)
+
+    else:
+
+        message(player_name + ' shoots the ' + monster.name +
+            ' with the ' + equipment.owner.name +
+            'but the shot reflects off the armor!', libtcod.light_red)
 
     # Animation test, courtesy of Trash Animation Studios(tm)
     dx = player.x
