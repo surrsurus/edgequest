@@ -31,7 +31,7 @@ Currently does not run on windows, but you will need the 32 bit version of pytho
 #### Mac OS
 
 Kevin playtested it on his Macbook Air and he used a live USB of linux mint.
-Considering he's the only one I know with a mac, and he found a way to circumvent this problem, so there is no planned mac version.
+Considering he's the only one I know with a mac, and he found a way to circumvent this problem, there is no planned mac version.
 
 ## Wiki
 
