@@ -316,6 +316,22 @@
         "ai": "normal"
     },
 
+    "sabitini": {
+        "name":"Dedodated AWPer",
+        "id":"sabitini",
+        "char":"@",
+        "color": "white",
+        "chance":[[1, 3], [2, 5]],
+        "hp":20,
+        "defense":2,
+        "power":0,
+        "xp":300,
+        "mana":0,
+        "death_func":"normal",
+        "attack_msg":"AWPs",
+        "ai": "normal"
+    },
+
     "slocker": {
         "name":"Slocker",
         "id":"slocker",
