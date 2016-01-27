@@ -66,6 +66,9 @@ timer = 0
 # Killstreak
 kill_count = 0
 
+# Stairs direction
+stairs_up = True
+
 ######################################
 # Classes
 ######################################
@@ -2052,12 +2055,22 @@ def make_map():
     player.x = x
     player.y = y
 
-    # Make stairs going up because why not
-    ustairs = Object(player.x, player.y, '<', 'up stairs', libtcod.white,
-                    always_visible=True)
-    objects.append(ustairs)
-    # So it's drawn below the monsters
-    ustairs.send_to_back()
+    # Make stairs going up/down on player position
+    if stairs_up:
+        ustairs = Object(player.x, player.y, '<', 'up stairs', libtcod.white,
+                        always_visible=True)
+
+        objects.append(ustairs)
+        # So it's drawn below the monsters
+        ustairs.send_to_back()
+
+    else:
+        dstairs = Object(player.x, player.y, '>', 'down stairs', libtcod.white,
+                        always_visible=True)
+
+        objects.append(dstairs)
+        # So it's drawn below the monsters
+        dstairs.send_to_back()
 
 def menu(header, options, width):
     ''' Create a menu that options can be selected from using the alphabet '''
@@ -2309,9 +2322,11 @@ def new_game():
 
 def next_level():
     ''' Go to next level '''
-    global dungeon_level, max_dungeon_level
+    global dungeon_level, max_dungeon_level, stairs_up
 
     dungeon_level += 1
+
+    stairs_up = True
 
     message('After a rare moment of peace, you descend deeper into the heart of the dungeon...',
             libtcod.red)
@@ -2467,10 +2482,12 @@ def player_move(dx, dy):
 
 def previous_level():
     ''' Go back up in the dungeon '''
-    global dungeon_level
+    global dungeon_level, stairs_up
     # In case if you're that guy who likes going back for some reason
 
     dungeon_level -= 1
+
+    stairs_up = False
 
     if dungeon_level == 0:
         for item in inventory:
