@@ -1519,6 +1519,26 @@ def get_names_under_mouse():
     else:
         return ''
 
+def git_screen():
+    # Clear screen
+    libtcod.console_clear(con)
+
+    # Set the screen to black
+    libtcod.console_set_default_background(con, libtcod.black)
+
+    libtcod.console_set_default_foreground(con, libtcod.light_yellow)
+    libtcod.console_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
+                            libtcod.BKGND_NONE, libtcod.CENTER,
+                            'Thank you for playing EdgeQuest')
+
+    # Blit to screen
+    libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+
+    msgbox(
+    'Make sure to check the latest master version on github periodically!\n\n' +
+    'Press any key to continue...',
+    40)
+
 def handle_keys():
     ''' Handle keypresses sent to the console. Executes other things,
     makes game playable '''
@@ -1908,6 +1928,8 @@ def load_game():
 def main_menu():
     ''' Show the main menu '''
     img = libtcod.image_load('images/menu_background.png')
+
+    git_screen()
 
     while not libtcod.console_is_window_closed():
         # Show the background image, at twice the regular console resolution
