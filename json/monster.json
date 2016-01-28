@@ -233,6 +233,29 @@
         "rate":60
     },
 
+    "scott": {
+        "name":"Scott",
+        "id":"scott",
+        "char":"@",
+        "color": "lime",
+    		"chance":[[1, 1]],
+    		"hp":900,
+    		"defense":0,
+    		"power":0,
+    		"xp":100,
+        "mana":0,
+    		"death_func":"talk",
+        "death_talk":"Died a freshman...",
+        "attack_msg":"Javas",
+        "ai": "talk",
+        "speech": [
+            "I'm the best builder on the team",
+            "Why isn't turkey spelled t-e-r-k-y?",
+            "My salt meter is off the charts"
+        ],
+        "rate":90
+    },
+
     "n0thing": {
       "name":"n0thing",
       "id":"n0thing",

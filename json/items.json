@@ -54,7 +54,7 @@
         "id": "tazer",
         "char": "=",
         "color": "sky",
-        "chance": [[20, 3]],
+        "chance": [[20, 5]],
         "type": "item",
         "effect": "lightning"
     },
