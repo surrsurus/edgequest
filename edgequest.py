@@ -6,14 +6,14 @@ import textwrap
 import time
 from random import *
 
-import modules.simplejson as json
-
 from colors import *
 from modules import libtcodpy as libtcod
 from modules.dmap import dMap
+from modules import simplejson as json
 from modules.wallselect import wallselect
 from settings import *
 
+# Backup in case if python -B doesn't get ran
 sys.dont_write_bytecode = True
 
 ######################################
@@ -1694,6 +1694,13 @@ def handle_keys():
                 right.weapon_function()
                 player_action = 'activating'
 
+        elif key_char == 'm':
+            status = player.fighter.magic_missile()
+            if status != 'cancelled':
+                player_action = 'casting'
+            else:
+                player_action = 'didnt-take-turn'
+
         elif key_char == '?':
             how_to_play()
             player_action = 'didnt-take-turn'
@@ -1712,12 +1719,8 @@ def handle_keys():
             debug_kill_all()
             player_action = 'didnt-take-turn'
 
-        elif key_char == 'm':
-            status = player.fighter.magic_missile()
-            if status != 'cancelled':
-                player_action = 'casting'
-            else:
-                player_action = 'didnt-take-turn'
+        elif key_char == 'o':
+            objects.append(generate_monster('fleck', player.x, player.y + 2))
 
         else:
             player_action = 'didnt-take-turn'
@@ -2635,7 +2638,7 @@ def render_all():
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.fighter and \
         obj.name != player.name and not blind:
             monsters_in_room += 1
-            if monsters_in_room > (SCREEN_HEIGHT - 17) / 2:
+            if monsters_in_room > (SCREEN_HEIGHT - 20) / 2:
                 continue
             else:
                 libtcod.console_set_default_foreground(panel, obj.color)
