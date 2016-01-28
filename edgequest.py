@@ -962,7 +962,7 @@ def check_timer():
 
     # Regenerate health
     if player.fighter.hp != player.fighter.max_hp:
-        if timer % 10 == 0:
+        if timer % 8 == 0:
             player.fighter.heal(1)
             timer += 1
 
