@@ -312,7 +312,7 @@
 
     "fawkesmask": {
         "name": "Guy Fawkes Mask",
-        "short_name": "",
+        "short_name": "Fawkes Mask",
         "id": "fawkesmask",
         "char": ")",
         "color": "white",

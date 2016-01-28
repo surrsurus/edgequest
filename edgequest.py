@@ -2718,7 +2718,7 @@ def render_equips(y_offset, slot):
     if not equip:
         equip = "None"
     else:
-        if len(equip.owner.name) > 15:
+        if len(equip.owner.name) > 12:
             equip = equip.short_name
         else:
             equip = equip.owner.name
