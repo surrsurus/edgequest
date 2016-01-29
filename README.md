@@ -23,11 +23,11 @@ EdgeQuest is packaged with [simplejson](https://github.com/simplejson/simplejson
 
 ## Download
 
-You can download the latest master [here](https://github.com/TriangularEgg/edgequest/archive/master.zip) or just click the `Download Zip` button at the top of the page. The master release should be stable enough to play, but becomes outdated fairly quickly, do use the `download-master` script in the scripts folder to download the latest master.
+You can download the latest master [here](https://github.com/TriangularEgg/edgequest/archive/master.zip) or just click the `Download Zip` button at the top of the page. The master release should be stable enough to play, but becomes outdated fairly quickly, so please use the `download-master` script in the scripts folder to download the latest master.
 
 If you want more stability, download the latest release [here](https://github.com/TriangularEgg/edgequest/releases)
 
-If you want bleeding edge development, download the testing branch [here](https://github.com/TriangularEgg/edgequest/archive/testing.zip) Note that this version is extremely prone to bugs.
+If you want bleeding edge development, download the testing branch [here](https://github.com/TriangularEgg/edgequest/archive/testing.zip). Note that this version is extremely prone to bugs.
 
 
 ## Run Edgequest
@@ -36,7 +36,7 @@ If you want bleeding edge development, download the testing branch [here](https:
 
 It should be as simple as running the `run` script included with the repository
 
-All imports are from the standard library (with the exception of simplejson, included with edgequest), so you should have no problem with running this on a linux machine
+All imports are from the standard library (with the exception of simplejson and libtcod, included with edgequest), so you should have no problem with running this on a linux machine
 
 If you get an SDL error along the lines of `libsdl1.2.0 not found` try:
 
@@ -57,6 +57,8 @@ Considering he's the only one I know with a mac, and he found a way to circumven
 ## Issue Tracking
 
 If you come across any bug or have an idea for an enhancement, please create a github issue. It helps me track the bugs and also makes sure I don't have to playtest all the time (Though, I'm not complaining if I have to).
+
+Create an issue [here](https://github.com/TriangularEgg/edgequest/issues).
 
 
 ## Wiki
