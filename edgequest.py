@@ -920,6 +920,12 @@ def cast_lightning():
 
     libtcod.console_flush()
 
+def check_ground():
+    for obj in objects:  # Look for an item in the player's tile
+        if obj.x == player.x and obj.y == player.y and obj != player:
+            message(' '.join(['You see a', obj.name, 'here.']),
+                    libtcod.white)
+
 def check_level_up():
     ''' See if the player's experience is enough to level-up '''
     level_up_xp = LEVEL_UP_BASE + player.level * LEVEL_UP_FACTOR
@@ -1582,10 +1588,7 @@ def handle_keys():
             # Recompute the fov if moved
             check_fov = True
 
-            for obj in objects:  # Look for an item in the player's tile
-                if obj.x == player.x and obj.y == player.y and obj.item:
-                    message(' '.join(['You see a', obj.name, 'here.']),
-                            libtcod.white)
+            check_ground()
 
             player_action = 'move'
 
@@ -2017,9 +2020,6 @@ def make_map():
                             world[x][y].blocked = True
                             world[x][y].block_sight = True
 
-    # Put stuff everywhere
-    place_objects()
-
     # Make an FOV map
     fov_map = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
 
@@ -2040,7 +2040,8 @@ def make_map():
     dstairs = Object(x, y, '>', 'down stairs', libtcod.white,
                     always_visible=True)
     objects.append(dstairs)
-    dstairs.send_to_back()  #so it's drawn below the monsters
+    # This tends to cause issues in the later levels
+    dstairs.send_to_back()  # So it's drawn below the monsters
 
 
     # Same for player
@@ -2070,6 +2071,9 @@ def make_map():
         objects.append(dstairs)
         # So it's drawn below the monsters
         dstairs.send_to_back()
+
+    # Finally put stuff everywhere
+    place_objects()
 
 def menu(header, options, width):
     ''' Create a menu that options can be selected from using the alphabet '''
@@ -2239,7 +2243,6 @@ def mouse_move_astar(tx, ty):
             while not libtcod.console_is_window_closed() and not monster and \
             (player.x, player.y) != (tx, ty):
                 render_all()
-                libtcod.console_flush()
                 # Present the root console
                 libtcod.console_flush()
 
@@ -2254,9 +2257,13 @@ def mouse_move_astar(tx, ty):
                 player.move_astar(tx, ty, True)
                 fov_recompute()
 
+                # AI takes turn
                 for obj in objects:
                     if obj.ai:
                         obj.ai.take_turn()
+
+                check_ground()
+
     except IndexError:
         message('Out of range', libtcod.pink)
 
