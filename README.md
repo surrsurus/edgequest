@@ -1,14 +1,34 @@
 # edgequest
-Roguelike in Python based on the [Roguebasin Tutorial](http://www.roguebasin.com/index.php?title=Complete_Roguelike_Tutorial,_using_python%2Blibtcod) but with several key differences, namely being the feature to store items and monsters inside of JSON files, making modular additions possible without needing to alter the python source in any way.
+
+EdgeQuest is a 'roguelike' in Python based on the [Roguebasin Tutorial](http://www.roguebasin.com/index.php?title=Complete_Roguelike_Tutorial,_using_python%2Blibtcod) but with several key differences, namely being the feature to store items and monsters inside of JSON files, making modular additions possible without needing to alter the python source in any way.
+
+A roguelike is a game featuring perma-death, random map generation, turn-based combat, and RPG elements.
 
 Some say making a roguelike in python is pointless, due to the slow speeds that may come as a part of constant A* pathfinding, FOV, djikstra maps, and dynamic lighting, but to the naysayers I say "Eh, you're probably right"
 
-Utilizes the [simplejson python library](https://github.com/simplejson/simplejson)
+
+# Why EdgeQuest?
+
+There are certainly other much better roguelikes out there that are faster, pack more features, have less bugs, and written in faster languages. EdgeQuest is just something fun for me to do that other people like, because it's humorous and has some level of actual playability and enjoyment created from ASCII text. Also I don't know about any other roguelike that lets you dual weild an AWP and an M9 bayonet whilst chugging mountain dew and tazing John Cena.
+
 
 ## Requirements
+
 1. Python 2.7
 2. Enough edge to cut yourself on
 3. 10 minutes of free time
+
+EdgeQuest is packaged with [simplejson](https://github.com/simplejson/simplejson) and [libtcod](https://bitbucket.org/libtcod/libtcod) already so no additional libraries should be needed (outside of SDL).
+
+
+## Download
+
+You can download the latest master [here](https://github.com/TriangularEgg/edgequest/archive/master.zip) or just click the `Download Zip` button at the top of the page. The master release should be stable enough to play, but becomes outdated fairly quickly, do use the `download-master` script in the scripts folder to download the latest master.
+
+If you want more stability, download the latest release [here](https://github.com/TriangularEgg/edgequest/releases)
+
+If you want bleeding edge development, download the testing branch [here](https://github.com/TriangularEgg/edgequest/archive/testing.zip) Note that this version is extremely prone to bugs.
+
 
 ## Run Edgequest
 
@@ -26,18 +46,30 @@ Max tried to run the code in Manjaro Linux and it didn't work so there is an iss
 
 #### Windows
 
-Currently does not run on windows, but you will need the 32 bit version of python2.7 to start.
+Currently does not run on windows, but this is planned for the future.
 
 #### Mac OS
 
 Kevin playtested it on his Macbook Air and he used a live USB of linux mint.
 Considering he's the only one I know with a mac, and he found a way to circumvent this problem, there is no planned mac version.
 
+
+## Issue Tracking
+
+If you come across any bug or have an idea for an enhancement, please create a github issue. It helps me track the bugs and also makes sure I don't have to playtest all the time (Though, I'm not complaining if I have to).
+
+
 ## Wiki
 
 Please check the [wiki](https://github.com/TriangularEgg/edgequest/wiki) for further information
 
-#### License
+
+## Modding
+
+EdgeQuest is very hackable. There is a `settings.py` file that can be edited to change values of things in the game, and JSON files that can be edited to add monsters and items. This may not be the most robust modding system, but it gives the player with enough motivation to create brand new things with the existing code.
+
+
+## License
 
 [![CC0] (https://licensebuttons.net/l/GPL/2.0/88x62.png)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
