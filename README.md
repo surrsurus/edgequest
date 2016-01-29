@@ -36,3 +36,9 @@ Considering he's the only one I know with a mac, and he found a way to circumven
 ## Wiki
 
 Please check the [wiki](https://github.com/TriangularEgg/edgequest/wiki) for further information
+
+#### License
+
+[![CC0] (https://licensebuttons.net/l/GPL/2.0/88x62.png)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
+This code is released under the GNU GENERAL PUBLIC LICENSE. All works in this repository are meant to be utilized under this license with the exception of the [simplejson](https://github.com/simplejson/simplejson) and [libtcod](https://bitbucket.org/libtcod/libtcod) which are not my property. Please see the respective licenses.
