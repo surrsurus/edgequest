@@ -13,8 +13,8 @@ color_dark_wall = libtcod.Color(0, 0, 100)
 color_dark_ground = libtcod.Color(50, 50, 150)
 
 # Desaturated Master Rice
-# color_dark_wall = libtcod.Color(98, 98, 98)
-# color_dark_ground = libtcod.Color(128,128, 128)
+#color_dark_wall = libtcod.Color(98, 98, 98)
+#color_dark_ground = libtcod.Color(128,128, 128)
 
 # Sort of off-yellow-ish
 color_light_wall = libtcod.Color(130, 110, 50)
