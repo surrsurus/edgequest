@@ -34,7 +34,7 @@ If you want bleeding edge development, download the testing branch [here](https:
 
 #### Linux (Debian-based)
 
-It should be as simple as running the `run` script included with the repository
+It should be as simple as running the `linux-run` script included with the repository
 
 All imports are from the standard library (with the exception of simplejson and libtcod, included with edgequest), so you should have no problem with running this on a linux machine
 
