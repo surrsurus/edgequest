@@ -501,8 +501,9 @@ class Object:
                 # Set the color and then draw the character that
                 #   represents this object at its position
                 libtcod.console_set_default_foreground(con, self.color)
-                libtcod.console_put_char(con, x, y, self.char,
-                                        libtcod.BKGND_NONE)
+                libtcod.console_print_ex(con, x, y,
+                                        libtcod.BKGND_NONE, libtcod.CENTER,
+                                        self.char)
 
     def drop(self):
         ''' Add to the map and remove from the player's inventory.
