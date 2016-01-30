@@ -44,9 +44,15 @@ If you get an SDL error along the lines of `libsdl1.2.0 not found` try:
 
 Max tried to run the code in Manjaro Linux and it didn't work so there is an issue with pacman-based distros.
 
-#### Windows
+#### Windows (7)
 
-Currently does not run on windows, but this is planned for the future.
+On windows you will need to download and install [Python2.7](https://www.python.org/downloads/release/python-2711/).
+
+Once you have it downloaded, simply extract the zip file and double click on the `edgequest` file. (It should have a little blue and yellow snake icon on it!)
+
+If you have any problems please notify me by creating an issue on the issue tracker [here](https://github.com/TriangularEgg/edgequest/issues).
+
+I was not intending to support Windows, so there may be minor issues.
 
 #### Mac OS
 
