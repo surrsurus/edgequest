@@ -136,7 +136,7 @@
         "attack_msg": "bashes",
         "weapon_func": "awp",
         "power": -2,
-        "defense": 0,
+        "defense": -20,
         "hp": 0,
         "mana": 0
     },
@@ -157,7 +157,7 @@
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 15
+        "ranged": 10
     },
 
     "r8nerf": {
@@ -176,7 +176,7 @@
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 10
+        "ranged": 8
     },
 
     "r8": {
@@ -209,7 +209,7 @@
         "subtype": "armor",
         "slot": "torso",
         "power": 0,
-        "defense": 3,
+        "defense": 2,
         "hp": 0,
         "mana": 0
     },
@@ -225,7 +225,7 @@
         "subtype": "armor",
         "slot": "head",
         "power": 0,
-        "defense": 2,
+        "defense": 1,
         "hp": 0,
         "mana": 0
     },
@@ -240,10 +240,10 @@
         "type": "equipment",
         "subtype": "armor",
         "slot": "head",
-        "power": 5,
-        "defense": 10,
-        "hp": 100,
-        "mana": 50
+        "power": -5,
+        "defense": -10,
+        "hp": 0,
+        "mana": -100
     },
 
     "fgloves": {
@@ -257,7 +257,7 @@
         "subtype": "armor",
         "slot": "hands",
         "power": 0,
-        "defense": 2,
+        "defense": 1,
         "hp": 0,
         "mana": 0
     },
@@ -272,7 +272,7 @@
         "type": "equipment",
         "subtype": "armor",
         "slot": "accessory",
-        "power": 5,
+        "power": 2,
         "defense": 1,
         "hp": 0,
         "mana": 0
@@ -306,7 +306,7 @@
         "slot": "neck",
         "power": 1,
         "defense": 1,
-        "hp": 25,
+        "hp": 20,
         "mana": 0
     },
 
@@ -322,8 +322,8 @@
         "slot": "face",
         "power": 0,
         "defense": 0,
-        "hp": 20,
-        "mana": 20
+        "hp": 10,
+        "mana": 10
     }
 
 }
