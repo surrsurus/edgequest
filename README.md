@@ -44,7 +44,7 @@ If you get an SDL error along the lines of `libsdl1.2.0 not found` try:
 
 Max tried to run the code in Manjaro Linux and it didn't work so there is an issue with pacman-based distros.
 
-#### Windows (7)
+#### Windows (7 & 10)
 
 On windows you will need to download and install [Python2.7](https://www.python.org/downloads/release/python-2711/).
 

@@ -314,7 +314,7 @@
     	"hp":80,
     	"defense":9,
     	"power":20,
-    	"xp":4200,
+    	"xp":1000,
         "mana":0,
     	"death_func":"talk",
         "death_talk":"I curse you... with the R8",
