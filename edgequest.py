@@ -6,10 +6,14 @@ import textwrap
 import time
 from random import *
 
+try:
+	import simplejson as json
+except:
+	from modules import simplejson as json
+	
 from colors import *
 from modules import libtcodpy as libtcod
 from modules.dmap import dMap
-from modules import simplejson as json
 from modules.wallselect import wallselect
 from settings import *
 
