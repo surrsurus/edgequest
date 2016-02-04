@@ -1,2 +1,0 @@
-#! /bin/bash
-python2.7 -B edgequest.py
