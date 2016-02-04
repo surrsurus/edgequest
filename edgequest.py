@@ -633,6 +633,10 @@ class Object:
         objects.remove(self)
         objects.insert(0, self)
 
+    def set_corpse(self):
+        # Make a corpse
+        self.char = '&'
+
 class Rect:
     ''' This will take top-left coordinates for a rectangle
     (in tiles, of course), and its size, to define it in terms of two points:
@@ -2166,7 +2170,7 @@ def monster_death(monster):
             libtcod.darker_red)
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
             libtcod.orange)
-    monster.char = '%'
+    monster.set_corpse()
     monster.color = libtcod.dark_red
     monster.blocks = False
     monster.fighter = None
@@ -2184,7 +2188,7 @@ def monster_death_slock(monster):
             libtcod.orange)
     message(' '.join([monster.name.capitalize(),
             'casts a final spell in its dying moments!']))
-    monster.char = '%'
+    monster.set_corpse()
     monster.color = libtcod.dark_red
     monster.blocks = False
     monster.fighter = None
@@ -2207,7 +2211,7 @@ def monster_death_talk(monster):
             libtcod.darker_red)
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
             libtcod.orange)
-    monster.char = '%'
+    monster.set_corpse()
     monster.color = libtcod.dark_red
     monster.blocks = False
     monster.fighter = None
@@ -2460,7 +2464,7 @@ def player_death(player):
         message('You died!', libtcod.dark_red)
 
         # For added effect, transform the player into a corpse!
-        player.char = '%'
+        player.set_corpse()
         player.color = libtcod.dark_red
 
         game_state = 'dead'
