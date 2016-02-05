@@ -635,14 +635,13 @@ class Object:
         objects.insert(0, self)
 
     def set_corpse(self):
-        # Make a corpse
+        self.blocks = False
+        self.fighter = None
+        self.ai = None
+        self.send_to_back()
         self.char = '&'
-		self.color = libtcod.dark_red
-	    self.blocks = False
-	    self.fighter = None
-	    self.ai = None
-	    self.send_to_back()
-	    self.name = ' '.join(['remains of', self.name])
+        self.color = libtcod.dark_red
+        self.name = ' '.join(['remains of', self.name])
 
 class Rect:
     ''' This will take top-left coordinates for a rectangle
