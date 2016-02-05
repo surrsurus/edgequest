@@ -6,11 +6,12 @@ import textwrap
 import time
 from random import *
 
+# Test import. No need to use the packaged one if this works
 try:
 	import simplejson as json
 except:
 	from modules import simplejson as json
-	
+
 from colors import *
 from modules import libtcodpy as libtcod
 from modules.dmap import dMap
@@ -636,6 +637,12 @@ class Object:
     def set_corpse(self):
         # Make a corpse
         self.char = '&'
+		self.color = libtcod.dark_red
+	    self.blocks = False
+	    self.fighter = None
+	    self.ai = None
+	    self.send_to_back()
+	    self.name = ' '.join(['remains of', self.name])
 
 class Rect:
     ''' This will take top-left coordinates for a rectangle
@@ -2171,12 +2178,7 @@ def monster_death(monster):
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
             libtcod.orange)
     monster.set_corpse()
-    monster.color = libtcod.dark_red
-    monster.blocks = False
-    monster.fighter = None
-    monster.ai = None
-    monster.send_to_back()
-    monster.name = ' '.join(['remains of', monster.name])
+
 
 def monster_death_slock(monster):
     ''' Function called when monster dies. Blinds player '''
@@ -2189,12 +2191,6 @@ def monster_death_slock(monster):
     message(' '.join([monster.name.capitalize(),
             'casts a final spell in its dying moments!']))
     monster.set_corpse()
-    monster.color = libtcod.dark_red
-    monster.blocks = False
-    monster.fighter = None
-    monster.ai = None
-    monster.send_to_back()
-    monster.name = ' '.join(['remains of', monster.name])
     # Blind
     cast_inflict_blindness()
 
@@ -2212,12 +2208,6 @@ def monster_death_talk(monster):
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
             libtcod.orange)
     monster.set_corpse()
-    monster.color = libtcod.dark_red
-    monster.blocks = False
-    monster.fighter = None
-    monster.ai = None
-    monster.send_to_back()
-    monster.name = ' '.join(['remains of', monster.name])
 
 def monster_occupy_check(dx, dy):
     ''' If a monster is in that location, return true '''
