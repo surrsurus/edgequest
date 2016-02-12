@@ -151,7 +151,7 @@
         "power":0,
         "xp":1,
         "mana":0,
-  	    "death_func":"talk",
+  	"death_func":"talk",
         "death_talk":"I fell for the meme, kiddo...",
         "attack_msg":"flicks",
         "ai": "talk",
@@ -171,6 +171,38 @@
             "Sonic 06 was a genuinely good idea",
             "7/11 is better than Wawa",
             "C9 is just a bandwagon"
+        ],
+        "rate":60
+    },
+
+    "khaled": {
+        "name":"DJ Khaled",
+        "id":"khaled",
+        "char":"@",
+        "color": "azure",
+        "chance":[[1, 3]],
+        "hp":600,
+        "defense":10,
+        "power":3,
+        "xp":1,
+        "mana":0,
+  	"death_func":"talk",
+        "death_talk":"I played myself...",
+        "attack_msg":"raps",
+        "ai": "talk",
+        "speech": [
+            "Congrats, you played yourself",
+            "Walk with me on the pathway to more success",
+            "LION!",
+            "They don't want you to win this game",
+            "Major key right here",
+            "Anotha' one",
+            "My sound is accreat",
+            "It's not all about the jerrley",
+            "It's dark out here!",
+            "Key to success: buy my mixtape",
+            "We the best",
+            "They don't want you to beat me"
         ],
         "rate":60
     },

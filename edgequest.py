@@ -2178,7 +2178,6 @@ def monster_death(monster):
             libtcod.orange)
     monster.set_corpse()
 
-
 def monster_death_slock(monster):
     ''' Function called when monster dies. Blinds player '''
     # transform it into a nasty corpse! it doesn't block, can't be

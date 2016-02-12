@@ -27,7 +27,7 @@ MAP_WIDTH = 80
 MAP_HEIGHT = 40
 
 # FPS limiter. Doesn't do much in a turn based game
-LIMIT_FPS = 10
+LIMIT_FPS = 30
 
 # Parameters for dungeon generator
 ROOM_MAX_SIZE = 10
