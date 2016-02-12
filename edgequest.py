@@ -8,9 +8,9 @@ from random import *
 
 # Test import. No need to use the packaged one if this works
 try:
-	import simplejson as json
+    import simplejson as json
 except:
-	from modules import simplejson as json
+    from modules import simplejson as json
 
 from colors import *
 from modules import libtcodpy as libtcod
@@ -983,8 +983,9 @@ def check_timer():
 
     # Regenerate health
     if player.fighter.hp != player.fighter.max_hp:
-        if timer % 8 == 0:
-            player.fighter.heal(1)
+        if timer % 16 == 0:
+            # disabled
+            # player.fighter.heal(1)
             timer += 1
 
 def choose_name():
@@ -1944,7 +1945,7 @@ def load_game():
     if not blind:
         initialize_fov()
     else:
-	    player.draw()
+        player.draw()
 
 def main_menu():
     ''' Show the main menu '''
@@ -2052,11 +2053,18 @@ def make_map():
         x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
         y = libtcod.random_get_int(0,0, MAP_HEIGHT-1)
 
-    dstairs = Object(x, y, '>', 'down stairs', libtcod.white,
-                    always_visible=True)
-    objects.append(dstairs)
-    # This tends to cause issues in the later levels
-    dstairs.send_to_back()  # So it's drawn below the monsters
+        if stairs_up:
+            dstairs = Object(x, y, '>', 'down stairs', libtcod.white,
+                            always_visible=True)
+            objects.append(dstairs)
+            # This tends to cause issues in the later levels
+            dstairs.send_to_back()  # So it's drawn below the monsters
+        else:
+            ustairs = Object(x, y, '<', 'up stairs', libtcod.white,
+                            always_visible=True)
+            objects.append(ustairs)
+            # This tends to cause issues in the later levels
+            ustairs.send_to_back()  # So it's drawn below the monsters
 
 
     # Same for player
@@ -2342,7 +2350,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[15, 1], [30, 4], [35, 6]])
+    max_monsters = from_dungeon_level([[5, 1], [10, 2], [30, 4], [35, 6]])
 
     # Chance of each monster
     monster_chances = {}
