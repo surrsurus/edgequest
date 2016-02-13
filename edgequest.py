@@ -2076,25 +2076,25 @@ def make_map():
         x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
         y = libtcod.random_get_int(0,0, MAP_HEIGHT-1)
 
+        # Make stairs going up/down on player position
+        if stairs_up:
+            ustairs = Object(player.x, player.y, '<', 'up stairs', libtcod.white,
+                            always_visible=True)
+
+            objects.append(ustairs)
+            # So it's drawn below the monsters
+            ustairs.send_to_back()
+
+        else:
+            dstairs = Object(player.x, player.y, '>', 'down stairs', libtcod.white,
+                            always_visible=True)
+
+            objects.append(dstairs)
+            # So it's drawn below the monsters
+            dstairs.send_to_back()
+
     player.x = x
     player.y = y
-
-    # Make stairs going up/down on player position
-    if stairs_up:
-        ustairs = Object(player.x, player.y, '<', 'up stairs', libtcod.white,
-                        always_visible=True)
-
-        objects.append(ustairs)
-        # So it's drawn below the monsters
-        ustairs.send_to_back()
-
-    else:
-        dstairs = Object(player.x, player.y, '>', 'down stairs', libtcod.white,
-                        always_visible=True)
-
-        objects.append(dstairs)
-        # So it's drawn below the monsters
-        dstairs.send_to_back()
 
     # Finally put stuff everywhere
     place_objects()

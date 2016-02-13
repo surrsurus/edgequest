@@ -16,7 +16,7 @@ There are certainly other much better roguelikes out there that are faster, pack
 
 ## Requirements
 
-1. Python 2.7
+1. Python 2.7 (32 bit)
 2. Enough edge to cut yourself on
 3. 10 minutes of free time
 
@@ -49,6 +49,8 @@ Max tried to run the code in Manjaro Linux and it didn't work so there is an iss
 #### Windows (7 & 10)
 
 On windows you will need to download and install [Python2.7](https://www.python.org/downloads/release/python-2711/).
+
+Make sure it's the 32 bit version!
 
 Once you have it downloaded, simply extract the zip file and double click on the `edgequest` file. (It should have a little blue and yellow snake icon on it!)
 
