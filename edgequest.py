@@ -1900,6 +1900,7 @@ def json_get_color(color_str):
         'lime': libtcod.lime,
         'violet': libtcod.violet,
         'light_yellow': libtcod.light_yellow,
+        'gold': libtcod.gold,
         'sky': libtcod.sky,
         'azure': libtcod.azure,
         'light_turquoise': libtcod.light_turquoise,
