@@ -2054,19 +2054,18 @@ def make_map():
         x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
         y = libtcod.random_get_int(0,0, MAP_HEIGHT-1)
 
-        if stairs_up:
-            dstairs = Object(x, y, '>', 'down stairs', libtcod.white,
-                            always_visible=True)
-            objects.append(dstairs)
-            # This tends to cause issues in the later levels
-            dstairs.send_to_back()  # So it's drawn below the monsters
-        else:
-            ustairs = Object(x, y, '<', 'up stairs', libtcod.white,
-                            always_visible=True)
-            objects.append(ustairs)
-            # This tends to cause issues in the later levels
-            ustairs.send_to_back()  # So it's drawn below the monsters
-
+    if stairs_up:
+        dstairs = Object(x, y, '>', 'down stairs', libtcod.white,
+                        always_visible=True)
+        objects.append(dstairs)
+        # This tends to cause issues in the later levels
+        dstairs.send_to_back()  # So it's drawn below the monsters
+    else:
+        ustairs = Object(x, y, '<', 'up stairs', libtcod.white,
+                        always_visible=True)
+        objects.append(ustairs)
+        # This tends to cause issues in the later levels
+        ustairs.send_to_back()  # So it's drawn below the monsters
 
     # Same for player
     x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
@@ -2076,25 +2075,25 @@ def make_map():
         x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
         y = libtcod.random_get_int(0,0, MAP_HEIGHT-1)
 
-        # Make stairs going up/down on player position
-        if stairs_up:
-            ustairs = Object(player.x, player.y, '<', 'up stairs', libtcod.white,
-                            always_visible=True)
-
-            objects.append(ustairs)
-            # So it's drawn below the monsters
-            ustairs.send_to_back()
-
-        else:
-            dstairs = Object(player.x, player.y, '>', 'down stairs', libtcod.white,
-                            always_visible=True)
-
-            objects.append(dstairs)
-            # So it's drawn below the monsters
-            dstairs.send_to_back()
-
     player.x = x
     player.y = y
+
+    # Make stairs going up/down on player position
+    if stairs_up:
+        ustairs = Object(player.x, player.y, '<', 'up stairs', libtcod.white,
+                        always_visible=True)
+
+        objects.append(ustairs)
+        # So it's drawn below the monsters
+        ustairs.send_to_back()
+
+    else:
+        dstairs = Object(player.x, player.y, '>', 'down stairs', libtcod.white,
+                        always_visible=True)
+
+        objects.append(dstairs)
+        # So it's drawn below the monsters
+        dstairs.send_to_back()
 
     # Finally put stuff everywhere
     place_objects()
@@ -2351,7 +2350,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[5, 1], [10, 2], [30, 4], [35, 6]])
+    max_monsters = from_dungeon_level([[15, 1], [20, 2], [30, 4], [35, 6]])
 
     # Chance of each monster
     monster_chances = {}
@@ -2361,7 +2360,7 @@ def place_objects():
             from_dungeon_level(monster_data[item]['chance'])
 
     # Maximum number of items per level
-    max_items = from_dungeon_level([[10, 1], [20, 3], [25, 4]])
+    max_items = from_dungeon_level([[20, 1], [35, 3], [40, 4]])
 
     # Chance of each item (by default they have a chance of 0 at level 1,
     #   which then goes up)
