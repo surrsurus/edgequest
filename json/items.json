@@ -172,11 +172,11 @@
         "slot": "right hand",
         "attack_msg": "bashes",
         "weapon_func": "firearm",
-        "power": 1,
+        "power": -6,
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 10
+        "ranged": 6
     },
 
     "r8": {
@@ -191,11 +191,11 @@
         "slot": "right hand",
         "attack_msg": "bashes",
         "weapon_func": "firearm",
-        "power": 1,
+        "power": -3,
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 30
+        "ranged": 15
     },
 
     "trenchcoat": {

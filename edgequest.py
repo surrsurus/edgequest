@@ -1185,8 +1185,12 @@ def dispbox(header, width=50):
 
 def equipment_menu(header):
     ''' Show a menu with each equipment item as an option '''
+
+    equip_inven = []
+
     if len(inventory) == 0:
         options = ['Inventory is empty.']
+
     else:
         options = []
         sort_inventory()
@@ -1197,6 +1201,7 @@ def equipment_menu(header):
                 if item.equipment.is_equipped:
                     text = text + ' (on ' + item.equipment.slot + ')'
                 options.append(text)
+                equip_inven.append(item)
 
     if len(options) == 0:
         options = ['No equipment']
@@ -1204,9 +1209,9 @@ def equipment_menu(header):
     index = menu(header, options, INVENTORY_WIDTH)
 
     # If an item was chosen, return it
-    if index is None or len(inventory) == 0:
+    if index is None or len(equip_inven) == 0:
         return None
-    return inventory[index].item
+    return equip_inven[index].item
 
 def fire_weapon(equipment):
     ''' Find closest enemy and shoot it '''
@@ -1743,8 +1748,9 @@ def handle_keys():
             player_action = 'didnt-take-turn'
 
         elif key_char == 'o':
-            objects.append(generate_monster('fleck', player.x, player.y + 2))
-
+            # objects.append(generate_monster('fleck', player.x, player.y + 2))
+            pass
+            
         else:
             player_action = 'didnt-take-turn'
 
@@ -2354,7 +2360,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[15, 1], [20, 2], [30, 4], [35, 6]])
+    max_monsters = from_dungeon_level([[10, 1], [15, 2], [30, 4], [35, 6]])
 
     # Chance of each monster
     monster_chances = {}
