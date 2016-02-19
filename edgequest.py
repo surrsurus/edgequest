@@ -643,6 +643,10 @@ class Object:
         self.color = libtcod.dark_red
         self.name = ' '.join(['remains of', self.name])
 
+    def set_player_corpse(self):
+        self.char = '@'
+        self.color = libtcod.dark_red
+
 class Rect:
     ''' This will take top-left coordinates for a rectangle
     (in tiles, of course), and its size, to define it in terms of two points:
@@ -2460,7 +2464,7 @@ def player_death(player):
         message('You died!', libtcod.dark_red)
 
         # For added effect, transform the player into a corpse!
-        player.set_corpse()
+        player.set_player_corpse()
         player.color = libtcod.dark_red
 
         game_state = 'dead'
