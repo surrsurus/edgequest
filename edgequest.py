@@ -1750,7 +1750,7 @@ def handle_keys():
         elif key_char == 'o':
             # objects.append(generate_monster('fleck', player.x, player.y + 2))
             pass
-            
+
         else:
             player_action = 'didnt-take-turn'
 
@@ -2022,17 +2022,22 @@ def make_map():
     Okay this takes some magic to get working but once you do you can create
     a ton of cool maps with it.
 
-    the first two values are the dimensions of the map. The second one is the
-    'fail' rating.
-    Not sure what the heck that means but the higher it is, the more rooms you
-    get.
-    Then the fourth is the 'b1' value. What's a b1? No idea.
+    * The first two values are the dimensions of the map.
+    * The second one is the 'fail' rating.
+         * Not sure what the heck that means but the higher it is, the more rooms you
+           get.
+    * The the fourth is the 'b1' value. What's a b1? No idea.
     Apparently it controlls the frequency of corridors.
-    I don't like corridors so I keep it at 1.
     Lastly, the number of maximum rooms. Multiply the max_rooms by 4 because
     the rooms are pretty.
     '''
-    themap.makeMap(MAP_WIDTH,MAP_HEIGHT-2,250,1,MAX_ROOMS*4)
+
+    # Template original map: themap.makeMap(MAP_WIDTH,MAP_HEIGHT-2,250,1,MAX_ROOMS*4)
+    rooms = MAX_ROOMS + dungeon_level + int(math.floor((dungeon_level/4)*4))
+    print(rooms)
+    fail = 150 * int(math.floor((dungeon_level/3)*3)) + 100
+    b1 = int(math.floor((dungeon_level / 6)*3)) + 1
+    themap.makeMap(MAP_WIDTH, MAP_HEIGHT-2, fail, b1, rooms)
 
     # Turn ones and zeros into magic
     for y in range(MAP_HEIGHT-2):
@@ -2360,7 +2365,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[10, 1], [15, 2], [30, 4], [35, 6]])
+    max_monsters = from_dungeon_level([[6, 1], [10, 2], [15, 4], [20, 6], [30, 12]])
 
     # Chance of each monster
     monster_chances = {}
@@ -2370,7 +2375,7 @@ def place_objects():
             from_dungeon_level(monster_data[item]['chance'])
 
     # Maximum number of items per level
-    max_items = from_dungeon_level([[20, 1], [35, 3], [40, 4]])
+    max_items = from_dungeon_level([[4, 1], [10, 3], [18, 6], [21, 7], [30, 9], [35, 10], [40, 12]])
 
     # Chance of each item (by default they have a chance of 0 at level 1,
     #   which then goes up)
