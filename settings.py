@@ -112,6 +112,12 @@ BLIND_LENGTH = 10
 # Firearms
 FIREARM_RANGE = 8
 
+# Regen speed
+REGEN_SPEED = 10
+
+# Default attack message
+DEFAULT_ATTACK = 'attacks'
+
 ######################################
 # Debug Options
 ######################################

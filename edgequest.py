@@ -202,7 +202,7 @@ class Equipment:
                 if self.attack_msg:
                     player.fighter.attack_msg = self.attack_msg
                 else:
-                    player.fighter.attack_msg = None
+                    player.fighter.attack_msg = DEFAULT_ATTACK
 
             # If both hands are full, dequip something or else the player
             #   somehow grows a new hand spontaneously
@@ -221,6 +221,10 @@ class Equipment:
 
         # Equip object and show a message about it
         self.is_equipped = True
+        if self.attack_msg:
+            player.fighter.attack_msg = self.attack_msg
+        else:
+            player.fighter.attack_msg = DEFAULT_ATTACK
         message('Equipped ' + self.owner.name + ' on your ' + self.slot + '.',
                 libtcod.light_green)
 
@@ -235,13 +239,13 @@ class Equipment:
             if item != None:
                 player.fighter.attack_msg = item.attack_msg
             else:
-                player.fighter.attack_msg = 'punches'
+                player.fighter.attack_msg = DEFAULT_ATTACK
         elif self.slot == 'right hand':
             item = get_equipped_in_slot('left hand')
             if item != None:
                 player.fighter.attack_msg = item.attack_msg
             else:
-                player.fighter.attack_msg = 'punches'
+                player.fighter.attack_msg = DEFAULT_ATTACK
 
     def weapon_function(self):
         ''' Weapons have a special function that can be activated '''
@@ -325,12 +329,12 @@ class Fighter:
                         target.name.capitalize(), 'for', str(damage), 'hit points.']),
                         libtcod.red)
             else:
-                message(' '.join([self.owner.name.capitalize(), 'attacks',
+                message(' '.join([self.owner.name.capitalize(), DEFAULT_ATTACK,
                         target.name.capitalize(), 'for', str(damage), 'hit points.']),
                         libtcod.red)
             target.fighter.take_damage(damage)
         else:
-            message(' '.join([self.owner.name.capitalize(), 'attacks',
+            message(' '.join([self.owner.name.capitalize(), DEFAULT_ATTACK,
                 target.name.capitalize(), 'but it has no effect!']),
                     libtcod.light_red)
 
@@ -987,7 +991,7 @@ def check_timer():
 
     # Regenerate health
     if player.fighter.hp != player.fighter.max_hp:
-        if timer % 16 == 0:
+        if timer % REGEN_SPEED == 0:
             # disabled
             # player.fighter.heal(1)
             timer += 1
@@ -2323,7 +2327,7 @@ def new_game():
     # Player
     # create object representing the player
     fighter_component = Fighter(hp=100, defense=1, power=4, xp=0, mana=100,
-                                death_function=player_death,)
+                                death_function=player_death)
     player = Object(0, 0, PLAYER_CHARACTER, player_name, PLAYER_COLOR, blocks=True,
                     fighter=fighter_component)
 
