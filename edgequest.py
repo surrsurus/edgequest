@@ -1368,9 +1368,9 @@ def fov_recompute():
                     c = wallselect(world, map_x, map_y)
                     libtcod.console_put_char_ex(con, x, y, c,
                                                 libtcod.white,
-                                                libtcod.light_gray)
+                                                color_fov_wall)
                 else:
-                    libtcod.console_set_char_background(con, x, y, libtcod.gray,
+                    libtcod.console_set_char_background(con, x, y, color_fov_ground,
                                             libtcod.BKGND_SET)
                 # Since it's visible, explore it
                 world[map_x][map_y].explored = True
