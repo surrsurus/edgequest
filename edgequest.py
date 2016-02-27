@@ -750,7 +750,7 @@ msg_panel = libtcod.console_new(SCREEN_WIDTH, PANEL_HEIGHT)
 ######################################
 
 # Font
-libtcod.console_set_custom_font('images/terminal8x12_gs_tc.png',
+libtcod.console_set_custom_font('images/terminal16x24_gs_tc.png',
     libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
 # Initialize root console
@@ -2310,7 +2310,6 @@ def mouse_move_astar(tx, ty):
             message('That\'s not a good idea considering your blindness',
                 libtcod.pink)
         elif not monster:
-            message('Moving...', libtcod.pink)
             while not libtcod.console_is_window_closed() and not monster and \
             (player.x, player.y) != (tx, ty):
                 render_all()
@@ -2416,7 +2415,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[11, 1], [13, 2], [15, 4], [20, 6], [30, 12]])
+    max_monsters = from_dungeon_level([[9, 1], [11, 2], [15, 4], [20, 6], [30, 12]])
 
     # Chance of each monster
     monster_chances = {}
