@@ -140,6 +140,12 @@ WALL_HACK = False
 # Travel through floors anywhere
 STAIR_HACK = False
 
+# Invisible mode
+INVISIBLE = False
+
+# See all objects
+SEE_ALL = False
+
 # Coordinates show all the time
 COORDS_UNDER_MOUSE = False
 

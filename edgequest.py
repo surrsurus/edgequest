@@ -4,8 +4,6 @@ import shelve
 import sys
 import textwrap
 import time
-from random import *
-from sys import argv
 
 # Test import. No need to use the packaged one if this works
 try:
@@ -17,7 +15,9 @@ from colors import *
 from modules import libtcodpy as libtcod
 from modules.dmap import dMap
 from modules.wallselect import wallselect
+from random import *
 from settings import *
+from sys import argv
 
 # Backup in case if python -B doesn't get ran
 sys.dont_write_bytecode = True
@@ -78,6 +78,9 @@ perk_tazer = 0
 perk_incengren = 0
 perk_fbang = 0
 
+# An array with all unblocked coords
+unblocked_world = []
+
 ######################################
 # Classes
 ######################################
@@ -85,13 +88,13 @@ perk_fbang = 0
 class BasicMonster:
     ''' AI for a basic monster. '''
     def __init__(self):
-        pass
+        self.backup_coord = get_rand_unblocked_coord()
 
     def take_turn(self):
         '''Monster takes its turn. If you can see it, it can see you '''
         monster = self.owner
         # If it's in the player's fov then it approaches them
-        if libtcod.map_is_in_fov(fov_map, monster.x, monster.y):
+        if libtcod.map_is_in_fov(fov_map, monster.x, monster.y) and not INVISIBLE:
 
             # Move towards player if far away
             if monster.distance_to(player) >= 2:
@@ -101,11 +104,13 @@ class BasicMonster:
             elif player.fighter.hp > 0:
                 monster.fighter.attack(player)
 
-        # Otherwise it just runs around randomly
+        # Otherwise it moves to a random map location
         else:
-            x = libtcod.random_get_int(0, -1, 1)
-            y = libtcod.random_get_int(0, -1, 1)
-            monster.move(x, y)
+            x, y = self.backup_coord
+            monster.move_astar(x, y, False)
+
+        if (monster.x, monster.y) == self.backup_coord:
+            self.backup_coord = get_rand_unblocked_coord()
 
 class ConfusedMonster:
     ''' AI for a temporarily confused monster
@@ -135,6 +140,7 @@ class TalkingMonster:
     def __init__(self, speech, rate):
         self.speech = speech
         self.rate = rate
+        self.backup_coord = get_rand_unblocked_coord()
 
     def take_turn(self):
         ''' Monster takes a normal turn, but says something '''
@@ -142,11 +148,11 @@ class TalkingMonster:
         monster = self.owner
 
         # If monster is in FOV...
-        if libtcod.map_is_in_fov(fov_map, monster.x, monster.y):
+        if libtcod.map_is_in_fov(fov_map, monster.x, monster.y) and not INVISIBLE:
 
             # Move towards player if far away
             if monster.distance_to(player) >= 2:
-                monster.move_towards(player.x, player.y)
+                monster.move_astar(player.x, player.y, False)
 
             # Close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
@@ -161,6 +167,14 @@ class TalkingMonster:
                 r = libtcod.random_get_int(0, 0, len(self.speech)-1)
                 message(''.join([monster.name.capitalize(), ' says ', '\'',
                         self.speech[r], '\'']), monster.color)
+
+        # Otherwise it moves to a random map location
+        else:
+            x, y = self.backup_coord
+            monster.move_astar(x, y, False)
+
+        if (monster.x, monster.y) == self.backup_coord:
+            self.backup_coord = get_rand_unblocked_coord()
 
 class Equipment:
     ''' An object that can be equipped, yielding bonuses.
@@ -198,23 +212,41 @@ class Equipment:
             #   free hand and equip it there
             # Essentially, this is dual weilding
             if self.slot == 'left hand' or self.slot == 'right hand':
-                # Switch hands on equipment
+
+                other_hand_equip = None
+
                 if self.slot == 'left hand':
-                    self.slot = 'right hand'
+                    other_hand_equip = get_equipped_in_slot('right hand')
                 elif self.slot == 'right hand':
-                    self.slot = 'left hand'
+                    other_hand_equip = get_equipped_in_slot('left hand')
 
-                self.is_equipped = True
-                message('You use your free hand to equip the ' +
-                        self.owner.name)
+                if not other_hand_equip:
+                    # Switch hands on equipment
+                    if self.slot == 'left hand':
+                        self.slot = 'right hand'
+                    elif self.slot == 'right hand':
+                        self.slot = 'left hand'
 
-                if self.attack_msg:
-                    player.fighter.attack_msg = self.attack_msg
+                    message('You use your free hand to equip the ' +
+                            self.owner.name)
+
+                    if self.attack_msg:
+                        player.fighter.attack_msg = self.attack_msg
+                    else:
+                        player.fighter.attack_msg = DEFAULT_ATTACK
+
+                    self.is_equipped = True
+
+                    message('Equipped ' + self.owner.name + ' on your ' + self.slot + '.',
+                            libtcod.light_green)
+
                 else:
-                    player.fighter.attack_msg = DEFAULT_ATTACK
+                    message('There is already a ' + other_hand_equip.owner.name + ' on your ' + self.slot + '!',
+                            libtcod.light_red)
 
             # If both hands are full, dequip something or else the player
             #   somehow grows a new hand spontaneously
+            '''
             elif get_equipped_in_slot(self.slot) is not None:
                 message(('But something is already there, so take off the ' + \
                         old_equipment.owner.name + ' for the ' +
@@ -227,15 +259,17 @@ class Equipment:
                     self.slot = 'left hand'
 
                 old_equipment.dequip()
+            '''
 
         # Equip object and show a message about it
-        self.is_equipped = True
-        if self.attack_msg:
-            player.fighter.attack_msg = self.attack_msg
         else:
-            player.fighter.attack_msg = DEFAULT_ATTACK
-        message('Equipped ' + self.owner.name + ' on your ' + self.slot + '.',
-                libtcod.light_green)
+            self.is_equipped = True
+            if self.attack_msg:
+                player.fighter.attack_msg = self.attack_msg
+            else:
+                player.fighter.attack_msg = DEFAULT_ATTACK
+            message('Equipped ' + self.owner.name + ' on your ' + self.slot + '.',
+                    libtcod.light_green)
 
     def dequip(self):
         ''' Dequip object and show a message about it '''
@@ -524,7 +558,7 @@ class Object:
         ''' Draw object. Only show if it's visible to the player; or it's set to
         'always visible' and on an explored tile '''
         if ((libtcod.map_is_in_fov(fov_map, self.x, self.y)) or \
-        (self.always_visible and world[self.x][self.y].explored)):
+        (self.always_visible and world[self.x][self.y].explored)) or SEE_ALL:
             (x, y) = to_camera_coordinates(self.x, self.y)
 
             if x is not None:
@@ -598,7 +632,7 @@ class Object:
         #   from running around the map if there's an alternative path really
         #   far away
         if not libtcod.path_is_empty(my_path) and \
-        libtcod.path_size(my_path) < 25 \
+        libtcod.path_size(my_path) < 100 \
         or player_move:
             #Find the next coordinates in the computed full path
             x, y = libtcod.path_walk(my_path, True)
@@ -1622,11 +1656,20 @@ def get_names_under_mouse():
     # Read Coords. Debug
     if COORDS_UNDER_MOUSE:
         names += '( ' + str(x) + ', ' + str(y) + ' )'
+        for obj in objects:
+            if obj.x == x and obj.y == y:
+                if obj.ai:
+                    x, y = obj.ai.backup_coord
+                    names += ' going to: ( ' + str(x) + ', ' + str(y) + ' )'
 
     if names:
         return '['+names.capitalize()+']'
     else:
         return ''
+
+
+def get_rand_unblocked_coord():
+    return choice(unblocked_world)
 
 def git_screen():
     # Clear screen
@@ -2084,7 +2127,7 @@ def main_menu():
 
 def make_map():
     ''' Make a map '''
-    global world, fov_map, objects, dstairs, ustairs
+    global world, fov_map, objects, dstairs, ustairs, unblocked_world
 
     # The list of objects with just the player
     objects = [player]
@@ -2144,17 +2187,26 @@ def make_map():
     x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
     y = libtcod.random_get_int(0,0, MAP_HEIGHT-1)
 
-    while (world[x][y].blocked):
-        x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
-        y = libtcod.random_get_int(0,0, MAP_HEIGHT-1)
+    unblocked_world = []
+
+    for y in range(MAP_HEIGHT):
+        for x in range(MAP_WIDTH):
+            if not world[x][y].blocked:
+                unblocked_world.append((x, y))
 
     if stairs_up:
+
+        x, y = get_rand_unblocked_coord()
+
         dstairs = Object(x, y, '>', 'down stairs', libtcod.white,
                         always_visible=True)
         objects.append(dstairs)
         # This tends to cause issues in the later levels
         dstairs.send_to_back()  # So it's drawn below the monsters
     else:
+
+        x, y = get_rand_unblocked_coord()
+
         ustairs = Object(x, y, '<', 'up stairs', libtcod.white,
                         always_visible=True)
         objects.append(ustairs)
@@ -2162,13 +2214,7 @@ def make_map():
         ustairs.send_to_back()  # So it's drawn below the monsters
 
     # Same for player
-    x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
-    y = libtcod.random_get_int(0,0, MAP_HEIGHT-1)
-
-    while (world[x][y].blocked):
-        x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
-        y = libtcod.random_get_int(0,0, MAP_HEIGHT-1)
-
+    x, y = get_rand_unblocked_coord()
     player.x = x
     player.y = y
 
@@ -2402,8 +2448,12 @@ def new_game():
     # create object representing the player
     fighter_component = Fighter(hp=100, defense=1, power=4, xp=0, mana=100,
                                 death_function=player_death)
+
     player = Object(0, 0, PLAYER_CHARACTER, player_name, PLAYER_COLOR, blocks=True,
                     fighter=fighter_component)
+
+    if INVISIBLE:
+        player.color = libtcod.black
 
     player.level = 1
 
