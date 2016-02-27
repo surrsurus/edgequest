@@ -1123,6 +1123,30 @@ def closest_monster(max_range):
                 closest_dist = dist
     return closest_enemy
 
+def credits_screen():
+    # Clear screen
+    libtcod.console_clear(con)
+
+    # Set the screen to black
+    libtcod.console_set_default_background(con, libtcod.black)
+
+    libtcod.console_set_default_foreground(con, libtcod.light_yellow)
+    libtcod.console_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
+                            libtcod.BKGND_NONE, libtcod.CENTER,
+                            'Thank you for playing EdgeQuest!\n')
+
+    # Blit to screen
+    libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+
+    msgbox(
+    '\n\n\nCredits:\n\n' +
+    'Author: Gray (surrsurus)\n' +
+    'Big thanks to:\n' +
+    'Max for the colorscheme\n' +
+    'and Mike and Squirrel for playtesting\n\n' +
+    'Press any key to continue',
+    40)
+
 def debug_spawn_console(json_list):
     ''' Spawn a mini-console to spawn-in monsters or items '''
     # Needs to have JSON data
@@ -1355,9 +1379,9 @@ def fov_recompute():
                     # It's out of the player's FOV
                     if wall:
                         c = wallselect(world, map_x, map_y)
-                        libtcod.console_set_char_background(con, x, y,
-                                                    color_dark_wall,
-                                                    libtcod.BKGND_SET)
+                        libtcod.console_put_char_ex(con, x, y, c,
+                                                    color_fov_ground,
+                                                    color_dark_wall)
                     else:
                         libtcod.console_set_char_background(con, x, y,
                                                 color_dark_ground,
@@ -1421,6 +1445,8 @@ def game_win():
     Total Kills: ' + str(kill_count) + '\n\n \
     Press any key to continue...',
     CHARACTER_SCREEN_WIDTH)
+
+    credits_screen()
 
     exit()
 
@@ -2035,7 +2061,7 @@ def main_menu():
 
         # Show options and wait for the player's choice
         choice = menu('Options', ['Play a new game', 'Continue last game',
-                        'How to play', 'Quit'], 24)
+                        'How to play', 'Credits', 'Quit'], 24)
 
         if choice == 0:  # New game
             intro_cutscene()
@@ -2051,7 +2077,9 @@ def main_menu():
             play_game()
         if choice == 2:  # How to play
             how_to_play()
-        elif choice == 3:  # Quit
+        if choice == 3:
+            credits_screen()
+        elif choice == 4:  # Quit
             exit()
 
 def make_map():
