@@ -25,11 +25,11 @@ EdgeQuest is packaged with [simplejson](https://github.com/simplejson/simplejson
 
 ## Download
 
-You can download the latest master [here](https://github.com/TriangularEgg/edgequest/archive/master.zip) or just click the `Download Zip` button at the top of the page. The master release should be stable enough to play, but becomes outdated fairly quickly, so please use the `download-master` script in the scripts folder to download the latest master.
+You can download the latest master [here](https://github.com/surrsurus/edgequest/archive/master.zip) or just click the `Download Zip` button at the top of the page. The master release should be stable enough to play, but becomes outdated fairly quickly, so please use the `download-master` script in the scripts folder to download the latest master.
 
-If you want more stability, download the latest release [here](https://github.com/TriangularEgg/edgequest/releases)
+If you want more stability, download the latest release [here](https://github.com/surrsurus/edgequest/releases)
 
-If you want bleeding edge development, download the testing branch [here](https://github.com/TriangularEgg/edgequest/archive/testing.zip). Note that this version is extremely prone to bugs.
+If you want bleeding edge development, download the testing branch [here](https://github.com/surrsurus/edgequest/archive/testing.zip). Note that this version is extremely prone to bugs.
 
 
 ## Run Edgequest
@@ -54,7 +54,7 @@ Make sure it's the 32 bit version!
 
 Once you have it downloaded, simply extract the zip file and double click on the `edgequest` file. (It should have a little blue and yellow snake icon on it!)
 
-If you have any problems please notify me by creating an issue on the issue tracker [here](https://github.com/TriangularEgg/edgequest/issues).
+If you have any problems please notify me by creating an issue on the issue tracker [here](https://github.com/surrsurus/edgequest/issues).
 
 I was not intending to support Windows, so there may be minor issues.
 
@@ -68,12 +68,12 @@ Considering he's the only one I know with a mac, and he found a way to circumven
 
 If you come across any bug or have an idea for an enhancement, please create a github issue. It helps me track the bugs and also makes sure I don't have to playtest all the time (Though, I'm not complaining if I have to).
 
-Create an issue [here](https://github.com/TriangularEgg/edgequest/issues).
+Create an issue [here](https://github.com/surrsurus/edgequest/issues).
 
 
 ## Wiki
 
-Please check the [wiki](https://github.com/TriangularEgg/edgequest/wiki) for further information
+Please check the [wiki](https://github.com/surrsurus/edgequest/wiki) for further information
 
 
 ## Modding

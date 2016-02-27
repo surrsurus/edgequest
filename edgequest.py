@@ -5,6 +5,7 @@ import sys
 import textwrap
 import time
 from random import *
+from sys import argv
 
 # Test import. No need to use the packaged one if this works
 try:
@@ -69,6 +70,13 @@ kill_count = 0
 
 # Stairs direction
 stairs_up = True
+
+# Perks
+perk_mtndew = 0
+perk_cokezero = 0
+perk_tazer = 0
+perk_incengren = 0
+perk_fbang = 0
 
 ######################################
 # Classes
@@ -196,6 +204,7 @@ class Equipment:
                 elif self.slot == 'right hand':
                     self.slot = 'left hand'
 
+                self.is_equipped = True
                 message('You use your free hand to equip the ' +
                         self.owner.name)
 
@@ -429,6 +438,8 @@ class Item:
 
     def use(self):
         ''' Use an item '''
+        global perk_fbang, perk_tazer, perk_mtndew, perk_confuse, perk_cokezero, \
+            perk_incengren
         # pecial case: if the object has the Equipment component, the 'use'
         #   action is to equip/dequip
         if self.owner.equipment:
@@ -440,6 +451,16 @@ class Item:
             message('The ' + self.owner.name + ' cannot be used.', libtcod.gray)
         else:
             if self.use_function() != 'cancelled':
+                if self.owner.name == 'mountain dew':
+                    perk_mtndew += 1
+                elif self.owner.name == 'coke zero':
+                    perk_cokezero += 1
+                elif self.owner.name == 'tazer':
+                    perk_tazer += 1
+                elif self.owner.name == 'incendiary grenade':
+                    perk_incengren += 1
+                elif self.owner.name == 'flashbang':
+                    perk_fbang += 1
                 # Destroy after use, unless it was cancelled for some reason
                 inventory.remove(self.owner)
 
@@ -776,6 +797,19 @@ def cast_confuse():
     # Present the root console
     libtcod.console_flush()
 
+def cast_death():
+    ''' Ask the player for a target tile to kill '''
+    message('Left-click a target tile for the report, or right-click to cancel.',
+            libtcod.light_cyan)
+    (x, y) = target_tile()
+    if x is None: return 'cancelled'
+
+    for obj in objects:
+        if obj.distance(x, y) <= 0 and obj.fighter:
+            message('The ' + obj.name + ' gets reported to HEART!',
+                libtcod.orange)
+            obj.fighter.take_damage(9000000000)
+
 def cast_fireball():
     ''' Ask the player for a target tile to throw a fireball at '''
     message('Left-click a target tile for the fireball, or right-click to cancel.',
@@ -822,7 +856,7 @@ def cast_inflict_blindness():
     global blind, blind_counter
     blind = True
     blind_counter = 0
-    message("You are blinded!", libtcod.dark_sea)
+    message('You are blinded!', libtcod.dark_sea)
 
 def cast_mana():
     ''' Give some mana back '''
@@ -943,6 +977,18 @@ def cast_lightning():
 
     libtcod.console_flush()
 
+def check_args():
+    global player_name
+    try:
+        # assumes that the program is run wiht python2.7 edgequest.py
+        if argv[1] == '-q':
+            player_name = "Max"
+            new_game()
+            play_game()
+    except IndexError:
+        main_menu()
+
+
 def check_ground():
     for obj in objects:  # Look for an item in the player's tile
         if obj.x == player.x and obj.y == player.y and obj != player:
@@ -971,7 +1017,7 @@ def check_level_up():
                 ')',
                 'Strength (+1 attack, from ' + str(player.fighter.power) +
                 ')',
-                'Agility (+1 defense, from ' + str(player.fighter.defense) +
+                'Euphoria (+10 mana, from ' + str(player.fighter.mana) +
                 ')'], LEVEL_SCREEN_WIDTH)
 
         if choice == 0:
@@ -980,7 +1026,7 @@ def check_level_up():
         elif choice == 1:
             player.fighter.power += 1
         elif choice == 2:
-            player.fighter.defense += 1
+            player.fighter.mana += 10
 
         # Pause
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
@@ -993,7 +1039,7 @@ def check_timer():
     if player.fighter.hp != player.fighter.max_hp:
         if timer % REGEN_SPEED == 0:
             # disabled
-            # player.fighter.heal(1)
+            player.fighter.heal(1)
             timer += 1
 
 def choose_name():
@@ -1450,6 +1496,8 @@ def generate_item(item_id, x, y):
             item_component = Item(use_function=cast_heal)
         elif items_data[item_id]['effect'] == 'fireball':
             item_component = Item(use_function=cast_fireball)
+        elif items_data[item_id]['effect'] == 'death':
+            item_component = Item(use_function=cast_death)
         elif items_data[item_id]['effect'] == 'confuse':
             item_component = Item(use_function=cast_confuse)
         elif items_data[item_id]['effect'] == 'lightning':
@@ -2038,7 +2086,6 @@ def make_map():
 
     # Template original map: themap.makeMap(MAP_WIDTH,MAP_HEIGHT-2,250,1,MAX_ROOMS*4)
     rooms = MAX_ROOMS + dungeon_level + int(math.floor((dungeon_level/4)*4))
-    print(rooms)
     fail = 150 * int(math.floor((dungeon_level/3)*3)) + 100
     b1 = int(math.floor((dungeon_level / 6)*3)) + 1
     themap.makeMap(MAP_WIDTH, MAP_HEIGHT-2, fail, b1, rooms)
@@ -2369,7 +2416,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[6, 1], [10, 2], [15, 4], [20, 6], [30, 12]])
+    max_monsters = from_dungeon_level([[11, 1], [13, 2], [15, 4], [20, 6], [30, 12]])
 
     # Chance of each monster
     monster_chances = {}
@@ -2617,6 +2664,9 @@ def render_all():
     libtcod.console_print_ex(panel, 1 + BAR_WIDTH / 2, 1, libtcod.BKGND_NONE,
                             libtcod.CENTER, player.name)
 
+    # Show Perks
+    render_perks()
+
     # Cool distinctions
     libtcod.console_set_default_foreground(panel, libtcod.gray)
     for y in range(SCREEN_HEIGHT):
@@ -2785,6 +2835,35 @@ def render_health_bar(x, y, total_width, value, maximum, bar_color, back_color):
     libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
                             libtcod.CENTER, '')
 
+def render_perks():
+    y = 6
+    if perk_mtndew >= PERK_BASE:
+        libtcod.console_set_default_foreground(panel, libtcod.light_green)
+        libtcod.console_print_ex(panel, 1, y, libtcod.BKGND_NONE,
+                                libtcod.CENTER, '!')
+
+    if perk_cokezero >= PERK_BASE:
+        libtcod.console_set_default_foreground(panel, libtcod.violet)
+        libtcod.console_print_ex(panel, 2, y, libtcod.BKGND_NONE,
+                                libtcod.CENTER, '!')
+
+    if perk_tazer >= PERK_BASE:
+        libtcod.console_set_default_foreground(panel, libtcod.sky)
+        libtcod.console_print_ex(panel, 3, y, libtcod.BKGND_NONE,
+                                libtcod.CENTER, '=')
+
+    if perk_incengren >= PERK_BASE:
+        libtcod.console_set_default_foreground(panel, libtcod.light_red)
+        libtcod.console_print_ex(panel, 4, y, libtcod.BKGND_NONE,
+                                libtcod.CENTER, '*')
+
+    if perk_fbang >= PERK_BASE:
+        libtcod.console_set_default_foreground(panel, libtcod.azure)
+        libtcod.console_print_ex(panel, 5, y, libtcod.BKGND_NONE,
+                                libtcod.CENTER, '*')
+
+
+
 def save_game():
     ''' Open a new empty shelve (possibly overwriting an old one)
     to write the game data '''
@@ -2934,4 +3013,5 @@ def weapon_action_else(weapon):
 # Main Loop
 ######################################
 
-main_menu()
+check_args()
+# main_menu()

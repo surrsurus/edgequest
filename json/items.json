@@ -49,6 +49,16 @@
         "effect": "confuse"
     },
 
+    "anonnote": {
+        "name": "anonymous note",
+        "id": "anonnote",
+        "char": "~",
+        "color": "light_red",
+        "chance": [[1, 4]],
+        "type": "item",
+        "effect": "death"
+    },
+
     "tazer": {
         "name": "tazer",
         "id": "tazer",
@@ -172,7 +182,7 @@
         "slot": "right hand",
         "attack_msg": "bashes",
         "weapon_func": "firearm",
-        "power": -6,
+        "power": -3,
         "defense": 0,
         "hp": 0,
         "mana": 0,

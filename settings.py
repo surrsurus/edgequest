@@ -82,8 +82,8 @@ HEAL_AMOUNT = 40
 MANA_AMOUNT = 20
 
 # Siphon Spell cost
-SIPHON_COST = 5
-SIPHON_AMOUNT = 5
+SIPHON_COST = 1
+SIPHON_AMOUNT = 10
 
 # Magic Missile Spell cost
 MISSILE_COST = 10
@@ -109,7 +109,7 @@ LEVEL_UP_FACTOR = 150
 # Blindness
 BLIND_LENGTH = 10
 
-# Firearms
+# Firearmse
 FIREARM_RANGE = 8
 
 # Regen speed
@@ -117,6 +117,9 @@ REGEN_SPEED = 10
 
 # Default attack message
 DEFAULT_ATTACK = 'attacks'
+
+# Default perk val
+PERK_BASE = 10
 
 ######################################
 # Debug Options
