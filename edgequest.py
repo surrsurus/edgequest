@@ -750,7 +750,7 @@ msg_panel = libtcod.console_new(SCREEN_WIDTH, PANEL_HEIGHT)
 ######################################
 
 # Font
-libtcod.console_set_custom_font('images/terminal16x24_gs_tc.png',
+libtcod.console_set_custom_font('images/terminal10x16_gs_tc.png',
     libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
 # Initialize root console
