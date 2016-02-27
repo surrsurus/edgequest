@@ -215,7 +215,7 @@ class Equipment:
 
             # If both hands are full, dequip something or else the player
             #   somehow grows a new hand spontaneously
-            if get_equipped_in_slot(self.slot) is not None:
+            elif get_equipped_in_slot(self.slot) is not None:
                 message(('But something is already there, so take off the ' + \
                         old_equipment.owner.name + ' for the ' +
                         self.owner.name), libtcod.light_red)
