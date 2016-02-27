@@ -148,6 +148,7 @@ COORDS_UNDER_MOUSE = False
 ######################################
 
 movement_keys = [
+    # Num pad keys
     '1',
     '2',
     '3',
@@ -156,6 +157,7 @@ movement_keys = [
     '7',
     '8',
     '9',
+    # Vim keys
     'y',
     'u',
     'h',

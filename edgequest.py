@@ -3040,5 +3040,6 @@ def weapon_action_else(weapon):
 # Main Loop
 ######################################
 
+# Check the arguments that are ran with edgequest.py
+# If this gives problems, replace with `main_menu()`
 check_args()
-# main_menu()

@@ -1,6 +1,6 @@
 # edgequest
 
-Official website [here](http://www.edgequest.github.io)
+Official website [here](https://edgequest.github.io/)
 
 EdgeQuest is a 'roguelike' in Python based on the [Roguebasin Tutorial](http://www.roguebasin.com/index.php?title=Complete_Roguelike_Tutorial,_using_python%2Blibtcod) but with several key differences, namely being the feature to store items and monsters inside of JSON files, making modular additions possible without needing to alter the python source in any way.
 
