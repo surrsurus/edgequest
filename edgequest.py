@@ -2309,7 +2309,7 @@ def mouse_move_astar(tx, ty):
         elif blind:
             message('That\'s not a good idea considering your blindness',
                 libtcod.pink)
-        else:
+        elif not monster:
             message('Moving...', libtcod.pink)
             while not libtcod.console_is_window_closed() and not monster and \
             (player.x, player.y) != (tx, ty):
