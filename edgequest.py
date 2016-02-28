@@ -10,13 +10,12 @@ import sys
 import textwrap
 import time
 
-# Import 3rd party and custom modules
-from colors import *
 from modules import libtcodpy as libtcod
 from modules import simplejson as json
 from modules.dmap import dMap
 from modules.wallselect import wallselect
-from settings import *
+from settings.colors import *
+from settings.settings import *
 
 # ------------------------------------------------------------------------------
 

@@ -80,6 +80,9 @@ Please check the [wiki](https://github.com/surrsurus/edgequest/wiki) for further
 
 EdgeQuest is very hackable. There is a `settings.py` file that can be edited to change values of things in the game, and JSON files that can be edited to add monsters and items. This may not be the most robust modding system, but it gives the player with enough motivation to create brand new things with the existing code.
 
+## Community
+
+[EdgeQuest subreddit](https://www.reddit.com/r/edgequest/)
 
 ## License
 
