@@ -1304,7 +1304,7 @@ def credits_screen():
     '\n\n\nCredits:\n\n' +
     'Author: Gray (surrsurus)\n' +
     'Big thanks to:\n' +
-    'Max for the colorscheme\n' +
+    'Max for all the contributions!\n' +
     'and Fleck and Squirrel for playtesting\n\n' +
     'Press any key to continue',
     40)

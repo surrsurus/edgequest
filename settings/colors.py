@@ -21,36 +21,39 @@ color_ground_highlight = libtcod.Color(200, 180, 50)
 
 # ---------------------------------------------------------------------------- #
 
-# Converts a hex string into a libtcod Color object
 def hex_to_color(inp):
-    fhex = inp.replace('#', '').strip() # Format the string for use
+    ''' Converts a hex string into a libtcod Color object '''
+    # Format the string for use
+    fhex = inp.replace('#', '').strip()
     try:
         # Get string slices for each hex bit and convert them to numbers
         # NOTE: String slices are in base 16
         red_bit   = int(fhex[0:2], 16)
         green_bit = int(fhex[2:4], 16)
         blue_bit  = int(fhex[4:6], 16)
-        print 'Color: (' + str(red_bit) + ', ' + str(green_bit) + ', ' + str(blue_bit) + ')'
+
+        print 'Color: (' + str(red_bit) + ', ' + str(green_bit) + ', ' + \
+            str(blue_bit) + ')'
+
         return libtcod.Color(red_bit, green_bit, blue_bit);
+
     # If the color sting is mal-formatted
     except ValueError as e:
         print 'Error converting hex to color! Is it `rrggbb` formatted?'
         return None
 
 def get_color(col):
-    #
+    ''' returns the color based on whether it's
+    unicode or a list of rgb values '''
     if type(col) is unicode:
         return hex_to_color(col)
     elif type(col) is list:
         return libtcod.Color(*col)
 
 def default_colors():
-
-    '''
-        Sets the values used in the main file to hard-coded defaults
-
-        Should be used as a fallback in case something goes wrong and we cannot
-        load the colors from our theme file
+    ''' Sets the values used in the main file to hard-coded defaults
+    Should be used as a fallback in case something goes wrong and we cannot
+    load the colors from our theme file
     '''
 
     color_light_ground     = libtcod.Color(110, 109, 91)
