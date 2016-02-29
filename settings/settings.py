@@ -144,6 +144,12 @@ PERK_BASE = 10
 # Radius of FOV
 TORCH_RADIUS = 10
 
+# Ranged monster distance
+MONSTER_RANGE = FIREARM_RANGE
+
+# CSGO floor settings
+CSGO_FLOOR = 5
+
 # ------------------------------------------------------------------------------
 
 # Debug settings ---------------------------------------------------------------
@@ -312,6 +318,8 @@ COLORS = {
     'chartreuse': libtcod.chartreuse,
     'black': libtcod.black,
     'orange': libtcod.orange,
+    'ct_color': libtcod.Color(0, 0, 153),
+    't_color': libtcod.Color(204, 102, 0),
     'red': libtcod.red
 }
 

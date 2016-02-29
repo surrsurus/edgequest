@@ -10,6 +10,16 @@
         "effect": "heal"
     },
 
+    "bomb": {
+        "name": "bomb",
+        "id": "bomb",
+        "char": "#",
+        "color": "black",
+        "chance": [[100, 5]],
+        "type": "item",
+        "effect": "bomb"
+    },
+
     "gold": {
         "name": "gold",
         "id": "gold",

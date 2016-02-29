@@ -1,2 +1,57 @@
 #!/bin/bash
-wget https://github.com/surrsurus/edgequest/archive/master.zip
+
+REPO='https://github.com/surrsurus/edgequest/archive/master.zip'
+RNAME='master.zip'
+EQLOC='~/.edgequest/'
+VSP='----------------------------------------------------------'
+
+# If a previous copy exists for some reason, delete it.
+if [[ ! -f ${RNAME} ]]; then
+    rm ${RNAME}
+fi
+
+# If the backup location does not exist, make it.
+# Backup may not work!
+if [[ ! -d ${EQLOC} ]]; then
+    mkdir ${EQLOC}
+    if [[ ! -d ${EQLOC}/backups ]]; then
+        mkdir ${EQLOC}/backups
+    fi
+fi
+
+# Create a backup of the old branch
+tar -cvf ${EQLOC}/backups/backup.tar ..
+
+# Move into the edgequest directory...
+cd ..
+# ...and delete everything.
+echo
+echo ${VSP}
+echo 'This process will delete any files in your edgequest directory.'
+read -p 'Are you sure you want to install? [Yes/No] >' -n 1 -r
+echo ${VSP}
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    rm -rf ./*
+else
+    echo 'Aborting!'
+    exit 1
+fi
+
+
+# This gives us a file called `master.zip`
+wget ${REPO}
+# Now we unzip it!
+unzip ${RNAME}
+
+# Now we are in the directory with `master.zip` and the master folder
+# Delete the zip file...
+rm ${RNAME}
+
+# Now we move all the actual files out of `edgequest-master` and put them into the correct place.
+mv edgequest-master/* .
+
+# And now we are done with that folder, so we remove it
+rmdir edgequest-master
+
+# All done!
+
