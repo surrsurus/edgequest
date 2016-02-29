@@ -22,6 +22,16 @@ LIMIT_FPS = 25
 # FOV Algorithm for libtcod to use
 FOV_ALGO = 0
 
+# Resource Locations -----------------------------------------------------------
+
+# The locations for the JSON files that define the game content
+MONSTER_JSON_PATH = 'json/monster.json'
+ITEM_JSON_PATH = 'json/items.json'
+COLOR_JSON_PATH = 'json/colors.json'
+
+# Main menu image
+MENU_IMAGE = 'images/menu_background.png'
+
 # ------------------------------------------------------------------------------
 
 # Map settings -----------------------------------------------------------------
@@ -76,9 +86,6 @@ MSG_PANEL_Y      = SCREEN_HEIGHT - MSG_PANEL_HEIGHT
 MSG_X      = 1
 MSG_WIDTH  = SCREEN_WIDTH - BAR_WIDTH - 2
 MSG_HEIGHT = MSG_PANEL_HEIGHT - 1
-
-# Main menu image
-MENU_IMAGE = 'images/menu_background.png'
 
 # ------------------------------------------------------------------------------
 
@@ -315,5 +322,9 @@ COLORS = {
     't_color': libtcod.Color(204, 102, 0),
     'red': libtcod.red
 }
+
+# ------------------------------------------------------------------------------
+
+CURRENT_THEME = 'torchlight'
 
 # ------------------------------------------------------------------------------

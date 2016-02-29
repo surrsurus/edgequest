@@ -1,7 +1,6 @@
 #! /bin/bash
 
-if [ $1 == "-q" ]
-then
+if [ $1 == "-q" ]; then
     python2.7 -B edgequest.py -q
 else
     python2.7 -B edgequest.py

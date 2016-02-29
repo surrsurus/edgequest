@@ -1,0 +1,45 @@
+{
+    "classic": {
+        "highlight": {
+            "wall": [130, 110, 50],
+            "ground": [200, 180, 50]
+        },
+        "ground": {
+            "light": [127, 127, 127],
+            "dark": [50, 50, 150]
+        },
+        "wall": {
+            "light": [159, 159, 159],
+            "dark": [0, 0, 100]
+        }
+    },
+    "torchlight": {
+        "highlight": {
+            "wall": [130, 110, 50],
+            "ground": [200, 180, 50]
+        },
+        "ground": {
+            "light": [110, 109, 91],
+            "dark": [33, 33, 33]
+        },
+        "wall": {
+            "light": [128, 127, 98],
+            "dark": [51, 51, 51]
+        }
+    },
+    "abstract": {
+        "highlight": {
+            "wall": "#ffff00",
+            "ground": "#ffff00"
+        },
+        "ground": {
+            "light": "#00aa00",
+            "dark": "#003300"
+        },
+        "wall": {
+            "light": "#0000aa",
+            "dark": "#000033"
+        }
+    },
+    "errorenous": {}
+}
