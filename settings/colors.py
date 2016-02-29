@@ -13,7 +13,6 @@ from settings import COLOR_JSON_PATH, CURRENT_THEME
 # Colors -----------------------------------------------------------------------
 
 # Global Colors
-
 color_light_ground     = libtcod.Color(110, 109, 91)
 color_light_wall       = libtcod.Color(128, 127, 98)
 color_dark_wall        = libtcod.Color(51, 51, 51)

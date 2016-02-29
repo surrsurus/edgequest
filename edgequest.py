@@ -147,6 +147,18 @@ unblocked_world = []
 
 # ------------------------------------------------------------------------------
 
+# Dictionaries -----------------------------------------------------------------
+
+# Initialize Dictionaries here to be used later
+
+# Dictionary of death functions
+dict_death_func = {}
+
+# Dictionary of AIs
+dict_ais = {}
+
+# ------------------------------------------------------------------------------
+
 # Classes ----------------------------------------------------------------------
 
 class BasicMonster:
@@ -1643,31 +1655,46 @@ def game_win():
 def generate_monster(monster_id, x, y):
     ''' Generate monster from json '''
 
-    # Read color
-    color = json_get_color(monster_data[monster_id]['color'])
+    # Dictionary of death functions
+    dict_death_func = {
+        'normal'    : monster_death,
+        'slock'     : monster_death_slock,
+        'talk'      : monster_death_talk
+    }
+
+    # Dictionary of AIs
+    dict_ais = {
+        'normal'    : BasicMonster(),
+        'talk'      : TalkingMonster(0, 0),
+        'rangedtalk': RangedTalkerMonster(0, 0)
+    }
 
     # Select a death function
-    if monster_data[monster_id]['death_func'] == 'normal':
-        death = monster_death
-    elif monster_data[monster_id]['death_func'] == 'slock':
-        death = monster_death_slock
-    elif monster_data[monster_id]['death_func'] == 'talk':
-        death = monster_death_talk
-    else:
+    death = None
+    for key in dict_death_func:
+        if monster_data[monster_id]['death_func'] == key:
+            death = dict_death_func[key]
+
+    # Fallback
+    if death is None:
         death = monster_death
 
     # Select an AI
-    if monster_data[monster_id]['ai'] == 'normal':
+    ai = None
+    for key in dict_ais:
+        if monster_data[monster_id]['ai'] == key:
+            ai = dict_ais[key]
+
+    # Fallback
+    if ai is None:
         ai = BasicMonster()
-    elif monster_data[monster_id]['ai'] == 'talk':
-        ai = TalkingMonster(monster_data[monster_id]['speech'],
-                            monster_data[monster_id]['rate'])
-    elif monster_data[monster_id]['ai'] == 'rangedtalk':
-        ai = RangedTalkerMonster(monster_data[monster_id]['speech'],
-                            monster_data[monster_id]['rate'])
-    else:
-        print('Error: ai does not exist')
-        exit()
+
+    # Set values if applicable
+    try:
+        ai.speech = monster_data[monster_id]['speech']
+        ai.rate   = monster_data[monster_id]['rate']
+    except:
+        pass
 
     '''
     Example:
@@ -1679,24 +1706,30 @@ def generate_monster(monster_id, x, y):
         blocks=True, fighter=fighter_component, ai=ai_component)
     '''
 
-    fighter_component = Fighter(hp=int(monster_data[monster_id]['hp']),
-                            defense=int(monster_data[monster_id]['defense']),
-                            power=int(monster_data[monster_id]['power']),
-                            xp=int(monster_data[monster_id]['xp']),
-                            mana=int(monster_data[monster_id]['mana']),
-                            death_function=death,
-                            attack_msg=monster_data[monster_id]['attack_msg'])
+    # Read color
+    color = json_get_color(monster_data[monster_id]['color'])
+
+    # Create component
+    fighter_component = Fighter(
+        hp             = int(monster_data[monster_id]['hp']),
+        defense        = int(monster_data[monster_id]['defense']),
+        power          = int(monster_data[monster_id]['power']),
+        xp             = int(monster_data[monster_id]['xp']),
+        mana           = int(monster_data[monster_id]['mana']),
+        death_function = death,
+        attack_msg     = monster_data[monster_id]['attack_msg'])
 
     monster = Object(x, y, monster_data[monster_id]['char'],
-                    monster_data[monster_id]['name'], color, blocks=True,
-                    fighter = fighter_component, ai=ai)
+        monster_data[monster_id]['name'], color,
+        blocks         = True,
+        fighter        = fighter_component,
+        ai             = ai)
 
     return monster
 
 def generate_item(item_id, x, y):
     ''' Generate items from json '''
 
-    color = json_get_color(items_data[item_id]['color'])
 
     '''
     Example:
@@ -1711,72 +1744,110 @@ def generate_item(item_id, x, y):
     Please look at the json for more info on properties of both
     '''
 
-    if items_data[item_id]['type'] == 'item':
+    # Get the item type
+    type = items_data[item_id]['type']
 
-        if items_data[item_id]['effect'] == 'heal':
-            item_component = Item(use_function=cast_heal)
-        elif items_data[item_id]['effect'] == 'fireball':
-            item_component = Item(use_function=cast_fireball)
-        elif items_data[item_id]['effect'] == 'death':
-            item_component = Item(use_function=cast_death)
-        elif items_data[item_id]['effect'] == 'confuse':
-            item_component = Item(use_function=cast_confuse)
-        elif items_data[item_id]['effect'] == 'lightning':
-            item_component = Item(use_function=cast_lightning)
-        elif items_data[item_id]['effect'] == 'mana':
-            item_component = Item(use_function=cast_mana)
-        elif items_data[item_id]['effect'] == 'bomb':
-            item_component = Item(use_function=cast_explode)
+    # Get the color
+    color = json_get_color(items_data[item_id]['color'])
 
+    # Dictionary of all effects of items
+    dict_effects = {
+        'heal'      : Item(use_function=cast_heal),
+        'fireball'  : Item(use_function=cast_fireball),
+        'death'     : Item(use_function=cast_death),
+        'confuse'   : Item(use_function=cast_death),
+        'lightning' : Item(use_function=cast_lightning),
+        'mana'      : Item(use_function=cast_mana),
+        'bomb'      : Item(use_function=cast_explode)
+    }
+
+    # If it's a usable item, get it's effect
+    if type == 'item':
+
+        # Select an effect
+        effect = None
+        for key in dict_effects:
+            if items_data[item_id]['effect'] == key:
+                effect = dict_effects[key]
+
+        # Fallback
+        if effect is None:
+            effect = Item(use_function=cast_heal)
+
+        # Create a basic item
         item = Object(x, y, items_data[item_id]['char'],
-                        items_data[item_id]['name'], color, item=item_component)
+                        items_data[item_id]['name'], color, item=effect)
 
-    elif items_data[item_id]['type'] in ('equipment', 'firearm'):
+    elif type in ('equipment', 'firearm'):
 
-        if items_data[item_id]['subtype'] == 'weapon':
-            if items_data[item_id]['weapon_func'] == 'knife':
-                func = weapon_action_knife
-            elif items_data[item_id]['weapon_func'] == 'katana':
-                func = weapon_action_katana
-            elif items_data[item_id]['weapon_func'] == 'awp':
-                func = weapon_action_awp
-            else:
+        subtype = items_data[item_id]['subtype']
+
+        # Dictionary of weapon actions
+        dict_actions = {
+            'knife'  : weapon_action_knife,
+            'katana' : weapon_action_katana,
+            'awp'    : weapon_action_awp
+        }
+
+        if subtype == 'weapon':
+
+            # Select a weapon action
+            func = None
+            for key in dict_actions:
+                if items_data[item_id]['weapon_func'] == key:
+                    func = dict_actions[key]
+
+            # Fallback
+            if func is None:
                 func = weapon_action_else
-            equip_component = Equipment(slot=items_data[item_id]['slot'],
-                            power_bonus=items_data[item_id]['power'],
-                            defense_bonus=items_data[item_id]['defense'],
-                            max_hp_bonus=items_data[item_id]['hp'],
-                            max_mana_bonus=items_data[item_id]['mana'],
-                            attack_msg=items_data[item_id]['attack_msg'],
-                            weapon_func=func,
-                            short_name=items_data[item_id]['short_name'])
-        elif items_data[item_id]['subtype'] == 'firearm':
+
+            # Create the component
+            equip_component = Equipment(
+                slot           = items_data[item_id]['slot'],
+                power_bonus    = items_data[item_id]['power'],
+                defense_bonus  = items_data[item_id]['defense'],
+                max_hp_bonus   = items_data[item_id]['hp'],
+                max_mana_bonus = items_data[item_id]['mana'],
+                attack_msg     = items_data[item_id]['attack_msg'],
+                weapon_func    = func,
+                short_name     = items_data[item_id]['short_name'])
+
+        elif subtype == 'firearm':
+
+            # Set the firearm action
             if items_data[item_id]['weapon_func'] == 'firearm':
                 func = weapon_action_firearm
             else:
                 func = weapon_action_else
-            equip_component = Equipment(slot=items_data[item_id]['slot'],
-                            power_bonus=items_data[item_id]['power'],
-                            defense_bonus=items_data[item_id]['defense'],
-                            max_hp_bonus=items_data[item_id]['hp'],
-                            max_mana_bonus=items_data[item_id]['mana'],
-                            attack_msg=items_data[item_id]['attack_msg'],
-                            weapon_func=func,
-                            ranged_bonus=items_data[item_id]['ranged'],
-                            short_name=items_data[item_id]['short_name'])
-        elif items_data[item_id]['subtype'] == 'armor':
-            equip_component = Equipment(slot=items_data[item_id]['slot'],
-                            power_bonus=items_data[item_id]['power'],
-                            defense_bonus=items_data[item_id]['defense'],
-                            max_hp_bonus=items_data[item_id]['hp'],
-                            max_mana_bonus=items_data[item_id]['mana'],
-                            short_name=items_data[item_id]['short_name'])
+
+            # Create the component
+            equip_component = Equipment(
+                slot           = items_data[item_id]['slot'],
+                power_bonus    = items_data[item_id]['power'],
+                defense_bonus  = items_data[item_id]['defense'],
+                max_hp_bonus   = items_data[item_id]['hp'],
+                max_mana_bonus = items_data[item_id]['mana'],
+                attack_msg     = items_data[item_id]['attack_msg'],
+                weapon_func    = func,
+                ranged_bonus   = items_data[item_id]['ranged'],
+                short_name     = items_data[item_id]['short_name'])
+
+        elif subtype == 'armor':
+
+            # Create the component
+            equip_component = Equipment(
+                slot           = items_data[item_id]['slot'],
+                power_bonus    = items_data[item_id]['power'],
+                defense_bonus  = items_data[item_id]['defense'],
+                max_hp_bonus   = items_data[item_id]['hp'],
+                max_mana_bonus = items_data[item_id]['mana'],
+                short_name     = items_data[item_id]['short_name'])
 
         item = Object(x, y, items_data[item_id]['char'],
                         items_data[item_id]['name'], color,
                         equipment=equip_component)
 
-    elif items_data[item_id]['type'] == 'gold':
+    elif type == 'gold':
         item = Object(x, y, items_data[item_id]['char'],
                         items_data[item_id]['name'], color)
 
