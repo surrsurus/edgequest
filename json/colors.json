@@ -13,6 +13,7 @@
             "dark": [0, 0, 100]
         }
     },
+
     "torchlight": {
         "highlight": {
             "wall": [130, 110, 50],
@@ -27,6 +28,7 @@
             "dark": [51, 51, 51]
         }
     },
+
     "abstract": {
         "highlight": {
             "wall": "#ffff00",
@@ -41,5 +43,7 @@
             "dark": "#000033"
         }
     },
+    
     "errorenous": {}
+
 }

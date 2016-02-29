@@ -1,16 +1,18 @@
 # Colors.py
 
+# Imports ----------------------------------------------------------------------
+
 import traceback
 from modules import libtcodpy as libtcod
 from modules import simplejson as json
 from settings import CURRENT_THEME
 from settings import COLOR_JSON_PATH
 
-# ---------------------------------------------------------------------------- #
-# Colors
-# ---------------------------------------------------------------------------- #
+# ------------------------------------------------------------------------------
 
-# Global Colors -------------------------------------------------------------- #
+# Colors -----------------------------------------------------------------------
+
+# Global Colors
 
 color_light_ground     = libtcod.Color(110, 109, 91)
 color_light_wall       = libtcod.Color(128, 127, 98)
@@ -19,12 +21,15 @@ color_dark_ground      = libtcod.Color(33, 33, 33)
 color_wall_highlight   = libtcod.Color(130, 110, 50)
 color_ground_highlight = libtcod.Color(200, 180, 50)
 
-# ---------------------------------------------------------------------------- #
+# ------------------------------------------------------------------------------
+
+# Functions --------------------------------------------------------------------
 
 def hex_to_color(inp):
     ''' Converts a hex string into a libtcod Color object '''
     # Format the string for use
     fhex = inp.replace('#', '').strip()
+
     try:
         # Get string slices for each hex bit and convert them to numbers
         # NOTE: String slices are in base 16
@@ -105,3 +110,5 @@ if CURRENT_THEME is not None:
 else:
     print 'Warning: Theme is not set in settings.py! Using defaults...'
     default_colors()
+
+# ------------------------------------------------------------------------------
