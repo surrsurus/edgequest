@@ -635,18 +635,20 @@ class Item:
 
         # Easter egg!
         if self.owner.name == 'bomb':
+            owner = self.owner
+            objects.remove(owner)
             for obj in objects:
                 if obj.x == player.x and obj.y == player.y and obj != player:
-                    if obj.name in ('Bomb site A', 'Bomb site B'):
+                    if obj.name in ['Bomb site A', 'Bomb site B']:
                         message('Terrorists win!')
+
+                        (x, y) = to_camera_coordinates(player.x, player.y)
+
+                        animate_blast(libtcod.red, x, y, FIREBALL_RADIUS*2)
+
                         for obj in objects:
                             if obj.name in ('Counter-Terrorist', 'Terrorist'):
                                 obj.fighter.take_damage(9000000)
-                        (x, y) = to_camera_coordinates(player.x,
-                            player.y)
-                        animate_blast(libtcod.red, x, y,
-                            FIREBALL_RADIUS*2)
-                        objects.remove(self.owner)
 
     def use(self):
         ''' Use an item '''
