@@ -20,18 +20,16 @@ from settings.settings import *
 # ------------------------------------------------------------------------------
 
 # JSON loading -----------------------------------------------------------------
+# Paths are defined in settings.py
 
-# Monster JSON
-monster_json = 'json/monster.json'
 # Load monsters
-with open(monster_json) as json_data:
+with open(MONSTER_JSON_PATH) as json_data:
     monster_data = json.load(json_data)
 
-# Items JSON
-items_json = 'json/items.json'
 # Load items
-with open(items_json) as json_data:
+with open(ITEM_JSON_PATH) as json_data:
     items_data = json.load(json_data)
+
 
 # ------------------------------------------------------------------------------
 
@@ -2666,7 +2664,7 @@ def render_all():
     if not blind:
         # Display a cursor under mouse coords
         libtcod.console_set_char_background(con, mouse.cx, mouse.cy,
-                                            color_light_ground_rgb_yellow)
+                                            color_ground_highlight)
         # blit the contents of 'con' to the root console
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
         fov_recompute()
@@ -3011,6 +3009,7 @@ def toggle_fullscreen():
     ''' Toggle fullscreen mode in libtcod '''
 
     libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+    print 'Toggled fullscreen mode'
 
 def toggle_siphon():
     ''' Toggle the siphon spell '''
