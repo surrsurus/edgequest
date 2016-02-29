@@ -91,6 +91,9 @@ con = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
 # And one for a player-centered focus
 dcon = libtcod.console_new(SCREEN_WIDTH, SCREEN_HEIGHT)
 
+# And one for animations
+anicon = libtcod.console_new(MAP_WIDTH, MAP_HEIGHT)
+
 # FPS Limit
 libtcod.sys_set_fps(LIMIT_FPS)
 
@@ -231,6 +234,52 @@ class TalkingMonster:
             # Close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
                 monster.fighter.attack(player)
+
+            # Depending on the rate of speech set in the json,
+            #   the monster may talk
+            # Rate must be a value from 0 - 99
+            # The higher rate is, the less frequent the monster will talk
+            if libtcod.random_get_int(0, 0, 100) > self.rate:
+                # Say a random line
+                msg = random.choice(self.speech)
+                message(''.join([monster.name.capitalize(), ' says \'',
+                    msg, '\'']), monster.color)
+
+        # Otherwise it moves to a random map location
+        else:
+            x, y = self.backup_coord
+            monster.move_astar(x, y, False)
+
+        if (monster.x, monster.y) == self.backup_coord:
+            self.backup_coord = get_rand_unblocked_coord()
+
+class RangedTalkerMonster:
+    ''' An AI that says things '''
+    def __init__(self, speech, rate):
+        ''' Initialize the speech and rate (as well as the backup_coord) '''
+        self.speech = speech
+        self.rate = rate
+        self.backup_coord = get_rand_unblocked_coord()
+
+    def take_turn(self):
+        ''' Monster takes a normal turn, but says something '''
+        # A basic monster takes its turn. If you can see it, it can see you
+        monster = self.owner
+
+        sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
+
+        # If monster is in FOV...
+        if sees_player and not INVISIBLE:
+
+            # Move towards player if far away
+            if monster.distance_to(player) >= MONSTER_RANGE:
+                monster.move_astar(player.x, player.y, False)
+
+            # Close enough, attack! (if the player is still alive.)
+            elif player.fighter.hp > 0:
+                monster.fighter.attack(player)
+                animate_bolt(libtcod.yellow, self.owner.x, self.owner.y,
+                    player.x, player.y)
 
             # Depending on the rate of speech set in the json,
             #   the monster may talk
@@ -568,7 +617,26 @@ class Item:
         inventory.remove(self.owner)
         self.owner.x = player.x
         self.owner.y = player.y
-        message('You dropped a ' + self.owner.name + '.', libtcod.yellow)
+
+        if self.owner.name == 'bomb':
+            message('You planted a ' + self.owner.name + '.', libtcod.yellow)
+        else:
+            message('You dropped a ' + self.owner.name + '.', libtcod.yellow)
+
+        # Easter egg!
+        if self.owner.name == 'bomb':
+            for obj in objects:
+                if obj.x == player.x and obj.y == player.y and obj != player:
+                    if obj.name in ('Bomb site A', 'Bomb site B'):
+                        message('Terrorists win!')
+                        for obj in objects:
+                            if obj.name in ('Counter-Terrorist', 'Terrorist'):
+                                obj.fighter.take_damage(9000000)
+                        (x, y) = to_camera_coordinates(player.x,
+                            player.y)
+                        animate_blast(libtcod.red, x, y,
+                            FIREBALL_RADIUS*2)
+                        objects.remove(self.owner)
 
     def use(self):
         ''' Use an item '''
@@ -836,50 +904,88 @@ class Tile:
 
 # Functions --------------------------------------------------------------------
 
-def animate_bolt(color, tx, ty):
+def animate_bolt(color, dx, dy, tx, ty):
     ''' Animate a lightning bolt from the player to an enemy '''
+    if not blind:
+        # The lightning bolt changes depending on where the monster is
+        if (dx < tx and dy < ty) or \
+        (dx > tx and dy > ty):
+            char = '\\'
+        elif (dx < tx and dy > ty) or \
+        (dx > tx and dy < ty):
+            char = '/'
+        elif (dx == tx and dy != ty):
+            char = '|'
+        elif (dx != tx and dy == ty):
+            char = '-'
+        else:
+            char = '?'
 
-    dx = player.x
-    dy = player.y
+        # While, the distance to the monster is greater than 2
+        # Aka go towards it until it's one space away
+        while  math.sqrt((tx-dx) ** 2 + (ty-dy) ** 2) >= 2:
+            # First, try to move towards monster by row
+            if tx == dx:
+                pass
+            elif tx < dx:
+                dx += -1
+            elif tx > dx:
+                dx += 1
 
-    # The lightning bolt changes depending on where the monster is
-    if (dx < tx and dy < ty) or \
-    (dx > tx and dy > ty):
-        char = '\\'
-    elif (dx < tx and dy > ty) or \
-    (dx > tx and dy < ty):
-        char = '/'
-    elif (dx == tx and dy != ty):
-        char = '|'
-    elif (dx != tx and dy == ty):
-        char = '-'
-    else:
-        char = '?'
+            # Second, try to move towards player by column
+            if ty == dy:
+                pass
+            elif ty < dy:
+                dy += -1
+            elif ty > dy:
+                dy += 1
 
-    # While, the distance to the monster is greater than 2
-    # Aka go towards it until it's one space away
-    libtcod.console_set_default_foreground(con, color)
-    while  math.sqrt((tx-dx) ** 2 + (ty-dy) ** 2) >= 2:
-        # First, try to move towards monster by row
-        if tx == dx:
-            pass
-        elif tx < dx:
-            dx += -1
-        elif tx > dx:
-            dx += 1
+            (x, y) = to_camera_coordinates(dx, dy)
 
-        # Second, try to move towards player by column
-        if ty == dy:
-            pass
-        elif ty < dy:
-            dy += -1
-        elif ty > dy:
-            dy += 1
+            fov_recompute()
 
-        (x, y) = to_camera_coordinates(dx, dy)
-        libtcod.console_put_char(con, x, y, char, libtcod.BKGND_NONE)
+            for obj in objects:
+                if obj.name != player.name:
+                    obj.draw()
 
-    libtcod.console_flush()
+            player.draw()
+
+            libtcod.console_set_default_foreground(con, color)
+            libtcod.console_print_ex(con, x, y,
+                                    libtcod.BKGND_NONE, libtcod.CENTER,
+                                    char)
+            libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+            render_gui()
+            libtcod.console_flush()
+
+def animate_blast(color, tx, ty, radius):
+    ''' Animate an explosion '''
+
+    for i in range(radius):
+
+        fov_recompute()
+
+        for obj in objects:
+            if obj.name != player.name:
+                obj.draw()
+
+        player.draw()
+
+        libtcod.console_set_default_foreground(con, libtcod.red)
+
+        libtcod.console_put_char(con, tx,   ty,   '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, tx+i, ty,   '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, tx-i, ty,   '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, tx,   ty+i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, tx,   ty-i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, tx+i, ty+i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, tx-i, ty-i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, tx+i, ty-i, '4', libtcod.BKGND_NONE)
+        libtcod.console_put_char(con, tx-i, ty+i, '4', libtcod.BKGND_NONE)
+
+        libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+        render_gui()
+        libtcod.console_flush()
 
 def cast_confuse():
     ''' Ask the player for a target to confuse '''
@@ -922,6 +1028,23 @@ def cast_death():
             libtcod.orange)
         mon.fighter.take_damage(9000000000)
 
+def cast_explode():
+    ''' Detonate a bomb '''
+
+    message('The bomb explodes, burning everything within ' +
+        str(FIREBALL_RADIUS*2) + ' tiles!', libtcod.orange)
+
+    # Damage every fighter in range, including the player
+    for obj in objects:
+        if obj.distance(player.x, player.y) <= FIREBALL_RADIUS*2 and obj.fighter:
+            message('The ' + obj.name + ' gets burned for ' +
+                str(FIREBALL_DAMAGE*5) + ' hit points.', libtcod.orange)
+            obj.fighter.take_damage(FIREBALL_DAMAGE*5)
+
+    (x, y) = to_camera_coordinates(player.x, player.y)
+
+    animate_blast(libtcod.red, x, y, FIREBALL_RADIUS*2)
+
 def cast_fireball():
     ''' Ask the player for a target tile to throw a fireball at '''
 
@@ -944,19 +1067,7 @@ def cast_fireball():
     # Get the coordinates relative to the camera position
     (x, y) = to_camera_coordinates(x, y)
 
-    # Really bad animation
-    libtcod.console_set_default_foreground(con, libtcod.red)
-    for i in range(FIREBALL_RADIUS):
-        libtcod.console_put_char(con, x,   y,   '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x+i, y,   '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x-i, y,   '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x,   y+i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x,   y-i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x+i, y+i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x-i, y-i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x+i, y-i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, x-i, y+i, '4', libtcod.BKGND_NONE)
-    libtcod.console_flush()
+    animate_blast(libtcod.red, x, y, FIREBALL_RADIUS)
 
 def cast_heal():
     ''' Heal the player '''
@@ -999,7 +1110,7 @@ def cast_magic_missile():
 
     monster.fighter.take_damage(MISSILE_DAMAGE)
 
-    animate_bolt(libtcod.light_purple, monster.x, monster.y)
+    animate_bolt(libtcod.light_purple, player.x, player.y, monster.x, monster.y)
 
 def cast_lightning():
     ''' Find closest enemy (inside a maximum range) and damage it '''
@@ -1015,7 +1126,7 @@ def cast_lightning():
             ' hit points.', libtcod.light_blue)
     monster.fighter.take_damage(LIGHTNING_DAMAGE)
 
-    animate_bolt(libtcod.light_azure, monster.x, monster.y)
+    animate_bolt(libtcod.light_azure, player.x, player.y, monster.x, monster.y)
 
 def check_args():
     ''' Check the arguments the game is ran with '''
@@ -1290,6 +1401,87 @@ def debug_kill_all():
         if obj.ai:
             obj.fighter.take_damage(sys.maxint)
 
+def de_dust():
+    ''' Place objects on level '''
+    # Maximum number of monsters per level
+    max_monsters = from_dungeon_level([[4, 1], [7, 2], [13, 4],
+        [20, 6], [30, 12]])
+
+    # Chance of each monster
+    monster_chances = {}
+    # Monster name then chance
+    for item in monster_data:
+        monster_chances[str(monster_data[item]['id'])] = \
+            from_dungeon_level(monster_data[item]['chance'])
+
+    # Maximum number of items per level
+    max_items = from_dungeon_level([[4, 1], [10, 3], [18, 6], [21, 7], [30, 9],
+        [35, 10], [40, 12]])
+
+    # Chance of each item (by default they have a chance of 0 at level 1,
+    #   which then goes up)
+    item_chances = {}
+    # Item name then chance.
+    for item in items_data:
+        item_chances[str(items_data[item]['id'])] = \
+            from_dungeon_level(items_data[item]['chance'])
+
+    # Choose random number of monsters
+    num_monsters = libtcod.random_get_int(0, 0, max_monsters+dungeon_level)
+
+    for i in range(num_monsters):
+        x, y = get_rand_unblocked_coord()
+
+        while is_blocked(x, y):
+            x, y = get_rand_unblocked_coord()
+
+        choice = random_choice(monster_chances)
+
+        if random.randint(0, 1) == 1:
+            monster = generate_monster('t', x, y)
+        else:
+            monster = generate_monster('ct', x, y)
+
+        # Add monster to object list
+        objects.append(monster)
+
+    # Choose random number of items
+    num_items = libtcod.random_get_int(0, 0, max_items+dungeon_level)
+
+    for i in range(num_items):
+        x, y = get_rand_unblocked_coord()
+
+        while is_blocked(x, y):
+            x, y = get_rand_unblocked_coord()
+
+        # Only place it if the tile is not blocked
+        choice = random_choice(item_chances)
+
+        item = generate_item(choice, x, y)
+
+        objects.append(item)
+        # Items appear below other objects
+        item.send_to_back()
+        # Items are visible even out-of-FOV, if in an explored area
+        item.always_visible = True
+
+    x, y = get_rand_unblocked_coord()
+    a = Object(x, y, 'A', 'Bomb site A', libtcod.white,
+        always_visible=True)
+    objects.append(a)
+    a.send_to_back()
+
+    x, y = get_rand_unblocked_coord()
+    b = Object(x, y, 'B', 'Bomb site B', libtcod.white,
+        always_visible=True)
+    objects.append(b)
+    b.send_to_back()
+
+    x, y = get_rand_unblocked_coord()
+    bomb = generate_item('bomb', x, y)
+    objects.append(bomb)
+    bomb.send_to_back()
+
 def dispbox(header, width=50):
     ''' Like a msgbox but only lasts for one frame '''
 
@@ -1369,7 +1561,7 @@ def fire_weapon(equipment):
             ' with the ' + equipment.owner.name +
             'but the shot reflects off the armor!', libtcod.light_red)
 
-    animate_bolt(libtcod.yellow, monster.x, monster.y)
+    animate_bolt(libtcod.yellow, player.x, player.y, monster.x, monster.y)
 
 def fov_recompute():
     ''' Recompute fov '''
@@ -1472,6 +1664,9 @@ def generate_monster(monster_id, x, y):
     elif monster_data[monster_id]['ai'] == 'talk':
         ai = TalkingMonster(monster_data[monster_id]['speech'],
                             monster_data[monster_id]['rate'])
+    elif monster_data[monster_id]['ai'] == 'rangedtalk':
+        ai = RangedTalkerMonster(monster_data[monster_id]['speech'],
+                            monster_data[monster_id]['rate'])
     else:
         print('Error: ai does not exist')
         exit()
@@ -1532,6 +1727,8 @@ def generate_item(item_id, x, y):
             item_component = Item(use_function=cast_lightning)
         elif items_data[item_id]['effect'] == 'mana':
             item_component = Item(use_function=cast_mana)
+        elif items_data[item_id]['effect'] == 'bomb':
+            item_component = Item(use_function=cast_explode)
 
         item = Object(x, y, items_data[item_id]['char'],
                         items_data[item_id]['name'], color, item=item_component)
@@ -2144,7 +2341,10 @@ def make_map():
         dstairs.send_to_back()
 
     # Finally put stuff everywhere
-    place_objects()
+    if dungeon_level == CSGO_FLOOR:
+        de_dust()
+    else:
+        place_objects()
 
 def menu(header, options, width):
     ''' Create a menu that options can be selected from using the alphabet '''
@@ -2430,7 +2630,7 @@ def next_level():
 def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
-    max_monsters = from_dungeon_level([[9, 1], [11, 2], [15, 4],
+    max_monsters = from_dungeon_level([[4, 1], [7, 2], [13, 4],
         [20, 6], [30, 12]])
 
     # Chance of each monster
@@ -2441,7 +2641,7 @@ def place_objects():
             from_dungeon_level(monster_data[item]['chance'])
 
     # Maximum number of items per level
-    max_items = from_dungeon_level([[4, 1], [10, 3], [18, 6], [21, 7], [30, 9],
+    max_items = from_dungeon_level([[6, 1], [10, 3], [18, 6], [21, 7], [30, 9],
         [35, 10], [40, 12]])
 
     # Chance of each item (by default they have a chance of 0 at level 1,
@@ -2456,44 +2656,35 @@ def place_objects():
     num_monsters = libtcod.random_get_int(0, 0, max_monsters+dungeon_level)
 
     for i in range(num_monsters):
-        # Choose random spot for this monster
-        x = libtcod.random_get_int(0, 0, MAP_WIDTH-1)
-        y = libtcod.random_get_int(0, 0, MAP_HEIGHT-1)
-        while(world[x][y].blocked):
-            x = libtcod.random_get_int(0, 0, MAP_WIDTH-1)
-            y = libtcod.random_get_int(0, 0, MAP_HEIGHT-1)
+        x, y = get_rand_unblocked_coord()
+        while is_blocked(x, y):
+            x, y = get_rand_unblocked_coord()
 
-        # Only place it if the tile is not blocked
-        if not is_blocked(x, y):
-            choice = random_choice(monster_chances)
+        choice = random_choice(monster_chances)
 
-            monster = generate_monster(choice, x, y)
+        monster = generate_monster(choice, x, y)
 
-            # Add monster to object list
-            objects.append(monster)
+        # Add monster to object list
+        objects.append(monster)
 
     # Choose random number of items
     num_items = libtcod.random_get_int(0, 0, max_items+dungeon_level)
 
     for i in range(num_items):
-        # Choose random spot for this monster
-        x = libtcod.random_get_int(0, 0, MAP_WIDTH-1)
-        y = libtcod.random_get_int(0, 0, MAP_HEIGHT-1)
-        while(world[x][y].blocked):
-            x = libtcod.random_get_int(0, 0, MAP_WIDTH-1)
-            y = libtcod.random_get_int(0, 0, MAP_HEIGHT-1)
+        x, y = get_rand_unblocked_coord()
+        while is_blocked(x, y):
+            x, y = get_rand_unblocked_coord()
 
         # Only place it if the tile is not blocked
-        if not is_blocked(x, y):
-            choice = random_choice(item_chances)
+        choice = random_choice(item_chances)
 
-            item = generate_item(choice, x, y)
+        item = generate_item(choice, x, y)
 
-            objects.append(item)
-            # Items appear below other objects
-            item.send_to_back()
-            # Items are visible even out-of-FOV, if in an explored area
-            item.always_visible = True
+        objects.append(item)
+        # Items appear below other objects
+        item.send_to_back()
+        # Items are visible even out-of-FOV, if in an explored area
+        item.always_visible = True
 
 def play_game():
     ''' Main game loop '''
@@ -2641,7 +2832,7 @@ def random_choice_index(chances):
 def render_all():
     ''' Draw everything to the screen '''
 
-    global check_fov, camera_x, camera_y, blind, blind_counter
+    global check_fov, blind, blind_counter
 
     move_camera(player.x, player.y)
 
@@ -2676,6 +2867,76 @@ def render_all():
         player.draw()
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
 
+    render_gui()
+
+def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color):
+    ''' Render a bar (HP, experience). '''
+
+    # first calculate the width of the bar
+    bar_width = int(float(value) / maximum * total_width)
+
+    # Render the background first
+    libtcod.console_set_default_background(panel, back_color)
+    libtcod.console_rect(panel, x, y, total_width, 1, False,
+                            libtcod.BKGND_SCREEN)
+
+    # Now render the bar on top
+    libtcod.console_set_default_background(panel, bar_color)
+    if bar_width > 0:
+        libtcod.console_rect(panel, x, y, bar_width, 1, False,
+                            libtcod.BKGND_SCREEN)
+
+    # Finally, some centered text with the values
+    libtcod.console_set_default_foreground(panel, libtcod.white)
+    libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
+                            libtcod.CENTER, name + ': ' + str(value) +
+                            '/' + str(maximum))
+
+def render_bar_simple(x, y, total_width, name, value, color):
+    ''' Extremely simple bar rendering
+    Not intended to have values increase and decrease, but rather display
+    one static value instead (attack, defense)'''
+
+    # Render the background first
+    libtcod.console_set_default_background(panel, color)
+    libtcod.console_rect(panel, x, y, total_width, 1, False,
+                        libtcod.BKGND_SCREEN)
+
+    # Now render the bar on top
+    libtcod.console_set_default_background(panel, color)
+    if total_width > 0:
+        libtcod.console_rect(panel, x, y, total_width, 1, False,
+                            libtcod.BKGND_SCREEN)
+
+    # Finally, some centered text with the values
+    libtcod.console_set_default_foreground(panel, libtcod.white)
+    libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
+                            libtcod.CENTER, name + ': ' + str(value))
+
+def render_equips(y_offset, slot):
+    ''' Render equipment status based on slot '''
+
+    # Get equipment in a slot
+    equip = get_equipped_in_slot(slot)
+    if not equip:
+        equip = "None"
+    else:
+        # Shorten name if it's too long
+        if len(equip.owner.name) > 12:
+            equip = equip.short_name
+        else:
+            equip = equip.owner.name
+
+    # Shorten name if it's one of the hands
+    if slot == 'right hand':
+        slot = 'RH'
+    elif slot == 'left hand':
+        slot = 'LH'
+
+    render_bar_simple(1, y_offset, BAR_WIDTH, slot.capitalize(), equip,
+                        libtcod.black)
+
+def render_gui():
     # Prepare to render the GUI panel
     libtcod.console_set_default_background(panel, libtcod.black)
     libtcod.console_clear(panel)
@@ -2776,73 +3037,6 @@ def render_all():
                         MSG_PANEL_Y)
     libtcod.console_blit(panel, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, 0,
                             SCREEN_WIDTH-PANEL_WIDTH, PANEL_Y)
-
-def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color):
-    ''' Render a bar (HP, experience). '''
-
-    # first calculate the width of the bar
-    bar_width = int(float(value) / maximum * total_width)
-
-    # Render the background first
-    libtcod.console_set_default_background(panel, back_color)
-    libtcod.console_rect(panel, x, y, total_width, 1, False,
-                            libtcod.BKGND_SCREEN)
-
-    # Now render the bar on top
-    libtcod.console_set_default_background(panel, bar_color)
-    if bar_width > 0:
-        libtcod.console_rect(panel, x, y, bar_width, 1, False,
-                            libtcod.BKGND_SCREEN)
-
-    # Finally, some centered text with the values
-    libtcod.console_set_default_foreground(panel, libtcod.white)
-    libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
-                            libtcod.CENTER, name + ': ' + str(value) +
-                            '/' + str(maximum))
-
-def render_bar_simple(x, y, total_width, name, value, color):
-    ''' Extremely simple bar rendering
-    Not intended to have values increase and decrease, but rather display
-    one static value instead (attack, defense)'''
-
-    # Render the background first
-    libtcod.console_set_default_background(panel, color)
-    libtcod.console_rect(panel, x, y, total_width, 1, False,
-                        libtcod.BKGND_SCREEN)
-
-    # Now render the bar on top
-    libtcod.console_set_default_background(panel, color)
-    if total_width > 0:
-        libtcod.console_rect(panel, x, y, total_width, 1, False,
-                            libtcod.BKGND_SCREEN)
-
-    # Finally, some centered text with the values
-    libtcod.console_set_default_foreground(panel, libtcod.white)
-    libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
-                            libtcod.CENTER, name + ': ' + str(value))
-
-def render_equips(y_offset, slot):
-    ''' Render equipment status based on slot '''
-
-    # Get equipment in a slot
-    equip = get_equipped_in_slot(slot)
-    if not equip:
-        equip = "None"
-    else:
-        # Shorten name if it's too long
-        if len(equip.owner.name) > 12:
-            equip = equip.short_name
-        else:
-            equip = equip.owner.name
-
-    # Shorten name if it's one of the hands
-    if slot == 'right hand':
-        slot = 'RH'
-    elif slot == 'left hand':
-        slot = 'LH'
-
-    render_bar_simple(1, y_offset, BAR_WIDTH, slot.capitalize(), equip,
-                        libtcod.black)
 
 def render_health_bar(x, y, total_width, value, maximum, bar_color, back_color):
     ''' This is a bar that doesn't show any values in it. Useful for enemy

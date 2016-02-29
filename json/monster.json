@@ -97,7 +97,7 @@
         "id":"fcnoscoper",
         "char": "F",
         "color": "dark_crimson",
-        "chance":[[2, 4], [4, 5], [30, 7]],
+        "chance":[[2, 4], [4, 6], [30, 7]],
       	"hp":60,
       	"defense":3,
       	"power":9,
@@ -129,7 +129,7 @@
         "id":"nova3",
         "char":"N",
         "color": "violet",
-      	"chance":[[15, 3], [30, 5], [60, 7]],
+      	"chance":[[15, 3], [30, 6], [60, 8]],
       	"hp":40,
       	"defense":1,
       	"power":5,
@@ -315,7 +315,7 @@
         "id":"n0thing",
         "char":"@",
         "color": "light_turquoise",
-    	"chance":[[1, 5]],
+    	"chance":[[1, 6]],
     	"hp":40,
     	"defense":4,
     	"power":10,
@@ -411,7 +411,7 @@
         "id":"saltelemental",
         "char":"E",
         "color": "white",
-        "chance":[[15, 4], [30, 5]],
+        "chance":[[15, 4], [20, 6]],
         "hp":40,
         "defense":2,
         "power":6,
@@ -454,6 +454,56 @@
         "ai": "talk",
         "speech": [
             ":^)"
+        ],
+        "rate":90
+    },
+
+    "ct": {
+        "name":"Counter-Terrorist",
+        "id":"ct",
+        "char":"@",
+        "color": "ct_color",
+        "chance":[[50, 5]],
+        "hp":25,
+        "defense":2,
+        "power":6,
+        "xp":50,
+        "mana":0,
+        "death_func":"normal",
+        "attack_msg":"shoots",
+        "ai": "rangedtalk",
+        "speech": [
+            "GO!",
+            "Fire in the hole!",
+            "I'm defusing the bomb!",
+            "Smoke Out!",
+            "I'm in Position",
+            "Storm the Front"
+        ],
+        "rate":90
+    },
+
+    "t": {
+        "name":"Terrorist",
+        "id":"t",
+        "char":"@",
+        "color": "t_color",
+        "chance":[[50, 5]],
+        "hp":25,
+        "defense":2,
+        "power":6,
+        "xp":50,
+        "mana":0,
+        "death_func":"normal",
+        "attack_msg":"shoots",
+        "ai": "rangedtalk",
+        "speech": [
+            "GO!",
+            "Enemy spotted!",
+            "I'm planting the bomb!",
+            "Decoy Out!",
+            "Flashbang Out!",
+            "Regroup team!"
         ],
         "rate":90
     },
