@@ -3,10 +3,10 @@
 # Imports ----------------------------------------------------------------------
 
 import traceback
+
 from modules import libtcodpy as libtcod
 from modules import simplejson as json
-from settings import CURRENT_THEME
-from settings import COLOR_JSON_PATH
+from settings import COLOR_JSON_PATH, CURRENT_THEME
 
 # ------------------------------------------------------------------------------
 
