@@ -10,11 +10,13 @@ import sys
 import textwrap
 import time
 
+# This import is different because the theme can change
+# So we want to use the latest variables, not what the defaults are
+import settings.colors as colors
 from modules import libtcodpy as libtcod
 from modules import simplejson as json
 from modules.dmap import dMap
 from modules.wallselect import wallselect
-from settings.colors import *
 from settings.settings import *
 
 # ------------------------------------------------------------------------------
@@ -1603,11 +1605,11 @@ def fov_recompute():
                     if wall:
                         c = wallselect(world, map_x, map_y)
                         libtcod.console_put_char_ex(con, x, y, c,
-                                                    color_light_ground,
-                                                    color_dark_wall)
+                                                    colors.color_light_ground,
+                                                    colors.color_dark_wall)
                     else:
                         libtcod.console_set_char_background(con, x, y,
-                                                color_dark_ground,
+                                                colors.color_dark_ground,
                                                 libtcod.BKGND_SET)
             else:
                 # It's visible
@@ -1615,9 +1617,9 @@ def fov_recompute():
                     c = wallselect(world, map_x, map_y)
                     libtcod.console_put_char_ex(con, x, y, c,
                                                 libtcod.white,
-                                                color_light_wall)
+                                                colors.color_light_wall)
                 else:
-                    libtcod.console_set_char_background(con, x, y, color_light_ground,
+                    libtcod.console_set_char_background(con, x, y, colors.color_light_ground,
                                             libtcod.BKGND_SET)
                 # Since it's visible, explore it
                 world[map_x][map_y].explored = True
@@ -2146,6 +2148,10 @@ def initialize_fov():
             libtcod.map_set_properties(fov_map, x, y,
                                         not world[x][y].block_sight,
                                         not world[x][y].blocked)
+
+def initialize_theme(theme):
+    ''' Change theme on the fly. Don't judge '''
+    colors.set_theme(theme)
 
 def intro_cutscene():
     ''' Show a cutscene '''
@@ -2928,7 +2934,7 @@ def render_all():
     if not blind:
         # Display a cursor under mouse coords
         libtcod.console_set_char_background(con, mouse.cx, mouse.cy,
-                                            color_ground_highlight)
+                                            colors.color_ground_highlight)
         # blit the contents of 'con' to the root console
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
         fov_recompute()
@@ -3329,6 +3335,9 @@ def weapon_action_else(weapon):
 # ------------------------------------------------------------------------------
 
 # Start ------------------------------------------------------------------------
+
+# Set the color theme
+colors.set_theme(CURRENT_THEME)
 
 # Backup in case if python -B doesn't get ran
 sys.dont_write_bytecode = True
