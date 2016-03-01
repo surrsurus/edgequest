@@ -88,22 +88,22 @@
             "light": "#bbdefb"
         }
     },
-
-    "inferno": {
+    
+    "hardmode": {
         "highlight": {
-            "wall": "#ffccbc",
-            "ground": "#ffccbc"
+            "wall": "#ffff00",
+            "ground": "#ffff00"
         },
         "ground": {
-            "light": "#8d6e63",
-            "dark": "#795548"
+            "light": "#9e9e9e",
+            "dark": "#000000"
         },
         "wall": {
-            "light": "#c62828",
-            "dark": "#b71c1c"
+            "light": "#757575",
+            "dark": "#000000"
         },
         "accent": {
-            "light": "#ffd54f"
+            "light": "#ffffff"
         }
     },
 
