@@ -11,7 +11,7 @@
       	"power":3,
       	"xp":35,
         "mana":0,
-   	    "death_func":"normal",
+   	"death_func":"normal",
         "attack_msg":"",
         "ai": "normal"
     },
@@ -27,7 +27,7 @@
       	"power":3,
       	"xp":10,
         "mana":0,
-   	    "death_func":"normal",
+   	"death_func":"normal",
         "attack_msg":"bugs",
         "ai": "normal"
     },
