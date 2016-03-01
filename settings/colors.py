@@ -19,6 +19,7 @@ color_dark_wall        = libtcod.Color(51, 51, 51)
 color_dark_ground      = libtcod.Color(33, 33, 33)
 color_wall_highlight   = libtcod.Color(130, 110, 50)
 color_ground_highlight = libtcod.Color(200, 180, 50)
+color_accent           = libtcod.Color(255, 255, 255)
 
 # ------------------------------------------------------------------------------
 
@@ -62,6 +63,10 @@ def default_colors():
     Should be used as a fallback in case something goes wrong and we cannot
     load the colors from our theme file
     '''
+    global color_light_ground, color_light_wall, \
+        color_dark_wall, color_dark_ground, \
+        color_wall_highlight, color_ground_highlight, \
+        color_accent
 
     color_light_ground     = libtcod.Color(110, 109, 91)
     color_light_wall       = libtcod.Color(128, 127, 98)
@@ -69,11 +74,13 @@ def default_colors():
     color_dark_ground      = libtcod.Color(33, 33, 33)
     color_wall_highlight   = libtcod.Color(130, 110, 50)
     color_ground_highlight = libtcod.Color(200, 180, 50)
+    color_accent           = libtcod.Color(255, 255, 255)
 
 def set_theme(theme):
     global color_light_ground, color_light_wall, \
         color_dark_wall, color_dark_ground, \
-        color_wall_highlight, color_ground_highlight
+        color_wall_highlight, color_ground_highlight, \
+        color_accent
 
     # Setting colors to the absence of colors is kind of hard. Let's not do that.
     if theme is not None:
@@ -89,6 +96,8 @@ def set_theme(theme):
             color_dark_wall        = get_color(color_data[theme]['wall']['dark'])
             color_wall_highlight   = get_color(color_data[theme]['highlight']['wall'])
             color_ground_highlight = get_color(color_data[theme]['highlight']['ground'])
+            color_accent           = get_color(color_data[theme]['accent']['light'])
+
         except KeyError as e:
             print 'Something went terribly wrong while loading... Using defaults...'
             default_colors()
@@ -104,6 +113,7 @@ def set_theme(theme):
             assert color_dark_wall        is not None
             assert color_wall_highlight   is not None
             assert color_ground_highlight is not None
+            assert color_accent           is not None
         except AssertionError as e:
             print 'Looks like there is invalid or missing data in the `' +\
                 theme + '` theme! Using defaults...'

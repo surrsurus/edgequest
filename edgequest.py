@@ -1616,7 +1616,7 @@ def fov_recompute():
                 if wall:
                     c = wallselect(world, map_x, map_y)
                     libtcod.console_put_char_ex(con, x, y, c,
-                                                libtcod.white,
+                                                colors.color_accent,
                                                 colors.color_light_wall)
                 else:
                     libtcod.console_set_char_background(con, x, y, colors.color_light_ground,

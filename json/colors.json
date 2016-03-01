@@ -11,6 +11,9 @@
         "wall": {
             "light": [159, 159, 159],
             "dark": [0, 0, 100]
+        },
+        "accent": {
+            "light": [255, 255, 255]
         }
     },
 
@@ -26,10 +29,13 @@
         "wall": {
             "light": [128, 127, 98],
             "dark": [51, 51, 51]
+        },
+        "accent": {
+            "light": "#e5e297"
         }
     },
 
-    "abstract": {
+    "moonbounce": {
         "highlight": {
             "wall": "#ffff00",
             "ground": "#ffff00"
@@ -41,9 +47,66 @@
         "wall": {
             "light": "#0000aa",
             "dark": "#000033"
+        },
+        "accent": {
+            "light": "#ff00ff"
         }
     },
-    
+
+    "matrix": {
+        "highlight": {
+            "wall": "#dcedc8",
+            "ground": "#dcedc8"
+        },
+        "ground": {
+            "light": "#4caf50",
+            "dark": "#2e7d32"
+        },
+        "wall": {
+            "light": "#66bb6a",
+            "dark": "#1b5e20"
+        },
+        "accent": {
+            "light": "#aed581"
+        }
+    },
+
+    "cold_mountain": {
+        "highlight": {
+            "wall": "#d1c4e9",
+            "ground": "#d1c4e9"
+        },
+        "ground": {
+            "light": "#42a5f5",
+            "dark": "#1565c0"
+        },
+        "wall": {
+            "light": "#2196f3",
+            "dark": "#0d47a1"
+        },
+        "accent": {
+            "light": "#bbdefb"
+        }
+    },
+
+    "inferno": {
+        "highlight": {
+            "wall": "#ffccbc",
+            "ground": "#ffccbc"
+        },
+        "ground": {
+            "light": "#8d6e63",
+            "dark": "#795548"
+        },
+        "wall": {
+            "light": "#c62828",
+            "dark": "#b71c1c"
+        },
+        "accent": {
+            "light": "#ffd54f"
+        }
+    },
+
     "errorenous": {}
 
 }
