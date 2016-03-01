@@ -28,10 +28,11 @@ cd ..
 echo
 echo ${VSP}
 echo 'This process will delete any files in your edgequest directory.'
-read -p 'Are you sure you want to install? [Yes/No] >' -n 1 -r
+read -p 'Are you sure you want to install? [Y/N] >' -n 1 -r
 echo
 echo ${VSP}
 if [[ $REPLY =~ ^[Yy]$ ]]; then
+    cp -f savegame ${EQLOC}/savegame
     rm -rf ./*
 else
     echo 'Aborting!'
@@ -53,5 +54,8 @@ mv edgequest-master/* .
 
 # And now we are done with that folder, so we remove it
 rmdir edgequest-master
+
+# Reload the save file...
+cp ${EQLOC}/savegame savegame
 
 # All done!
