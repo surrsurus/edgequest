@@ -726,7 +726,7 @@ class Object:
         ''' Erase the character that represents this object '''
         (x, y) = to_camera_coordinates(self.x, self.y)
         if (x, y) is not (None, None):
-            libtcod.console_put_char(con, x, y, ' ', libtcod.BKGND_NONE)
+            tcod_put_char(con, x, y, ' ', libtcod.BKGND_NONE)
 
     def distance(self, x, y):
         ''' Return the distance to some coordinates '''
@@ -751,8 +751,8 @@ class Object:
             if (x, y) is not (None, None):
                 # Set the color and then draw the character that
                 #   represents this object at its position
-                libtcod.console_set_default_foreground(con, self.color)
-                libtcod.console_print_ex(con, x, y,
+                tcod_set_fg(con, self.color)
+                tcod_print_ex(con, x, y,
                                         libtcod.BKGND_NONE, libtcod.CENTER,
                                         self.char)
 
@@ -964,8 +964,8 @@ def animate_bolt(color, dx, dy, tx, ty):
 
             player.draw()
 
-            libtcod.console_set_default_foreground(con, color)
-            libtcod.console_print_ex(con, x, y,
+            tcod_set_fg(con, color)
+            tcod_print_ex(con, x, y,
                                     libtcod.BKGND_NONE, libtcod.CENTER,
                                     char)
             libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
@@ -985,17 +985,17 @@ def animate_blast(color, tx, ty, radius):
 
         player.draw()
 
-        libtcod.console_set_default_foreground(con, libtcod.red)
+        tcod_set_fg(con, libtcod.red)
 
-        libtcod.console_put_char(con, tx,   ty,   '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, tx+i, ty,   '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, tx-i, ty,   '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, tx,   ty+i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, tx,   ty-i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, tx+i, ty+i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, tx-i, ty-i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, tx+i, ty-i, '4', libtcod.BKGND_NONE)
-        libtcod.console_put_char(con, tx-i, ty+i, '4', libtcod.BKGND_NONE)
+        tcod_put_char(con, tx,   ty,   '4', libtcod.BKGND_NONE)
+        tcod_put_char(con, tx+i, ty,   '4', libtcod.BKGND_NONE)
+        tcod_put_char(con, tx-i, ty,   '4', libtcod.BKGND_NONE)
+        tcod_put_char(con, tx,   ty+i, '4', libtcod.BKGND_NONE)
+        tcod_put_char(con, tx,   ty-i, '4', libtcod.BKGND_NONE)
+        tcod_put_char(con, tx+i, ty+i, '4', libtcod.BKGND_NONE)
+        tcod_put_char(con, tx-i, ty-i, '4', libtcod.BKGND_NONE)
+        tcod_put_char(con, tx+i, ty-i, '4', libtcod.BKGND_NONE)
+        tcod_put_char(con, tx-i, ty+i, '4', libtcod.BKGND_NONE)
 
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
         render_gui()
@@ -1219,10 +1219,10 @@ def choose_name():
     name = ''
 
     # Set the screen to black
-    libtcod.console_set_default_background(con, libtcod.black)
+    tcod_set_bg(con, libtcod.black)
 
     # Set text color to yellow
-    libtcod.console_set_default_foreground(con, libtcod.light_yellow)
+    tcod_set_fg(con, libtcod.light_yellow)
 
     # Dispbox style key getting
     while not libtcod.console_is_window_closed():
@@ -1258,10 +1258,10 @@ def choose_name():
                 name = ''.join([name, key_char])
 
         # Clear screen
-        libtcod.console_clear(con)
+        tcod_clear(con)
 
         # Prompt for name
-        libtcod.console_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
+        tcod_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
                                 libtcod.BKGND_NONE, libtcod.CENTER,
                                 'Choose a name for the hero')
 
@@ -1303,13 +1303,13 @@ def credits_screen():
     ''' Show a quick credits screen '''
 
     # Clear screen
-    libtcod.console_clear(con)
+    tcod_clear(con)
 
     # Set the screen to black
-    libtcod.console_set_default_background(con, libtcod.black)
+    tcod_set_bg(con, libtcod.black)
 
-    libtcod.console_set_default_foreground(con, libtcod.light_yellow)
-    libtcod.console_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
+    tcod_set_fg(con, libtcod.light_yellow)
+    tcod_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
                             libtcod.BKGND_NONE, libtcod.CENTER,
                             'Thank you for playing EdgeQuest!\n')
 
@@ -1507,7 +1507,7 @@ def dispbox(header, width=50):
     window = libtcod.console_new(width, height)
 
     # Print the header, with auto-wrap
-    libtcod.console_set_default_foreground(window, libtcod.white)
+    tcod_set_fg(window, libtcod.white)
     libtcod.console_print_rect_ex(window, 0, 0, width, height,
                                     libtcod.BKGND_NONE, libtcod.LEFT, header)
 
@@ -1585,9 +1585,9 @@ def fov_recompute():
     move_camera(player.x, player.y)
 
     # Recompute FOV if needed (the player moved or something)
-    libtcod.map_compute_fov(fov_map, player.x, player.y, TORCH_RADIUS,
-                            FOV_LIGHT_WALLS, FOV_ALGO)
-    libtcod.console_clear(con)
+    libtcod.map_compute_fov(fov_map, player.x, player.y, TORCH_RADIUS, FOV_LIGHT_WALLS, FOV_ALGO)
+
+    tcod_clear(con)
 
     # Go through all tiles, and set their background color according to the FOV
     for y in range(CAMERA_HEIGHT):
@@ -1604,23 +1604,18 @@ def fov_recompute():
                     # It's out of the player's FOV
                     if wall:
                         c = wallselect(world, map_x, map_y)
-                        libtcod.console_put_char_ex(con, x, y, c,
-                                                    colors.color_light_ground,
-                                                    colors.color_dark_wall)
+                        tcod_put_char_ex(con, x, y, c, colors.color_light_ground, colors.color_dark_wall)
                     else:
-                        libtcod.console_set_char_background(con, x, y,
-                                                colors.color_dark_ground,
-                                                libtcod.BKGND_SET)
+                        tcod_set_char_bg(con, x, y, colors.color_dark_ground,
+                            bg_set=libtcod.BKGND_SET)
             else:
                 # It's visible
                 if wall:
                     c = wallselect(world, map_x, map_y)
-                    libtcod.console_put_char_ex(con, x, y, c,
-                                                colors.color_accent,
-                                                colors.color_light_wall)
+                    tcod_put_char_ex(con, x, y, c, colors.color_accent, colors.color_light_wall)
                 else:
-                    libtcod.console_set_char_background(con, x, y, colors.color_light_ground,
-                                            libtcod.BKGND_SET)
+                    tcod_set_char_bg(con, x, y, colors.color_light_ground,
+                        bg_set=libtcod.BKGND_SET)
                 # Since it's visible, explore it
                 world[map_x][map_y].explored = True
 
@@ -1734,7 +1729,6 @@ def generate_monster(monster_id, x, y):
 def generate_item(item_id, x, y):
     ''' Generate items from json '''
 
-
     '''
     Example:
     # Create a sword
@@ -1779,8 +1773,7 @@ def generate_item(item_id, x, y):
             effect = Item(use_function=cast_heal)
 
         # Create a basic item
-        item = Object(x, y, items_data[item_id]['char'],
-                        items_data[item_id]['name'], color, item=effect)
+        item = Object(x, y, items_data[item_id]['char'], items_data[item_id]['name'], color, item=effect)
 
     elif type in ('equipment', 'firearm'):
 
@@ -1847,13 +1840,11 @@ def generate_item(item_id, x, y):
                 max_mana_bonus = items_data[item_id]['mana'],
                 short_name     = items_data[item_id]['short_name'])
 
-        item = Object(x, y, items_data[item_id]['char'],
-                        items_data[item_id]['name'], color,
-                        equipment=equip_component)
+        item = Object(x, y, items_data[item_id]['char'], items_data[item_id]['name'], color,
+            equipment=equip_component)
 
     elif type == 'gold':
-        item = Object(x, y, items_data[item_id]['char'],
-                        items_data[item_id]['name'], color)
+        item = Object(x, y, items_data[item_id]['char'], items_data[item_id]['name'], color)
 
     return item
 
@@ -1917,15 +1908,14 @@ def git_screen():
     ''' Show a screen reminding the player to check for updates '''
 
     # Clear screen
-    libtcod.console_clear(con)
+    tcod_clear(con)
 
     # Set the screen to black
-    libtcod.console_set_default_background(con, libtcod.black)
+    tcod_set_bg(con, libtcod.black)
 
-    libtcod.console_set_default_foreground(con, libtcod.light_yellow)
-    libtcod.console_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
-                            libtcod.BKGND_NONE, libtcod.CENTER,
-                            'Thank you for playing EdgeQuest')
+    tcod_set_fg(con, libtcod.light_yellow)
+    tcod_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
+        libtcod.BKGND_NONE, libtcod.CENTER, 'Thank you for playing EdgeQuest')
 
     # Blit to screen
     libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
@@ -2032,7 +2022,7 @@ def handle_keys():
             # Clear screen
             for x in range(SCREEN_WIDTH):
                 for y in range(SCREEN_HEIGHT):
-                    libtcod.console_put_char(con, x, y, ' ', libtcod.BKGND_BURN)
+                    tcod_put_char(con, x, y, ' ', libtcod.BKGND_BURN)
 
             # Make a new map
             make_map()
@@ -2145,9 +2135,7 @@ def initialize_fov():
     fov_map = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
     for y in range(MAP_HEIGHT):
         for x in range(MAP_WIDTH):
-            libtcod.map_set_properties(fov_map, x, y,
-                                        not world[x][y].block_sight,
-                                        not world[x][y].blocked)
+            libtcod.map_set_properties(fov_map, x, y, not world[x][y].block_sight, not world[x][y].blocked)
 
 def initialize_theme(theme):
     ''' Change theme on the fly. Don't judge '''
@@ -2157,8 +2145,8 @@ def intro_cutscene():
     ''' Show a cutscene '''
 
     # Set Colors
-    libtcod.console_set_default_background(con, libtcod.black)
-    libtcod.console_set_default_foreground(con, libtcod.light_yellow)
+    tcod_set_bg(con, libtcod.black)
+    tcod_set_fg(con, libtcod.light_yellow)
 
     key = libtcod.Key()
     # We take the y and subtract it from the y val so that the text moves up
@@ -2174,12 +2162,12 @@ def intro_cutscene():
         if libtcod.console_is_window_closed():
             exit()
 
-        libtcod.console_clear(con)
+        tcod_clear(con)
         # Draw the wall at the y coord
         for i, line in enumerate(INTRO_WALL):
-            libtcod.console_print_ex(con, SCREEN_WIDTH / 2, i-y,
-                                    libtcod.BKGND_NONE, libtcod.CENTER,
-                                    line)
+            tcod_print_ex(con, SCREEN_WIDTH / 2, i-y,
+                libtcod.BKGND_NONE, libtcod.CENTER, line)
+
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
         libtcod.console_flush()
         time.sleep(.75)
@@ -2264,17 +2252,15 @@ def main_menu():
         libtcod.image_blit_2x(img, 0, 0, 0)
 
         # Show the game's title, and some credits!
-        libtcod.console_set_default_foreground(0, libtcod.light_yellow)
-        libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
-                                libtcod.BKGND_NONE, libtcod.CENTER,
-                                'Edgequest')
-        libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 4,
-                                libtcod.BKGND_NONE, libtcod.CENTER,
-                                'What hath God wrought?')
+        tcod_set_fg(0, libtcod.light_yellow)
+        tcod_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
+            libtcod.BKGND_NONE, libtcod.CENTER, 'Edgequest')
+        tcod_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 4,
+            libtcod.BKGND_NONE, libtcod.CENTER, 'What hath God wrought?')
 
-        libtcod.console_set_default_foreground(0, libtcod.black)
-        libtcod.console_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 2,
-                                libtcod.BKGND_NONE, libtcod.CENTER, 'By Gray')
+        tcod_set_fg(0, libtcod.black)
+        tcod_print_ex(0, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 2,
+            libtcod.BKGND_NONE, libtcod.CENTER, 'By Gray')
 
         # Show options and wait for the player's choice
         choice = menu('Options', ['Play a new game', 'Continue last game',
@@ -2357,9 +2343,7 @@ def make_map():
     # Set FOV map
     for y in range(MAP_HEIGHT):
         for x in range(MAP_WIDTH):
-            libtcod.map_set_properties(fov_map, x, y,
-                                        not world[x][y].block_sight,
-                                        not world[x][y].blocked)
+            libtcod.map_set_properties(fov_map, x, y, not world[x][y].block_sight, not world[x][y].blocked)
 
     # Create stairs at some random ass location
     x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
@@ -2384,15 +2368,14 @@ def make_map():
         # Randomly place downstairs
         x, y = get_rand_unblocked_coord()
 
-        dstairs = Object(x, y, '>', 'down stairs', libtcod.white,
-                        always_visible=True)
+        dstairs = Object(x, y, '>', 'down stairs', libtcod.white, always_visible=True)
+
         objects.append(dstairs)
         # This tends to cause issues in the later levels
         dstairs.send_to_back()  # So it's drawn below the monsters
 
         # Place upstairs on player
-        ustairs = Object(player.x, player.y, '<', 'up stairs', libtcod.white,
-                        always_visible=True)
+        ustairs = Object(player.x, player.y, '<', 'up stairs', libtcod.white, always_visible=True)
 
         objects.append(ustairs)
         # So it's drawn below the monsters
@@ -2403,15 +2386,13 @@ def make_map():
         # Place upstairs randomly
         x, y = get_rand_unblocked_coord()
 
-        ustairs = Object(x, y, '<', 'up stairs', libtcod.white,
-                        always_visible=True)
+        ustairs = Object(x, y, '<', 'up stairs', libtcod.white, always_visible=True)
         objects.append(ustairs)
         # This tends to cause issues in the later levels
         ustairs.send_to_back()  # So it's drawn below the monsters
 
         # Place downstairs on player
-        dstairs = Object(player.x, player.y, '>', 'down stairs', libtcod.white,
-                        always_visible=True)
+        dstairs = Object(player.x, player.y, '>', 'down stairs', libtcod.white, always_visible=True)
 
         objects.append(dstairs)
         # So it's drawn below the monsters
@@ -2431,24 +2412,24 @@ def menu(header, options, width):
 
     # Calculate total height for the header (after auto-wrap) and one line per
     #   option
-    header_height = libtcod.console_get_height_rect(con, 0, 0, width,
-                                                    SCREEN_HEIGHT, header)
+    header_height = libtcod.console_get_height_rect(con, 0, 0, width, SCREEN_HEIGHT, header)
+
     height = len(options) + header_height
 
     # Create an off-screen console that represents the menu's window
     window = libtcod.console_new(width, height)
 
     # Print the header, with auto-wrap
-    libtcod.console_set_default_foreground(window, libtcod.white)
+    tcod_set_fg(window, libtcod.white)
     libtcod.console_print_rect_ex(window, 0, 0, width, height,
-                                    libtcod.BKGND_NONE, libtcod.LEFT, header)
+        libtcod.BKGND_NONE, libtcod.LEFT, header)
 
     # Print all the options
     y = header_height
     letter_index = ord('a')
     for option_text in options:
         text = '(' + chr(letter_index) + ') ' + option_text
-        libtcod.console_print_ex(window, 0, y, libtcod.BKGND_NONE,
+        tcod_print_ex(window, 0, y, libtcod.BKGND_NONE,
                                 libtcod.LEFT, text)
         y += 1
         letter_index += 1
@@ -2509,9 +2490,9 @@ def monster_death(monster):
     # Transform it into a nasty corpse! it doesn't block, can't be
     # Attacked and doesn't move
     message(' '.join([monster.name.capitalize(), 'is dead!']),
-            libtcod.darker_red)
+        libtcod.darker_red)
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
-            libtcod.orange)
+        libtcod.orange)
     monster.set_corpse()
 
 def monster_death_slock(monster):
@@ -2520,11 +2501,11 @@ def monster_death_slock(monster):
     # Transform it into a nasty corpse! it doesn't block, can't be
     # Attacked and doesn't move
     message(' '.join([monster.name.capitalize(), 'is dead!']),
-            libtcod.darker_red)
+        libtcod.darker_red)
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
-            libtcod.orange)
+        libtcod.orange)
     message(' '.join([monster.name.capitalize(),
-            'casts a final spell in its dying moments!']))
+        'casts a final spell in its dying moments!']))
     monster.set_corpse()
     # Blind
     cast_inflict_blindness()
@@ -2538,11 +2519,11 @@ def monster_death_talk(monster):
         if monster.name == monster_data[mon]['name']:
             death_speech = monster_data[mon]['death_talk']
     message(''.join([monster.name.capitalize(), ' says "', death_speech,
-            '"']), libtcod.darker_red)
+        '"']), libtcod.darker_red)
     message(' '.join([monster.name.capitalize(), 'is dead!']),
-            libtcod.darker_red)
+        libtcod.darker_red)
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
-            libtcod.orange)
+        libtcod.orange)
     monster.set_corpse()
 
 def monster_occupy_check(dx, dy):
@@ -2662,7 +2643,7 @@ def new_game():
         death_function=player_death, attack_msg=DEFAULT_ATTACK)
 
     player = Object(0, 0, PLAYER_CHARACTER, player_name, PLAYER_COLOR, blocks=True,
-                    fighter=fighter_component)
+        fighter=fighter_component)
 
     if INVISIBLE:
         player.color = libtcod.black
@@ -2774,8 +2755,7 @@ def play_game():
     key = libtcod.Key()
 
     while not libtcod.console_is_window_closed():
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS |
-                                    libtcod.EVENT_MOUSE, key, mouse)
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
         render_all()
         # Present the root console
@@ -2818,6 +2798,7 @@ def player_death(player):
         game_state = 'dead'
 
         render_all()
+
         # Present the root console
         libtcod.console_flush()
 
@@ -2933,14 +2914,13 @@ def render_all():
 
     if not blind:
         # Display a cursor under mouse coords
-        libtcod.console_set_char_background(con, mouse.cx, mouse.cy,
-                                            colors.color_ground_highlight)
+        tcod_set_char_bg(con, mouse.cx, mouse.cy, colors.color_ground_highlight)
         # blit the contents of 'con' to the root console
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
         fov_recompute()
     else:
-        libtcod.console_clear(con)
-        libtcod.console_set_default_background(con, libtcod.black)
+        tcod_clear(con)
+        tcod_set_bg(con, libtcod.black)
         player.draw()
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
 
@@ -2953,21 +2933,19 @@ def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color):
     bar_width = int(float(value) / maximum * total_width)
 
     # Render the background first
-    libtcod.console_set_default_background(panel, back_color)
-    libtcod.console_rect(panel, x, y, total_width, 1, False,
-                            libtcod.BKGND_SCREEN)
+    tcod_set_bg(panel, back_color)
+    libtcod.console_rect(panel, x, y, total_width, 1, False, libtcod.BKGND_SCREEN)
 
     # Now render the bar on top
-    libtcod.console_set_default_background(panel, bar_color)
+    tcod_set_bg(panel, bar_color)
     if bar_width > 0:
-        libtcod.console_rect(panel, x, y, bar_width, 1, False,
-                            libtcod.BKGND_SCREEN)
+        libtcod.console_rect(panel, x, y, bar_width, 1, False, libtcod.BKGND_SCREEN)
 
     # Finally, some centered text with the values
-    libtcod.console_set_default_foreground(panel, libtcod.white)
-    libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
-                            libtcod.CENTER, name + ': ' + str(value) +
-                            '/' + str(maximum))
+    tcod_set_fg(panel, libtcod.white)
+    tcod_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
+        libtcod.CENTER, name + ': ' + str(value) +
+        '/' + str(maximum))
 
 def render_bar_simple(x, y, total_width, name, value, color):
     ''' Extremely simple bar rendering
@@ -2975,20 +2953,18 @@ def render_bar_simple(x, y, total_width, name, value, color):
     one static value instead (attack, defense)'''
 
     # Render the background first
-    libtcod.console_set_default_background(panel, color)
-    libtcod.console_rect(panel, x, y, total_width, 1, False,
-                        libtcod.BKGND_SCREEN)
+    tcod_set_bg(panel, color)
+    libtcod.console_rect(panel, x, y, total_width, 1, False, libtcod.BKGND_SCREEN)
 
     # Now render the bar on top
-    libtcod.console_set_default_background(panel, color)
+    tcod_set_bg(panel, color)
     if total_width > 0:
-        libtcod.console_rect(panel, x, y, total_width, 1, False,
-                            libtcod.BKGND_SCREEN)
+        libtcod.console_rect(panel, x, y, total_width, 1, False, libtcod.BKGND_SCREEN)
 
     # Finally, some centered text with the values
-    libtcod.console_set_default_foreground(panel, libtcod.white)
-    libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
-                            libtcod.CENTER, name + ': ' + str(value))
+    tcod_set_fg(panel, libtcod.white)
+    tcod_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
+        libtcod.CENTER, name + ': ' + str(value))
 
 def render_equips(y_offset, slot):
     ''' Render equipment status based on slot '''
@@ -3010,55 +2986,53 @@ def render_equips(y_offset, slot):
     elif slot == 'left hand':
         slot = 'LH'
 
-    render_bar_simple(1, y_offset, BAR_WIDTH, slot.capitalize(), equip,
-                        libtcod.black)
+    render_bar_simple(1, y_offset, BAR_WIDTH, slot.capitalize(), equip, libtcod.black)
 
 def render_gui():
     # Prepare to render the GUI panel
-    libtcod.console_set_default_background(panel, libtcod.black)
-    libtcod.console_clear(panel)
+    tcod_set_bg(panel, libtcod.black)
+    tcod_clear(panel)
 
     # Also the message panel
-    libtcod.console_set_default_background(msg_panel, libtcod.black)
-    libtcod.console_clear(msg_panel)
+    tcod_set_bg(msg_panel, libtcod.black)
+    tcod_clear(msg_panel)
 
     # Show the player's stats
-    libtcod.console_print_ex(panel, 1 + BAR_WIDTH / 2, 1, libtcod.BKGND_NONE,
-                            libtcod.CENTER, player.name)
+    tcod_print_ex(panel, 1 + BAR_WIDTH / 2, 1, libtcod.BKGND_NONE,
+        libtcod.CENTER, player.name)
 
     # Show Perks
     render_perks()
 
     # Cool distinctions
-    libtcod.console_set_default_foreground(panel, libtcod.gray)
+    tcod_set_fg(panel, libtcod.gray)
     for y in range(SCREEN_HEIGHT):
-        libtcod.console_print_ex(panel, 0, y, libtcod.BKGND_NONE,
-                                    libtcod.CENTER, '|')
-    libtcod.console_set_default_foreground(msg_panel, libtcod.gray)
+        tcod_print_ex(panel, 0, y, libtcod.BKGND_NONE, libtcod.CENTER, '|')
+
+    tcod_set_fg(msg_panel, libtcod.gray)
+
     for x in range(SCREEN_WIDTH):
-        libtcod.console_print_ex(msg_panel, x, 0, libtcod.BKGND_NONE,
-                                    libtcod.CENTER, '-')
+        tcod_print_ex(msg_panel, x, 0, libtcod.BKGND_NONE, libtcod.CENTER,
+            '-')
 
     render_bar(1, 2, BAR_WIDTH, 'HP', player.fighter.hp, player.fighter.max_hp,
-               libtcod.light_red, libtcod.darker_red)
+        libtcod.light_red, libtcod.darker_red)
 
     # Self-explanatory bars
     render_bar(1, 3, BAR_WIDTH, 'Edge', player.fighter.mana,
-                player.fighter.max_mana, libtcod.dark_fuchsia,
-                libtcod.darker_fuchsia)
+        player.fighter.max_mana, libtcod.dark_fuchsia, libtcod.darker_fuchsia)
 
     render_bar(1, 4, BAR_WIDTH, 'XP', player.fighter.xp, (LEVEL_UP_BASE +
-                player.level * LEVEL_UP_FACTOR),
-                libtcod.dark_yellow, libtcod.darker_yellow)
+        player.level * LEVEL_UP_FACTOR), libtcod.dark_yellow,
+        libtcod.darker_yellow)
 
     render_bar_simple(1, 5, BAR_WIDTH, 'Floor', str(dungeon_level),
-                                                    libtcod.light_blue)
-
+        libtcod.light_blue)
 
     render_bar_simple(1, 7, BAR_WIDTH, 'Attack', str(player.fighter.power),
-                        libtcod.dark_chartreuse)
+        libtcod.dark_chartreuse)
     render_bar_simple(1, 8, BAR_WIDTH, 'Defense', str(player.fighter.defense),
-                        libtcod.flame)
+        libtcod.flame)
 
     # Render equipment
     slot_list = [
@@ -3086,34 +3060,30 @@ def render_gui():
             if monsters_in_room > (SCREEN_HEIGHT - 20) / 2:
                 continue
             else:
-                libtcod.console_set_default_foreground(panel, obj.color)
-                libtcod.console_print_ex(panel, 1, 9+(2*monsters_in_room),
-                                        libtcod.BKGND_NONE, libtcod.LEFT,
-                                        ''.join([obj.char, ' ',
-                                        obj.name.capitalize()]))
+                tcod_set_fg(panel, obj.color)
+                tcod_print_ex(panel, 1, 9+(2*monsters_in_room),
+                    libtcod.BKGND_NONE, libtcod.LEFT, ''.join([obj.char, ' ',
+                    obj.name.capitalize()]))
                 render_health_bar(1, 10+(2*monsters_in_room), BAR_WIDTH,
-                                    obj.fighter.hp, obj.fighter.base_max_hp,
-                                    libtcod.red, libtcod.dark_red)
+                    obj.fighter.hp, obj.fighter.base_max_hp, libtcod.red,
+                    libtcod.dark_red)
 
     # Display names of objects under the mouse
     if not blind:
-        libtcod.console_set_default_foreground(msg_panel, libtcod.light_gray)
-        libtcod.console_print_ex(msg_panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT,
-                                get_names_under_mouse())
+        tcod_set_fg(msg_panel, libtcod.light_gray)
+        tcod_print_ex(msg_panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, get_names_under_mouse())
 
     # Print the game messages, one line at a time
     y = 1
     for (line, color) in game_msgs:
-        libtcod.console_set_default_foreground(msg_panel, color)
-        libtcod.console_print_ex(msg_panel, MSG_X, y, libtcod.BKGND_NONE,
-                                libtcod.LEFT, line)
+        tcod_set_fg(msg_panel, color)
+        tcod_print_ex(msg_panel, MSG_X, y, libtcod.BKGND_NONE, libtcod.LEFT, line)
         y += 1
 
     # Blit the contents of 'panel' and 'msg_panel' to the root console
-    libtcod.console_blit(msg_panel, 0, 0, SCREEN_WIDTH, PANEL_HEIGHT, 0, 0,
-                        MSG_PANEL_Y)
-    libtcod.console_blit(panel, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, 0,
-                            SCREEN_WIDTH-PANEL_WIDTH, PANEL_Y)
+    libtcod.console_blit(msg_panel, 0, 0, SCREEN_WIDTH, PANEL_HEIGHT, 0, 0, MSG_PANEL_Y)
+    libtcod.console_blit(panel, 0, 0, PANEL_WIDTH, PANEL_HEIGHT, 0, SCREEN_WIDTH-PANEL_WIDTH,
+        PANEL_Y)
 
 def render_health_bar(x, y, total_width, value, maximum, bar_color, back_color):
     ''' This is a bar that doesn't show any values in it. Useful for enemy
@@ -3123,20 +3093,19 @@ def render_health_bar(x, y, total_width, value, maximum, bar_color, back_color):
     bar_width = int(float(value) / maximum * total_width)
 
     # Render the background first
-    libtcod.console_set_default_background(panel, back_color)
+    tcod_set_bg(panel, back_color)
     libtcod.console_rect(panel, x, y, total_width, 1, False,
-                        libtcod.BKGND_SCREEN)
+        libtcod.BKGND_SCREEN)
 
     # Now render the bar on top
-    libtcod.console_set_default_background(panel, bar_color)
+    tcod_set_bg(panel, bar_color)
     if bar_width > 0:
         libtcod.console_rect(panel, x, y, bar_width, 1, False,
-                            libtcod.BKGND_SCREEN)
+            libtcod.BKGND_SCREEN)
 
     # Finally, show the bar
-    libtcod.console_set_default_foreground(panel, libtcod.white)
-    libtcod.console_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE,
-                            libtcod.CENTER, '')
+    tcod_set_fg(panel, libtcod.white)
+    tcod_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE, libtcod.CENTER, '')
 
 def render_perks():
     ''' Render the perks '''
@@ -3144,29 +3113,24 @@ def render_perks():
     y = 6
 
     if perk_mtndew >= PERK_BASE:
-        libtcod.console_set_default_foreground(panel, libtcod.light_green)
-        libtcod.console_print_ex(panel, 1, y, libtcod.BKGND_NONE,
-                                libtcod.CENTER, '!')
+        tcod_set_fg(panel, libtcod.light_green)
+        tcod_print_ex(panel, 1, y, libtcod.BKGND_NONE, libtcod.CENTER, '!')
 
     if perk_cokezero >= PERK_BASE:
-        libtcod.console_set_default_foreground(panel, libtcod.violet)
-        libtcod.console_print_ex(panel, 2, y, libtcod.BKGND_NONE,
-                                libtcod.CENTER, '!')
+        tcod_set_fg(panel, libtcod.violet)
+        tcod_print_ex(panel, 2, y, libtcod.BKGND_NONE, libtcod.CENTER, '!')
 
     if perk_tazer >= PERK_BASE:
-        libtcod.console_set_default_foreground(panel, libtcod.sky)
-        libtcod.console_print_ex(panel, 3, y, libtcod.BKGND_NONE,
-                                libtcod.CENTER, '=')
+        tcod_set_fg(panel, libtcod.sky)
+        tcod_print_ex(panel, 3, y, libtcod.BKGND_NONE, libtcod.CENTER, '=')
 
     if perk_incengren >= PERK_BASE:
-        libtcod.console_set_default_foreground(panel, libtcod.light_red)
-        libtcod.console_print_ex(panel, 4, y, libtcod.BKGND_NONE,
-                                libtcod.CENTER, '*')
+        tcod_set_fg(panel, libtcod.light_red)
+        tcod_print_ex(panel, 4, y, libtcod.BKGND_NONE, libtcod.CENTER, '*')
 
     if perk_fbang >= PERK_BASE:
-        libtcod.console_set_default_foreground(panel, libtcod.azure)
-        libtcod.console_print_ex(panel, 5, y, libtcod.BKGND_NONE,
-                                libtcod.CENTER, '*')
+        tcod_set_fg(panel, libtcod.azure)
+        tcod_print_ex(panel, 5, y, libtcod.BKGND_NONE, libtcod.CENTER, '*')
 
 def save_game():
     ''' Open a new empty shelve (possibly overwriting an old one)
@@ -3246,8 +3210,9 @@ def target_tile(max_range=None):
         # Render the screen. this erases the inventory and
         #   shows the names of objects under the mouse.
         libtcod.console_flush()
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS |
-                                    libtcod.EVENT_MOUSE, key, mouse)
+
+        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+
         render_all()
         # Present the root console
         libtcod.console_flush()
@@ -3282,6 +3247,7 @@ def toggle_fullscreen():
     ''' Toggle fullscreen mode in libtcod '''
 
     libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+
     print 'Toggled fullscreen mode'
 
 def toggle_siphon():
@@ -3331,6 +3297,42 @@ def weapon_action_else(weapon):
     ''' Emergency reserve action '''
 
     message('You stare deeply at your ' + weapon.name)
+
+# ------------------------------------------------------------------------------
+
+# Libtcod Wrappers -------------------------------------------------------------
+
+def tcod_print_ex(console, x, y, background, alignment, char):
+    ''' Wrap console_print_ex '''
+    libtcod.console_print_ex(console, x, y, background, alignment, char)
+
+def tcod_set_char_bg(console, x, y, color, bg_set=None):
+    ''' Wrap console_set_char_background '''
+    if bg_set:
+        libtcod.console_set_char_background(console, x, y, color, bg_set)
+    else:
+        libtcod.console_set_char_background(console, x, y, color)
+
+def tcod_put_char_ex(console, x, y, char, fg_color, bg_color):
+    ''' Wrap console_put_char_ex '''
+    libtcod.console_put_char_ex(console, x, y, char, fg_color, bg_color)
+
+def tcod_put_char(console, x, y, char, bg_set):
+    ''' Wrap put char '''
+    libtcod.console_put_char(console, x, y, char, bg_set)
+
+def tcod_set_fg(console, color):
+    ''' Wrap the foreground setter '''
+    libtcod.console_set_default_foreground(console, color)
+
+def tcod_set_bg(console, color):
+    ''' Wrap background setter '''
+    libtcod.console_set_default_background(console, color)
+
+def tcod_clear(console):
+    ''' Wrap console clearer '''
+    libtcod.console_clear(console)
+
 
 # ------------------------------------------------------------------------------
 
