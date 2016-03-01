@@ -1698,7 +1698,7 @@ def generate_monster(monster_id, x, y):
     mon_hp         = monster_data[monster_id]['hp']
     mon_defense    = monster_data[monster_id]['defense']
     mon_power      = monster_data[monster_id]['power']
-    mon_hp         = monster_data[monster_id]['xp']
+    mon_xp         = monster_data[monster_id]['xp']
     mon_mana       = monster_data[monster_id]['mana']
     mon_death_func = monster_data[monster_id]['death_func']
     mon_attack_msg = monster_data[monster_id]['attack_msg']
@@ -2574,7 +2574,7 @@ def monster_death_talk(monster):
 
     message(''.join([monster.name.capitalize(), ' says "', mon_death_talk,
         '"']), libtcod.darker_red)
-        
+
     message(' '.join([monster.name.capitalize(), 'is dead!']),
         libtcod.darker_red)
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
