@@ -22,6 +22,9 @@ color_ground_highlight = libtcod.Color(200, 180, 50)
 
 # ------------------------------------------------------------------------------
 
+with open(COLOR_JSON_PATH) as json_data:
+    color_data = json.load(json_data)
+
 # Functions --------------------------------------------------------------------
 
 def hex_to_color(inp):
@@ -67,47 +70,49 @@ def default_colors():
     color_wall_highlight   = libtcod.Color(130, 110, 50)
     color_ground_highlight = libtcod.Color(200, 180, 50)
 
-with open(COLOR_JSON_PATH) as json_data:
-    color_data = json.load(json_data)
+def set_theme(theme):
+    global color_light_ground, color_light_wall, \
+        color_dark_wall, color_dark_ground, \
+        color_wall_highlight, color_ground_highlight
 
-# Setting colors to the absence of colors is kind of hard. Let's not do that.
-if CURRENT_THEME is not None:
-    print 'Theme set: ' + CURRENT_THEME
+    # Setting colors to the absence of colors is kind of hard. Let's not do that.
+    if theme is not None:
+        print 'Theme set: ' + theme
 
-    # Set all the colors here
-    # Yes, I know. It goes over the proper line wrapping length.
-    # The other way is 10x less readable, so I am not wrapping it.
-    try:
-        color_light_ground     = get_color(color_data[CURRENT_THEME]['ground']['light'])
-        color_dark_ground      = get_color(color_data[CURRENT_THEME]['ground']['dark'])
-        color_light_wall       = get_color(color_data[CURRENT_THEME]['wall']['light'])
-        color_dark_wall        = get_color(color_data[CURRENT_THEME]['wall']['dark'])
-        color_wall_highlight   = get_color(color_data[CURRENT_THEME]['highlight']['wall'])
-        color_ground_highlight = get_color(color_data[CURRENT_THEME]['highlight']['ground'])
-    except KeyError as e:
-        print 'Something went terribly wrong while loading... Using defaults...'
+        # Set all the colors here
+        # Yes, I know. It goes over the proper line wrapping length.
+        # The other way is 10x less readable, so I am not wrapping it.
+        try:
+            color_light_ground     = get_color(color_data[theme]['ground']['light'])
+            color_dark_ground      = get_color(color_data[theme]['ground']['dark'])
+            color_light_wall       = get_color(color_data[theme]['wall']['light'])
+            color_dark_wall        = get_color(color_data[theme]['wall']['dark'])
+            color_wall_highlight   = get_color(color_data[theme]['highlight']['wall'])
+            color_ground_highlight = get_color(color_data[theme]['highlight']['ground'])
+        except KeyError as e:
+            print 'Something went terribly wrong while loading... Using defaults...'
+            default_colors()
+            print '----- STACK TRACE: -----'
+            traceback.print_exc()
+            print '------------------------'
+
+        # Simple assertion testing to make sure all the colors loaded properly
+        try:
+            assert color_light_ground     is not None
+            assert color_dark_ground      is not None
+            assert color_light_wall       is not None
+            assert color_dark_wall        is not None
+            assert color_wall_highlight   is not None
+            assert color_ground_highlight is not None
+        except AssertionError as e:
+            print 'Looks like there is invalid or missing data in the `' +\
+                theme + '` theme! Using defaults...'
+            default_colors()
+            print '----- STACK TRACE: -----'
+            traceback.print_exc()
+            print '------------------------'
+    else:
+        print 'Warning: Theme is not set in settings.py! Using defaults...'
         default_colors()
-        print '----- STACK TRACE: -----'
-        traceback.print_exc()
-        print '------------------------'
-
-    # Simple assertion testing to make sure all the colors loaded properly
-    try:
-        assert color_light_ground     is not None
-        assert color_dark_ground      is not None
-        assert color_light_wall       is not None
-        assert color_dark_wall        is not None
-        assert color_wall_highlight   is not None
-        assert color_ground_highlight is not None
-    except AssertionError as e:
-        print 'Looks like there is invalid or missing data in the `' +\
-            CURRENT_THEME + '` theme! Using defaults...'
-        default_colors()
-        print '----- STACK TRACE: -----'
-        traceback.print_exc()
-        print '------------------------'
-else:
-    print 'Warning: Theme is not set in settings.py! Using defaults...'
-    default_colors()
 
 # ------------------------------------------------------------------------------
