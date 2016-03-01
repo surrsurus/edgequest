@@ -323,8 +323,28 @@ COLORS = {
     'red': libtcod.red
 }
 
+# Fallback item / monster ------------------------------------------------------
+
+FALLBACK_MONSTER = {
+    "thegoof": {
+        "name": "the goof",
+        "id":"thegoof",
+        "char": "G",
+        "color": "lime",
+        "chance":[[30, 1], [0, 3]],
+      	"hp":5,
+      	"defense":0,
+      	"power":0,
+      	"xp":1,
+        "mana":0,
+   	    "death_func":"normal",
+        "attack_msg":"RAISES ERRORS at",
+        "ai": "normal"
+    }
+}
+
 # Theme settings ---------------------------------------------------------------
 
-CURRENT_THEME = 'hardmode'
+CURRENT_THEME = 'torchlight'
 
 # ------------------------------------------------------------------------------

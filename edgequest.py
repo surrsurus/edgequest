@@ -8,6 +8,7 @@ import random
 import shelve
 import sys
 import textwrap
+import traceback
 import time
 
 # This import is different because the theme can change
@@ -1668,26 +1669,66 @@ def generate_monster(monster_id, x, y):
         'rangedtalk': RangedTalkerMonster(0, 0)
     }
 
+    # Test values
+    try:
+        assert monster_data[monster_id]['name']       is not None
+        assert monster_data[monster_id]['char']       is not None
+        assert monster_data[monster_id]['color']      is not None
+        assert monster_data[monster_id]['chance']     is not None
+        assert monster_data[monster_id]['hp']         is not None
+        assert monster_data[monster_id]['defense']    is not None
+        assert monster_data[monster_id]['power']      is not None
+        assert monster_data[monster_id]['xp']         is not None
+        assert monster_data[monster_id]['mana']       is not None
+        assert monster_data[monster_id]['death_func'] is not None
+        assert monster_data[monster_id]['attack_msg'] is not None
+        assert monster_data[monster_id]['ai']         is not None
+    except AssertionError as e:
+        print 'Error: ' + monster_id + ' is missing data!'
+        print '----- STACK TRACE: -----'
+        traceback.print_exc()
+        print '------------------------'
+        exit()
+
+    # Set default values. These should always be present
+    mon_name       = monster_data[monster_id]['name']
+    mon_char       = monster_data[monster_id]['char']
+    mon_color      = monster_data[monster_id]['color']
+    mon_chance     = monster_data[monster_id]['chance']
+    mon_hp         = monster_data[monster_id]['hp']
+    mon_defense    = monster_data[monster_id]['defense']
+    mon_power      = monster_data[monster_id]['power']
+    mon_hp         = monster_data[monster_id]['xp']
+    mon_mana       = monster_data[monster_id]['mana']
+    mon_death_func = monster_data[monster_id]['death_func']
+    mon_attack_msg = monster_data[monster_id]['attack_msg']
+    mon_ai         = monster_data[monster_id]['ai']
+
     # Select a death function
     death = None
     for key in dict_death_func:
-        if monster_data[monster_id]['death_func'] == key:
+        if mon_death_func == key:
             death = dict_death_func[key]
 
     # Fallback
     if death is None:
+        print 'Error: monster ' + monster_id + 'has an invalid death_func'
+        print 'Setting to default...'
         death = monster_death
 
     # Select an AI
     ai = None
     for key in dict_ais:
-        if monster_data[monster_id]['ai'] == key:
+        if mon_ai == key:
             ai = dict_ais[key]
 
     # Fallback
     if ai is None:
+        print 'Error: monster ' + monster_id + 'has an invalid ai'
+        print 'Setting to default...'
         ai = BasicMonster()
 
+    # These values might actually fail
     # Set values if applicable
     try:
         ai.speech = monster_data[monster_id]['speech']
@@ -1706,20 +1747,20 @@ def generate_monster(monster_id, x, y):
     '''
 
     # Read color
-    color = json_get_color(monster_data[monster_id]['color'])
+    color = json_get_color(mon_color)
 
     # Create component
     fighter_component = Fighter(
-        hp             = int(monster_data[monster_id]['hp']),
-        defense        = int(monster_data[monster_id]['defense']),
-        power          = int(monster_data[monster_id]['power']),
-        xp             = int(monster_data[monster_id]['xp']),
-        mana           = int(monster_data[monster_id]['mana']),
+        hp             = int(mon_hp),
+        defense        = int(mon_defense),
+        power          = int(mon_power),
+        xp             = int(mon_xp),
+        mana           = int(mon_mana),
         death_function = death,
-        attack_msg     = monster_data[monster_id]['attack_msg'])
+        attack_msg     = mon_attack_msg)
 
-    monster = Object(x, y, monster_data[monster_id]['char'],
-        monster_data[monster_id]['name'], color,
+    monster = Object(x, y, mon_char,
+        mon_name, color,
         blocks         = True,
         fighter        = fighter_component,
         ai             = ai)
@@ -2515,11 +2556,25 @@ def monster_death_talk(monster):
 
     # Transform it into a nasty corpse! it doesn't block, can't be
     # Attacked and doesn't move
-    for mon in monster_data:
-        if monster.name == monster_data[mon]['name']:
-            death_speech = monster_data[mon]['death_talk']
-    message(''.join([monster.name.capitalize(), ' says "', death_speech,
+
+    # This function requires something special from the monster json so
+    # let's look for that
+
+    mon = None
+    for json in monster_data:
+        if monster.name == monster_data[json]['name']:
+            mon = monster_data[json]['id']
+
+    try:
+        assert monster_data[mon]['death_talk'] is not None
+        mon_death_talk = monster_data[mon]['death_talk']
+    except AssertionError as e:
+        print 'Error: death_talk not found for ' + monster.name
+        mon_death_talk = 'I was born to die just like a bug!'
+
+    message(''.join([monster.name.capitalize(), ' says "', mon_death_talk,
         '"']), libtcod.darker_red)
+        
     message(' '.join([monster.name.capitalize(), 'is dead!']),
         libtcod.darker_red)
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
