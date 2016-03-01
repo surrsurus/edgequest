@@ -49,7 +49,7 @@
             "dark": "#000033"
         },
         "accent": {
-            "light": "#ff00ff"
+            "light": "#dd00dd"
         }
     },
 
@@ -88,18 +88,18 @@
             "light": "#bbdefb"
         }
     },
-    
+
     "hardmode": {
         "highlight": {
             "wall": "#ffff00",
             "ground": "#ffff00"
         },
         "ground": {
-            "light": "#9e9e9e",
+            "light": "#000000",
             "dark": "#000000"
         },
         "wall": {
-            "light": "#757575",
+            "light": "#9e9e9e",
             "dark": "#000000"
         },
         "accent": {
@@ -107,6 +107,6 @@
         }
     },
 
-    "errorenous": {}
+    "erroneous": {}
 
 }
