@@ -1785,7 +1785,7 @@ def generate_item(item_id, x, y):
         'heal'      : Item(use_function=cast_heal),
         'fireball'  : Item(use_function=cast_fireball),
         'death'     : Item(use_function=cast_death),
-        'confuse'   : Item(use_function=cast_death),
+        'confuse'   : Item(use_function=cast_confuse),
         'lightning' : Item(use_function=cast_lightning),
         'mana'      : Item(use_function=cast_mana),
         'bomb'      : Item(use_function=cast_explode)
