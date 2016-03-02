@@ -1684,11 +1684,8 @@ def generate_monster(monster_id, x, y):
         assert monster_data[monster_id]['attack_msg'] is not None
         assert monster_data[monster_id]['ai']         is not None
     except AssertionError as e:
-        print 'Error: ' + monster_id + ' is missing data!'
-        print '----- STACK TRACE: -----'
-        traceback.print_exc()
-        print '------------------------'
-        exit()
+        print 'At monster distinguishing: '
+        id_err(monster_id)
 
     # Set default values. These should always be present
     mon_name       = monster_data[monster_id]['name']
@@ -1783,12 +1780,6 @@ def generate_item(item_id, x, y):
     Please look at the json for more info on properties of both
     '''
 
-    # Get the item type
-    type = items_data[item_id]['type']
-
-    # Get the color
-    color = json_get_color(items_data[item_id]['color'])
-
     # Dictionary of all effects of items
     dict_effects = {
         'heal'      : Item(use_function=cast_heal),
@@ -1800,13 +1791,40 @@ def generate_item(item_id, x, y):
         'bomb'      : Item(use_function=cast_explode)
     }
 
+    try:
+        assert items_data[item_id]['name']   is not None
+        assert items_data[item_id]['id']     is not None
+        assert items_data[item_id]['char']   is not None
+        assert items_data[item_id]['color']  is not None
+        assert items_data[item_id]['chance'] is not None
+        assert items_data[item_id]['type']   is not None
+    except AssertionError as e:
+        print 'At usable/equipment distinguishing: '
+        id_err(item_id)
+
+    item_name = items_data[item_id]['name']
+    item_id = items_data[item_id]['id']
+    item_char = items_data[item_id]['char']
+    item_color = items_data[item_id]['color']
+    item_chance = items_data[item_id]['chance']
+    item_type = items_data[item_id]['type']
+
+    color = json_get_color(item_color)
+
     # If it's a usable item, get it's effect
-    if type == 'item':
+    if item_type == 'item':
+
+        try:
+            assert items_data[item_id]['effect'] is not None
+        except AssertionError as e:
+            id_err(item_id)
+
+        item_effect = items_data[item_id]['effect']
 
         # Select an effect
         effect = None
         for key in dict_effects:
-            if items_data[item_id]['effect'] == key:
+            if item_effect == key:
                 effect = dict_effects[key]
 
         # Fallback
@@ -1814,11 +1832,27 @@ def generate_item(item_id, x, y):
             effect = Item(use_function=cast_heal)
 
         # Create a basic item
-        item = Object(x, y, items_data[item_id]['char'], items_data[item_id]['name'], color, item=effect)
+        item = Object(x, y, item_char, item_name, color, item=effect)
 
-    elif type in ('equipment', 'firearm'):
+    elif item_type in ('equipment', 'firearm'):
 
-        subtype = items_data[item_id]['subtype']
+        try:
+            assert items_data[item_id]['subtype'] is not None
+            assert items_data[item_id]['slot']    is not None
+            assert items_data[item_id]['power']   is not None
+            assert items_data[item_id]['defense'] is not None
+            assert items_data[item_id]['hp']      is not None
+            assert items_data[item_id]['mana']    is not None
+        except AssertionError as e:
+            print 'At equipment/firearm distinguishing: '
+            id_err(item_id)
+
+        item_subtype = items_data[item_id]['subtype']
+        item_slot    = items_data[item_id]['slot']
+        item_power   = items_data[item_id]['power']
+        item_defense = items_data[item_id]['defense']
+        item_hp      = items_data[item_id]['hp']
+        item_mana    = items_data[item_id]['mana']
 
         # Dictionary of weapon actions
         dict_actions = {
@@ -1827,12 +1861,24 @@ def generate_item(item_id, x, y):
             'awp'    : weapon_action_awp
         }
 
-        if subtype == 'weapon':
+        if item_subtype == 'weapon':
+
+            try:
+                assert items_data[item_id]['attack_msg']  is not None
+                assert items_data[item_id]['weapon_func'] is not None
+                assert items_data[item_id]['short_name']  is not None
+            except AssertionError as e:
+                print 'At equipment/firearm distinguishing: '
+                id_err(item_id)
+
+            item_attack_msg  = items_data[item_id]['attack_msg']
+            item_weapon_func = items_data[item_id]['weapon_func']
+            item_short_name  = items_data[item_id]['short_name']
 
             # Select a weapon action
             func = None
             for key in dict_actions:
-                if items_data[item_id]['weapon_func'] == key:
+                if item_weapon_func == key:
                     func = dict_actions[key]
 
             # Fallback
@@ -1841,51 +1887,72 @@ def generate_item(item_id, x, y):
 
             # Create the component
             equip_component = Equipment(
-                slot           = items_data[item_id]['slot'],
-                power_bonus    = items_data[item_id]['power'],
-                defense_bonus  = items_data[item_id]['defense'],
-                max_hp_bonus   = items_data[item_id]['hp'],
-                max_mana_bonus = items_data[item_id]['mana'],
-                attack_msg     = items_data[item_id]['attack_msg'],
+                slot           = item_slot,
+                power_bonus    = item_power,
+                defense_bonus  = item_defense,
+                max_hp_bonus   = item_hp,
+                max_mana_bonus = item_mana,
+                attack_msg     = item_attack_msg,
                 weapon_func    = func,
-                short_name     = items_data[item_id]['short_name'])
+                short_name     = item_short_name)
 
-        elif subtype == 'firearm':
+        elif item_subtype == 'firearm':
+
+            try:
+                assert items_data[item_id]['attack_msg']  is not None
+                assert items_data[item_id]['weapon_func'] is not None
+                assert items_data[item_id]['short_name']  is not None
+                assert items_data[item_id]['ranged']      is not None
+            except AssertionError as e:
+                print 'At equipment/firearm distinguishing: '
+                id_err(item_id)
+
+            item_attack_msg  = items_data[item_id]['attack_msg']
+            item_weapon_func = items_data[item_id]['weapon_func']
+            item_short_name  = items_data[item_id]['short_name']
+            item_ranged      = items_data[item_id]['ranged']
 
             # Set the firearm action
-            if items_data[item_id]['weapon_func'] == 'firearm':
+            if item_weapon_func == 'firearm':
                 func = weapon_action_firearm
             else:
                 func = weapon_action_else
 
             # Create the component
             equip_component = Equipment(
-                slot           = items_data[item_id]['slot'],
-                power_bonus    = items_data[item_id]['power'],
-                defense_bonus  = items_data[item_id]['defense'],
-                max_hp_bonus   = items_data[item_id]['hp'],
-                max_mana_bonus = items_data[item_id]['mana'],
-                attack_msg     = items_data[item_id]['attack_msg'],
+                slot           = item_slot,
+                power_bonus    = item_power,
+                defense_bonus  = item_defense,
+                max_hp_bonus   = item_hp,
+                max_mana_bonus = item_mana,
+                attack_msg     = item_attack_msg,
                 weapon_func    = func,
-                ranged_bonus   = items_data[item_id]['ranged'],
-                short_name     = items_data[item_id]['short_name'])
+                ranged_bonus   = item_ranged,
+                short_name     = item_short_name)
 
-        elif subtype == 'armor':
+        elif item_subtype == 'armor':
+
+            try:
+                assert items_data[item_id]['short_name']  is not None
+            except AssertionError as e:
+                id_err(item_id)
+
+            item_short_name = items_data[item_id]['short_name']
 
             # Create the component
             equip_component = Equipment(
-                slot           = items_data[item_id]['slot'],
-                power_bonus    = items_data[item_id]['power'],
-                defense_bonus  = items_data[item_id]['defense'],
-                max_hp_bonus   = items_data[item_id]['hp'],
-                max_mana_bonus = items_data[item_id]['mana'],
-                short_name     = items_data[item_id]['short_name'])
+                slot           = item_slot,
+                power_bonus    = item_power,
+                defense_bonus  = item_defense,
+                max_hp_bonus   = item_hp,
+                max_mana_bonus = item_mana,
+                short_name     = item_short_name)
 
-        item = Object(x, y, items_data[item_id]['char'], items_data[item_id]['name'], color,
+        item = Object(x, y, item_char, item_name, color,
             equipment=equip_component)
 
     elif type == 'gold':
-        item = Object(x, y, items_data[item_id]['char'], items_data[item_id]['name'], color)
+        item = Object(x, y, item_char, item_name, color)
 
     return item
 
@@ -2165,6 +2232,13 @@ def how_to_play():
     v - Kill all on level\n\n \
     Press any key to continue...',
     CHARACTER_SCREEN_WIDTH)
+
+def id_err(id):
+    print 'Error: ' + id + ' is missing data!'
+    print '----- STACK TRACE: -----'
+    traceback.print_exc()
+    print '------------------------'
+    exit()
 
 def initialize_fov():
     ''' Initialize the fov '''
