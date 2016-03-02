@@ -8,8 +8,8 @@ import random
 import shelve
 import sys
 import textwrap
-import traceback
 import time
+import traceback
 
 # This import is different because the theme can change
 # So we want to use the latest variables, not what the defaults are
