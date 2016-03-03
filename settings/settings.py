@@ -139,7 +139,7 @@ DEFAULT_ATTACK = 'attacks'
 DEFAULT_NAME = 'Max'
 
 # Recieve perks at this many uses
-PERK_BASE = 1
+PERK_BASE = 10
 
 # Radius of FOV
 TORCH_RADIUS = 10

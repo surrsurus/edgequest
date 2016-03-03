@@ -150,18 +150,6 @@ unblocked_world = []
 
 # ------------------------------------------------------------------------------
 
-# Dictionaries -----------------------------------------------------------------
-
-# Initialize Dictionaries here to be used later
-
-# Dictionary of death functions
-dict_death_func = {}
-
-# Dictionary of AIs
-dict_ais = {}
-
-# ------------------------------------------------------------------------------
-
 # Classes ----------------------------------------------------------------------
 
 class BasicMonster:
@@ -181,6 +169,46 @@ class BasicMonster:
 
         # If it's in the player's fov then it approaches them
         if sees_player and not INVISIBLE:
+
+            # Move towards player if far away
+            if monster.distance_to(player) >= 2:
+                monster.move_astar(player.x, player.y, False)
+
+            # Close enough, attack! (if the player is still alive.)
+            elif player.fighter.hp > 0:
+                monster.fighter.attack(player)
+
+        # Otherwise it moves to a random map location
+        else:
+            x, y = self.backup_coord
+            monster.move_astar(x, y, False)
+
+        # If the monster has reached the coord position, make a new one
+        if (monster.x, monster.y) == self.backup_coord:
+            self.backup_coord = get_rand_unblocked_coord()
+
+class CenaMonster:
+    ''' AI for John Cena. I'm sorry '''
+    def __init__(self):
+        # Create a coordinate the monster travels to if it
+        #   doesn't see the player
+        self.backup_coord = get_rand_unblocked_coord()
+        self.saw_player = False
+
+    def take_turn(self):
+        '''Monster takes its turn. If you can see it, it can see you '''
+
+        # Always check the owner
+        monster = self.owner
+
+        sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
+
+        # If it's in the player's fov then it approaches them
+        if sees_player and not INVISIBLE:
+
+            if not self.saw_player:
+                message("AND HIS NAME IS... JOHN CENA!", libtcod.crimson)
+                self.saw_player = True
 
             # Move towards player if far away
             if monster.distance_to(player) >= 2:
@@ -1668,7 +1696,8 @@ def generate_monster(monster_id, x, y):
     dict_ais = {
         'normal'    : BasicMonster(),
         'talk'      : TalkingMonster(0, 0),
-        'rangedtalk': RangedTalkerMonster(0, 0)
+        'rangedtalk': RangedTalkerMonster(0, 0),
+        'cena'      : CenaMonster()
     }
 
     # Test values

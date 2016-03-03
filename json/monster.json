@@ -355,7 +355,7 @@
         "mana":0,
       	"death_func":"normal",
         "attack_msg":"RKOs",
-        "ai": "normal"
+        "ai": "cena"
     },
 
     "gaben": {
