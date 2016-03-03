@@ -224,7 +224,7 @@
         "id": "trenchcoat",
         "char": "[",
         "color": "darker_orange",
-        "chance": [[15, 2]],
+        "chance": [[15, 4]],
         "type": "equipment",
         "subtype": "armor",
         "slot": "torso",
@@ -314,20 +314,68 @@
         "mana": 0
     },
 
-    "neckbeard": {
-        "name": "neckbeard",
-        "short_name": "",
-        "id": "neckbeard",
-        "char": "#",
-        "color": "darker_orange",
-        "chance": [[5, 1]],
+    "wizcloak": {
+        "name": "wizard cloak",
+        "short_name": "wiz cloak",
+        "id": "wizcloak",
+        "char": "[",
+        "color": "navy",
+        "chance": [[20, 2]],
         "type": "equipment",
         "subtype": "armor",
-        "slot": "neck",
+        "slot": "torso",
+        "power": 0,
+        "defense": 0,
+        "hp": 0,
+        "mana": 50
+    },
+
+    "wizhat": {
+        "name": "wizard hat",
+        "short_name": "wiz hat",
+        "id": "wizhat",
+        "char": "^",
+        "color": "navy",
+        "chance": [[25, 2]],
+        "type": "equipment",
+        "subtype": "armor",
+        "slot": "head",
+        "power": 0,
+        "defense": 0,
+        "hp": 0,
+        "mana": 25
+    },
+
+    "crocs": {
+        "name": "crocs",
+        "short_name": "",
+        "id": "crocs",
+        "char": "-",
+        "color": "white",
+        "chance": [[25, 4]],
+        "type": "equipment",
+        "subtype": "armor",
+        "slot": "feet",
         "power": 1,
-        "defense": 1,
-        "hp": 25,
-        "mana": 0
+        "defense": 0,
+        "hp": 10,
+        "mana": 10
+    },
+
+    "combatboots": {
+        "name": "combat boots",
+        "short_name": "combat boots",
+        "id": "combatboots",
+        "char": "b",
+        "color": "black",
+        "chance": [[15, 6]],
+        "type": "equipment",
+        "subtype": "armor",
+        "slot": "feet",
+        "power": 0,
+        "defense": 2,
+        "hp": 15,
+        "mana": 15
     },
 
     "fawkesmask": {

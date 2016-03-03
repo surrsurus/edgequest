@@ -669,7 +669,8 @@ class Item:
             message('The ' + self.owner.name + ' cannot be used.', libtcod.gray)
         else:
             if self.use_function() != 'cancelled':
-                # Increase perk values
+
+                # Increment perks
                 if self.owner.name == 'mountain dew':
                     perk_mtndew += 1
                 elif self.owner.name == 'coke zero':
@@ -680,6 +681,7 @@ class Item:
                     perk_incengren += 1
                 elif self.owner.name == 'flashbang':
                     perk_fbang += 1
+
                 # Destroy after use, unless it was cancelled for some reason
                 inventory.remove(self.owner)
 
@@ -1176,7 +1178,7 @@ def check_level_up():
 
         # Level up
         player.level += 1
-        player.fighter.xp -= player.fighter.level_up_xp
+        player.fighter.xp = 0
         message('Your battle skills grow stronger! You reached level ' +
             str(player.level) + '!', libtcod.yellow)
 
@@ -3173,6 +3175,7 @@ def render_gui():
         'torso',
         'hands',
         'legs',
+        'feet',
         'accessory'
     ]
 

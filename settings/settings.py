@@ -139,7 +139,7 @@ DEFAULT_ATTACK = 'attacks'
 DEFAULT_NAME = 'Max'
 
 # Recieve perks at this many uses
-PERK_BASE = 10
+PERK_BASE = 1
 
 # Radius of FOV
 TORCH_RADIUS = 10
@@ -320,6 +320,8 @@ COLORS = {
     'orange': libtcod.orange,
     'ct_color': libtcod.Color(0, 0, 153),
     't_color': libtcod.Color(204, 102, 0),
+    'navy': libtcod.dark_blue,
+    'yellow': libtcod.yellow,
     'red': libtcod.red
 }
 
