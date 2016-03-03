@@ -120,7 +120,7 @@
       	"xp":55,
         "mana":0,
       	"death_func":"normal",
-        "attack_msg":"",
+        "attack_msg":"steals the gains of",
         "ai": "normal"
     },
 
@@ -195,7 +195,7 @@
         "name":"DJ Khaled",
         "id":"khaled",
         "char":"@",
-        "color": "azure",
+        "color": "yellow",
         "chance":[[1, 3]],
         "hp":600,
         "defense":10,
