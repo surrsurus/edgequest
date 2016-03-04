@@ -173,11 +173,11 @@
         "slot": "right hand",
         "attack_msg": "bashes",
         "weapon_func": "firearm",
-        "power": 2,
+        "power": -4,
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 15
+        "ranged": 10
     },
 
     "r8nerf": {
@@ -260,10 +260,10 @@
         "type": "equipment",
         "subtype": "armor",
         "slot": "head",
-        "power": 5,
-        "defense": 10,
-        "hp": 100,
-        "mana": 50
+        "power": -5,
+        "defense": -5,
+        "hp": -100,
+        "mana": -50
     },
 
     "fgloves": {
@@ -325,7 +325,7 @@
         "subtype": "armor",
         "slot": "torso",
         "power": 0,
-        "defense": 0,
+        "defense": -2,
         "hp": 0,
         "mana": 50
     },
@@ -341,7 +341,7 @@
         "subtype": "armor",
         "slot": "head",
         "power": 0,
-        "defense": 0,
+        "defense": -1,
         "hp": 0,
         "mana": 25
     },
@@ -356,10 +356,26 @@
         "type": "equipment",
         "subtype": "armor",
         "slot": "feet",
-        "power": 1,
+        "power": 0,
         "defense": 0,
         "hp": 10,
         "mana": 10
+    },
+
+    "socksandsandals": {
+        "name": "socks and sandals",
+        "short_name": "s&s",
+        "id": "socksandsandals",
+        "char": "=",
+        "color": "darker_orange",
+        "chance": [[25, 2]],
+        "type": "equipment",
+        "subtype": "armor",
+        "slot": "feet",
+        "power": 0,
+        "defense": 1,
+        "hp": 0,
+        "mana": 0
     },
 
     "combatboots": {
@@ -375,7 +391,7 @@
         "power": 0,
         "defense": 2,
         "hp": 15,
-        "mana": 15
+        "mana": 0
     },
 
     "fawkesmask": {
@@ -390,7 +406,7 @@
         "slot": "face",
         "power": 0,
         "defense": 0,
-        "hp": 20,
+        "hp": 10,
         "mana": 20
     }
 

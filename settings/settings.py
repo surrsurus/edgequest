@@ -103,7 +103,7 @@ SIPHON_AMOUNT = 10
 
 # Magic Missile Spell cost
 MISSILE_COST   = 10
-MISSILE_DAMAGE = 10
+MISSILE_DAMAGE = 7
 MISSILE_RANGE  = 5
 
 # Lightning Scroll
