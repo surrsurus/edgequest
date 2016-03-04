@@ -454,6 +454,15 @@ class Equipment:
         message('Dequipped ' + self.owner.name + ' from ' + self.slot + '.',
                 libtcod.light_yellow)
 
+        # Check stats
+        '''
+        if player.max_mana < player.mana:
+            player.mana = player.max_mana
+
+        if player.max_hp < player.hp:
+            player.hp = player.max_hp
+        '''
+
     def update_attack_message(self):
         ''' Update the player's attack message based on the equipment's '''
         if self.attack_msg:
@@ -756,7 +765,7 @@ class Object:
     def clear(self):
         ''' Erase the character that represents this object '''
         (x, y) = to_camera_coordinates(self.x, self.y)
-        if (x, y) is not (None, None):
+        if x is None:
             tcod_put_char(con, x, y, ' ', libtcod.BKGND_NONE)
 
     def distance(self, x, y):
@@ -1097,7 +1106,7 @@ def cast_fireball():
         right-click to cancel.', libtcod.light_cyan)
 
     (x, y) = target_tile()
-    if (x, y) is (None, None): return 'cancelled'
+    if x is None: return 'cancelled'
 
     message('The fireball explodes, burning everything within ' +
         str(FIREBALL_RADIUS) + ' tiles!', libtcod.orange)
@@ -1510,7 +1519,7 @@ def de_dust():
 
         objects.append(item)
         # Items appear below other objects
-        item.send_to_back()
+        # item.send_to_back()
         # Items are visible even out-of-FOV, if in an explored area
         item.always_visible = True
 
@@ -1593,15 +1602,14 @@ def fire_weapon(equipment):
         message('No enemy is close enough to shoot.', libtcod.red)
         return 'cancelled'
 
-    damage = (equipment.ranged_bonus + int(math.floor((equipment.ranged_bonus/2 * int(math.floor(player.level/(2))))*player.level*.2))) - monster.fighter.defense
+    damage = (equipment.ranged_bonus + int(math.floor((equipment.ranged_bonus/2 * math.floor(player.level/(2)))*player.level*.2))) - monster.fighter.defense
 
     if damage > 0:
 
         # Zap it!
         message(player_name + ' shoots the ' + monster.name +
                 ' with the ' + equipment.owner.name + '! The damage is ' +
-                str(damage) +
-                ' hit points.', libtcod.light_red)
+                str(damage) + ' hit points.', libtcod.light_red)
         monster.fighter.take_damage(damage)
 
     else:
@@ -2888,6 +2896,8 @@ def place_objects():
 
         # Add monster to object list
         objects.append(monster)
+
+        # monster.send_to_back()
 
     # Choose random number of items
     num_items = libtcod.random_get_int(0, 0, max_items+dungeon_level)
