@@ -286,6 +286,11 @@ COLORS = {
     'red': libtcod.red
 }
 
+CONSUMABLES = [
+    'mountain dew',
+    'coke zero'
+]
+
 # Fallback item / monster ------------------------------------------------------
 
 FALLBACK_MONSTER = {

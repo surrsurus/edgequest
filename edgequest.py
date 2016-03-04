@@ -1436,6 +1436,29 @@ def closest_monster(max_range):
 
     return closest_enemy
 
+def consumables_menu(header):
+    ''' Show a menu with each edible item as an option '''
+
+    consum_inven = []
+
+    if len(inventory) != 0:
+        options = []
+        sort_inventory()
+        for item in inventory:
+            # Only get consumable items
+            if item.name in CONSUMABLES:
+                options.append(item.name)
+                consum_inven.append(item)
+    else:
+        options = ['No food']
+
+    index = menu(header, options, INVENTORY_WIDTH)
+
+    # If an item was chosen, return it
+    if index is None or len(consum_inven) == 0:
+        return None
+    return consum_inven[index].item
+
 def credits_screen():
     ''' Show a quick credits screen '''
 
@@ -1661,10 +1684,7 @@ def equipment_menu(header):
 
     equip_inven = []
 
-    if len(inventory) == 0:
-        options = ['Inventory is empty.']
-
-    else:
+    if len(inventory) != 0:
         options = []
         sort_inventory()
         for item in inventory:
@@ -1675,8 +1695,7 @@ def equipment_menu(header):
                     text = text + ' (on ' + item.equipment.slot + ')'
                 options.append(text)
                 equip_inven.append(item)
-
-    if len(options) == 0:
+    else:
         options = ['No equipment']
 
     index = menu(header, options, INVENTORY_WIDTH)
@@ -2248,6 +2267,15 @@ def handle_keys():
                 chosen_item.use()
                 player_action = 'use'
 
+        # Show food
+        elif key_char == 'E':
+            chosen_item = consumables_menu(
+            'Press the key next to an item to eat it, or any other to cancel.\
+            \n')
+            if chosen_item is not None:
+                chosen_item.use()
+                player_action = 'use'
+
         # Show the inventory; if an item is selected, drop it
         elif key_char == 'd':
             chosen_item = inventory_menu(
@@ -2353,6 +2381,7 @@ def how_to_play():
     . - Wait \n \
     i - Open Inventory \n \
     e - Open Equipment\n \
+    E - Eat Food\n \
     g - Grab item below you\n \
     d - Drop item\n \
     > - Go Down Stairs\n \
@@ -2363,8 +2392,8 @@ def how_to_play():
     ? - Open this menu\n\n \
     Debug Commands\n\n \
     r - Reload a new map\n \
-    z - Spawn monster console\n \
-    x - Spawn item console\n \
+    z - Open spawn monster console\n \
+    x - Open spawn item console\n \
     v - Kill all on level\n\n \
     Press any key to continue...',
     CHARACTER_SCREEN_WIDTH)
