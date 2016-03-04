@@ -610,7 +610,7 @@ class Fighter:
             return 'cancelled'
 
         self.mana -= MISSILE_COST
-        cast_magic_missile()
+        cast_magic_missile(self.owner)
 
     def restore(self, ammount):
         ''' Give some mana back to the player '''
@@ -1142,18 +1142,22 @@ def cast_mana():
     message('You begin to feel edgy!', libtcod.light_flame)
     player.fighter.restore(MANA_AMOUNT)
 
-def cast_magic_missile():
+def cast_magic_missile(fighter_owner):
     ''' Find closest enemy (inside a maximum range) and damage it
     assumes that you already have a monster in range '''
 
+    obj = fighter_owner.fighter
+
     monster = closest_monster(MISSILE_RANGE)
+
+    damage = MISSILE_DAMAGE + int(math.floor((MISSILE_DAMAGE * int(math.floor(obj.max_mana/(75))))*obj.owner.level*.2))
 
     # Zap it!
     message('A missile of pure edge strikes the ' + monster.name +
-            ' with a loud airhorn! The damage is ' + str(MISSILE_DAMAGE) +
+            ' with a loud airhorn! The damage is ' + str(damage) +
             ' hit points.', libtcod.light_blue)
 
-    monster.fighter.take_damage(MISSILE_DAMAGE)
+    monster.fighter.take_damage(damage)
 
     animate_bolt(libtcod.light_purple, player.x, player.y, monster.x, monster.y)
 
@@ -1217,16 +1221,16 @@ def check_level_up():
                 ')',
                 'Strength (+1 attack, from ' + str(player.fighter.power) +
                 ')',
-                'Euphoria (+10 mana, from ' + str(player.fighter.mana) +
+                'Euphoria (+10 mana, from ' + str(player.fighter.max_mana) +
                 ')'], LEVEL_SCREEN_WIDTH)
 
         if choice == 0:
-            player.fighter.max_hp += 20
+            player.fighter.base_max_hp += 20
             player.fighter.hp += 20
         elif choice == 1:
-            player.fighter.power += 1
+            player.fighter.base_power += 1
         elif choice == 2:
-            player.fighter.mana += 10
+            player.fighter.base_max_mana += 10
 
         # Pause
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
@@ -1589,7 +1593,7 @@ def fire_weapon(equipment):
         message('No enemy is close enough to shoot.', libtcod.red)
         return 'cancelled'
 
-    damage = equipment.ranged_bonus - monster.fighter.defense
+    damage = (equipment.ranged_bonus + int(math.floor((equipment.ranged_bonus/2 * int(math.floor(player.level/(2))))*player.level*.2))) - monster.fighter.defense
 
     if damage > 0:
 
