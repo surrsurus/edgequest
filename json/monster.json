@@ -112,7 +112,7 @@
         "name": "gains goblin",
         "id":"gainsgoblin",
         "char": "g",
-        "color": "desaturated_green",
+        "color": "green",
         "chance":[[20, 2]],
       	"hp":30,
       	"defense":1,

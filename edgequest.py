@@ -76,6 +76,46 @@ msg_panel = libtcod.console_new(SCREEN_WIDTH, PANEL_HEIGHT)
 
 # ------------------------------------------------------------------------------
 
+# Debug settings ---------------------------------------------------------------
+
+# Determines whether the map is revealed or not
+# Default: true
+FOG_OF_WAR_ENABLED = True
+
+# Turns FOV on and off
+# Default: true
+FOV_ENABLED = True
+
+# Player cannot die
+# Default: false
+GOD_MODE = False
+
+# Allows travel through walls
+# Default: false
+WALL_HACK = False
+
+# Travel through floors anywhere
+# Default: false
+STAIR_HACK = False
+
+# Invisible mode (enemies can't see player)
+# Default: false
+INVISIBLE = False
+
+# See all entities on map
+# Default: false
+SEE_ALL = False
+
+# Coordinates show all the time when the mouse is hovered above entity
+# Default: false
+COORDS_UNDER_MOUSE = False
+
+# Determines wheter the walls will light up. Looks nice when true
+# Default: true
+FOV_LIGHT_WALLS = True
+
+# ------------------------------------------------------------------------------
+
 # libtcod objects --------------------------------------------------------------
 
 # Font
@@ -1189,14 +1229,30 @@ def cast_lightning():
 def check_args():
     ''' Check the arguments the game is ran with '''
 
-    global player_name
+    global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL
 
     try:
         # assumes that the program is run with python2.7 -B edgequest.py
-        if sys.argv[1] == '-q':
-            player_name = DEFAULT_NAME
-            new_game()
-            play_game()
+        for arg in sys.argv:
+            if arg == '-q':
+                player_name = DEFAULT_NAME
+                new_game()
+                play_game()
+            if arg == '-h':
+                GOD_MODE = True
+                FOG_OF_WAR_ENABLED = False
+                STAIR_HACK = True
+                SEE_ALL = True
+                main_menu()
+            if arg == '-hq' or arg == '-qh':
+                GOD_MODE = True
+                FOG_OF_WAR_ENABLED = False
+                STAIR_HACK = True
+                SEE_ALL = True
+                player_name = DEFAULT_NAME
+                new_game()
+                play_game()
+
     except IndexError:
         main_menu()
 
@@ -1323,6 +1379,43 @@ def choose_name():
         name = DEFAULT_NAME
 
     player_name = name.capitalize()
+
+def choose_theme():
+    ''' Choose a theme '''
+
+    # Set the screen to black
+    tcod_set_bg(con, libtcod.black)
+
+    # Set text color to yellow
+    tcod_set_fg(con, libtcod.light_yellow)
+
+    # Clear screen
+    tcod_clear(con)
+
+    # Blit to screen
+    libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+
+    options = []
+
+    # Store all color themes to list
+    for key, value in colors.color_data.iteritems():
+        if key != 'erroneous':
+            options.append(key)
+
+    # Preset list for player to select theme
+    theme = menu('Choose a theme. Default: ' + CURRENT_THEME, options, INVENTORY_WIDTH)
+
+    if theme is None:
+        print 'No theme selected'
+        return None
+    else:
+        print 'Selecting...'
+        # Set the theme
+        for ind, val in enumerate(options):
+            print ind
+            print val
+            if ind == theme:
+                initialize_theme(val)
 
 def closest_monster(max_range):
     ''' Find closest enemy, up to a maximum range, and in the player's FOV '''
@@ -2427,6 +2520,7 @@ def main_menu():
         if choice == 0:  # New game
             intro_cutscene()
             choose_name()
+            choose_theme()
             new_game()
             play_game()
         if choice == 1:  # Load last game
@@ -2476,7 +2570,7 @@ def make_map():
 
     # Template original map:
     #   themap.makeMap(MAP_WIDTH,MAP_HEIGHT-2,250,1,MAX_ROOMS*4)
-    rooms = MAX_ROOMS + dungeon_level + int(math.floor((dungeon_level/4)*4))
+    rooms = MAX_ROOMS + dungeon_level + int(math.floor((dungeon_level/4)*4)) + 2
     fail = 150 * int(math.floor((dungeon_level/3)*3)) + 100
     b1 = int(math.floor((dungeon_level / 6)*3)) + 1
 
@@ -3513,11 +3607,11 @@ def tcod_clear(console):
 
 # Start ------------------------------------------------------------------------
 
-# Set the color theme
-colors.set_theme(CURRENT_THEME)
-
 # Backup in case if python -B doesn't get ran
 sys.dont_write_bytecode = True
+
+# Init a basic theme
+initialize_theme(CURRENT_THEME)
 
 # Check the arguments that are ran with edgequest.py
 # If this gives problems, replace with `main_menu()`

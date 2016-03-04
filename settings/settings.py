@@ -152,46 +152,6 @@ CSGO_FLOOR = 5
 
 # ------------------------------------------------------------------------------
 
-# Debug settings ---------------------------------------------------------------
-
-# Determines whether the map is revealed or not
-# Default: true
-FOG_OF_WAR_ENABLED = True
-
-# Turns FOV on and off
-# Default: true
-FOV_ENABLED = True
-
-# Player cannot die
-# Default: false
-GOD_MODE = False
-
-# Allows travel through walls
-# Default: false
-WALL_HACK = False
-
-# Travel through floors anywhere
-# Default: false
-STAIR_HACK = False
-
-# Invisible mode (enemies can't see player)
-# Default: false
-INVISIBLE = False
-
-# See all entities on map
-# Default: false
-SEE_ALL = False
-
-# Coordinates show all the time when the mouse is hovered above entity
-# Default: false
-COORDS_UNDER_MOUSE = False
-
-# Determines wheter the walls will light up. Looks nice when true
-# Default: true
-FOV_LIGHT_WALLS = True
-
-# ------------------------------------------------------------------------------
-
 # Intro settings ---------------------------------------------------------------
 
 # Title crawl text
@@ -299,6 +259,7 @@ COLORS = {
     'desaturated_green': libtcod.desaturated_green,
     'darker_green': libtcod.darker_green,
     'lime': libtcod.lime,
+    'green': libtcod.green,
     'violet': libtcod.violet,
     'light_yellow': libtcod.light_yellow,
     'gold': libtcod.gold,

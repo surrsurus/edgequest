@@ -2,6 +2,12 @@
 
 if [ $1 == "-q" ]; then
     python2.7 -B edgequest.py -q
+elif [ $1 == "-h" ]; then
+    python2.7 -B edgequest.py -h
+elif [ $1 == "-qh" ]; then
+    python2.7 -B edgequest.py -qh
+elif [ $1 == "-hq" ]; then
+    python2.7 -B edgequest.py -hq
 else
     python2.7 -B edgequest.py
 fi
