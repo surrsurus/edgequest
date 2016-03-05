@@ -18,6 +18,7 @@ from modules import libtcodpy as libtcod
 from modules import simplejson as json
 from modules.dmap import dMap
 from modules.wallselect import wallselect
+from settings.keymap import *
 from settings.settings import *
 
 # ------------------------------------------------------------------------------
@@ -247,7 +248,7 @@ class CenaMonster:
         if sees_player and not INVISIBLE:
 
             if not self.saw_player:
-                message("AND HIS NAME IS... JOHN CENA!", libtcod.crimson)
+                message("AND HIS NAME IS... JOHN CENA!", self.owner.color)
                 self.saw_player = True
 
             # Move towards player if far away
@@ -288,7 +289,7 @@ class ConfusedMonster:
         else:
             self.owner.ai = self.old_ai
             message('The ' + self.owner.name + ' is no longer confused!',
-                libtcod.red)
+                MESSAGE_COLORS['bad'])
 
 class TalkingMonster:
     ''' An AI that says things '''
@@ -450,7 +451,7 @@ class Equipment:
                     self.update_attack_message()
                     self.is_equipped = True
                     message(''.join(['Equipped the ', self.owner.name, ' on your ',
-                        self.slot, '.']), libtcod.light_green)
+                        self.slot, '.']), MESSAGE_COLORS['good'])
 
                 # Otherwise let the player know that something needs to be
                 #   dequipped
@@ -458,7 +459,7 @@ class Equipment:
                     message(''.join(['There is already a ',
                         other_hand_equip.owner.name, ' on your ',
                         self.slot, '!']),
-                        libtcod.light_red)
+                        MESSAGE_COLORS['fail'])
 
         # Otherwise, equip object and show a message about it
         else:
@@ -466,7 +467,7 @@ class Equipment:
             self.update_attack_message()
             self.is_equipped = True
             message(''.join(['Equipped the ', self.owner.name, ' on your ',
-                self.slot, '.']), libtcod.light_green)
+                self.slot, '.']), MESSAGE_COLORS['good'])
 
     def dequip(self):
         ''' Dequip object and show a message about it '''
@@ -492,7 +493,7 @@ class Equipment:
         # Finalize dequip
         self.is_equipped = False
         message('Dequipped ' + self.owner.name + ' from ' + self.slot + '.',
-                libtcod.light_yellow)
+                MESSAGE_COLORS['fail'])
 
         # Check stats
         '''
@@ -609,14 +610,14 @@ class Fighter:
             # Make the target take some damage
             message(' '.join([self.owner.name.capitalize(), self.attack_msg,
                 target.name.capitalize(), 'for', str(damage),
-                'hit points.']),libtcod.red)
+                'hit points.']),MESSAGE_COLORS['bad'])
 
             target.fighter.take_damage(damage)
 
         else:
             message(' '.join([self.owner.name.capitalize(), self.attack_msg,
                 target.name.capitalize(), 'but it has no effect!']),
-                    libtcod.light_red)
+                    MESSAGE_COLORS['fail'])
 
     def heal(self, amount):
         ''' Heal by the given amount, without going over the maximum '''
@@ -627,7 +628,7 @@ class Fighter:
     def cast(self, cost):
         ''' Not used. Not sure what this can be used for in the future '''
         if self.mana - cost < 0:
-            message('You don\'t have enough mana to cast this!', libtcod.red)
+            message('You don\'t have enough mana to cast this!', MESSAGE_COLORS['fail'])
         else:
             self.mana -= cost
 
@@ -635,13 +636,13 @@ class Fighter:
         ''' Steal life. Sort of like a regeneration system '''
         if self.mana - SIPHON_COST < 0:
             message('You try to siphon any life away, but you aren\'t edgy enough',
-                    libtcod.light_red)
+                    MESSAGE_COLORS['fail'])
             return 'cancelled'
 
         self.mana -= SIPHON_COST
         self.heal(SIPHON_AMOUNT)
 
-        message('You siphon life from the deceased', libtcod.fuchsia)
+        message('You siphon life from the deceased', MESSAGE_COLORS['magic'])
 
     def magic_missile(self):
         ''' Fire a magic missile '''
@@ -649,13 +650,13 @@ class Fighter:
         monster = closest_monster(MISSILE_RANGE)
         if monster is None:  # No enemy found within maximum range
             message('No enemy is close enough to strike with your edge missile',
-                    libtcod.light_red)
+                    MESSAGE_COLORS['fail'])
             return 'cancelled'
 
         # Fire a magic missile
         if self.mana - MISSILE_COST < 0:
             message('You try to fire an edge missile, but you aren\'t edgy enough',
-                    libtcod.light_red)
+                    MESSAGE_COLORS['fail'])
             return 'cancelled'
 
         self.mana -= MISSILE_COST
@@ -678,13 +679,13 @@ class Item:
         # Inventory has a cap of 26 items
         if len(inventory) >= 26:
             message('Your inventory is full, cannot pick up ' +
-                self.owner.name + '.', libtcod.dark_fuchsia)
+                self.owner.name + '.', MESSAGE_COLORS['fail'])
 
         else:
             inventory.append(self.owner)
             objects.remove(self.owner)
             message('You picked up a ' + self.owner.name + '!',
-                    libtcod.light_green)
+                    MESSAGE_COLORS['good'])
 
             # Special case: automatically equip, if the corresponding equipment
             #   slot is unused, or if the item is a weapon
@@ -709,9 +710,9 @@ class Item:
         self.owner.y = player.y
 
         if self.owner.name == 'bomb':
-            message('You planted a ' + self.owner.name + '.', libtcod.yellow)
+            message('You planted a ' + self.owner.name + '.', MESSAGE_COLORS['debug'])
         else:
-            message('You dropped a ' + self.owner.name + '.', libtcod.yellow)
+            message('You dropped a ' + self.owner.name + '.', MESSAGE_COLORS['neutral'])
 
         # Easter egg!
         if self.owner.name == 'bomb':
@@ -743,7 +744,7 @@ class Item:
 
         # Just call the 'use_function' if it is defined
         if self.use_function is None:
-            message('The ' + self.owner.name + ' cannot be used.', libtcod.gray)
+            message('The ' + self.owner.name + ' cannot be used.', MESSAGE_COLORS['neutral'])
         else:
             if self.use_function() != 'cancelled':
 
@@ -828,7 +829,7 @@ class Object:
         if player_can_see or persistent or SEE_ALL:
             (x, y) = to_camera_coordinates(self.x, self.y)
 
-            if (x, y) is not (None, None):
+            if x is not None:
                 # Set the color and then draw the character that
                 #   represents this object at its position
                 tcod_set_fg(con, self.color)
@@ -843,7 +844,7 @@ class Object:
         inventory.remove(self.owner)
         self.owner.x = player.x
         self.owner.y = player.y
-        message('You dropped a ' + self.owner.name + '.', libtcod.yellow)
+        message('You dropped a ' + self.owner.name + '.', MESSAGE_COLORS['neutral'])
 
     def move(self, dx, dy):
         ''' Move by a given amount '''
@@ -1085,7 +1086,7 @@ def cast_confuse():
     ''' Ask the player for a target to confuse '''
 
     message('Left-click an enemy to confuse it, or right-click to cancel.',
-        libtcod.light_cyan)
+        MESSAGE_COLORS['magic'])
 
     monster = target_monster(CONFUSE_RANGE)
 
@@ -1097,7 +1098,7 @@ def cast_confuse():
     monster.ai = ConfusedMonster(old_ai)
     monster.ai.owner = monster  # Tell the new component who owns it
     message('The eyes of the ' + monster.name +
-        ' look vacant, as he starts to stumble around!', libtcod.light_green)
+        ' look vacant, as he starts to stumble around!', MESSAGE_COLORS['magic'])
 
     render_all()
 
@@ -1108,31 +1109,31 @@ def cast_death():
     ''' Ask the player for a target tile to kill '''
 
     message('Left-click a target monster to report, or right-click to cancel.',
-            libtcod.light_cyan)
+            MESSAGE_COLORS['magic'])
 
     mon = target_monster()
 
     # Handle possible errors
     if mon is None:
-        message('Cancelled', libtcod.light_red)
+        message('Cancelled', MESSAGE_COLORS['fail'])
         return 'cancelled'
 
     else:
         message('The ' + mon.name + ' gets reported to HEART!',
-            libtcod.orange)
+            MESSAGE_COLORS['very_bad'])
         mon.fighter.take_damage(9000000000)
 
 def cast_explode():
     ''' Detonate a bomb '''
 
     message('The bomb explodes, burning everything within ' +
-        str(FIREBALL_RADIUS*2) + ' tiles!', libtcod.orange)
+        str(FIREBALL_RADIUS*2) + ' tiles!', MESSAGE_COLORS['very_bad'])
 
     # Damage every fighter in range, including the player
     for obj in objects:
         if obj.distance(player.x, player.y) <= FIREBALL_RADIUS*2 and obj.fighter:
             message('The ' + obj.name + ' gets burned for ' +
-                str(FIREBALL_DAMAGE*5) + ' hit points.', libtcod.orange)
+                str(FIREBALL_DAMAGE*5) + ' hit points.', MESSAGE_COLORS['bad'])
             obj.fighter.take_damage(FIREBALL_DAMAGE*5)
 
     (x, y) = to_camera_coordinates(player.x, player.y)
@@ -1143,19 +1144,19 @@ def cast_fireball():
     ''' Ask the player for a target tile to throw a fireball at '''
 
     message('Left-click a target tile for the fireball, or \
-        right-click to cancel.', libtcod.light_cyan)
+        right-click to cancel.', MESSAGE_COLORS['magic'])
 
     (x, y) = target_tile()
     if x is None: return 'cancelled'
 
     message('The fireball explodes, burning everything within ' +
-        str(FIREBALL_RADIUS) + ' tiles!', libtcod.orange)
+        str(FIREBALL_RADIUS) + ' tiles!', MESSAGE_COLORS['magic'])
 
     # Damage every fighter in range, including the player
     for obj in objects:
         if obj.distance(x, y) <= FIREBALL_RADIUS and obj.fighter:
             message('The ' + obj.name + ' gets burned for ' +
-                str(FIREBALL_DAMAGE) + ' hit points.', libtcod.orange)
+                str(FIREBALL_DAMAGE) + ' hit points.', MESSAGE_COLORS['bad'])
             obj.fighter.take_damage(FIREBALL_DAMAGE)
 
     # Get the coordinates relative to the camera position
@@ -1167,10 +1168,10 @@ def cast_heal():
     ''' Heal the player '''
 
     if player.fighter.hp == player.fighter.max_hp:
-        message('You are already at full health.', libtcod.light_gray)
+        message('You are already at full health.', MESSAGE_COLORS['neutral'])
         return 'cancelled'
 
-    message('Your wounds start to feel better!', libtcod.light_violet)
+    message('Your wounds start to feel better!', MESSAGE_COLORS['good'])
     player.fighter.heal(HEAL_AMOUNT)
 
 def cast_inflict_blindness():
@@ -1179,16 +1180,16 @@ def cast_inflict_blindness():
     global blind, blind_counter
     blind = True
     blind_counter = 0
-    message('You are blinded!', libtcod.dark_sea)
+    message('You are blinded!', MESSAGE_COLORS['very_bad'])
 
 def cast_mana():
     ''' Give some mana back '''
 
     if player.fighter.mana == player.fighter.max_mana:
-        message('You already have enough edge.')
+        message('You already have enough edge.', MESSAGE_COLORS['neutral'])
         return 'cancelled'
 
-    message('You begin to feel edgy!', libtcod.light_flame)
+    message('You begin to feel edgy!', MESSAGE_COLORS['edge'])
     player.fighter.restore(MANA_AMOUNT)
 
 def cast_magic_missile(fighter_owner):
@@ -1204,7 +1205,7 @@ def cast_magic_missile(fighter_owner):
     # Zap it!
     message('A missile of pure edge strikes the ' + monster.name +
             ' with a loud airhorn! The damage is ' + str(damage) +
-            ' hit points.', libtcod.light_blue)
+            ' hit points.', MESSAGE_COLORS['edge'])
 
     monster.fighter.take_damage(damage)
 
@@ -1215,13 +1216,13 @@ def cast_lightning():
 
     monster = closest_monster(LIGHTNING_RANGE)
     if monster is None:  # No enemy found within maximum range
-        message('No enemy is close enough to strike.', libtcod.red)
+        message('No enemy is close enough to strike.', MESSAGE_COLORS['fail'])
         return 'cancelled'
 
     # Zap it!
     message('A lighting bolt strikes the ' + monster.name +
             ' with a loud thunder! The damage is ' + str(LIGHTNING_DAMAGE) +
-            ' hit points.', libtcod.light_blue)
+            ' hit points.', MESSAGE_COLORS['magic'])
     monster.fighter.take_damage(LIGHTNING_DAMAGE)
 
     animate_bolt(libtcod.light_azure, player.x, player.y, monster.x, monster.y)
@@ -1229,7 +1230,8 @@ def cast_lightning():
 def check_args():
     ''' Check the arguments the game is ran with '''
 
-    global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL
+    global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL, \
+        COORDS_UNDER_MOUSE
 
     try:
         # assumes that the program is run with python2.7 -B edgequest.py
@@ -1243,15 +1245,19 @@ def check_args():
                 FOG_OF_WAR_ENABLED = False
                 STAIR_HACK = True
                 SEE_ALL = True
+                COORDS_UNDER_MOUSE = True
                 main_menu()
             if arg == '-hq' or arg == '-qh':
                 GOD_MODE = True
                 FOG_OF_WAR_ENABLED = False
                 STAIR_HACK = True
                 SEE_ALL = True
+                COORDS_UNDER_MOUSE = True
                 player_name = DEFAULT_NAME
                 new_game()
                 play_game()
+            else:
+                main_menu()
 
     except IndexError:
         main_menu()
@@ -1260,8 +1266,7 @@ def check_ground():
     ''' Look for an item in the player's tile '''
     for obj in objects:
         if obj.x == player.x and obj.y == player.y and obj != player:
-            message(' '.join(['You see a', obj.name, 'here.']),
-                    libtcod.white)
+            message(' '.join(['You see a', obj.name, 'here.']), MESSAGE_COLORS['neutral'])
 
 def check_level_up():
     ''' See if the player's experience is enough to level-up '''
@@ -1277,7 +1282,7 @@ def check_level_up():
         player.level += 1
         player.fighter.xp = 0
         message('Your battle skills grow stronger! You reached level ' +
-            str(player.level) + '!', libtcod.yellow)
+            str(player.level) + '!', MESSAGE_COLORS['level_up'])
 
         choice = None
         while choice == None:  # Keep asking until a choice is made
@@ -1468,7 +1473,7 @@ def credits_screen():
     # Set the screen to black
     tcod_set_bg(con, libtcod.black)
 
-    tcod_set_fg(con, libtcod.light_yellow)
+    tcod_set_fg(con, MESSAGE_COLORS['edge'])
     tcod_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
                             libtcod.BKGND_NONE, libtcod.CENTER,
                             'Thank you for playing EdgeQuest!\n')
@@ -1494,9 +1499,9 @@ def debug_spawn_console(json_list):
 
     # Message displaying what will be spawned
     if json_list == 'monster':
-        message('Enter a monster name', libtcod.red)
+        message('Enter a monster name', MESSAGE_COLORS['debug'])
     elif json_list == 'item':
-        message('Enter an item name', libtcod.red)
+        message('Enter an item name', MESSAGE_COLORS['debug'])
 
     # Show new message
     render_all()
@@ -1711,7 +1716,7 @@ def fire_weapon(equipment):
     monster = closest_monster(FIREARM_RANGE)
 
     if monster is None:  # No enemy found within maximum range
-        message('No enemy is close enough to shoot.', libtcod.red)
+        message('No enemy is close enough to shoot.', MESSAGE_COLORS['fail'])
         return 'cancelled'
 
     damage = (equipment.ranged_bonus + int(math.floor((equipment.ranged_bonus/2 * math.floor(player.level/(2)))*player.level*.2))) - monster.fighter.defense
@@ -1721,14 +1726,14 @@ def fire_weapon(equipment):
         # Zap it!
         message(player_name + ' shoots the ' + monster.name +
                 ' with the ' + equipment.owner.name + '! The damage is ' +
-                str(damage) + ' hit points.', libtcod.light_red)
+                str(damage) + ' hit points.', MESSAGE_COLORS['magic'])
         monster.fighter.take_damage(damage)
 
     else:
 
         message(player_name + ' shoots the ' + monster.name +
             ' with the ' + equipment.owner.name +
-            'but the shot reflects off the armor!', libtcod.light_red)
+            'but the shot reflects off the armor!', MESSAGE_COLORS['bad'])
 
     animate_bolt(libtcod.yellow, player.x, player.y, monster.x, monster.y)
 
@@ -2176,7 +2181,7 @@ def git_screen():
     # Set the screen to black
     tcod_set_bg(con, libtcod.black)
 
-    tcod_set_fg(con, libtcod.light_yellow)
+    tcod_set_fg(con, MESSAGE_COLORS['edge'])
     tcod_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
         libtcod.BKGND_NONE, libtcod.CENTER, 'Thank you for playing EdgeQuest')
 
@@ -2200,7 +2205,7 @@ def handle_keys():
 
     if game_state == 'playing':
         # End game with escape
-        if key.vk == libtcod.KEY_ESCAPE:
+        if key.vk == QUIT_KEY:
             player_action = 'didnt-take-turn'
             save_game()
 
@@ -2233,24 +2238,24 @@ def handle_keys():
             player_action = 'move'
 
         # Wait
-        elif key_char in ('5', '.'):
+        elif key_char in WAIT_KEYS:
             check_fov = True
-            message('You wait', libtcod.gray)
+            message('You wait', MESSAGE_COLORS['neutral'])
             player_action = 'wait'
 
         # Pick up an item
-        elif key_char == 'g':
+        elif key_char == GET_ITEM_KEY:
             for obj in objects:  # Look for an item in the player's tile
                 if obj.x == player.x and obj.y == player.y and obj.item:
                     obj.item.pick_up()
                     player_action = 'pickup'
                     break
             else:
-                message('There is nothing there to pick up', libtcod.gray)
+                message('There is nothing there to pick up', MESSAGE_COLORS['neutral'])
                 player_action = 'didnt-take-turn'
 
         # Show the inventory
-        elif key_char == 'i':
+        elif key_char == INVENTORY_KEY:
             chosen_item = inventory_menu(
             'Press the key next to an item to use it, or any other to cancel.\
             \n')
@@ -2259,7 +2264,7 @@ def handle_keys():
                 player_action = 'use'
 
         # Show equipment
-        elif key_char == 'e':
+        elif key_char == EQUIPMENT_MENU_KEY:
             chosen_item = equipment_menu(
             'Press the key next to an item to equip/dequip it, or any other to cancel.\
             \n')
@@ -2268,7 +2273,7 @@ def handle_keys():
                 player_action = 'use'
 
         # Show food
-        elif key_char == 'E':
+        elif key_char == FOOD_MENU_KEY:
             chosen_item = consumables_menu(
             'Press the key next to an item to eat it, or any other to cancel.\
             \n')
@@ -2277,7 +2282,7 @@ def handle_keys():
                 player_action = 'use'
 
         # Show the inventory; if an item is selected, drop it
-        elif key_char == 'd':
+        elif key_char == DROP_ITEM_KEY:
             chosen_item = inventory_menu(
             'Press the key next to an item to drop it, or any other to cancel.\
             \n')
@@ -2285,8 +2290,75 @@ def handle_keys():
                 chosen_item.drop()
                 player_action = 'drop'
 
+        # Go down stairs, if the player is on them
+        elif key_char == GO_DOWN_KEY:
+            if (dstairs.x == player.x and dstairs.y == player.y) or STAIR_HACK:
+                next_level()
+
+        # Go up stairs, if the player is on them
+        elif key_char == GO_UP_KEY:
+            if (ustairs.x == player.x and ustairs.y == player.y) or STAIR_HACK:
+                previous_level()
+
+        # Show character information
+        elif key_char == STATS_KEY:
+            msgbox_stats('Character Information')
+
+        elif key_char == TOGGLE_SIPHON_KEY:
+            # Toggle the siphon ability
+            toggle_siphon()
+            player_action = 'didnt-take-turn'
+
+        # Taunt
+        elif key_char == TAUNT_KEY:
+            taunt()
+            player_action = 'taunt'
+
+        # Activate weapon
+        elif key_char == ACTIVATE_WEAPON_KEY:
+            right = get_equipped_in_slot('right hand')
+            left = get_equipped_in_slot('left hand')
+            if left:
+                left.weapon_function()
+                player_action = 'activating'
+
+            if right:
+                right.weapon_function()
+                player_action = 'activating'
+
+        # Cast magic missile
+        elif key_char == CAST_MAGIC_MISSLE_KEY:
+            status = player.fighter.magic_missile()
+            if status != 'cancelled':
+                player_action = 'casting'
+            else:
+                player_action = 'didnt-take-turn'
+
+        # Show help
+        elif key_char == SHOW_HELP_KEY:
+            how_to_play()
+            player_action = 'didnt-take-turn'
+
+        # Debug commands
+
+        elif key_char == SPAWN_DEBUG_CONSOLE_M_KEY:
+            debug_spawn_console('monster')
+            player_action = 'didnt-take-turn'
+
+        elif key_char == SPAWN_DEBUG_CONSOLE_I_KEY:
+            debug_spawn_console('item')
+            player_action = 'didnt-take-turn'
+
+        elif key_char == KILL_ALL_KEY:
+            debug_kill_all()
+            player_action = 'didnt-take-turn'
+
+        elif key_char == SPAWN_MONSTER_KEY:
+            objects.append(generate_monster('silver2', player.x, player.y + 2))
+            pass
+
         # Reset the map (DEBUG)
-        elif key_char == 'r':
+        elif key_char == RELOAD_MAP_KEY:
             # Empty objects and re-add the player so the game is playable
             objects = []
             objects.insert(0, player)
@@ -2300,73 +2372,6 @@ def handle_keys():
             make_map()
             fov_recompute()
             player_action = 'didnt-take-turn'
-
-        # Go down stairs, if the player is on them
-        elif key_char == '>':
-            if (dstairs.x == player.x and dstairs.y == player.y) or STAIR_HACK:
-                next_level()
-
-        # Go up stairs, if the player is on them
-        elif key_char == '<':
-            if (ustairs.x == player.x and ustairs.y == player.y) or STAIR_HACK:
-                previous_level()
-
-        # Show character information
-        elif key_char == 'c':
-            msgbox_stats('Character Information')
-
-        elif key_char == 'q':
-            # Toggle the siphon ability
-            toggle_siphon()
-            player_action = 'didnt-take-turn'
-
-        # Taunt
-        elif key_char == 't':
-            taunt()
-            player_action = 'taunt'
-
-        # Activate weapon
-        elif key_char == 'f':
-            right = get_equipped_in_slot('right hand')
-            left = get_equipped_in_slot('left hand')
-            if left:
-                left.weapon_function()
-                player_action = 'activating'
-
-            if right:
-                right.weapon_function()
-                player_action = 'activating'
-
-        # Cast magic missile
-        elif key_char == 'm':
-            status = player.fighter.magic_missile()
-            if status != 'cancelled':
-                player_action = 'casting'
-            else:
-                player_action = 'didnt-take-turn'
-
-        # Show help
-        elif key_char == '?':
-            how_to_play()
-            player_action = 'didnt-take-turn'
-
-        # Debug commands
-
-        elif key_char == 'z':
-            debug_spawn_console('monster')
-            player_action = 'didnt-take-turn'
-
-        elif key_char == 'x':
-            debug_spawn_console('item')
-            player_action = 'didnt-take-turn'
-
-        elif key_char == 'v':
-            debug_kill_all()
-            player_action = 'didnt-take-turn'
-
-        elif key_char == 'o':
-            objects.append(generate_monster('silver2', player.x, player.y + 2))
-            pass
 
         else:
             player_action = 'didnt-take-turn'
@@ -2732,7 +2737,7 @@ def menu(header, options, width):
     else:
         return None
 
-def message(new_msg, color=libtcod.white):
+def message(new_msg, color=MESSAGE_COLORS['default']):
     ''' Send a message to the console at the bottom '''
 
     global old_msg, msg_counter
@@ -2771,9 +2776,9 @@ def monster_death(monster):
     # Transform it into a nasty corpse! it doesn't block, can't be
     # Attacked and doesn't move
     message(' '.join([monster.name.capitalize(), 'is dead!']),
-        libtcod.darker_red)
+        MESSAGE_COLORS['very_bad'])
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
-        libtcod.orange)
+        MESSAGE_COLORS['level_up'])
     monster.set_corpse()
 
 def monster_death_slock(monster):
@@ -2782,9 +2787,9 @@ def monster_death_slock(monster):
     # Transform it into a nasty corpse! it doesn't block, can't be
     # Attacked and doesn't move
     message(' '.join([monster.name.capitalize(), 'is dead!']),
-        libtcod.darker_red)
+        MESSAGE_COLORS['very_bad'])
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
-        libtcod.orange)
+        MESSAGE_COLORS['level_up'])
     message(' '.join([monster.name.capitalize(),
         'casts a final spell in its dying moments!']))
     monster.set_corpse()
@@ -2813,12 +2818,12 @@ def monster_death_talk(monster):
         mon_death_talk = 'I was born to die just like a bug!'
 
     message(''.join([monster.name.capitalize(), ' says "', mon_death_talk,
-        '"']), libtcod.darker_red)
+        '"']), MESSAGE_COLORS['bad'])
 
     message(' '.join([monster.name.capitalize(), 'is dead!']),
-        libtcod.darker_red)
+        MESSAGE_COLORS['very_bad'])
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
-        libtcod.orange)
+        MESSAGE_COLORS['level_up'])
     monster.set_corpse()
 
 def monster_occupy_check(dx, dy):
@@ -2842,14 +2847,14 @@ def mouse_move_astar(tx, ty):
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
         obj.fighter and \
         obj.name != player.name:
-            message('Cannot move: Monster in view!', libtcod.pink)
+            message('Cannot move: Monster in view!', MESSAGE_COLORS['debug'])
             monster = True
 
     try:
         if is_blocked(tx, ty):
-            message('Cannot move: Location is unexplored', libtcod.pink)
+            message('Cannot move: Location is unexplored', MESSAGE_COLORS['debug'])
         elif not world[tx][ty].explored:
-            message('Cannot move: Location is unexplored', libtcod.pink)
+            message('Cannot move: Location is unexplored', MESSAGE_COLORS['debug'])
         elif blind:
             message('Cannot move: You are blind',
                 libtcod.pink)
@@ -2864,7 +2869,7 @@ def mouse_move_astar(tx, ty):
                     if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
                     obj.fighter and \
                     obj.name != player.name:
-                        message('Cannot move: Monster in view!', libtcod.pink)
+                        message('Cannot move: Monster in view!', MESSAGE_COLORS['debug'])
                         monster = True
                         continue
 
@@ -2879,7 +2884,7 @@ def mouse_move_astar(tx, ty):
                 check_ground()
 
     except IndexError:
-        message('Cannot move: Out of range', libtcod.pink)
+        message('Cannot move: Out of range', MESSAGE_COLORS['debug'])
 
 def msgbox(text, width=50):
     ''' use menu() as a sort of \'message box\' '''
@@ -2959,7 +2964,8 @@ def new_game():
     game_msgs = []
 
     # A warm welcoming message!
-    message('Welcome!', libtcod.lighter_yellow)
+    message('Welcome to EdgeQuest!', MESSAGE_COLORS['edge'])
+    message('Press ? to see a list of commands!', MESSAGE_COLORS['debug'])
 
     render_all()
     # Present the root console
@@ -2975,7 +2981,7 @@ def next_level():
     stairs_up = True
 
     message('After a rare moment of peace, you descend deeper into the \
-        heart of the dungeon...', libtcod.red)
+        heart of the dungeon...', MESSAGE_COLORS['neutral'])
 
     make_map()  # Create a fresh new level!
     initialize_fov()
@@ -3086,7 +3092,7 @@ def player_death(player):
     # The game ended!
     global game_state
     if not GOD_MODE: # Debug
-        message('You died!', libtcod.dark_red)
+        message('You died!', MESSAGE_COLORS['very_bad'])
 
         # For added effect, transform the player into a corpse!
         player.set_player_corpse()
@@ -3102,7 +3108,7 @@ def player_death(player):
         game_over()
 
     else:
-        message('...But it refused!', libtcod.crimson)
+        message('...But it refused!', MESSAGE_COLORS['fail'])
         player.fighter.hp = player.fighter.max_hp
 
 def player_move(dx, dy):
@@ -3155,7 +3161,7 @@ def previous_level():
 
     else:
         message('After a rare moment of peace, you ascend upwards towards \
-            the surface...', libtcod.red)
+            the surface...', MESSAGE_COLORS['neutral'])
         make_map()  # Create a fresh new level!
         initialize_fov()
 
@@ -3206,7 +3212,7 @@ def render_all():
         if blind_counter == BLIND_LENGTH:
             blind = False
             blind_counter = 0
-            message("Your vision returns!", libtcod.light_sea)
+            message("Your vision returns!", MESSAGE_COLORS['magic'])
     player.draw()
 
     if not blind:
@@ -3554,10 +3560,10 @@ def toggle_siphon():
     global activate_siphon
     if activate_siphon:
         activate_siphon = False
-        message('You deativate your siphon ability', libtcod.magenta)
+        message('You deativate your siphon ability', MESSAGE_COLORS['debug'])
     else:
         activate_siphon = True
-        message('You activate your siphon ability', libtcod.magenta)
+        message('You activate your siphon ability', MESSAGE_COLORS['debug'])
 
 def to_camera_coordinates(x, y):
     ''' convert coordinates on the map to coordinates on the screen '''
@@ -3573,17 +3579,17 @@ def to_camera_coordinates(x, y):
 def weapon_action_katana(weapon):
     ''' Katana action '''
 
-    message('You examine the fine steel of the katana, surely folded over 1000 times')
+    message('You examine the fine steel of the katana, surely folded over 1000 times', MESSAGE_COLORS['neutral'])
 
 def weapon_action_knife(weapon):
     ''' Knife action '''
 
-    message('You flaunt your latest knife')
+    message('You inspect your latest knife', MESSAGE_COLORS['neutral'])
 
 def weapon_action_awp(weapon):
     ''' AWP action '''
 
-    message('You no-scope with the AWP')
+    message('You no-scope with the AWP', MESSAGE_COLORS['magic'])
     cast_lightning()
 
 def weapon_action_firearm(weapon):
@@ -3594,7 +3600,7 @@ def weapon_action_firearm(weapon):
 def weapon_action_else(weapon):
     ''' Emergency reserve action '''
 
-    message('You stare deeply at your ' + weapon.name)
+    message('You stare deeply at your ' + weapon.name, MESSAGE_COLORS['fail'])
 
 # ------------------------------------------------------------------------------
 

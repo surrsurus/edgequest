@@ -205,47 +205,6 @@ INTRO_WALL = BUFFER + INTRO_TEXT
 
 # ------------------------------------------------------------------------------
 
-# Keymaps ----------------------------------------------------------------------
-
-# Keys that trigger fullscreen mode
-FULLSCREEN_KEYS = [
-    libtcod.KEY_TAB,
-    libtcod.KEY_F4
-]
-
-# Keymap for movement keys
-MOVEMENT_KEYS = [
-    # Num pad keys
-    '1',
-    '2',
-    '3',
-    '4',
-    '6',
-    '7',
-    '8',
-    '9',
-    # Vim keys
-    'y',
-    'u',
-    'h',
-    'j',
-    'k',
-    'l',
-    'b',
-    'n'
-]
-
-# Movement keymap for the key.vk libtcod objects
-MOVEMENT_KEYS_VK = [
-    # Arrow Keys
-    libtcod.KEY_UP,
-    libtcod.KEY_DOWN,
-    libtcod.KEY_LEFT,
-    libtcod.KEY_RIGHT
-]
-
-# ------------------------------------------------------------------------------
-
 # Lists ------------------------------------------------------------------------
 
 # List of weapon slot_list
@@ -286,6 +245,21 @@ COLORS = {
     'red': libtcod.red
 }
 
+# List of colors for console
+MESSAGE_COLORS = {
+    'default'  : libtcod.white,
+    'good'     : libtcod.light_green,
+    'bad'      : libtcod.light_red,
+    'very_bad' : libtcod.red,
+    'level_up' : libtcod.yellow,
+    'fail'     : libtcod.orange,
+    'magic'    : libtcod.light_sea,
+    'debug'    : libtcod.fuchsia,
+    'neutral'  : libtcod.gray,
+    'edge'     : libtcod.flame
+}
+
+# List of consumables
 CONSUMABLES = [
     'mountain dew',
     'coke zero'
