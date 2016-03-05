@@ -246,7 +246,7 @@ COLORS = {
 }
 
 # List of colors for console
-MESSAGE_COLORS = {
+TEXT_COLORS = {
     'default'  : libtcod.white,
     'good'     : libtcod.light_green,
     'bad'      : libtcod.light_red,
@@ -256,7 +256,8 @@ MESSAGE_COLORS = {
     'magic'    : libtcod.light_sea,
     'debug'    : libtcod.fuchsia,
     'neutral'  : libtcod.gray,
-    'edge'     : libtcod.flame
+    'edge'     : libtcod.fuchsia,
+    'title'    : libtcod.light_yellow
 }
 
 # List of consumables
