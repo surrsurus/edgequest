@@ -28,6 +28,7 @@ cd ..
 echo
 echo ${VSP}
 echo 'This process will delete any files in your edgequest directory.'
+echo 'You should make backups of anything you wish to save now.'
 read -p 'Are you sure you want to install? [Y/N] >' -n 1 -r
 echo
 echo ${VSP}
