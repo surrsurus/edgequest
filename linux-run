@@ -1,12 +1,16 @@
 #! /bin/bash
 
 if [ $1 == "-q" ]; then
+    echo '[>] Quickstart'
     python2.7 -B edgequest.py -q
 elif [ $1 == "-h" ]; then
+    echo '[>] Debug enabled'
     python2.7 -B edgequest.py -h
 elif [ $1 == "-qh" ]; then
+    echo '[>] Quickstart Debug'
     python2.7 -B edgequest.py -qh
 elif [ $1 == "-hq" ]; then
+    echo '[>] Quickstart Debug'
     python2.7 -B edgequest.py -hq
 else
     python2.7 -B edgequest.py

@@ -95,7 +95,7 @@ MSG_HEIGHT = MSG_PANEL_HEIGHT - 1
 HEAL_AMOUNT = 40
 
 # Mana Potion
-MANA_AMOUNT = 20
+MANA_AMOUNT = 40
 
 # Siphon Spell cost
 SIPHON_COST   = 1
@@ -149,6 +149,10 @@ MONSTER_RANGE = FIREARM_RANGE
 
 # CSGO floor settings
 CSGO_FLOOR = 5
+
+# Megadeath
+
+MEGADEATH = 90000000
 
 # ------------------------------------------------------------------------------
 

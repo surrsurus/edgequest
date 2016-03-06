@@ -40,7 +40,7 @@ def hex_to_color(inp):
         green_bit = int(fhex[2:4], 16)
         blue_bit  = int(fhex[4:6], 16)
 
-        print 'Color: (' + str(red_bit) + ', ' + str(green_bit) + ', ' + \
+        print '[:] Color: (' + str(red_bit) + ', ' + str(green_bit) + ', ' + \
             str(blue_bit) + ')'
 
         return libtcod.Color(red_bit, green_bit, blue_bit);
@@ -84,7 +84,7 @@ def set_theme(theme):
 
     # Setting colors to the absence of colors is kind of hard. Let's not do that.
     if theme is not None:
-        print 'Theme set: ' + theme
+        print '[+] Theme set: ' + theme
 
         # Set all the colors here
         # Yes, I know. It goes over the proper line wrapping length.
@@ -99,7 +99,7 @@ def set_theme(theme):
             color_accent           = get_color(color_data[theme]['accent']['light'])
 
         except KeyError as e:
-            print 'Something went terribly wrong while loading... Using defaults...'
+            print '[!] Error: JSON error while loading... Using defaults...'
             default_colors()
             print '----- STACK TRACE: -----'
             traceback.print_exc()
@@ -115,14 +115,15 @@ def set_theme(theme):
             assert color_ground_highlight is not None
             assert color_accent           is not None
         except AssertionError as e:
-            print 'Looks like there is invalid or missing data in the `' +\
+            print '[!] AssertionError: Looks like there is invalid or missing data in the `' +\
                 theme + '` theme! Using defaults...'
             default_colors()
             print '----- STACK TRACE: -----'
             traceback.print_exc()
             print '------------------------'
     else:
-        print 'Warning: Theme is not set in settings.py! Using defaults...'
+        print '[!] Warning: Theme is not set in settings.py!'
+        print '[:] Defaulting...'
         default_colors()
 
 # ------------------------------------------------------------------------------

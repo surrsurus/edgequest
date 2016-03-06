@@ -11,13 +11,32 @@ import textwrap
 import time
 import traceback
 
+# Camera controls
+import core.camera as camera
+
 # This import is different because the theme can change
 # So we want to use the latest variables, not what the defaults are
 import settings.colors as colors
+
+# Animation tools
+import core.animtools as anim
+
+# Map generation
+from core.dmap import dMap
+
+# Wall decorations
+from core.wallselect import wallselect
+
+# Libtcod wrappers
+from core.wrappers import *
+
+# Rendering library
 from modules import libtcodpy as libtcod
+
+# JSON parsing library
 from modules import simplejson as json
-from modules.dmap import dMap
-from modules.wallselect import wallselect
+
+# Settings
 from settings.keymap import *
 from settings.settings import *
 
@@ -33,7 +52,6 @@ with open(MONSTER_JSON_PATH) as json_data:
 # Load items
 with open(ITEM_JSON_PATH) as json_data:
     items_data = json.load(json_data)
-
 
 # ------------------------------------------------------------------------------
 
@@ -57,9 +75,6 @@ world = None
 
 # FOV Map
 fov_map = None
-
-# Check FOV if true
-check_fov = True
 
 # Stairs objects
 dstairs = None
@@ -185,9 +200,6 @@ perk_fbang     = 0
 
 # An array with all unblocked coords
 unblocked_world = []
-
-# Camera coordinates
-(camera_x, camera_y) = (0, 0)
 
 # ------------------------------------------------------------------------------
 
@@ -723,13 +735,13 @@ class Item:
                     if obj.name in ['Bomb site A', 'Bomb site B']:
                         message('Terrorists win!')
 
-                        (x, y) = to_camera_coordinates(player.x, player.y)
+                        (x, y) = camera.to_coords(player.x, player.y)
 
                         animate_blast(libtcod.red, x, y, FIREBALL_RADIUS*2)
 
                         for obj in objects:
                             if obj.name in ('Counter-Terrorist', 'Terrorist'):
-                                obj.fighter.take_damage(9000000)
+                                obj.fighter.take_damage(MEGADEATH)
 
     def use(self):
         ''' Use an item '''
@@ -805,7 +817,7 @@ class Object:
 
     def clear(self):
         ''' Erase the character that represents this object '''
-        (x, y) = to_camera_coordinates(self.x, self.y)
+        (x, y) = camera.to_coords(self.x, self.y)
         if x is None:
             tcod_put_char(con, x, y, ' ', libtcod.BKGND_NONE)
 
@@ -827,7 +839,7 @@ class Object:
         persistent = (self.always_visible and world[self.x][self.y].explored)
 
         if player_can_see or persistent or SEE_ALL:
-            (x, y) = to_camera_coordinates(self.x, self.y)
+            (x, y) = camera.to_coords(self.x, self.y)
 
             if x is not None:
                 # Set the color and then draw the character that
@@ -1002,20 +1014,6 @@ class Tile:
 def animate_bolt(color, dx, dy, tx, ty):
     ''' Animate a lightning bolt from the player to an enemy '''
     if not blind:
-        # The lightning bolt changes depending on where the monster is
-        if (dx < tx and dy < ty) or \
-        (dx > tx and dy > ty):
-            char = '\\'
-        elif (dx < tx and dy > ty) or \
-        (dx > tx and dy < ty):
-            char = '/'
-        elif (dx == tx and dy != ty):
-            char = '|'
-        elif (dx != tx and dy == ty):
-            char = '-'
-        else:
-            char = '?'
-
         # While, the distance to the monster is greater than 2
         # Aka go towards it until it's one space away
         while  math.sqrt((tx-dx) ** 2 + (ty-dy) ** 2) >= 2:
@@ -1035,7 +1033,7 @@ def animate_bolt(color, dx, dy, tx, ty):
             elif ty > dy:
                 dy += 1
 
-            (x, y) = to_camera_coordinates(dx, dy)
+            (x, y) = camera.to_coords(dx, dy)
 
             fov_recompute()
 
@@ -1046,6 +1044,10 @@ def animate_bolt(color, dx, dy, tx, ty):
             player.draw()
 
             tcod_set_fg(con, color)
+
+            # Get the lightning bolt
+            char = anim.lightning_direction(dx, dy, tx, ty)
+
             tcod_print_ex(con, x, y,
                                     libtcod.BKGND_NONE, libtcod.CENTER,
                                     char)
@@ -1093,7 +1095,7 @@ def cast_confuse():
     if monster is None: return 'cancelled'
 
     # Replace the monster's AI with a 'confused' one; after some turns it will
-    #   restore the old AI
+    # restore the old AI
     old_ai = monster.ai
     monster.ai = ConfusedMonster(old_ai)
     monster.ai.owner = monster  # Tell the new component who owns it
@@ -1121,7 +1123,7 @@ def cast_death():
     else:
         message('The ' + mon.name + ' gets reported to HEART!',
             TEXT_COLORS['very_bad'])
-        mon.fighter.take_damage(9000000000)
+        mon.fighter.take_damage(MEGADEATH)
 
 def cast_explode():
     ''' Detonate a bomb '''
@@ -1136,8 +1138,10 @@ def cast_explode():
                 str(FIREBALL_DAMAGE*5) + ' hit points.', TEXT_COLORS['bad'])
             obj.fighter.take_damage(FIREBALL_DAMAGE*5)
 
-    (x, y) = to_camera_coordinates(player.x, player.y)
+    # Get the coordinates relative to the camera position
+    (x, y) = camera.to_coords(player.x, player.y)
 
+    # Then animate it
     animate_blast(libtcod.red, x, y, FIREBALL_RADIUS*2)
 
 def cast_fireball():
@@ -1160,8 +1164,9 @@ def cast_fireball():
             obj.fighter.take_damage(FIREBALL_DAMAGE)
 
     # Get the coordinates relative to the camera position
-    (x, y) = to_camera_coordinates(x, y)
+    (x, y) = camera.to_coords(x, y)
 
+    # Then animate it
     animate_blast(libtcod.red, x, y, FIREBALL_RADIUS)
 
 def cast_heal():
@@ -1200,7 +1205,15 @@ def cast_magic_missile(fighter_owner):
 
     monster = closest_monster(MISSILE_RANGE)
 
-    damage = MISSILE_DAMAGE + int(math.floor((MISSILE_DAMAGE * int(math.floor(obj.max_mana/(75))))*obj.owner.level*.2))
+    # Most complex damage algorithm you've screen
+    # Scale based on max mana
+    mana_scale = int(math.floor(obj.max_mana/(75)))
+    # Scale based on level
+    # This is not math.floored because we don't want this to be come too
+    # underpowered, so we math.floor it last in the final damage variable
+    level_scale = obj.owner.level*.2
+    # Add base missile damage to the scaled damage (damage*mana_scale)
+    damage = MISSILE_DAMAGE + int(math.floor((MISSILE_DAMAGE * mana_scale)*level_scale))
 
     # Zap it!
     message('A missile of pure edge strikes the ' + monster.name +
@@ -1209,6 +1222,7 @@ def cast_magic_missile(fighter_owner):
 
     monster.fighter.take_damage(damage)
 
+    # Animate the lightning bolt
     animate_bolt(libtcod.light_purple, player.x, player.y, monster.x, monster.y)
 
 def cast_lightning():
@@ -1225,6 +1239,7 @@ def cast_lightning():
             ' hit points.', TEXT_COLORS['magic'])
     monster.fighter.take_damage(LIGHTNING_DAMAGE)
 
+    # Animate the lightning bolt
     animate_bolt(libtcod.light_azure, player.x, player.y, monster.x, monster.y)
 
 def check_args():
@@ -1234,13 +1249,18 @@ def check_args():
         COORDS_UNDER_MOUSE
 
     try:
+        # variable to store argument found State
+        arg_found = False
+
         # assumes that the program is run with python2.7 -B edgequest.py
         for arg in sys.argv:
             if arg == '-q':
+                arg_found = True
                 player_name = DEFAULT_NAME
                 new_game()
                 play_game()
             if arg == '-h':
+                arg_found = True
                 GOD_MODE = True
                 FOG_OF_WAR_ENABLED = False
                 STAIR_HACK = True
@@ -1248,6 +1268,7 @@ def check_args():
                 COORDS_UNDER_MOUSE = True
                 main_menu()
             if arg == '-hq' or arg == '-qh':
+                arg_found = True
                 GOD_MODE = True
                 FOG_OF_WAR_ENABLED = False
                 STAIR_HACK = True
@@ -1256,10 +1277,13 @@ def check_args():
                 player_name = DEFAULT_NAME
                 new_game()
                 play_game()
-            else:
-                main_menu()
+
+        if not arg_found:
+            print '[:] No arguments found'
+            main_menu()
 
     except IndexError:
+        print '[!] Arg: index error, continuing as normal'
         main_menu()
 
 def check_ground():
@@ -1320,64 +1344,7 @@ def choose_name():
 
     global player_name
 
-    key = libtcod.Key()
-    name = ''
-
-    # Set the screen to black
-    tcod_set_bg(con, libtcod.black)
-
-    # Set text color to title color
-    tcod_set_fg(con, TEXT_COLORS['title'])
-
-    # Dispbox style key getting
-    while not libtcod.console_is_window_closed():
-
-        # This loop has a tendency to eat all the cpu
-        time.sleep(1/LIMIT_FPS*2)
-
-        # Check for keypresses
-        if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
-
-            # Get key
-            key_char = chr(key.c)
-
-            # Set fullscreen
-            if key.vk in FULLSCREEN_KEYS:
-                toggle_fullscreen()
-
-            # Enter submits name
-            elif key.vk == libtcod.KEY_ENTER:
-                break
-            # Backspace deletes line
-            elif key.vk == libtcod.KEY_BACKSPACE:
-                if len(name) == 1:
-                    name = ''
-                else:
-                    name = name[:-1]
-            # Shift causes a problem in libtcod so make sure nothing happens if
-            #   pressed
-            elif key.vk == libtcod.KEY_SHIFT:
-                pass
-            # Add char to string
-            elif key_char:
-                name = ''.join([name, key_char])
-
-        # Clear screen
-        tcod_clear(con)
-
-        # Prompt for name
-        tcod_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
-                                libtcod.BKGND_NONE, libtcod.CENTER,
-                                'Choose a name for the hero')
-
-        # Blit to screen
-        libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
-
-        # Show name
-        dispbox('\n' + name + '\n', len(name))
-
-        # Present the root console
-        libtcod.console_flush()
+    name = console_input('Enter a name')
 
     # In case if the name isn't anything
     if name == '':
@@ -1390,9 +1357,6 @@ def choose_theme():
 
     # Set the screen to black
     tcod_set_bg(con, libtcod.black)
-
-    # Set text color to title color
-    tcod_set_fg(con, TEXT_COLORS['title'])
 
     # Clear screen
     tcod_clear(con)
@@ -1411,10 +1375,10 @@ def choose_theme():
     theme = menu('Choose a theme. Default: ' + CURRENT_THEME, options, INVENTORY_WIDTH)
 
     if theme is None:
-        print 'No theme selected'
+        print '[-] No theme selected'
         return None
     else:
-        print 'Selecting...'
+        print '[+] Selecting...'
         # Set the theme
         for ind, val in enumerate(options):
             if ind == theme:
@@ -1438,6 +1402,110 @@ def closest_monster(max_range):
                 closest_dist = dist
 
     return closest_enemy
+
+def console_input(title):
+    ''' Display a console and get input sent to it '''
+    key = libtcod.Key()
+    string = ''
+
+    # Set the screen to black
+    tcod_set_bg(con, libtcod.black)
+
+    # Set text color to title color
+    tcod_set_fg(con, TEXT_COLORS['title'])
+
+    # Dispbox style key getting
+    while not libtcod.console_is_window_closed():
+
+        # This loop has a tendency to eat all the cpu
+        time.sleep(1/LIMIT_FPS*2)
+
+        # Check for keypresses
+        if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
+
+            # Get key
+            key_char = chr(key.c)
+
+            # Set fullscreen
+            if key.vk in FULLSCREEN_KEYS:
+                toggle_fullscreen()
+
+            # Enter submits string
+            elif key.vk == libtcod.KEY_ENTER:
+                break
+            # Backspace deletes line
+            elif key.vk == libtcod.KEY_BACKSPACE:
+                if len(string) == 1:
+                    string = ''
+                else:
+                    string = string[:-1]
+            # Shift causes a problem in libtcod so make sure nothing happens if
+            #   pressed
+            elif key.vk == libtcod.KEY_SHIFT:
+                pass
+            # Add char to string
+            elif key_char:
+                string = ''.join([string, key_char])
+
+        # Clear screen
+        tcod_clear(con)
+
+        # Prompt for string
+        tcod_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
+                                libtcod.BKGND_NONE, libtcod.CENTER,
+                                title)
+
+        # Blit to screen
+        libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
+
+        # Show string
+        dispbox('\n' + string + '\n', len(string))
+
+        # Present the root console
+        libtcod.console_flush()
+
+    return string
+
+def console_input_small():
+
+    string = ''
+
+    # Loop to show input from player
+    while not libtcod.console_is_window_closed():
+
+        # This loop has a tendency to eat all the cpu
+        time.sleep(1/LIMIT_FPS*2)
+
+        # Render before drawing a new dispbox
+        render_all()
+
+        # Check for keypresses
+        if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
+            # Enter submits string
+            key_char = chr(key.c)
+            if key.vk == libtcod.KEY_ENTER:
+                break
+            elif key.vk in FULLSCREEN_KEYS:
+                toggle_fullscreen()
+
+            # Backspace deletes character
+            elif key.vk == libtcod.KEY_BACKSPACE:
+                if len(string) == 1:
+                    string = ''
+                else:
+                    string = string[:-1]
+            # Esc quits
+            elif key.vk == libtcod.KEY_ESCAPE:
+                check = False
+                break
+            elif key.vk == libtcod.KEY_SHIFT:
+                pass
+            elif key_char != '':
+                string = ''.join([string, key_char])
+
+            dispbox('\n' + string + '\n', len(string))
+
+    return string
 
 def consumables_menu(header):
     ''' Show a menu with each edible item as an option '''
@@ -1472,7 +1540,7 @@ def credits_screen():
     tcod_set_bg(con, libtcod.black)
 
     tcod_set_fg(con, TEXT_COLORS['edge'])
-    tcod_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 4,
+    tcod_print_ex(con, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 7,
                             libtcod.BKGND_NONE, libtcod.CENTER,
                             'Thank you for playing EdgeQuest!\n')
 
@@ -1483,7 +1551,7 @@ def credits_screen():
     '\n\n\nCredits:\n\n' +
     'Author: Gray (surrsurus)\n' +
     'Big thanks to:\n' +
-    'Max for all the contributions!\n' +
+    'Max for all the contributions! (XavilPergis)\n' +
     'and Fleck and Squirrel for playtesting\n\n' +
     'Press any key to continue',
     40)
@@ -1506,43 +1574,9 @@ def debug_spawn_console(json_list):
     libtcod.console_flush()
 
     key = libtcod.Key()
-    name = ''
     check = True
 
-    # Loop to show input from player
-    while not libtcod.console_is_window_closed():
-
-        # This loop has a tendency to eat all the cpu
-        time.sleep(1/LIMIT_FPS*2)
-
-        # Render before drawing a new dispbox
-        render_all()
-
-        # Check for keypresses
-        if libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse):
-            # Enter submits name
-            key_char = chr(key.c)
-            if key.vk == libtcod.KEY_ENTER:
-                break
-            elif key.vk in FULLSCREEN_KEYS:
-                toggle_fullscreen()
-
-            # Backspace deletes character
-            elif key.vk == libtcod.KEY_BACKSPACE:
-                if len(name) == 1:
-                    name = ''
-                else:
-                    name = name[:-1]
-            # Esc quits
-            elif key.vk == libtcod.KEY_ESCAPE:
-                check = False
-                break
-            elif key.vk == libtcod.KEY_SHIFT:
-                pass
-            elif key_char != '':
-                name = ''.join([name, key_char])
-
-            dispbox('\n' + name + '\n', len(name))
+    name = console_input_small()
 
     # Names have the ability to not exist, considering player is giving input
     found = False
@@ -1576,7 +1610,7 @@ def debug_kill_all():
 
     for obj in objects:
         if obj.ai:
-            obj.fighter.take_damage(sys.maxint)
+            obj.fighter.take_damage(MEGADEATH)
 
 def de_dust():
     ''' Place objects on level '''
@@ -1711,36 +1745,48 @@ def equipment_menu(header):
 def fire_weapon(equipment):
     ''' Find closest enemy and shoot it '''
 
-    monster = closest_monster(FIREARM_RANGE)
+    if not blind:
+        monster = closest_monster(FIREARM_RANGE)
 
-    if monster is None:  # No enemy found within maximum range
-        message('No enemy is close enough to shoot.', TEXT_COLORS['fail'])
-        return 'cancelled'
+        if monster is None:  # No enemy found within maximum range
+            message('No enemy is close enough to shoot.', TEXT_COLORS['fail'])
+            return 'cancelled'
 
-    damage = (equipment.ranged_bonus + int(math.floor((equipment.ranged_bonus/2 * math.floor(player.level/(2)))*player.level*.2))) - monster.fighter.defense
+        # Super long damage algorithm
+        # Make it harder to do a lot of damage
+        challenge = monster.fighter.defense + monster.distance_to(player)
+        # Beneficially with level
+        level_scale_easy = (equipment.ranged_bonus/4) * math.floor(player.level/(4))
+        # Negatively scale with level
+        level_scale_hard = player.level*.2
+        # Combine them all into a damage algorithm
+        # This makes guns super weak unless their ranged damage is very high
+        damage = int((equipment.ranged_bonus + int(math.floor(level_scale_easy)*level_scale_hard)) - challenge)
 
-    if damage > 0:
+        if damage > 0:
 
-        # Zap it!
-        message(player_name + ' shoots the ' + monster.name +
-                ' with the ' + equipment.owner.name + '! The damage is ' +
-                str(damage) + ' hit points.', TEXT_COLORS['magic'])
-        monster.fighter.take_damage(damage)
+            # Zap it!
+            message(player_name + ' shoots the ' + monster.name +
+                    ' with the ' + equipment.owner.name + '! The damage is ' +
+                    str(damage) + ' hit points.', TEXT_COLORS['magic'])
+            monster.fighter.take_damage(damage)
 
+        else:
+
+            message(player_name + ' shoots the ' + monster.name +
+                ' with the ' + equipment.owner.name +
+                'but the shot reflects off the armor!', TEXT_COLORS['bad'])
+
+        animate_bolt(libtcod.yellow, player.x, player.y, monster.x, monster.y)
     else:
-
-        message(player_name + ' shoots the ' + monster.name +
-            ' with the ' + equipment.owner.name +
-            'but the shot reflects off the armor!', TEXT_COLORS['bad'])
-
-    animate_bolt(libtcod.yellow, player.x, player.y, monster.x, monster.y)
+        message('You can\'t shoot while blind!', TEXT_COLORS['fail'])
 
 def fov_recompute():
     ''' Recompute fov '''
 
     global world
 
-    move_camera(player.x, player.y)
+    camera.move(player.x, player.y)
 
     # Recompute FOV if needed (the player moved or something)
     libtcod.map_compute_fov(fov_map, player.x, player.y, TORCH_RADIUS, FOV_LIGHT_WALLS, FOV_ALGO)
@@ -1750,7 +1796,7 @@ def fov_recompute():
     # Go through all tiles, and set their background color according to the FOV
     for y in range(CAMERA_HEIGHT):
         for x in range(CAMERA_WIDTH):
-            (map_x, map_y) = (camera_x + x, camera_y + y)
+            (map_x, map_y) = (camera.x + x, camera.y + y)
             visible = libtcod.map_is_in_fov(fov_map, map_x, map_y)
 
             wall = world[map_x][map_y].block_sight
@@ -1807,7 +1853,7 @@ def game_win():
 
     credits_screen()
 
-    main_menu()
+    exit()
 
 def generate_monster(monster_id, x, y):
     ''' Generate monster from json '''
@@ -1842,7 +1888,7 @@ def generate_monster(monster_id, x, y):
         assert monster_data[monster_id]['attack_msg'] is not None
         assert monster_data[monster_id]['ai']         is not None
     except AssertionError as e:
-        print 'At monster distinguishing: '
+        print '[!] AssertionError at monster distinguishing: '
         id_err(monster_id)
 
     # Set default values. These should always be present
@@ -1867,8 +1913,8 @@ def generate_monster(monster_id, x, y):
 
     # Fallback
     if death is None:
-        print 'Error: monster ' + monster_id + 'has an invalid death_func'
-        print 'Setting to default...'
+        print '[!] Error: monster ' + monster_id + 'has an invalid death_func'
+        print '[+] Setting to default...'
         death = monster_death
 
     # Select an AI
@@ -1879,8 +1925,8 @@ def generate_monster(monster_id, x, y):
 
     # Fallback
     if ai is None:
-        print 'Error: monster ' + monster_id + 'has an invalid ai'
-        print 'Setting to default...'
+        print '[!] Error: monster ' + monster_id + 'has an invalid ai'
+        print '[+] Setting to default...'
         ai = BasicMonster()
 
     # These values might actually fail
@@ -1957,7 +2003,7 @@ def generate_item(item_id, x, y):
         assert items_data[item_id]['chance'] is not None
         assert items_data[item_id]['type']   is not None
     except AssertionError as e:
-        print 'At usable/equipment distinguishing: '
+        print '[!] AssertionError at usable/equipment distinguishing: '
         id_err(item_id)
 
     item_name = items_data[item_id]['name']
@@ -2002,7 +2048,7 @@ def generate_item(item_id, x, y):
             assert items_data[item_id]['hp']      is not None
             assert items_data[item_id]['mana']    is not None
         except AssertionError as e:
-            print 'At equipment/firearm distinguishing: '
+            print '[!] AssertionError at equipment/firearm distinguishing: '
             id_err(item_id)
 
         item_subtype = items_data[item_id]['subtype']
@@ -2026,7 +2072,7 @@ def generate_item(item_id, x, y):
                 assert items_data[item_id]['weapon_func'] is not None
                 assert items_data[item_id]['short_name']  is not None
             except AssertionError as e:
-                print 'At equipment/firearm distinguishing: '
+                print '[!] AssertionError at equipment/firearm distinguishing: '
                 id_err(item_id)
 
             item_attack_msg  = items_data[item_id]['attack_msg']
@@ -2062,7 +2108,7 @@ def generate_item(item_id, x, y):
                 assert items_data[item_id]['short_name']  is not None
                 assert items_data[item_id]['ranged']      is not None
             except AssertionError as e:
-                print 'At equipment/firearm distinguishing: '
+                print '[!] AssertionError at equipment/firearm distinguishing: '
                 id_err(item_id)
 
             item_attack_msg  = items_data[item_id]['attack_msg']
@@ -2135,37 +2181,6 @@ def get_all_equipped(obj):
     else:
         return []  # Other objects have no equipment
 
-def get_names_under_mouse():
-    ''' Self explanatory name '''
-
-    global mouse
-
-    # Return a string with the names of all objects under the mouses
-    # From screen to map coordinates
-    (x, y) = (camera_x + mouse.cx, camera_y + mouse.cy)
-
-    # Create a list with the names of all objects at the mouse's
-    #   coordinates and in FOV
-    names = [obj.name for obj in objects
-             if obj.x == x and obj.y == y]
-
-    names = ', '.join(names)  # Join the names, separated by commas
-
-    # Read Coords. Debug
-    if COORDS_UNDER_MOUSE:
-        names += '( ' + str(x) + ', ' + str(y) + ' )'
-        for obj in objects:
-            if obj.x == x and obj.y == y:
-                if obj.ai:
-                    # Also show where it's headed to if a monster
-                    x, y = obj.ai.backup_coord
-                    names += ' going to: ( ' + str(x) + ', ' + str(y) + ' )'
-
-    if names:
-        return '['+names.capitalize()+']'
-    else:
-        return ''
-
 def get_rand_unblocked_coord():
     ''' Get a random, unblocked coordinate on the map '''
     return random.choice(unblocked_world)
@@ -2195,7 +2210,7 @@ def handle_keys():
     ''' Handle keypresses sent to the console. Executes other things,
     makes game playable '''
 
-    global check_fov, game_state, objects, player_action, key, timer
+    global game_state, objects, player_action, key, timer
 
     # F4 for Fullscreen
     if key.vk in FULLSCREEN_KEYS:
@@ -2229,7 +2244,7 @@ def handle_keys():
                 player_move(1, 1)
 
             # Recompute the fov if moved
-            check_fov = True
+            camera.check_fov = True
 
             check_ground()
 
@@ -2237,7 +2252,7 @@ def handle_keys():
 
         # Wait
         elif key_char in WAIT_KEYS:
-            check_fov = True
+            camera.check_fov = True
             message('You wait', TEXT_COLORS['neutral'])
             player_action = 'wait'
 
@@ -2402,7 +2417,7 @@ def how_to_play():
     CHARACTER_SCREEN_WIDTH)
 
 def id_err(id):
-    print 'Error: ' + id + ' is missing data!'
+    print '[!] Error: ' + id + ' is missing data!'
     print '----- STACK TRACE: -----'
     traceback.print_exc()
     print '------------------------'
@@ -2411,8 +2426,8 @@ def id_err(id):
 def initialize_fov():
     ''' Initialize the fov '''
 
-    global check_fov, fov_map
-    check_fov = True
+    global fov_map
+    camera.check_fov = True
 
     # Create the FOV map, according to the generated map
     fov_map = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
@@ -2688,6 +2703,11 @@ def make_map():
     else:
         place_objects()
 
+    # TODO: Biomes
+    if dungeon_level >= 10:
+        # initialize_theme()
+        pass
+
 def menu(header, options, width):
     ''' Create a menu that options can be selected from using the alphabet '''
 
@@ -2812,7 +2832,8 @@ def monster_death_talk(monster):
         assert monster_data[mon]['death_talk'] is not None
         mon_death_talk = monster_data[mon]['death_talk']
     except AssertionError as e:
-        print 'Error: death_talk not found for ' + monster.name
+        print '[-] Error: death_talk not found for ' + monster.name
+        print '[:] Defaulting...'
         mon_death_talk = 'I was born to die just like a bug!'
 
     message(''.join([monster.name.capitalize(), ' says "', mon_death_talk,
@@ -2904,31 +2925,6 @@ def msgbox_stats(title):
     Press any key to continue...',
     CHARACTER_SCREEN_WIDTH)
 
-def move_camera(target_x, target_y):
-    ''' Move camera to coordinates '''
-
-    global camera_x, camera_y, check_fov
-
-    # New camera coordinates (top-left corner of the screen relative to the map)
-    # Coordinates so that the target is at the center of the screen
-    x = target_x - CAMERA_WIDTH / 2
-    y = target_y - CAMERA_HEIGHT / 2
-
-    # Make sure the camera doesn't see outside the map
-    if x < 0:
-        x = 0
-    if y < 0:
-        y = 0
-    if x > MAP_WIDTH - CAMERA_WIDTH - 1:
-        x = MAP_WIDTH - CAMERA_WIDTH - 1
-    if y > MAP_HEIGHT - CAMERA_HEIGHT - 1:
-        y = MAP_HEIGHT - CAMERA_HEIGHT - 1
-
-    if x != camera_x or y != camera_y:
-        check_fov = True
-
-    (camera_x, camera_y) = (x, y)
-
 def new_game():
     ''' Start a new game '''
 
@@ -2988,7 +2984,7 @@ def place_objects():
     ''' Place objects on level '''
     # Maximum number of monsters per level
     max_monsters = from_dungeon_level([[4, 1], [7, 2], [13, 4],
-        [20, 6], [30, 12]])
+        [20, 6], [21, 10]])
 
     # Chance of each monster
     monster_chances = {}
@@ -2998,8 +2994,7 @@ def place_objects():
             from_dungeon_level(monster_data[item]['chance'])
 
     # Maximum number of items per level
-    max_items = from_dungeon_level([[6, 1], [10, 3], [18, 6], [21, 7], [30, 9],
-        [35, 10], [40, 12]])
+    max_items = from_dungeon_level([[6, 1], [10, 3], [18, 6], [21, 7], [30, 9]])
 
     # Chance of each item (by default they have a chance of 0 at level 1,
     #   which then goes up)
@@ -3073,7 +3068,7 @@ def play_game():
 
         # Handle mouse
         if mouse.lbutton_pressed:
-            mouse_move_astar(mouse.cx + camera_x, mouse.cy + camera_y)
+            mouse_move_astar(mouse.cx + camera.x, mouse.cy + camera.y)
 
         # Let monsters take their turn
         if game_state == 'playing' and player_action != 'didnt-take-turn':
@@ -3191,13 +3186,13 @@ def random_choice_index(chances):
 def render_all():
     ''' Draw everything to the screen '''
 
-    global check_fov, blind, blind_counter
+    global blind, blind_counter
 
-    move_camera(player.x, player.y)
+    camera.move(player.x, player.y)
 
     if not blind:
-        if check_fov:
-            check_fov = False
+        if camera.check_fov:
+            camera.check_fov = False
             fov_recompute()
 
         # Draw all objects in the list, except the player. we want it to
@@ -3373,7 +3368,7 @@ def render_gui():
     # Display names of objects under the mouse
     if not blind:
         tcod_set_fg(msg_panel, libtcod.light_gray)
-        tcod_print_ex(msg_panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, get_names_under_mouse())
+        tcod_print_ex(msg_panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, camera.get_names_under_mouse(mouse, objects, COORDS_UNDER_MOUSE))
 
     # Print the game messages, one line at a time
     y = 1
@@ -3519,7 +3514,7 @@ def target_tile(max_range=None):
         # Present the root console
         libtcod.console_flush()
         (x, y) = (mouse.cx, mouse.cy)
-        (x, y) = (camera_x + x, camera_y + y)  # From screen to map coordinates
+        (x, y) = (camera.x + x, camera.y + y)  # From screen to map coordinates
 
         # Cancel if the player right-clicked or pressed Escape
         if mouse.rbutton_pressed or key.vk == libtcod.KEY_ESCAPE:
@@ -3550,7 +3545,7 @@ def toggle_fullscreen():
 
     libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
-    print 'Toggled fullscreen mode'
+    print '[:] Toggled fullscreen mode'
 
 def toggle_siphon():
     ''' Toggle the siphon spell '''
@@ -3562,17 +3557,6 @@ def toggle_siphon():
     else:
         activate_siphon = True
         message('You activate your siphon ability', TEXT_COLORS['debug'])
-
-def to_camera_coordinates(x, y):
-    ''' convert coordinates on the map to coordinates on the screen '''
-
-    (x, y) = (x - camera_x, y - camera_y)
-
-    # If it's outside the view, return nothing
-    if x < 0 or y < 0 or x >= CAMERA_WIDTH or y >= CAMERA_HEIGHT:
-        return None, None
-
-    return x, y
 
 def weapon_action_katana(weapon):
     ''' Katana action '''
@@ -3599,42 +3583,6 @@ def weapon_action_else(weapon):
     ''' Emergency reserve action '''
 
     message('You stare deeply at your ' + weapon.name, TEXT_COLORS['fail'])
-
-# ------------------------------------------------------------------------------
-
-# Libtcod Wrappers -------------------------------------------------------------
-
-def tcod_print_ex(console, x, y, background, alignment, char):
-    ''' Wrap console_print_ex '''
-    libtcod.console_print_ex(console, x, y, background, alignment, char)
-
-def tcod_set_char_bg(console, x, y, color, bg_set=None):
-    ''' Wrap console_set_char_background '''
-    if bg_set:
-        libtcod.console_set_char_background(console, x, y, color, bg_set)
-    else:
-        libtcod.console_set_char_background(console, x, y, color)
-
-def tcod_put_char_ex(console, x, y, char, fg_color, bg_color):
-    ''' Wrap console_put_char_ex '''
-    libtcod.console_put_char_ex(console, x, y, char, fg_color, bg_color)
-
-def tcod_put_char(console, x, y, char, bg_set):
-    ''' Wrap put char '''
-    libtcod.console_put_char(console, x, y, char, bg_set)
-
-def tcod_set_fg(console, color):
-    ''' Wrap the foreground setter '''
-    libtcod.console_set_default_foreground(console, color)
-
-def tcod_set_bg(console, color):
-    ''' Wrap background setter '''
-    libtcod.console_set_default_background(console, color)
-
-def tcod_clear(console):
-    ''' Wrap console clearer '''
-    libtcod.console_clear(console)
-
 
 # ------------------------------------------------------------------------------
 
