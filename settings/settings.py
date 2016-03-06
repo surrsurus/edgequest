@@ -261,6 +261,7 @@ TEXT_COLORS = {
     'debug'    : libtcod.fuchsia,
     'neutral'  : libtcod.gray,
     'edge'     : libtcod.fuchsia,
+    'crit'     : libtcod.gold,
     'title'    : libtcod.light_yellow
 }
 

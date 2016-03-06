@@ -1,7 +1,7 @@
 #! /bin/bash
 
-
-echo
+echo '[:] Welcome to EdgeQuest Linux-run'
+echo '[:] Searching for args...'
 # This stores all the arguments (from `$@`) in an array called `args`
 read -r -d ' ' -a args <<< "$@"
 
@@ -28,7 +28,6 @@ for arg in "${args[@]}"; do
         '--debug'     ) echo '[>] Debug enabled' ;;
     esac
 done
-echo
 
-# Her we just run edgequest with all the user arguments
+# Here we just run edgequest with all the user arguments
 python2.7 -B edgequest.py $@

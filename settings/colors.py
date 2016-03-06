@@ -85,7 +85,7 @@ def set_theme(theme):
 
     # Setting colors to the absence of colors is kind of hard. Let's not do that.
     if theme is not None:
-        print '[+] Theme set: ' + theme
+        logger.info('Theme set: ' + theme)
 
         # Set all the colors here
         # Yes, I know. It goes over the proper line wrapping length.

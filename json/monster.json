@@ -11,6 +11,7 @@
       	"power":3,
       	"xp":35,
         "mana":0,
+        "accuracy": 0,
    	"death_func":"normal",
         "attack_msg":"",
         "ai": "normal"
@@ -27,6 +28,7 @@
       	"power":3,
       	"xp":10,
         "mana":0,
+        "accuracy": 0,
    	"death_func":"normal",
         "attack_msg":"bugs",
         "ai": "normal"
@@ -43,6 +45,7 @@
       	"power":2,
       	"xp":20,
         "mana":0,
+        "accuracy": 0,
   		"death_func":"talk",
         "death_talk":"I hope I don't get deranked again...",
         "attack_msg":"rushes",
@@ -71,6 +74,7 @@
       	"power":3,
       	"xp":35,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"normal",
         "attack_msg":"hardscopes",
         "ai": "normal"
@@ -87,6 +91,7 @@
       	"power":5,
       	"xp":75,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"normal",
         "attack_msg":"knifes",
         "ai": "normal"
@@ -103,6 +108,7 @@
       	"power":9,
       	"xp":130,
         "mana":0,
+        "accuracy": 0,
 		"death_func":"normal",
         "attack_msg":"360 no-scopes",
         "ai": "normal"
@@ -119,6 +125,7 @@
       	"power":5,
       	"xp":55,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"normal",
         "attack_msg":"steals the gains of",
         "ai": "normal"
@@ -135,6 +142,7 @@
       	"power":5,
       	"xp":100,
         "mana":0,
+        "accuracy": 0,
     	"death_func":"normal",
         "attack_msg":"",
         "ai": "normal"
@@ -151,6 +159,7 @@
       	"power":12,
       	"xp":100,
         "mana":0,
+        "accuracy": 0,
     	"death_func":"normal",
         "attack_msg":"",
         "ai": "normal"
@@ -167,6 +176,7 @@
     	"power":6,
     	"xp":300,
         "mana":0,
+        "accuracy": 0,
     	"death_func":"normal",
         "attack_msg":"harvests the organs of",
         "ai": "normal"
@@ -183,6 +193,7 @@
         "power":0,
         "xp":1,
         "mana":0,
+        "accuracy": 0,
   	    "death_func":"talk",
         "death_talk":"I fell for the meme, kiddo...",
         "attack_msg":"flicks",
@@ -218,6 +229,7 @@
         "power":3,
         "xp":1,
         "mana":0,
+        "accuracy": 0,
   	    "death_func":"talk",
         "death_talk":"I played myself...",
         "attack_msg":"raps",
@@ -252,6 +264,7 @@
         "power":15,
         "xp":-1,
         "mana":0,
+        "accuracy": 0,
     	"death_func":"talk",
         "death_talk":"Python is better than ruby...",
         "attack_msg":"StatTraks",
@@ -281,6 +294,7 @@
       	"power":2,
       	"xp":300,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"talk",
         "death_talk":"I'll be back... swift-ly",
         "attack_msg":"Javas",
@@ -313,6 +327,7 @@
       	"power":0,
       	"xp":100,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"talk",
         "death_talk":"Died a freshman...",
         "attack_msg":"Javas",
@@ -337,6 +352,7 @@
     	"power":10,
     	"xp":400,
         "mana":0,
+        "accuracy": 0,
     	"death_func":"normal",
         "attack_msg":"",
         "ai": "normal"
@@ -353,6 +369,7 @@
       	"power":5,
       	"xp":50,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"normal",
         "attack_msg":"",
         "ai": "normal"
@@ -369,6 +386,7 @@
       	"power":5,
       	"xp":50,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"normal",
         "attack_msg":"",
         "ai": "normal"
@@ -385,6 +403,7 @@
       	"power":40,
       	"xp":400,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"normal",
         "attack_msg":"RKOs",
         "ai": "cena"
@@ -401,6 +420,7 @@
       	"power":20,
       	"xp":1000,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"talk",
         "death_talk":"I curse you... with the R8",
         "attack_msg":"VAC bans",
@@ -426,6 +446,7 @@
       	"power":0,
       	"xp":1000,
         "mana":0,
+        "accuracy": 0,
       	"death_func":"talk",
         "death_talk":"...My grades",
         "attack_msg":"grades",
@@ -449,6 +470,7 @@
         "power":6,
         "xp":70,
         "mana":0,
+        "accuracy": 0,
         "death_func":"normal",
         "attack_msg":"spits salty brine at",
         "ai": "normal"
@@ -465,6 +487,7 @@
         "power":0,
         "xp":300,
         "mana":0,
+        "accuracy": 0,
         "death_func":"normal",
         "attack_msg":"AWPs",
         "ai": "normal"
@@ -481,6 +504,7 @@
         "power":0,
         "xp":300,
         "mana":0,
+        "accuracy": 0,
         "death_func":"normal",
         "attack_msg":"bullies",
         "ai": "talk",
@@ -501,6 +525,7 @@
         "power":6,
         "xp":50,
         "mana":0,
+        "accuracy": 0,
         "death_func":"normal",
         "attack_msg":"shoots",
         "ai": "rangedtalk",
@@ -526,6 +551,7 @@
         "power":6,
         "xp":50,
         "mana":0,
+        "accuracy": 0,
         "death_func":"normal",
         "attack_msg":"shoots",
         "ai": "rangedtalk",
@@ -551,6 +577,7 @@
         "power":9,
         "xp":60,
         "mana":0,
+        "accuracy": 0,
         "death_func":"slock",
         "attack_msg":"installs slock to",
         "ai": "normal"
@@ -567,6 +594,7 @@
         "power":15,
         "xp":160,
         "mana":0,
+        "accuracy": 0,
         "death_func":"slock",
         "attack_msg":"installs slock to",
         "ai": "normal"

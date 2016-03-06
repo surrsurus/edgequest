@@ -402,21 +402,22 @@ class Equipment:
     ''' An object that can be equipped, yielding bonuses.
     automatically adds the Item component. '''
     def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0,
-        max_mana_bonus=0, attack_msg=None, weapon_func=None,
+        max_mana_bonus=0, max_accuracy_bonus=0, attack_msg=None, weapon_func=None,
         ranged_bonus=0, short_name=None):
-        self.power_bonus     = power_bonus
-        self.defense_bonus   = defense_bonus
-        self.max_hp_bonus    = max_hp_bonus
-        self.max_mana_bonus  = max_mana_bonus
-        self.ranged_bonus    = ranged_bonus
+        self.power_bonus        = power_bonus
+        self.defense_bonus      = defense_bonus
+        self.max_hp_bonus       = max_hp_bonus
+        self.max_mana_bonus     = max_mana_bonus
+        self.ranged_bonus       = ranged_bonus
+        self.max_accuracy_bonus = max_accuracy_bonus
 
-        self.attack_msg      = attack_msg
-        self.weapon_func     = weapon_func
+        self.attack_msg         = attack_msg
+        self.weapon_func        = weapon_func
 
         self.slot = slot
-        self.is_equipped     = False
+        self.is_equipped        = False
 
-        self.short_name      = short_name
+        self.short_name         = short_name
 
     def toggle_equip(self):
         ''' Toggle equip/dequip status. Used when selected from inventory '''
@@ -536,7 +537,7 @@ class Equipment:
 
 class Fighter:
     ''' Combat-related properties and methods (monster, player, NPC) '''
-    def __init__(self, hp, defense, power, xp, mana, death_function=None,
+    def __init__(self, hp, defense, power, xp, mana, accuracy, death_function=None,
         attack_msg=None):
         self.base_max_hp     = hp
         self.hp              = hp
@@ -546,6 +547,8 @@ class Fighter:
         self.base_power      = power
 
         self.xp              = xp
+
+        self.base_accuracy   = accuracy
 
         self.death_function  = death_function
 
@@ -558,7 +561,7 @@ class Fighter:
     def power(self):
         # Return actual power, by summing up the bonuses from all equipped items
         bonus = sum(equipment.power_bonus for equipment in \
-                get_all_equipped(self.owner))
+            get_all_equipped(self.owner))
         return self.base_power + bonus
 
     @property
@@ -566,7 +569,7 @@ class Fighter:
         # Return actual defense, by summing up the bonuses from
         #   all equipped items
         bonus = sum(equipment.defense_bonus for equipment in \
-                get_all_equipped(self.owner))
+            get_all_equipped(self.owner))
         return self.base_defense + bonus
 
     @property
@@ -574,15 +577,21 @@ class Fighter:
         # Return actual max_hp, by summing up the bonuses from
         #   all equipped items
         bonus = sum(equipment.max_hp_bonus for equipment in \
-                get_all_equipped(self.owner))
+            get_all_equipped(self.owner))
         return self.base_max_hp + bonus
 
     @property
     def max_mana(self):
         # Return actual mana, by summing up the bonuses from all equipped items
         bonus = sum(equipment.max_mana_bonus for equipment in \
-                    get_all_equipped(self.owner))
+            get_all_equipped(self.owner))
         return self.base_max_mana + bonus
+
+    @property
+    def accuracy(self):
+        bonus = sum(equipment.max_accuracy_bonus for equipment in \
+            get_all_equipped(self.owner))
+        return self.base_accuracy + bonus
 
     @property
     def level_up_xp(self):
@@ -621,13 +630,25 @@ class Fighter:
 
     def attack(self, target):
         ''' A simple formula for attack damage '''
-        damage = self.power - target.fighter.defense
+
+        # Random factor for damage calculation
+        random_fac = libtcod.random_get_int(0, 0, 5) - libtcod.random_get_int(0, 0, 6)
+        damage = self.power - target.fighter.defense + random_fac
 
         if damage > 0:
             # Make the target take some damage
-            message(' '.join([self.owner.name.capitalize(), self.attack_msg,
-                target.name.capitalize(), 'for', str(damage),
-                'hit points.']),TEXT_COLORS['bad'])
+            if random_fac == 5 and target != player:
+                message(' '.join(['Critical hit!', self.owner.name.capitalize(), self.attack_msg,
+                    target.name.capitalize(), 'for', str(damage),
+                    'hit points.']),TEXT_COLORS['good'])
+            elif random_fac == 5 and target == player:
+                message(' '.join(['Critical hit!', self.owner.name.capitalize(), self.attack_msg,
+                    target.name.capitalize(), 'for', str(damage),
+                    'hit points.']),TEXT_COLORS['very_bad'])
+            else:
+                message(' '.join([self.owner.name.capitalize(), self.attack_msg,
+                    target.name.capitalize(), 'for', str(damage),
+                    'hit points.']),TEXT_COLORS['bad'])
 
             target.fighter.take_damage(damage)
 
@@ -1216,15 +1237,22 @@ def cast_magic_missile(fighter_owner):
     # Most complex damage algorithm you've screen
     # Scale based on max mana
     mana_scale = int(math.floor(obj.max_mana/(75)))
+    # Random factor
+    random_fac = libtcod.random_get_int(0, 0, 5) - libtcod.random_get_int(0, 0, 6)
     # Scale based on level
     # This is not math.floored because we don't want this to be come too
     # underpowered, so we math.floor it last in the final damage variable
     level_scale = obj.owner.level*.2
     # Add base missile damage to the scaled damage (damage*mana_scale)
-    damage = MISSILE_DAMAGE + int(math.floor((MISSILE_DAMAGE * mana_scale)*level_scale))
+    damage = MISSILE_DAMAGE + random_fac + int(math.floor((MISSILE_DAMAGE * mana_scale)*level_scale))
 
     # Zap it!
-    message('A missile of pure edge strikes the ' + monster.name +
+    if random_fac == 5:
+        message('Critical hit! A missile of pure edge strikes the ' + monster.name +
+            ' with a loud airhorn! The damage is ' + str(damage) +
+            ' hit points.', TEXT_COLORS['crit'])
+    else:
+        message('A missile of pure edge strikes the ' + monster.name +
             ' with a loud airhorn! The damage is ' + str(damage) +
             ' hit points.', TEXT_COLORS['edge'])
 
@@ -1388,6 +1416,8 @@ def check_level_up():
                 'Strength (+1 attack, from ' + str(player.fighter.power) +
                 ')',
                 'Euphoria (+10 mana, from ' + str(player.fighter.max_mana) +
+                ')',
+                'Adderall (+1 accuracy, from ' + str(player.fighter.accuracy) +
                 ')'], LEVEL_SCREEN_WIDTH)
 
         if choice == 0:
@@ -1397,6 +1427,8 @@ def check_level_up():
             player.fighter.base_power += 1
         elif choice == 2:
             player.fighter.base_max_mana += 10
+        elif choice == 3:
+            player.fighter.base_accuracy += 1
 
         # Pause
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
@@ -1826,21 +1858,29 @@ def fire_weapon(equipment):
 
         # Super long damage algorithm
         # Make it harder to do a lot of damage
-        challenge = monster.fighter.defense + monster.distance_to(player)
+        challenge = monster.fighter.defense + monster.distance_to(player) - player.fighter.accuracy
+        # Add a random factor
+        random_fac = libtcod.random_get_int(0, 0, 5) - libtcod.random_get_int(0, 0, 6)
         # Beneficially with level
         level_scale_easy = (equipment.ranged_bonus/4) * math.floor(player.level/(4))
         # Negatively scale with level
         level_scale_hard = player.level*.2
         # Combine them all into a damage algorithm
         # This makes guns super weak unless their ranged damage is very high
-        damage = int((equipment.ranged_bonus + int(math.floor(level_scale_easy)*level_scale_hard)) - challenge)
+        damage = int((equipment.ranged_bonus + random_fac + int(math.floor(level_scale_easy)*level_scale_hard)) - challenge)
 
         if damage > 0:
 
             # Zap it!
-            message(player_name + ' shoots the ' + monster.name +
-                    ' with the ' + equipment.owner.name + '! The damage is ' +
-                    str(damage) + ' hit points.', TEXT_COLORS['magic'])
+            if random_fac == 5:
+                message('Critical hit! ' + player_name + ' shoots the ' + monster.name +
+                        ' with the ' + equipment.owner.name + '! The damage is ' +
+                        str(damage) + ' hit points.', TEXT_COLORS['crit'])
+            else:
+                message(player_name + ' shoots the ' + monster.name +
+                        ' with the ' + equipment.owner.name + '! The damage is ' +
+                        str(damage) + ' hit points.', TEXT_COLORS['bad'])
+
             monster.fighter.take_damage(damage)
 
         else:
@@ -1956,6 +1996,7 @@ def generate_monster(monster_id, x, y):
         assert monster_data[monster_id]['power']      is not None
         assert monster_data[monster_id]['xp']         is not None
         assert monster_data[monster_id]['mana']       is not None
+        assert monster_data[monster_id]['accuracy']   is not None
         assert monster_data[monster_id]['death_func'] is not None
         assert monster_data[monster_id]['attack_msg'] is not None
         assert monster_data[monster_id]['ai']         is not None
@@ -1973,6 +2014,7 @@ def generate_monster(monster_id, x, y):
     mon_power      = monster_data[monster_id]['power']
     mon_xp         = monster_data[monster_id]['xp']
     mon_mana       = monster_data[monster_id]['mana']
+    mon_accuracy   = monster_data[monster_id]['accuracy']
     mon_death_func = monster_data[monster_id]['death_func']
     mon_attack_msg = monster_data[monster_id]['attack_msg']
     mon_ai         = monster_data[monster_id]['ai']
@@ -2029,6 +2071,7 @@ def generate_monster(monster_id, x, y):
         power          = int(mon_power),
         xp             = int(mon_xp),
         mana           = int(mon_mana),
+        accuracy       = int(mon_accuracy),
         death_function = death,
         attack_msg     = mon_attack_msg)
 
@@ -2113,22 +2156,24 @@ def generate_item(item_id, x, y):
     elif item_type in ('equipment', 'firearm'):
 
         try:
-            assert items_data[item_id]['subtype'] is not None
-            assert items_data[item_id]['slot']    is not None
-            assert items_data[item_id]['power']   is not None
-            assert items_data[item_id]['defense'] is not None
-            assert items_data[item_id]['hp']      is not None
-            assert items_data[item_id]['mana']    is not None
+            assert items_data[item_id]['subtype']  is not None
+            assert items_data[item_id]['slot']     is not None
+            assert items_data[item_id]['power']    is not None
+            assert items_data[item_id]['defense']  is not None
+            assert items_data[item_id]['hp']       is not None
+            assert items_data[item_id]['mana']     is not None
+            assert items_data[item_id]['accuracy'] is not None
         except AssertionError as e:
             logger.severe('AssertionError at equipment distinguishing')
             id_err(item_id)
 
-        item_subtype = items_data[item_id]['subtype']
-        item_slot    = items_data[item_id]['slot']
-        item_power   = items_data[item_id]['power']
-        item_defense = items_data[item_id]['defense']
-        item_hp      = items_data[item_id]['hp']
-        item_mana    = items_data[item_id]['mana']
+        item_subtype  = items_data[item_id]['subtype']
+        item_slot     = items_data[item_id]['slot']
+        item_power    = items_data[item_id]['power']
+        item_defense  = items_data[item_id]['defense']
+        item_hp       = items_data[item_id]['hp']
+        item_mana     = items_data[item_id]['mana']
+        item_accuracy = items_data[item_id]['accuracy']
 
         # Dictionary of weapon actions
         dict_actions = {
@@ -2163,14 +2208,15 @@ def generate_item(item_id, x, y):
 
             # Create the component
             equip_component = Equipment(
-                slot           = item_slot,
-                power_bonus    = item_power,
-                defense_bonus  = item_defense,
-                max_hp_bonus   = item_hp,
-                max_mana_bonus = item_mana,
-                attack_msg     = item_attack_msg,
-                weapon_func    = func,
-                short_name     = item_short_name)
+                slot               = item_slot,
+                power_bonus        = item_power,
+                defense_bonus      = item_defense,
+                max_hp_bonus       = item_hp,
+                max_mana_bonus     = item_mana,
+                max_accuracy_bonus = item_accuracy,
+                attack_msg         = item_attack_msg,
+                weapon_func        = func,
+                short_name         = item_short_name)
 
         elif item_subtype == 'firearm':
 
@@ -3006,7 +3052,7 @@ def new_game():
     # Player
     # create object representing the player
     fighter_component = Fighter(hp=100, defense=1, power=4, xp=0, mana=100,
-        death_function=player_death, attack_msg=DEFAULT_ATTACK)
+        accuracy=0, death_function=player_death, attack_msg=DEFAULT_ATTACK)
 
     player = Object(0, 0, PLAYER_CHARACTER, player_name, PLAYER_COLOR, blocks=True,
         fighter=fighter_component)
@@ -3366,11 +3412,11 @@ def render_gui():
     tcod_clear(msg_panel)
 
     # Show the player's stats
-    tcod_print_ex(panel, 1 + BAR_WIDTH / 2, 1, libtcod.BKGND_NONE,
+    tcod_print_ex(panel, 1 + BAR_WIDTH / 2, 0, libtcod.BKGND_NONE,
         libtcod.CENTER, player.name)
 
     # Show Perks
-    render_perks()
+    render_perks(5)
 
     # Cool distinctions
     tcod_set_fg(panel, libtcod.gray)
@@ -3383,24 +3429,28 @@ def render_gui():
         tcod_print_ex(msg_panel, x, 0, libtcod.BKGND_NONE, libtcod.CENTER,
             '-')
 
-    render_bar(1, 2, BAR_WIDTH, 'HP', player.fighter.hp, player.fighter.max_hp,
+    render_bar(1, 1, BAR_WIDTH, 'HP', player.fighter.hp, player.fighter.max_hp,
         libtcod.light_red, libtcod.darker_red)
 
     # Self-explanatory bars
-    render_bar(1, 3, BAR_WIDTH, 'Edge', player.fighter.mana,
+    render_bar(1, 2, BAR_WIDTH, 'Edge', player.fighter.mana,
         player.fighter.max_mana, libtcod.dark_fuchsia, libtcod.darker_fuchsia)
 
-    render_bar(1, 4, BAR_WIDTH, 'XP', player.fighter.xp, (LEVEL_UP_BASE +
+    render_bar(1, 3, BAR_WIDTH, 'XP', player.fighter.xp, (LEVEL_UP_BASE +
         player.level * LEVEL_UP_FACTOR), libtcod.dark_yellow,
         libtcod.darker_yellow)
 
-    render_bar_simple(1, 5, BAR_WIDTH, 'Floor', str(dungeon_level),
+    render_bar_simple(1, 4, BAR_WIDTH, 'Floor', str(dungeon_level),
         libtcod.light_blue)
 
-    render_bar_simple(1, 7, BAR_WIDTH, 'Attack', str(player.fighter.power),
-        libtcod.dark_chartreuse)
-    render_bar_simple(1, 8, BAR_WIDTH, 'Defense', str(player.fighter.defense),
+    render_bar_simple(1, 6, BAR_WIDTH/2, 'STR', str(player.fighter.power),
+        libtcod.darker_chartreuse)
+
+    render_bar_simple(1, 7, BAR_WIDTH/2, 'DEF', str(player.fighter.defense),
         libtcod.flame)
+
+    render_bar_simple(BAR_WIDTH/2+1, 7, BAR_WIDTH/2, 'ACU', str(player.fighter.accuracy),
+        libtcod.dark_blue)
 
     # Render equipment
     slot_list = [
@@ -3426,14 +3476,14 @@ def render_gui():
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.fighter and \
         obj.name != player.name and not blind:
             monsters_in_room += 1
-            if monsters_in_room > (SCREEN_HEIGHT - 20) / 2:
+            if monsters_in_room > (SCREEN_HEIGHT - 18) / 2:
                 continue
             else:
                 tcod_set_fg(panel, obj.color)
-                tcod_print_ex(panel, 1, 9+(2*monsters_in_room),
+                tcod_print_ex(panel, 1, 7+(2*monsters_in_room),
                     libtcod.BKGND_NONE, libtcod.LEFT, ''.join([obj.char, ' ',
                     obj.name.capitalize()]))
-                render_health_bar(1, 10+(2*monsters_in_room), BAR_WIDTH,
+                render_health_bar(1, 8+(2*monsters_in_room), BAR_WIDTH,
                     obj.fighter.hp, obj.fighter.base_max_hp, libtcod.red,
                     libtcod.dark_red)
 
@@ -3476,10 +3526,8 @@ def render_health_bar(x, y, total_width, value, maximum, bar_color, back_color):
     tcod_set_fg(panel, libtcod.white)
     tcod_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE, libtcod.CENTER, '')
 
-def render_perks():
+def render_perks(y):
     ''' Render the perks '''
-
-    y = 6
 
     if perk_mtndew >= PERK_BASE:
         tcod_set_fg(panel, libtcod.light_green)
@@ -3659,6 +3707,8 @@ def weapon_action_else(weapon):
 # ------------------------------------------------------------------------------
 
 # Start ------------------------------------------------------------------------
+
+logger.info('EdgeQuest Start')
 
 # Backup in case if python -B doesn't get ran
 sys.dont_write_bytecode = True

@@ -104,7 +104,8 @@
         "power": 3,
         "defense": 0,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "karambit": {
@@ -122,7 +123,8 @@
         "power": 5,
         "defense": 0,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "runedsword": {
@@ -140,7 +142,8 @@
         "power": 7,
         "defense": 0,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "dagger": {
@@ -158,7 +161,8 @@
         "power": 1,
         "defense": 0,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "m9bayonet": {
@@ -176,7 +180,8 @@
         "power": 10,
         "defense": 0,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "awp": {
@@ -194,7 +199,8 @@
         "power": -2,
         "defense": 0,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "p90": {
@@ -213,7 +219,8 @@
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 17
+        "ranged": 17,
+        "accuracy": 0
     },
 
     "ppbizon": {
@@ -232,7 +239,8 @@
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 35
+        "ranged": 35,
+        "accuracy": 0
     },
 
     "r8nerf": {
@@ -251,7 +259,8 @@
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 15
+        "ranged": 10,
+        "accuracy": 0
     },
 
     "deagle": {
@@ -270,7 +279,8 @@
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 24
+        "ranged": 24,
+        "accuracy": 0
     },
 
     "r8": {
@@ -289,7 +299,8 @@
         "defense": 0,
         "hp": 0,
         "mana": 0,
-        "ranged": 35
+        "ranged": 35,
+        "accuracy": 0
     },
 
     "trenchcoat": {
@@ -305,7 +316,8 @@
         "power": 0,
         "defense": 3,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "scorpjacket": {
@@ -321,7 +333,8 @@
         "power": 0,
         "defense": 6,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "fedora": {
@@ -337,7 +350,8 @@
         "power": 0,
         "defense": 2,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "trilby": {
@@ -353,7 +367,8 @@
         "power": 0,
         "defense": 4,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "stattrakfedora": {
@@ -369,7 +384,8 @@
         "power": -5,
         "defense": -5,
         "hp": -100,
-        "mana": -50
+        "mana": -50,
+        "accuracy": 0
     },
 
     "fgloves": {
@@ -385,7 +401,8 @@
         "power": 0,
         "defense": 2,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "leathergloves": {
@@ -401,7 +418,8 @@
         "power": 0,
         "defense": 4,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "laniard": {
@@ -417,7 +435,8 @@
         "power": 5,
         "defense": 1,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "cargoshorts": {
@@ -433,7 +452,8 @@
         "power": 0,
         "defense": 1,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "cargopants": {
@@ -449,7 +469,8 @@
         "power": 0,
         "defense": 2,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "wizcloak": {
@@ -465,7 +486,8 @@
         "power": 0,
         "defense": -2,
         "hp": 0,
-        "mana": 50
+        "mana": 50,
+        "accuracy": 0
     },
 
     "furcoat": {
@@ -481,7 +503,8 @@
         "power": 0,
         "defense": -2,
         "hp": 0,
-        "mana": 100
+        "mana": 100,
+        "accuracy": 0
     },
 
     "wizhat": {
@@ -497,7 +520,8 @@
         "power": 0,
         "defense": -1,
         "hp": 0,
-        "mana": 25
+        "mana": 25,
+        "accuracy": 0
     },
 
     "crocs": {
@@ -513,7 +537,8 @@
         "power": 0,
         "defense": 0,
         "hp": 10,
-        "mana": 10
+        "mana": 10,
+        "accuracy": 0
     },
 
     "furboots": {
@@ -529,7 +554,8 @@
         "power": 0,
         "defense": 0,
         "hp": 30,
-        "mana": 30
+        "mana": 30,
+        "accuracy": 0
     },
 
     "socksandsandals": {
@@ -545,7 +571,8 @@
         "power": 0,
         "defense": 1,
         "hp": 0,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "combatboots": {
@@ -561,7 +588,8 @@
         "power": 0,
         "defense": 2,
         "hp": 15,
-        "mana": 0
+        "mana": 0,
+        "accuracy": 0
     },
 
     "fawkesmask": {
@@ -577,7 +605,8 @@
         "power": 0,
         "defense": 0,
         "hp": 10,
-        "mana": 20
+        "mana": 20,
+        "accuracy": 0
     }
 
 }
