@@ -59,7 +59,9 @@ with open(ITEM_JSON_PATH) as json_data:
 
 # Player object
 player = None
-player_name = None
+
+# We need to set this to prevent a segfault because py2.7 nested functions do weird s***
+player_name = DEFAULT_NAME
 
 # Object List
 objects = []
@@ -204,6 +206,9 @@ unblocked_world = []
 # ------------------------------------------------------------------------------
 
 # Classes ----------------------------------------------------------------------
+
+# The namespace class is a blank class used to organize values.
+class Namespace(object): pass
 
 class BasicMonster:
     ''' AI for a basic monster. '''
@@ -1248,40 +1253,85 @@ def check_args():
     global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL, \
         COORDS_UNDER_MOUSE
 
+    # Create a local namespace to store flags
+    FLAGS = Namespace()
+
+    FLAGS.FOUND    = False, # True if any argument was found
+    FLAGS.MENU     = True,  # If this flag is on, the main menu will be displayed
+    FLAGS.NEWGAME  = False, # Flag to initialize new game
+    FLAGS.PLAYGAME = False  # Flag to play the game
+
+    def ARG_QUICKSTART():
+        # define globals used in system
+        global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL, \
+            COORDS_UNDER_MOUSE
+        player_name = DEFAULT_NAME
+        # You connot modify variables in the outer-funcion scope, but you CAN
+        # update a dictionary!
+        FLAGS.MENU = False
+        FLAGS.NEWGAME = True
+        FLAGS.PLAYGAME = True
+
+    def ARG_DEBUG():
+        # define globals used in system
+        global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL, \
+            COORDS_UNDER_MOUSE
+        GOD_MODE = True
+        FOG_OF_WAR_ENABLED = False
+        STAIR_HACK = True
+        SEE_ALL = True
+        COORDS_UNDER_MOUSE = True
+
     try:
-        # variable to store argument found State
-        arg_found = False
+        # Function lookup for sysargs
+        ARG_LOOKUP = {
+            'quickstart': ARG_QUICKSTART,
+            'debug': ARG_DEBUG
+        }
+
+        # Single-character table that links to the sysarg table
+        ARG_EXPANSION = {
+            'q': 'quickstart',
+            'h': 'debug'
+        }
 
         # assumes that the program is run with python2.7 -B edgequest.py
+        # Scan over all input arguments
         for arg in sys.argv:
-            if arg == '-q':
-                arg_found = True
-                player_name = DEFAULT_NAME
-                new_game()
-                play_game()
-            if arg == '-h':
-                arg_found = True
-                GOD_MODE = True
-                FOG_OF_WAR_ENABLED = False
-                STAIR_HACK = True
-                SEE_ALL = True
-                COORDS_UNDER_MOUSE = True
-                main_menu()
-            if arg == '-hq' or arg == '-qh':
-                arg_found = True
-                GOD_MODE = True
-                FOG_OF_WAR_ENABLED = False
-                STAIR_HACK = True
-                SEE_ALL = True
-                COORDS_UNDER_MOUSE = True
-                player_name = DEFAULT_NAME
-                new_game()
-                play_game()
-
-        if not arg_found:
+            # Look for small args (like `al` in `ls -al`)
+            # In each argument, we look for a starting `-` that is not followed by another `-`
+            if arg[0:1] == '-' and arg[1:2] != '-':
+                for minarg in list(arg[1:]):
+                    try:
+                        # Expand argument and do a lookup with the expanded argument
+                        expanded_arg = ARG_EXPANSION[minarg]
+                        # Look up function and call it
+                        ARG_LOOKUP[expanded_arg]()
+                        FLAGS.FOUND = True
+                    except (IndexError, KeyError) as e:
+                        print '[!] Arg: invalid argument `' + minarg + '`, continuing as normal'
+            # Look for large arguments like `--help`
+            if arg[0:2] == '--':
+                # We already have the expanded argument
+                expanded_arg = arg[2:]
+                try:
+                    # Look up function and call it
+                    ARG_LOOKUP[expanded_arg]()
+                    FLAGS.FOUND = True
+                except (IndexError, KeyError) as e:
+                    print '[!] Arg: invalid argument `' + expanded_arg + '`, continuing as normal'
+        # If there are no args found, run this
+        if not FLAGS.FOUND:
             print '[:] No arguments found'
             main_menu()
 
+        # Do stuff based on flags
+        if FLAGS.MENU:
+            main_menu()
+        if FLAGS.NEWGAME:
+            new_game()
+        if FLAGS.PLAYGAME:
+            play_game()
     except IndexError:
         print '[!] Arg: index error, continuing as normal'
         main_menu()
