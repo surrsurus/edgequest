@@ -24,6 +24,9 @@ import core.animtools as anim
 # Map generation
 from core.dmap import dMap
 
+# Logger
+from core.logger import logger
+
 # Wall decorations
 from core.wallselect import wallselect
 
@@ -1279,11 +1282,11 @@ def check_args():
                 play_game()
 
         if not arg_found:
-            print '[:] No arguments found'
+            logger.info('No arguments found')
             main_menu()
 
     except IndexError:
-        print '[!] Arg: index error, continuing as normal'
+        logger.error('IndexError: Problem with flags. Defaulting to main menu...')
         main_menu()
 
 def check_ground():
@@ -1375,10 +1378,10 @@ def choose_theme():
     theme = menu('Choose a theme. Default: ' + CURRENT_THEME, options, INVENTORY_WIDTH)
 
     if theme is None:
-        print '[-] No theme selected'
+        logger.warn('No theme selected')
         return None
     else:
-        print '[+] Selecting...'
+        logger.info('Selecting theme...')
         # Set the theme
         for ind, val in enumerate(options):
             if ind == theme:
@@ -1888,7 +1891,7 @@ def generate_monster(monster_id, x, y):
         assert monster_data[monster_id]['attack_msg'] is not None
         assert monster_data[monster_id]['ai']         is not None
     except AssertionError as e:
-        print '[!] AssertionError at monster distinguishing: '
+        logger.severe('AssertionError at monster distinguishing')
         id_err(monster_id)
 
     # Set default values. These should always be present
@@ -1913,8 +1916,8 @@ def generate_monster(monster_id, x, y):
 
     # Fallback
     if death is None:
-        print '[!] Error: monster ' + monster_id + 'has an invalid death_func'
-        print '[+] Setting to default...'
+        logger.error('Monster ' + monster_id + 'has an invalid death_func')
+        logger.info('Defaulting the monster death function...')
         death = monster_death
 
     # Select an AI
@@ -1925,8 +1928,8 @@ def generate_monster(monster_id, x, y):
 
     # Fallback
     if ai is None:
-        print '[!] Error: monster ' + monster_id + 'has an invalid ai'
-        print '[+] Setting to default...'
+        logger.error('Monster ' + monster_id + 'has an invalid ai')
+        logger.info('Defaulting the monster ai...')
         ai = BasicMonster()
 
     # These values might actually fail
@@ -2003,7 +2006,7 @@ def generate_item(item_id, x, y):
         assert items_data[item_id]['chance'] is not None
         assert items_data[item_id]['type']   is not None
     except AssertionError as e:
-        print '[!] AssertionError at usable/equipment distinguishing: '
+        logger.severe('[!] AssertionError at usable/equipment distinguishing')
         id_err(item_id)
 
     item_name = items_data[item_id]['name']
@@ -2048,7 +2051,7 @@ def generate_item(item_id, x, y):
             assert items_data[item_id]['hp']      is not None
             assert items_data[item_id]['mana']    is not None
         except AssertionError as e:
-            print '[!] AssertionError at equipment/firearm distinguishing: '
+            logger.severe('AssertionError at equipment distinguishing')
             id_err(item_id)
 
         item_subtype = items_data[item_id]['subtype']
@@ -2072,7 +2075,7 @@ def generate_item(item_id, x, y):
                 assert items_data[item_id]['weapon_func'] is not None
                 assert items_data[item_id]['short_name']  is not None
             except AssertionError as e:
-                print '[!] AssertionError at equipment/firearm distinguishing: '
+                logger.severe('AssertionError at weapon/firearm distinguishing')
                 id_err(item_id)
 
             item_attack_msg  = items_data[item_id]['attack_msg']
@@ -2108,7 +2111,7 @@ def generate_item(item_id, x, y):
                 assert items_data[item_id]['short_name']  is not None
                 assert items_data[item_id]['ranged']      is not None
             except AssertionError as e:
-                print '[!] AssertionError at equipment/firearm distinguishing: '
+                logger.severe('AssertionError at firearm distinguishing')
                 id_err(item_id)
 
             item_attack_msg  = items_data[item_id]['attack_msg']
@@ -2417,10 +2420,10 @@ def how_to_play():
     CHARACTER_SCREEN_WIDTH)
 
 def id_err(id):
-    print '[!] Error: ' + id + ' is missing data!'
-    print '----- STACK TRACE: -----'
-    traceback.print_exc()
-    print '------------------------'
+    logger.severe('Error: ' + id + ' is missing data!')
+    logger.write('----- STACK TRACE: -----')
+    logger.write(traceback.print_exc())
+    logger.write('------------------------')
     exit()
 
 def initialize_fov():
@@ -2832,8 +2835,8 @@ def monster_death_talk(monster):
         assert monster_data[mon]['death_talk'] is not None
         mon_death_talk = monster_data[mon]['death_talk']
     except AssertionError as e:
-        print '[-] Error: death_talk not found for ' + monster.name
-        print '[:] Defaulting...'
+        logger.error('AssertionError: death_talk not found for ' + monster.name)
+        logger.info('Defaulting death talk...')
         mon_death_talk = 'I was born to die just like a bug!'
 
     message(''.join([monster.name.capitalize(), ' says "', mon_death_talk,
@@ -3545,7 +3548,7 @@ def toggle_fullscreen():
 
     libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
-    print '[:] Toggled fullscreen mode'
+    logger.info('[:] Toggled fullscreen mode')
 
 def toggle_siphon():
     ''' Toggle the siphon spell '''

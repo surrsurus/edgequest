@@ -6,6 +6,7 @@ import traceback
 
 from modules import libtcodpy as libtcod
 from modules import simplejson as json
+from core.logger import logger
 from settings import COLOR_JSON_PATH, CURRENT_THEME
 
 # ------------------------------------------------------------------------------
@@ -40,14 +41,14 @@ def hex_to_color(inp):
         green_bit = int(fhex[2:4], 16)
         blue_bit  = int(fhex[4:6], 16)
 
-        print '[:] Color: (' + str(red_bit) + ', ' + str(green_bit) + ', ' + \
-            str(blue_bit) + ')'
+        logger.info('Color: (' + str(red_bit) + ', ' + str(green_bit) + ', ' + \
+            str(blue_bit) + ')')
 
         return libtcod.Color(red_bit, green_bit, blue_bit);
 
     # If the color sting is mal-formatted
     except ValueError as e:
-        print 'Error converting hex to color! Is it `rrggbb` formatted?'
+        logger.error('Problem converting hex to color! Is it `rrggbb` formatted?')
         return None
 
 def get_color(col):
@@ -99,11 +100,11 @@ def set_theme(theme):
             color_accent           = get_color(color_data[theme]['accent']['light'])
 
         except KeyError as e:
-            print '[!] Error: JSON error while loading... Using defaults...'
+            logger.severe('KeyError: JSON error occurred while loading... Using defaults...')
             default_colors()
-            print '----- STACK TRACE: -----'
-            traceback.print_exc()
-            print '------------------------'
+            logger.write('----- STACK TRACE: -----')
+            logger.write(traceback.print_exc())
+            logger.write('------------------------')
 
         # Simple assertion testing to make sure all the colors loaded properly
         try:
@@ -115,15 +116,15 @@ def set_theme(theme):
             assert color_ground_highlight is not None
             assert color_accent           is not None
         except AssertionError as e:
-            print '[!] AssertionError: Looks like there is invalid or missing data in the `' +\
-                theme + '` theme! Using defaults...'
+            logger.severe('AssertionError: Looks like there is invalid or missing data in the `' +\
+                theme + '` theme! Using defaults...')
             default_colors()
-            print '----- STACK TRACE: -----'
-            traceback.print_exc()
-            print '------------------------'
+            logger.write('----- STACK TRACE: -----')
+            logger.write(traceback.print_exc())
+            logger.write('------------------------')
     else:
-        print '[!] Warning: Theme is not set in settings.py!'
-        print '[:] Defaulting...'
+        logger.warn('No theme passed to set_theme()!')
+        logger.info('Defaulting theme...')
         default_colors()
 
 # ------------------------------------------------------------------------------
