@@ -1,17 +1,34 @@
 #! /bin/bash
 
-if [ $1 == "-q" ]; then
-    echo '[>] Quickstart'
-    python2.7 -B edgequest.py -q
-elif [ $1 == "-h" ]; then
-    echo '[>] Debug enabled'
-    python2.7 -B edgequest.py -h
-elif [ $1 == "-qh" ]; then
-    echo '[>] Quickstart Debug'
-    python2.7 -B edgequest.py -qh
-elif [ $1 == "-hq" ]; then
-    echo '[>] Quickstart Debug'
-    python2.7 -B edgequest.py -hq
-else
-    python2.7 -B edgequest.py
-fi
+
+echo
+# This stores all the arguments (from `$@`) in an array called `args`
+read -r -d ' ' -a args <<< "$@"
+
+# Iterate over args
+# NOTE: This is just to print statements according to user input. It is meant to be expandable.
+for arg in "${args[@]}"; do
+
+    # Store each character
+    read -r -d '\n' -a sarg <<< $(echo "$arg" | grep -o .)
+
+    # Check if the arg starts with a dash and is not followed by another dash
+    if [[ ${sarg[0]} == '-' && ${sarg[1]} != '-' ]]; then
+        for _arg in "${sarg[@]}"; do
+            case $_arg in
+                'q') echo '[>] Quickstart'    ;;
+                'h') echo '[>] Debug enabled' ;;
+            esac
+        done
+    fi
+
+    # Match big args
+    case $arg in
+        '--quickstart') echo '[>] Quickstart'    ;;
+        '--debug'     ) echo '[>] Debug enabled' ;;
+    esac
+done
+echo
+
+# Her we just run edgequest with all the user arguments
+python2.7 -B edgequest.py $@
