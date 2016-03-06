@@ -210,9 +210,6 @@ unblocked_world = []
 
 # Classes ----------------------------------------------------------------------
 
-# The namespace class is a blank class used to organize values.
-class Namespace(object): pass
-
 class BasicMonster:
     ''' AI for a basic monster. '''
     def __init__(self):
@@ -783,6 +780,9 @@ class Item:
                 # Destroy after use, unless it was cancelled for some reason
                 inventory.remove(self.owner)
 
+# The namespace class is a blank class used to organize values.
+class Namespace(object): pass
+
 class Object:
     '''
     This is a generic object: the player, a monster, an item, the stairs...
@@ -1251,7 +1251,24 @@ def cast_lightning():
     animate_bolt(libtcod.light_azure, player.x, player.y, monster.x, monster.y)
 
 def check_args():
-    ''' Check the arguments the game is ran with '''
+    ''' Check the arguments the game is ran with
+
+    Q: This looks confusing. Like really confusing.
+
+    A: Once you know what's happening it makes a lot of sense. Here's the break-
+    down.
+
+    1. We run linux-run and pass arguments (-q, -h, --quickstart, etc)
+    2. This function gets called
+    3. Run through all args and find if they need to be expanded (-q, -h) or
+        if they're already big --
+    3a. Expand miniargs (-q) into big args (--quickstart) based on a dictionary
+    4. Run method associated with argument (quickstart: ARG_QUICKSTART)
+    5. Method changes flags or values in the game itself
+    6. If flags are on or off, run the associated function (FLAGS.MENU will run
+        main_menu())
+
+    '''
 
     global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL, \
         COORDS_UNDER_MOUSE
@@ -1265,6 +1282,7 @@ def check_args():
     FLAGS.PLAYGAME = False  # Flag to play the game
 
     def ARG_QUICKSTART():
+        ''' Enable quickstart mode '''
         # define globals used in system
         global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL, \
             COORDS_UNDER_MOUSE
@@ -1276,6 +1294,7 @@ def check_args():
         FLAGS.PLAYGAME = True
 
     def ARG_DEBUG():
+        ''' Enable debug mode '''
         # define globals used in system
         global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL, \
             COORDS_UNDER_MOUSE
@@ -1312,7 +1331,7 @@ def check_args():
                         ARG_LOOKUP[expanded_arg]()
                         FLAGS.FOUND = True
                     except (IndexError, KeyError) as e:
-                        print '[!] Arg: invalid argument `' + minarg + '`, continuing as normal'
+                        logger.error('Arg: invalid argument `' + minarg + '`, continuing as normal')
             # Look for large arguments like `--help`
             if arg[0:2] == '--':
                 # We already have the expanded argument
@@ -1322,10 +1341,10 @@ def check_args():
                     ARG_LOOKUP[expanded_arg]()
                     FLAGS.FOUND = True
                 except (IndexError, KeyError) as e:
-                    print '[!] Arg: invalid argument `' + expanded_arg + '`, continuing as normal'
+                    logger.error('Arg: invalid argument `' + expanded_arg + '`, continuing as normal')
         # If there are no args found, run this
         if not FLAGS.FOUND:
-            print '[:] No arguments found'
+            logger.info('No args found')
             main_menu()
 
         # Do stuff based on flags
