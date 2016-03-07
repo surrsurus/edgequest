@@ -465,7 +465,13 @@ class TamedMonster:
             # See if there's any monsters near
             mon = closest_monster(DOG_RANGE)
 
-            if mon != None:
+            # Move towards player if far away and not displaced
+            if self.owner.displaced:
+
+                self.owner.displaced = False
+
+            elif mon != None:
+
                 # Move towards monster
                 if monster.distance_to(mon) >= 2:
                     monster.move_astar(mon.x, mon.y, False)
@@ -473,7 +479,7 @@ class TamedMonster:
                 elif player.fighter.hp > 0:
                     monster.fighter.attack(mon)
 
-            # Move towards player if far away
+            # Move towards player
             elif monster.distance_to(player) >= 2:
                 monster.move_astar(player.x, player.y, False)
 
@@ -1017,11 +1023,20 @@ class Object:
             self.item = Item()
             self.item.owner = self
 
+        # Store value if displaced
+        self.displaced = False
+
     def clear(self):
         ''' Erase the character that represents this object '''
         (x, y) = camera.to_coords(self.x, self.y)
         if x is None:
             tcod_put_char(con, x, y, ' ', libtcod.BKGND_NONE)
+
+    def displace(self, dx, dy):
+        ''' Displace a monster '''
+        message('You displace the ' + self.name, TEXT_COLORS['neutral'])
+        self.move_towards(self.x + dx, self.y + dy)
+        self.displaced = True
 
     def distance(self, x, y):
         ''' Return the distance to some coordinates '''
@@ -3218,8 +3233,10 @@ def mouse_move_astar(tx, ty):
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
         obj.fighter and \
         obj.name != player.name:
-            message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
-            monster = True
+            if obj.ai:
+                if not obj.ai.tamed:
+                    message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
+                    monster = True
 
     try:
         if is_blocked(tx, ty):
@@ -3240,9 +3257,11 @@ def mouse_move_astar(tx, ty):
                     if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
                     obj.fighter and \
                     obj.name != player.name:
-                        message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
-                        monster = True
-                        continue
+                        if obj.ai:
+                            if not obj.ai.tamed:
+                                message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
+                                monster = True
+                                continue
 
                 player.move_astar(tx, ty, True)
                 fov_recompute()
@@ -3474,7 +3493,10 @@ def player_move(dx, dy):
 
     # Attack if target found, move otherwise
     if target is not None:
-        player.fighter.attack(target)
+        if target.ai.tamed:
+            target.displace(dx, dy)
+        else:
+            player.fighter.attack(target)
     else:
         player.move(dx, dy)
         fov_recompute()
