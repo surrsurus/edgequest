@@ -97,6 +97,12 @@ HEAL_AMOUNT = 40
 # Fortune cookie heal ammount
 FORTUNE_HEAL = 10
 
+# Dog range
+DOG_RANGE = 10
+
+# Monster Sense range
+SENSE_RANGE = 7
+
 # Mana Potion
 MANA_AMOUNT = 40
 

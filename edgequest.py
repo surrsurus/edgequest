@@ -66,6 +66,9 @@ with open(ITEM_JSON_PATH) as json_data:
 # Player object
 player = None
 
+# Dog object
+dog = None
+
 # We need to set this to prevent a segfault because py2.7 nested functions do weird s***
 player_name = DEFAULT_NAME
 
@@ -219,6 +222,8 @@ class BasicMonster:
         # Create a coordinate the monster travels to if it
         #   doesn't see the player
         self.backup_coord = get_rand_unblocked_coord()
+        # Tamed variable
+        self.tamed = False
 
     def take_turn(self):
         '''Monster takes its turn. If you can see it, it can see you '''
@@ -226,18 +231,43 @@ class BasicMonster:
         # Always check the owner
         monster = self.owner
 
+        # Get data
+        tamed_monster = closest_tamed_monster(SENSE_RANGE)
+        if tamed_monster is not None:
+            distance_to_tamed = monster.distance_to(tamed_monster)
+        else:
+            distance_to_tamed = MEGADEATH
+        distance_to_player = monster.distance_to(player)
+
         sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
 
         # If it's in the player's fov then it approaches them
-        if sees_player and not INVISIBLE:
-
+        if distance_to_tamed < SENSE_RANGE and not sees_player:
             # Move towards player if far away
-            if monster.distance_to(player) >= 2:
-                monster.move_astar(player.x, player.y, False)
+            if monster.distance_to(tamed_monster) >= 2:
+                monster.move_astar(tamed_monster.x, tamed_monster.y, False)
 
             # Close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
-                monster.fighter.attack(player)
+                monster.fighter.attack(tamed_monster)
+
+        if sees_player and not INVISIBLE:
+
+            # Select what to attack
+            if distance_to_tamed < distance_to_player:
+                target = tamed_monster
+            elif distance_to_tamed == distance_to_player:
+                target = player
+            else:
+                target = player
+
+            # Move towards target if far away
+            if monster.distance_to(target) >= 2:
+                monster.move_astar(target.x, target.y, False)
+
+            # Close enough, attack! (if the target is still alive.)
+            elif target.fighter.hp > 0:
+                monster.fighter.attack(target)
 
         # Otherwise it moves to a random map location
         else:
@@ -255,6 +285,8 @@ class CenaMonster:
         #   doesn't see the player
         self.backup_coord = get_rand_unblocked_coord()
         self.saw_player = False
+        # Tamed variable
+        self.tamed = False
 
     def take_turn(self):
         '''Monster takes its turn. If you can see it, it can see you '''
@@ -262,22 +294,48 @@ class CenaMonster:
         # Always check the owner
         monster = self.owner
 
+        # Get data
+        tamed_monster = closest_tamed_monster(SENSE_RANGE)
+        if tamed_monster is not None:
+            distance_to_tamed = monster.distance_to(tamed_monster)
+        else:
+            distance_to_tamed = MEGADEATH
+        distance_to_player = monster.distance_to(player)
+
         sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
 
         # If it's in the player's fov then it approaches them
+        if distance_to_tamed < SENSE_RANGE and not sees_player:
+            # Move towards player if far away
+            if monster.distance_to(tamed_monster) >= 2:
+                monster.move_astar(tamed_monster.x, tamed_monster.y, False)
+
+            # Close enough, attack! (if the player is still alive.)
+            elif player.fighter.hp > 0:
+                monster.fighter.attack(tamed_monster)
+
         if sees_player and not INVISIBLE:
 
+            # JOOOOOHN CENA
             if not self.saw_player:
                 message("AND HIS NAME IS... JOHN CENA!", self.owner.color)
                 self.saw_player = True
 
-            # Move towards player if far away
-            if monster.distance_to(player) >= 2:
-                monster.move_astar(player.x, player.y, False)
+            # Select what to attack
+            if distance_to_tamed < distance_to_player:
+                target = tamed_monster
+            elif distance_to_tamed == distance_to_player:
+                target = player
+            else:
+                target = player
 
-            # Close enough, attack! (if the player is still alive.)
-            elif player.fighter.hp > 0:
-                monster.fighter.attack(player)
+            # Move towards target if far away
+            if monster.distance_to(target) >= 2:
+                monster.move_astar(target.x, target.y, False)
+
+            # Close enough, attack! (if the target is still alive.)
+            elif target.fighter.hp > 0:
+                monster.fighter.attack(target)
 
         # Otherwise it moves to a random map location
         else:
@@ -294,6 +352,8 @@ class ConfusedMonster:
     def __init__(self, old_ai, num_turns=CONFUSE_NUM_TURNS):
         self.old_ai = old_ai
         self.num_turns = num_turns
+        # Tamed variable
+        self.tamed = False
 
     def take_turn(self):
         ''' Monster takes a turn, but moves randomly '''
@@ -318,24 +378,51 @@ class TalkingMonster:
         self.speech = speech
         self.rate = rate
         self.backup_coord = get_rand_unblocked_coord()
+        # Tamed variable
+        self.tamed = False
 
     def take_turn(self):
         ''' Monster takes a normal turn, but says something '''
         # A basic monster takes its turn. If you can see it, it can see you
         monster = self.owner
 
+        # Get data
+        tamed_monster = closest_tamed_monster(SENSE_RANGE)
+        if tamed_monster is not None:
+            distance_to_tamed = monster.distance_to(tamed_monster)
+        else:
+            distance_to_tamed = MEGADEATH
+        distance_to_player = monster.distance_to(player)
+
         sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
 
-        # If monster is in FOV...
-        if sees_player and not INVISIBLE:
-
+        # If it's in the player's fov then it approaches them
+        if distance_to_tamed < SENSE_RANGE and not sees_player:
             # Move towards player if far away
-            if monster.distance_to(player) >= 2:
-                monster.move_astar(player.x, player.y, False)
+            if monster.distance_to(tamed_monster) >= 2:
+                monster.move_astar(tamed_monster.x, tamed_monster.y, False)
 
             # Close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
-                monster.fighter.attack(player)
+                monster.fighter.attack(tamed_monster)
+
+        if sees_player and not INVISIBLE:
+
+            # Select what to attack
+            if distance_to_tamed < distance_to_player:
+                target = tamed_monster
+            elif distance_to_tamed == distance_to_player:
+                target = player
+            else:
+                target = player
+
+            # Move towards target if far away
+            if monster.distance_to(target) >= 2:
+                monster.move_astar(target.x, target.y, False)
+
+            # Close enough, attack! (if the target is still alive.)
+            elif target.fighter.hp > 0:
+                monster.fighter.attack(target)
 
             # Depending on the rate of speech set in the json,
             #   the monster may talk
@@ -355,6 +442,50 @@ class TalkingMonster:
         if (monster.x, monster.y) == self.backup_coord:
             self.backup_coord = get_rand_unblocked_coord()
 
+class TamedMonster:
+    ''' AI for a basic monster. '''
+    def __init__(self):
+        # Create a coordinate the monster travels to if it
+        #   doesn't see the player
+        self.backup_coord = get_rand_unblocked_coord()
+
+        self.tamed = True
+
+    def take_turn(self):
+        '''Monster takes its turn. If you can see it, it can see you '''
+
+        # Always check the owner
+        monster = self.owner
+
+        sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
+
+        # If it's in the player's fov then it approaches them
+        if sees_player and not INVISIBLE:
+
+            # See if there's any monsters near
+            mon = closest_monster(DOG_RANGE)
+
+            if mon != None:
+                # Move towards monster
+                if monster.distance_to(mon) >= 2:
+                    monster.move_astar(mon.x, mon.y, False)
+                # Close enough, attack! (if the player is still alive.)
+                elif player.fighter.hp > 0:
+                    monster.fighter.attack(mon)
+
+            # Move towards player if far away
+            elif monster.distance_to(player) >= 2:
+                monster.move_astar(player.x, player.y, False)
+
+        # Otherwise it moves to a random map location
+        else:
+            x, y = self.backup_coord
+            monster.move_astar(x, y, False)
+
+        # If the monster has reached the coord position, make a new one
+        if (monster.x, monster.y) == self.backup_coord:
+            self.backup_coord = get_rand_unblocked_coord()
+
 class RangedTalkerMonster:
     ''' An AI that says things '''
     def __init__(self, speech, rate):
@@ -362,24 +493,51 @@ class RangedTalkerMonster:
         self.speech = speech
         self.rate = rate
         self.backup_coord = get_rand_unblocked_coord()
+        # Tamed variable
+        self.tamed = False
 
     def take_turn(self):
         ''' Monster takes a normal turn, but says something '''
         # A basic monster takes its turn. If you can see it, it can see you
         monster = self.owner
 
+        # Get data
+        tamed_monster = closest_tamed_monster(SENSE_RANGE)
+        if tamed_monster is not None:
+            distance_to_tamed = monster.distance_to(tamed_monster)
+        else:
+            distance_to_tamed = MEGADEATH
+        distance_to_player = monster.distance_to(player)
+
         sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
 
-        # If monster is in FOV...
-        if sees_player and not INVISIBLE:
-
+        # If it's in the player's fov then it approaches them
+        if distance_to_tamed < SENSE_RANGE and not sees_player:
             # Move towards player if far away
-            if monster.distance_to(player) >= MONSTER_RANGE:
-                monster.move_astar(player.x, player.y, False)
+            if monster.distance_to(tamed_monster) >= 2:
+                monster.move_astar(tamed_monster.x, tamed_monster.y, False)
 
             # Close enough, attack! (if the player is still alive.)
             elif player.fighter.hp > 0:
-                monster.fighter.attack(player)
+                monster.fighter.attack(tamed_monster)
+
+        if sees_player and not INVISIBLE:
+
+            # Select what to attack
+            if distance_to_tamed < distance_to_player:
+                target = tamed_monster
+            elif distance_to_tamed == distance_to_player:
+                target = player
+            else:
+                target = player
+
+            # Move towards target if far away
+            if monster.distance_to(target) >= MONSTER_RANGE:
+                monster.move_astar(target.x, target.y, False)
+
+            # Close enough, attack! (if the target is still alive.)
+            elif target.fighter.hp > 0:
+                monster.fighter.attack(target)
                 animate_bolt(libtcod.yellow, self.owner.x, self.owner.y,
                     player.x, player.y)
 
@@ -634,11 +792,23 @@ class Fighter:
     def attack(self, target):
         ''' A simple formula for attack damage '''
 
+        ans = 'yes'
+        if self.owner == player and target.ai.tamed:
+            ans = console_input('Are you sure you want to attack the ' + target.name.capitalize() + '?')
+            if ans is None:
+                ans = 'no'
+            elif ans.lower() in ['n', 'no']:
+                ans = 'no'
+            elif ans.lower() in ['y', 'yes']:
+                ans = 'yes'
+            else:
+                ans = 'no'
+
         # Random factor for damage calculation
         random_fac = libtcod.random_get_int(0, 0, 5) - libtcod.random_get_int(0, 0, 6)
         damage = self.power - target.fighter.defense + random_fac
 
-        if damage > 0:
+        if damage > 0 and ans == 'yes':
             # Make the target take some damage
             if random_fac == 5 and target != player:
                 message(' '.join(['Critical hit!', self.owner.name.capitalize(), self.attack_msg,
@@ -655,7 +825,7 @@ class Fighter:
 
             target.fighter.take_damage(damage)
 
-        else:
+        elif ans == 'yes':
             message(' '.join([self.owner.name.capitalize(), self.attack_msg,
                 target.name.capitalize(), 'but it has no effect!']),
                     TEXT_COLORS['fail'])
@@ -1217,7 +1387,6 @@ def cast_fortune():
     message('Oh! A fortune!', TEXT_COLORS['level_up'])
     message(fortune.get_fortune(), TEXT_COLORS['level_up'])
 
-
 def cast_heal():
     ''' Heal the player '''
 
@@ -1519,11 +1688,34 @@ def closest_monster(max_range):
     for obj in objects:
         if obj.fighter and not obj == player and \
         libtcod.map_is_in_fov(fov_map, obj.x, obj.y):
-            # Calculate distance between this obj and the player
-            dist = player.distance_to(obj)
-            if dist < closest_dist:  # It's closer, so remember it
-                closest_enemy = obj
-                closest_dist = dist
+            if obj.ai:
+                if not obj.ai.tamed:
+                    # Calculate distance between this obj and the player
+                    dist = player.distance_to(obj)
+                    if dist < closest_dist:  # It's closer, so remember it
+                        closest_enemy = obj
+                        closest_dist = dist
+
+    return closest_enemy
+
+def closest_tamed_monster(max_range):
+    ''' Find closest enemy, up to a maximum range, and in the player's FOV '''
+
+    closest_enemy = None
+
+    # Start with (slightly more than) maximum range
+    closest_dist = max_range + 1
+
+    for obj in objects:
+        if obj.fighter and not obj == player and \
+        libtcod.map_is_in_fov(fov_map, obj.x, obj.y):
+            if obj.ai:
+                if obj.ai.tamed:
+                    # Calculate distance between this obj and the player
+                    dist = player.distance_to(obj)
+                    if dist < closest_dist:  # It's closer, so remember it
+                        closest_enemy = obj
+                        closest_dist = dist
 
     return closest_enemy
 
@@ -1621,6 +1813,7 @@ def console_input_small():
             # Esc quits
             elif key.vk == libtcod.KEY_ESCAPE:
                 check = False
+                return None
                 break
             elif key.vk == libtcod.KEY_SHIFT:
                 pass
@@ -1734,7 +1927,8 @@ def debug_kill_all():
 
     for obj in objects:
         if obj.ai:
-            obj.fighter.take_damage(MEGADEATH)
+            if not obj.ai.tamed:
+                obj.fighter.take_damage(MEGADEATH)
 
 def de_dust():
     ''' Place objects on level '''
@@ -2002,7 +2196,8 @@ def generate_monster(monster_id, x, y):
         'normal'    : BasicMonster(),
         'talk'      : TalkingMonster(0, 0),
         'rangedtalk': RangedTalkerMonster(0, 0),
-        'cena'      : CenaMonster()
+        'cena'      : CenaMonster(),
+        'tamed'     : TamedMonster()
     }
 
     # Test values
@@ -2512,10 +2707,6 @@ def handle_keys():
 
         # Reset the map (DEBUG)
         elif key_char == RELOAD_MAP_KEY:
-            # Empty objects and re-add the player so the game is playable
-            objects = []
-            objects.insert(0, player)
-
             # Clear screen
             for x in range(SCREEN_WIDTH):
                 for y in range(SCREEN_HEIGHT):
@@ -2729,8 +2920,22 @@ def make_map():
 
     global world, fov_map, objects, dstairs, ustairs, unblocked_world
 
+    # Tamed monsters follow player up and down stairs
+    saved_monsters = []
+    if objects:
+        for mon in objects:
+            if mon.ai:
+                if mon.ai.tamed:
+                    saved_monsters.append(mon)
+
     # The list of objects with just the player
-    objects = [player]
+    objects = []
+    objects.append(player)
+
+    # Load up tamed monsters
+    for mon in saved_monsters:
+        objects.append(mon)
+
 
     # fill map with 'blocked' tiles
     world = [[Tile(True) for y in range(MAP_HEIGHT)] for x in range(MAP_WIDTH)]
@@ -2801,6 +3006,13 @@ def make_map():
     x, y = get_rand_unblocked_coord()
     player.x = x
     player.y = y
+
+    # Place tamed monster on same tile
+    for mon in objects:
+        if mon.ai:
+            if mon.ai.tamed:
+                mon.backup_coord = get_rand_unblocked_coord()
+                (mon.x, mon.y) = (x, y)
 
     # If player is moving downwards
     if stairs_up:
@@ -3069,7 +3281,7 @@ def new_game():
     ''' Start a new game '''
 
     global player, edge, inventory, game_msgs, game_state, dungeon_level, \
-            monster_data, items_data
+            monster_data, items_data, dog, objects
 
     # Player
     # create object representing the player
@@ -3078,6 +3290,8 @@ def new_game():
 
     player = Object(0, 0, PLAYER_CHARACTER, player_name, PLAYER_COLOR, blocks=True,
         fighter=fighter_component)
+
+    objects.append(generate_monster('tameddog', 0, 0))
 
     if INVISIBLE:
         player.color = libtcod.black
@@ -3502,9 +3716,13 @@ def render_gui():
                 continue
             else:
                 tcod_set_fg(panel, obj.color)
+                flair = ""
+                if obj.ai:
+                    if obj.ai.tamed:
+                        flair = '(tamed)'
                 tcod_print_ex(panel, 1, 7+(2*monsters_in_room),
                     libtcod.BKGND_NONE, libtcod.LEFT, ''.join([obj.char, ' ',
-                    obj.name.capitalize()]))
+                    obj.name.capitalize() + ' ' + flair]))
                 render_health_bar(1, 8+(2*monsters_in_room), BAR_WIDTH,
                     obj.fighter.hp, obj.fighter.base_max_hp, libtcod.red,
                     libtcod.dark_red)
@@ -3734,6 +3952,9 @@ logger.info('EdgeQuest Start')
 
 # Backup in case if python -B doesn't get ran
 sys.dont_write_bytecode = True
+
+# Start a basic List
+unblocked_world = [(0, 0)]
 
 # Init a basic theme
 initialize_theme(CURRENT_THEME)

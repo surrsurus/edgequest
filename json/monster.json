@@ -13,8 +13,25 @@
         "mana":0,
         "accuracy": 0,
    	"death_func":"normal",
-        "attack_msg":"",
+        "attack_msg":"rushes",
         "ai": "normal"
+    },
+
+    "tameddog": {
+        "name": "dog",
+        "id":"tameddog",
+        "char": "d",
+        "color": "gold",
+        "chance":[[0, 1]],
+      	"hp":20,
+      	"defense":1,
+      	"power":3,
+      	"xp":0,
+        "mana":0,
+        "accuracy": 0,
+   	"death_func":"normal",
+        "attack_msg":"bites",
+        "ai": "tamed"
     },
 
     "gridbug": {
