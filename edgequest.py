@@ -21,6 +21,9 @@ import settings.colors as colors
 # Animation tools
 import core.animtools as anim
 
+# Fortune generator
+import core.fortune as fortune
+
 # Map generation
 from core.dmap import dMap
 
@@ -1198,6 +1201,23 @@ def cast_fireball():
     # Then animate it
     animate_blast(libtcod.red, x, y, FIREBALL_RADIUS)
 
+def cast_fortune():
+    ''' Eat a fortune cookie. Not really a spell, more of a usable effect
+    specific to the fortune cookie item '''
+
+    message('You break open the fortune cookie and eat the shell.', TEXT_COLORS['neutral'])
+
+    # Do nothing if full health
+    if player.fighter.hp == player.fighter.max_hp:
+        pass
+    else:
+        message('Your wounds start to feel better!', TEXT_COLORS['good'])
+        player.fighter.heal(FORTUNE_HEAL)
+
+    message('Oh! A fortune!', TEXT_COLORS['level_up'])
+    message(fortune.get_fortune(), TEXT_COLORS['level_up'])
+
+
 def cast_heal():
     ''' Heal the player '''
 
@@ -2107,7 +2127,8 @@ def generate_item(item_id, x, y):
         'confuse'   : Item(use_function=cast_confuse),
         'lightning' : Item(use_function=cast_lightning),
         'mana'      : Item(use_function=cast_mana),
-        'bomb'      : Item(use_function=cast_explode)
+        'bomb'      : Item(use_function=cast_explode),
+        'fortune'   : Item(use_function=cast_fortune)
     }
 
     try:
@@ -2148,6 +2169,7 @@ def generate_item(item_id, x, y):
 
         # Fallback
         if effect is None:
+            logger.error(effect + ' Not recognized as an item effect.')
             effect = Item(use_function=cast_heal)
 
         # Create a basic item

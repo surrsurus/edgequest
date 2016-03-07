@@ -94,6 +94,9 @@ MSG_HEIGHT = MSG_PANEL_HEIGHT - 1
 # Healing Potion
 HEAL_AMOUNT = 40
 
+# Fortune cookie heal ammount
+FORTUNE_HEAL = 10
+
 # Mana Potion
 MANA_AMOUNT = 40
 
