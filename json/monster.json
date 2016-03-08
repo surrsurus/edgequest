@@ -18,15 +18,15 @@
     },
 
     "tameddog": {
-        "name": "dog",
+        "name": "doge",
         "id":"tameddog",
         "char": "d",
         "color": "gold",
         "chance":[[0, 1]],
-      	"hp":20,
+      	"hp":100,
       	"defense":1,
       	"power":3,
-      	"xp":0,
+      	"xp":-1,
         "mana":0,
         "accuracy": 0,
    	"death_func":"normal",

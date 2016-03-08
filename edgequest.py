@@ -785,15 +785,23 @@ class Fighter:
             # Yield experience to the player, take some mana
             #   and give some health
             if self.owner != player:
-                player.fighter.xp += self.xp
-                check_level_up()
+                if self.owner.ai:
+                    if self.owner.ai.tamed:
+                        pass
+                else:
+                    player.fighter.xp += self.xp
+                    for obj in objects:
+                        if obj.ai:
+                            if obj.ai.tamed:
+                                obj.fighter.xp += self.xp
+                    check_level_up()
 
-                # Try to siphon life
-                if activate_siphon:
-                    player.fighter.siphon()
+                    # Try to siphon life
+                    if activate_siphon:
+                        player.fighter.siphon()
 
-                # Increment kill count
-                kill_count += 1
+                    # Increment kill count
+                    kill_count += 1
 
     def attack(self, target):
         ''' A simple formula for attack damage '''
@@ -1025,6 +1033,9 @@ class Object:
 
         # Store value if displaced
         self.displaced = False
+
+        # Level
+        self.level = 1
 
     def clear(self):
         ''' Erase the character that represents this object '''
@@ -1637,15 +1648,26 @@ def check_level_up():
         # Pause
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
+    for obj in objects:
+        if obj.ai:
+            if obj.ai.tamed:
+                if obj.fighter.xp >= obj.fighter.level_up_xp:
+                    message('Your ' + obj.name + ' has grown!')
+                    obj.fighter.base_power += 2
+                    obj.fighter.base_defense += 2
+                    obj.fighter.base_max_hp += 20
+
 def check_timer():
     ''' Check the timer periodically '''
     global timer
 
     # Regenerate health
-    if player.fighter.hp != player.fighter.max_hp:
-        if timer % REGEN_SPEED == 0:
-            player.fighter.heal(1)
-            timer += 1
+    for obj in objects:
+        if obj.fighter:
+            if obj.fighter.hp != obj.fighter.max_hp:
+                if timer % REGEN_SPEED == 0:
+                    obj.fighter.heal(1)
+                    timer += 1
 
 def choose_name():
     ''' Choose a name for the hero '''
