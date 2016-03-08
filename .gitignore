@@ -1,9 +1,4 @@
 *.pyc
 *.eqlg
-*.so
-*.dll
 logs/*
-modules/simplejson/*
-modules/libtcodpy.py
 savegame
-a
