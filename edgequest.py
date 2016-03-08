@@ -3538,7 +3538,7 @@ def mouse_move_astar(tx, ty):
                 for obj in objects:
                     # Continually scan for monsters
                     if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
-                    obj.fighter and if obj.ai:
+                    obj.fighter and obj.ai:
                         if not obj.ai.tamed:
                             message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
                             monster = True
