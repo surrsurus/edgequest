@@ -8,6 +8,13 @@ import modules.libtcodpy as libtcod
 
 # Store a lot of common values and libtcod objects needed
 
+'''
+
+These should be clear, but if you have problems, you can ask a question on the
+GitHub issue tracker
+
+'''
+
 # Libtcod settings -------------------------------------------------------------
 
 # Screen width and height
@@ -129,7 +136,7 @@ FIREBALL_DAMAGE = 25
 
 # Experience and level-ups
 # Experience Algorithm: LEVEL_UP_FACTOR * current level + base
-LEVEL_UP_BASE   = 200
+LEVEL_UP_BASE   = 150
 LEVEL_UP_FACTOR = 150
 
 # Length of blindness
@@ -224,6 +231,20 @@ INTRO_WALL = BUFFER + INTRO_TEXT
 WEAPON_SLOTS = [
     'right hand',
     'left hand'
+]
+
+# List of all slots
+SLOT_LIST = [
+    'right hand',
+    'left hand',
+    'head',
+    'face',
+    'neck',
+    'torso',
+    'hands',
+    'legs',
+    'feet',
+    'accessory'
 ]
 
 # List of color objects

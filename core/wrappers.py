@@ -2,6 +2,18 @@
 
 # Libtcod wrappers to make things shorter
 
+'''
+
+libtcod calls get kind of long so we can abstract those with wrapper functions
+that do the same thing with less space
+
+You can read about each of these below.
+
+This is purely for aesthetics, and not really required, so this can be removed
+if one wanted to
+
+'''
+
 # Imports ----------------------------------------------------------------------
 
 # Rendering library

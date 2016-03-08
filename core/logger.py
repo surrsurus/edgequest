@@ -1,7 +1,16 @@
 # Logger.py
 
-# Amazing logger Max made
-# Legit greatest thing ever
+# Amazing logger Max made'
+
+'''
+
+Logger class with lots of cool features.
+
+EdgeQuest uses a system that prints to the console and writes to a file.
+
+The code might be hard to understand because it's certified MaxCode(tm)
+
+'''
 
 # Imports ----------------------------------------------------------------------
 
@@ -105,4 +114,4 @@ l.severe('This is severe')
 
 '''
 
-# Logger class -----------------------------------------------------------------
+# ------------------------------------------------------------------------------

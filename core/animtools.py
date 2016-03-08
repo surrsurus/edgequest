@@ -2,6 +2,15 @@
 
 # Animation tools
 
+'''
+
+This file has animation tools for drawing things to the screen in EdgeQuest.
+
+* lightning_direction - changes the direction of
+lightning/bullets/magic spells in the middle of its 'trajectory'
+
+'''
+
 # Functions --------------------------------------------------------------------
 
 def lightning_direction(source_x, source_y, target_x, target_y):

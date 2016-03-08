@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# This file:
+# * Downloads the latest master from the EdgeQuest repo
+# * Overwrites the current EdgeQuest files with the new ones
+# * Saves any saved games, and re adds them to the EdgeQuest dir
+
 REPO="https://github.com/surrsurus/edgequest/archive/master.zip"
 RNAME="master.zip"
 EQLOC="/home/$USER/.edgequest/"

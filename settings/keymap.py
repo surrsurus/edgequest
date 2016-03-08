@@ -1,9 +1,14 @@
 # Keymap.py
 
-''' You can set your custom keymaps here while playing EdgeQuest
+'''
+
+You can set your custom keymaps here while playing EdgeQuest
 
 Please note that all of your changes will be overwritten with each consecutive
 release of the game
+
+Keys should be self explanatory and are only used in the edgequest.handle_keys
+function
 
 '''
 
@@ -46,6 +51,7 @@ MOVEMENT_KEYS_VK = [
     libtcod.KEY_RIGHT
 ]
 
+# Press these to do nothing
 WAIT_KEYS = [
     '5',
     '.'
@@ -57,6 +63,7 @@ FULLSCREEN_KEYS = [
     libtcod.KEY_F4
 ]
 
+# Quit things
 QUIT_KEY = libtcod.KEY_ESCAPE
 
 # Keys based on the actual characters

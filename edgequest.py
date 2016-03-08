@@ -69,7 +69,7 @@ player = None
 # Dog object
 dog = None
 
-# We need to set this to prevent a segfault because py2.7 nested functions do weird s***
+# We need to set this to prevent a segfault because py2.7 nested functions do weird stuff
 player_name = DEFAULT_NAME
 
 # Object List
@@ -214,10 +214,31 @@ unblocked_world = []
 
 # ------------------------------------------------------------------------------
 
-# Classes ----------------------------------------------------------------------
+################################################################################
+# Classes
+################################################################################
+
+# AI Classes -------------------------------------------------------------------
+
+'''
+
+These classes are assigned to monsters that should act autonomously.
+Monsters usually have a fighter and ai class inside of the object class
+
+You can see how this is implemented in the generate_monster function
+
+'''
 
 class BasicMonster:
-    ''' AI for a basic monster. '''
+    ''' AI for a basic monster.
+
+    Has the functionality to track the player, attack it, and move to random
+    locations around the map
+
+    All monsters are based around this AI, and you can see the variations
+    very easily by comparing it to this class
+
+    '''
     def __init__(self):
         # Create a coordinate the monster travels to if it
         #   doesn't see the player
@@ -232,13 +253,20 @@ class BasicMonster:
         monster = self.owner
 
         # Get data
+        # Make sure that the monster prioritizes between tamed monsters
+        # and the player if it's in range
+        # Get the closest tamed monster
         tamed_monster = closest_tamed_monster(SENSE_RANGE)
+        # If it exists, store the distance
         if tamed_monster is not None:
             distance_to_tamed = monster.distance_to(tamed_monster)
+        # Otherwise we don't need it so we set it to a HUGE int
         else:
             distance_to_tamed = MEGADEATH
+        # Get distance to player
         distance_to_player = monster.distance_to(player)
 
+        # Is the player in the fov?
         sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
 
         # If it's in the player's fov then it approaches them
@@ -254,10 +282,14 @@ class BasicMonster:
         if sees_player and not INVISIBLE:
 
             # Select what to attack
+            # Prioritize the closer one
             if distance_to_tamed < distance_to_player:
                 target = tamed_monster
+            # If they're equal, prioritize the player
             elif distance_to_tamed == distance_to_player:
                 target = player
+            # Otherwise the distance to the player must be shorter,
+            # Therefore, prioritize the player
             else:
                 target = player
 
@@ -279,7 +311,12 @@ class BasicMonster:
             self.backup_coord = get_rand_unblocked_coord()
 
 class CenaMonster:
-    ''' AI for John Cena. I'm sorry '''
+    ''' AI for John Cena.
+
+    This is a fun joke monster that has some properties that are better suited
+    for it's own class rather than hardwired if-elses somewhere in the code
+
+    '''
     def __init__(self):
         # Create a coordinate the monster travels to if it
         #   doesn't see the player
@@ -295,13 +332,20 @@ class CenaMonster:
         monster = self.owner
 
         # Get data
+        # Make sure that the monster prioritizes between tamed monsters
+        # and the player if it's in range
+        # Get the closest tamed monster
         tamed_monster = closest_tamed_monster(SENSE_RANGE)
+        # If it exists, store the distance
         if tamed_monster is not None:
             distance_to_tamed = monster.distance_to(tamed_monster)
+        # Otherwise we don't need it so we set it to a HUGE int
         else:
             distance_to_tamed = MEGADEATH
+        # Get distance to player
         distance_to_player = monster.distance_to(player)
 
+        # Is the player in the fov?
         sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
 
         # If it's in the player's fov then it approaches them
@@ -316,18 +360,23 @@ class CenaMonster:
 
         if sees_player and not INVISIBLE:
 
+            # Select what to attack
+            # Prioritize the closer one
+            if distance_to_tamed < distance_to_player:
+                target = tamed_monster
+            # If they're equal, prioritize the player
+            elif distance_to_tamed == distance_to_player:
+                target = player
+            # Otherwise the distance to the player must be shorter,
+            # Therefore, prioritize the player
+            else:
+                target = player
+
             # JOOOOOHN CENA
+            # If John cena is in the fov, say his name once
             if not self.saw_player:
                 message("AND HIS NAME IS... JOHN CENA!", self.owner.color)
                 self.saw_player = True
-
-            # Select what to attack
-            if distance_to_tamed < distance_to_player:
-                target = tamed_monster
-            elif distance_to_tamed == distance_to_player:
-                target = player
-            else:
-                target = player
 
             # Move towards target if far away
             if monster.distance_to(target) >= 2:
@@ -348,35 +397,55 @@ class CenaMonster:
 
 class ConfusedMonster:
     ''' AI for a temporarily confused monster
-    (reverts to previous AI after a while). '''
+
+    This makes the confuse spell actually do things. The monster just bumbles
+    around randomly.
+
+    This will revert to previous AI after a while.
+
+    '''
     def __init__(self, old_ai, num_turns=CONFUSE_NUM_TURNS):
+        ''' Get some important data on init '''
+        # You defintely want to store the old ai, or else the monster will
+        # not be able to revert
         self.old_ai = old_ai
+        # Not really needed, as the number of turns are defined in settings.py
+        # But we use it as a count-down timer instead
         self.num_turns = num_turns
         # Tamed variable
         self.tamed = False
 
     def take_turn(self):
         ''' Monster takes a turn, but moves randomly '''
-        if self.num_turns > 0:  # Still confused...
+        # Still confused...
+        if self.num_turns > 0:
             # Move in a random direction, and decrease the number of
-            #   turns confused
+            # turns confused
             self.owner.move(libtcod.random_get_int(0, -1, 1),
                             libtcod.random_get_int(0, -1, 1))
             self.num_turns -= 1
 
         # Restore the previous AI
-        #   (this one will be deleted because it's not referenced anymore)
+        # (this one will be deleted because it's not referenced anymore)
         else:
             self.owner.ai = self.old_ai
             message('The ' + self.owner.name + ' is no longer confused!',
                 TEXT_COLORS['bad'])
 
 class TalkingMonster:
-    ''' An AI that says things '''
+    ''' An AI that says things
+
+    Basically a basic monster but with a bit more character. Kind of fun
+    for 'unique' monsters with rare spawn rates
+
+    '''
     def __init__(self, speech, rate):
         ''' Initialize the speech and rate (as well as the backup_coord) '''
+        # Must be a list
         self.speech = speech
+        # Rate out of 100. Basically an integer percent chance
         self.rate = rate
+        # backup_coord. You should have seen this previously
         self.backup_coord = get_rand_unblocked_coord()
         # Tamed variable
         self.tamed = False
@@ -387,13 +456,20 @@ class TalkingMonster:
         monster = self.owner
 
         # Get data
+        # Make sure that the monster prioritizes between tamed monsters
+        # and the player if it's in range
+        # Get the closest tamed monster
         tamed_monster = closest_tamed_monster(SENSE_RANGE)
+        # If it exists, store the distance
         if tamed_monster is not None:
             distance_to_tamed = monster.distance_to(tamed_monster)
+        # Otherwise we don't need it so we set it to a HUGE int
         else:
             distance_to_tamed = MEGADEATH
+        # Get distance to player
         distance_to_player = monster.distance_to(player)
 
+        # Is the player in the fov?
         sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
 
         # If it's in the player's fov then it approaches them
@@ -409,10 +485,14 @@ class TalkingMonster:
         if sees_player and not INVISIBLE:
 
             # Select what to attack
+            # Prioritize the closer one
             if distance_to_tamed < distance_to_player:
                 target = tamed_monster
+            # If they're equal, prioritize the player
             elif distance_to_tamed == distance_to_player:
                 target = player
+            # Otherwise the distance to the player must be shorter,
+            # Therefore, prioritize the player
             else:
                 target = player
 
@@ -439,16 +519,29 @@ class TalkingMonster:
             x, y = self.backup_coord
             monster.move_astar(x, y, False)
 
+        # If the monster reaches the backup_coord, make a new one
         if (monster.x, monster.y) == self.backup_coord:
             self.backup_coord = get_rand_unblocked_coord()
 
 class TamedMonster:
-    ''' AI for a basic monster. '''
+    ''' AI for a basic monster.
+
+    Tamed monsters have special privleges compared to other AI types.
+    They can:
+        * Follow player
+        * Attack enemies
+        * Have enemies attack them
+        * Level up!
+
+    Basically it's a whole lot of fun.
+
+    '''
     def __init__(self):
         # Create a coordinate the monster travels to if it
         #   doesn't see the player
         self.backup_coord = get_rand_unblocked_coord()
 
+        # Tamed is true! This monster is special.
         self.tamed = True
 
     def take_turn(self):
@@ -457,6 +550,7 @@ class TamedMonster:
         # Always check the owner
         monster = self.owner
 
+        # Is the monster in the player fov
         sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
 
         # If it's in the player's fov then it approaches them
@@ -467,9 +561,10 @@ class TamedMonster:
 
             # Move towards player if far away and not displaced
             if self.owner.displaced:
-
+                # flip variable. Prevents moving for one turn
                 self.owner.displaced = False
 
+            # If there's a monster, attack it!
             elif mon != None:
 
                 # Move towards monster
@@ -493,7 +588,14 @@ class TamedMonster:
             self.backup_coord = get_rand_unblocked_coord()
 
 class RangedTalkerMonster:
-    ''' An AI that says things '''
+    ''' An AI that says things and shoots
+
+    Exact same code as the TalkingMonster, but the attack range is larger AND
+    there's an animation
+
+    TODO: Implement firarm damage algorithm
+
+    '''
     def __init__(self, speech, rate):
         ''' Initialize the speech and rate (as well as the backup_coord) '''
         self.speech = speech
@@ -508,19 +610,26 @@ class RangedTalkerMonster:
         monster = self.owner
 
         # Get data
+        # Make sure that the monster prioritizes between tamed monsters
+        # and the player if it's in range
+        # Get the closest tamed monster
         tamed_monster = closest_tamed_monster(SENSE_RANGE)
+        # If it exists, store the distance
         if tamed_monster is not None:
             distance_to_tamed = monster.distance_to(tamed_monster)
+        # Otherwise we don't need it so we set it to a HUGE int
         else:
             distance_to_tamed = MEGADEATH
+        # Get distance to player
         distance_to_player = monster.distance_to(player)
 
+        # Is the player in the fov?
         sees_player = libtcod.map_is_in_fov(fov_map, monster.x, monster.y)
 
         # If it's in the player's fov then it approaches them
         if distance_to_tamed < SENSE_RANGE and not sees_player:
             # Move towards player if far away
-            if monster.distance_to(tamed_monster) >= 2:
+            if monster.distance_to(tamed_monster) >= MONSTER_RANGE:
                 monster.move_astar(tamed_monster.x, tamed_monster.y, False)
 
             # Close enough, attack! (if the player is still alive.)
@@ -530,10 +639,14 @@ class RangedTalkerMonster:
         if sees_player and not INVISIBLE:
 
             # Select what to attack
+            # Prioritize the closer one
             if distance_to_tamed < distance_to_player:
                 target = tamed_monster
+            # If they're equal, prioritize the player
             elif distance_to_tamed == distance_to_player:
                 target = player
+            # Otherwise the distance to the player must be shorter,
+            # Therefore, prioritize the player
             else:
                 target = player
 
@@ -562,15 +675,43 @@ class RangedTalkerMonster:
             x, y = self.backup_coord
             monster.move_astar(x, y, False)
 
+        # Reset backup coord
         if (monster.x, monster.y) == self.backup_coord:
             self.backup_coord = get_rand_unblocked_coord()
 
+# ------------------------------------------------------------------------------
+
+# Object classes ---------------------------------------------------------------
+
+'''
+
+Classes for all the game objects!
+
+Here's an example hierarchy
+
+Object:
+    Fighter:
+        AI
+
+Object:
+    Item:
+        Equipment
+
+You can see how this is implemented in generate_item
+
+'''
+
 class Equipment:
     ''' An object that can be equipped, yielding bonuses.
-    automatically adds the Item component. '''
+    automatically adds the Item component.
+
+    This is for items that are not usable, namely armor, weapons, and firearms
+
+    '''
     def __init__(self, slot, power_bonus=0, defense_bonus=0, max_hp_bonus=0,
         max_mana_bonus=0, max_accuracy_bonus=0, attack_msg=None, weapon_func=None,
         ranged_bonus=0, short_name=None):
+        # Bonuses to stats
         self.power_bonus        = power_bonus
         self.defense_bonus      = defense_bonus
         self.max_hp_bonus       = max_hp_bonus
@@ -578,12 +719,17 @@ class Equipment:
         self.ranged_bonus       = ranged_bonus
         self.max_accuracy_bonus = max_accuracy_bonus
 
+        # Attack message changes how the player attacks (fluff)
         self.attack_msg         = attack_msg
+        # Function called when weapon is used
         self.weapon_func        = weapon_func
 
+        # Slot
         self.slot = slot
+        # Equipped status. Always starts as false
         self.is_equipped        = False
 
+        # Short name for rendering in the render_equips function
         self.short_name         = short_name
 
     def toggle_equip(self):
@@ -639,7 +785,7 @@ class Equipment:
                         self.slot, '.']), TEXT_COLORS['good'])
 
                 # Otherwise let the player know that something needs to be
-                #   dequipped
+                # dequipped
                 else:
                     message(''.join(['There is already a ',
                         other_hand_equip.owner.name, ' on your ',
@@ -663,13 +809,16 @@ class Equipment:
         # Change attack message to that of the item in the other hand
         if self.slot == 'left hand':
             item = get_equipped_in_slot('right hand')
+            # Don't do it if there's no weapons
             if item != None:
                 player.fighter.attack_msg = item.attack_msg
             else:
                 player.fighter.attack_msg = DEFAULT_ATTACK
 
+        # And again...
         elif self.slot == 'right hand':
             item = get_equipped_in_slot('left hand')
+            # Don't do it if there's no weapons
             if item != None:
                 player.fighter.attack_msg = item.attack_msg
             else:
@@ -703,10 +852,16 @@ class Equipment:
             function(self.owner)
 
 class Fighter:
-    ''' Combat-related properties and methods (monster, player, NPC) '''
+    ''' Combat-related properties and methods (monster, player, NPC)
+
+    If you want to kill it, it needs to be a fighter
+
+    '''
     def __init__(self, hp, defense, power, xp, mana, accuracy, death_function=None,
         attack_msg=None):
+        # Store the base hp
         self.base_max_hp     = hp
+        # Current hp
         self.hp              = hp
 
         self.base_defense    = defense
@@ -717,12 +872,22 @@ class Fighter:
 
         self.base_accuracy   = accuracy
 
+        # Called on death
         self.death_function  = death_function
 
         self.mana            = mana
         self.base_max_mana   = mana
 
         self.attack_msg      = attack_msg
+
+    '''
+
+    Properties are weird but amazing. Basically it's just an extension of the class.
+    We use them to get the current stats based on all the equipment bonuses
+
+    Basically, it's really handy
+
+    '''
 
     @property
     def power(self):
@@ -756,6 +921,7 @@ class Fighter:
 
     @property
     def accuracy(self):
+        # Return actual accuracy, by summing up the bonuses from all equipped items
         bonus = sum(equipment.max_accuracy_bonus for equipment in \
             get_all_equipped(self.owner))
         return self.base_accuracy + bonus
@@ -783,17 +949,26 @@ class Fighter:
                 function(self.owner)
 
             # Yield experience to the player, take some mana
-            #   and give some health
+            # and give some health
+
+            # Don't award experience to player if player dies
             if self.owner != player:
+                # Don't award for killing tamed animals :(
                 if self.owner.ai:
                     if self.owner.ai.tamed:
+                        # You might want to do something here later
+                        # Don't remove this
                         pass
+                # If a regular monster dies, xp is given to tamed monsters
+                # and player, in the exact same amount as defined in the monster.json
                 else:
                     player.fighter.xp += self.xp
                     for obj in objects:
                         if obj.ai:
                             if obj.ai.tamed:
                                 obj.fighter.xp += self.xp
+
+                    # Did anything level up
                     check_level_up()
 
                     # Try to siphon life
@@ -806,6 +981,7 @@ class Fighter:
     def attack(self, target):
         ''' A simple formula for attack damage '''
 
+        # NOTE: This never gets called. I'm considering removing it.
         ans = 'yes'
         if self.owner == player and target.ai.tamed:
             ans = console_input('Are you sure you want to attack the ' + target.name.capitalize() + '?')
@@ -824,14 +1000,17 @@ class Fighter:
 
         if damage > 0 and ans == 'yes':
             # Make the target take some damage
+            # Player lands a crit
             if random_fac == 5 and target != player:
                 message(' '.join(['Critical hit!', self.owner.name.capitalize(), self.attack_msg,
                     target.name.capitalize(), 'for', str(damage),
                     'hit points.']),TEXT_COLORS['good'])
+            # Monster lands a crit
             elif random_fac == 5 and target == player:
                 message(' '.join(['Critical hit!', self.owner.name.capitalize(), self.attack_msg,
                     target.name.capitalize(), 'for', str(damage),
                     'hit points.']),TEXT_COLORS['very_bad'])
+            # No one lands a crit
             else:
                 message(' '.join([self.owner.name.capitalize(), self.attack_msg,
                     target.name.capitalize(), 'for', str(damage),
@@ -839,6 +1018,8 @@ class Fighter:
 
             target.fighter.take_damage(damage)
 
+        # Attack the tamed monster
+        # NOTE: Not used.
         elif ans == 'yes':
             message(' '.join([self.owner.name.capitalize(), self.attack_msg,
                 target.name.capitalize(), 'but it has no effect!']),
@@ -988,17 +1169,19 @@ class Item:
                 # Destroy after use, unless it was cancelled for some reason
                 inventory.remove(self.owner)
 
-# The namespace class is a blank class used to organize values.
-class Namespace(object): pass
-
 class Object:
     '''
     This is a generic object: the player, a monster, an item, the stairs...
     It's always represented by a character on screen
+
+    The foundation and root of basically everything except tiles, and screen
+    rendering magic
+
     '''
     def __init__(self, x, y, char, name, color, blocks=False,
         always_visible=False, fighter=None, ai=None, item=None,
         gold=None, equipment=None):
+        # These should be self-explanatory
         self.always_visible  = always_visible
         self.char            = char
         self.name            = name
@@ -1063,15 +1246,18 @@ class Object:
         ''' Draw object. Only show if it's visible to the player; or it's set to
         'always visible' and on an explored tile '''
 
+        # Draw if the player can see it
         player_can_see = libtcod.map_is_in_fov(fov_map, self.x, self.y)
+        # Or if the player always can see it
         persistent = (self.always_visible and world[self.x][self.y].explored)
 
+        # SEE_ALL is a debug thing that lets you see all objects.
         if player_can_see or persistent or SEE_ALL:
             (x, y) = camera.to_coords(self.x, self.y)
 
             if x is not None:
                 # Set the color and then draw the character that
-                #   represents this object at its position
+                # represents this object at its position
                 tcod_set_fg(con, self.color)
                 tcod_print_ex(con, x, y,
                                         libtcod.BKGND_NONE, libtcod.CENTER,
@@ -1102,7 +1288,11 @@ class Object:
             pass
 
     def move_astar(self, tx, ty, player_move):
-        ''' A* Algorithm for pathfinding towards target '''
+        ''' A* Algorithm for pathfinding towards target
+
+        libtcod has this built in... Thank goodness
+
+        '''
         # Create a FOV map that has the dimensions of the map
         fov = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
 
@@ -1141,6 +1331,7 @@ class Object:
         # It makes sense to keep path size relatively low to keep the monsters
         #   from running around the map if there's an alternative path really
         #   far away
+        # This breaks constantly so just set it to be really large
         if not libtcod.path_is_empty(my_path) and \
         libtcod.path_size(my_path) < 100 \
         or player_move:
@@ -1221,23 +1412,39 @@ class Object:
         self.color = libtcod.dark_red
 
 class Tile:
-    ''' A tile of the map and its properties '''
+    ''' A tile of the map and its properties
+
+    The foundation of every good world
+
+    '''
     def __init__(self, blocked, block_sight=None):
+        # Does it block players and monsters?
         self.blocked = blocked
 
+        # Debug switch, all tiles are unexplored unless you're a debugger
         if FOG_OF_WAR_ENABLED:
             self.explored = False
         else:
             self.explored = True
 
-        # By default, if a tile is blocked, it also blocks sight
+        # By default, if a tile is blocked, it also blocks sight. Makes sense.
         if block_sight is None:
             block_sight = blocked
         self.block_sight = block_sight
 
 # ------------------------------------------------------------------------------
 
-# Functions --------------------------------------------------------------------
+# Misc -------------------------------------------------------------------------
+
+# The namespace class is a blank class used to organize values.
+# Used in check_args
+class Namespace(object): pass
+
+# ------------------------------------------------------------------------------
+
+################################################################################
+# Functions
+################################################################################
 
 def animate_bolt(color, dx, dy, tx, ty):
     ''' Animate a lightning bolt from the player to an enemy '''
@@ -1511,6 +1718,9 @@ def check_args():
     6. If flags are on or off, run the associated function (FLAGS.MENU will run
         main_menu())
 
+    If you have questions, make sure to ask max what the heck is going on because
+    as of right now he seems to know how to operate this black box in a black box
+
     '''
 
     global player_name, GOD_MODE, FOG_OF_WAR_ENABLED, STAIR_HACK, SEE_ALL, \
@@ -1723,41 +1933,43 @@ def closest_monster(max_range):
     closest_dist = max_range + 1
 
     for obj in objects:
+        # If it's a fighter and in the fov and has an ai
         if obj.fighter and not obj == player and \
-        libtcod.map_is_in_fov(fov_map, obj.x, obj.y):
-            if obj.ai:
-                if not obj.ai.tamed:
-                    # Calculate distance between this obj and the player
-                    dist = player.distance_to(obj)
-                    if dist < closest_dist:  # It's closer, so remember it
-                        closest_enemy = obj
-                        closest_dist = dist
+        libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.ai:
+            # Don't hurt tamed monsters!
+            if not obj.ai.tamed:
+                # Calculate distance between this obj and the player
+                dist = player.distance_to(obj)
+                if dist < closest_dist:  # It's closer, so remember it
+                    closest_enemy = obj
+                    closest_dist = dist
 
     return closest_enemy
 
 def closest_tamed_monster(max_range):
-    ''' Find closest enemy, up to a maximum range, and in the player's FOV '''
+    ''' Find closest tamed monster, up to a maximum range, and in the player's FOV '''
 
     closest_enemy = None
 
     # Start with (slightly more than) maximum range
     closest_dist = max_range + 1
 
+    # Same as the closest_monster function, with one difference
     for obj in objects:
         if obj.fighter and not obj == player and \
-        libtcod.map_is_in_fov(fov_map, obj.x, obj.y):
-            if obj.ai:
-                if obj.ai.tamed:
-                    # Calculate distance between this obj and the player
-                    dist = player.distance_to(obj)
-                    if dist < closest_dist:  # It's closer, so remember it
-                        closest_enemy = obj
-                        closest_dist = dist
+        libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.ai:
+            if obj.ai.tamed:
+                # Calculate distance between this obj and the player
+                dist = player.distance_to(obj)
+                if dist < closest_dist:  # It's closer, so remember it
+                    closest_enemy = obj
+                    closest_dist = dist
 
     return closest_enemy
 
 def console_input(title):
-    ''' Display a console and get input sent to it '''
+    ''' Display a black screen with a console and get input sent to it '''
+
     key = libtcod.Key()
     string = ''
 
@@ -1820,6 +2032,7 @@ def console_input(title):
     return string
 
 def console_input_small():
+    ''' Same as above but isn't as intrusive '''
 
     string = ''
 
@@ -1930,37 +2143,49 @@ def debug_spawn_console(json_list):
     key = libtcod.Key()
     check = True
 
+    # Get a name from a console input
     name = console_input_small()
 
     # Names have the ability to not exist, considering player is giving input
     found = False
+    # If we're spawning a monster...
     if json_list == 'monster' and check:
+        # For monser in the json list to check
         for mon in monster_data:
+            # If the name corresponds to a name or id...
             if monster_data[mon]['name'] == name or \
             monster_data[mon]['id'] == name:
+                # Generate a monster!
                 obj = generate_monster(monster_data[mon]['id'], player.x+2,
                                         player.y)
                 # Add monster to object list
                 objects.append(obj)
                 message('Spawned a ' + name)
+                # We found one, so don't display an error message
                 found = True
+    # If we're spawning an item...
     elif json_list == 'item' and check:
+        # For item in the json list...
         for item in items_data:
+            # If the name corresponds to a name or id...
             if items_data[item]['name'] == name or \
             items_data[item]['id'] == name:
+                # Generate an item
                 obj = generate_item(items_data[item]['id'], player.x,
                                     player.y)
 
                 # Add item to object list
                 objects.append(obj)
                 message('Spawned a ' + name)
+                logger.debug('Spawning a ' + name)
                 found = True
 
     if not found and check:
         message('Failed to find a ' + name)
+        logger.debug('Failed to find a ' + name)
 
 def debug_kill_all():
-    ''' Kill everything with an ai '''
+    ''' Kill everything with an ai that's not tamed '''
 
     for obj in objects:
         if obj.ai:
@@ -1968,7 +2193,7 @@ def debug_kill_all():
                 obj.fighter.take_damage(MEGADEATH)
 
 def de_dust():
-    ''' Place objects on level '''
+    ''' Place objects on level. Easter egg '''
     # Maximum number of monsters per level
     max_monsters = from_dungeon_level([[4, 1], [7, 2], [13, 4],
         [20, 6], [30, 12]])
@@ -2076,20 +2301,25 @@ def equipment_menu(header):
 
     equip_inven = []
 
+    # If there's items in the inventory...
     if len(inventory) != 0:
         options = []
         sort_inventory()
+        # Then for each item...
         for item in inventory:
-            # Only get equipment
+            # Only get equipment...
             if item.equipment:
                 text = item.name
+                # And optionally show where it got equipped to
                 if item.equipment.is_equipped:
                     text = text + ' (on ' + item.equipment.slot + ')'
+                # Then append it to the options list
                 options.append(text)
                 equip_inven.append(item)
     else:
         options = ['No equipment']
 
+    # Get a selection
     index = menu(header, options, INVENTORY_WIDTH)
 
     # If an item was chosen, return it
@@ -2100,10 +2330,13 @@ def equipment_menu(header):
 def fire_weapon(equipment):
     ''' Find closest enemy and shoot it '''
 
+    # You can't fire guns blind because that's dangerous!
     if not blind:
+        # Get closest monster
         monster = closest_monster(FIREARM_RANGE)
 
-        if monster is None:  # No enemy found within maximum range
+        # No enemy found within maximum range
+        if monster is None:
             message('No enemy is close enough to shoot.', TEXT_COLORS['fail'])
             return 'cancelled'
 
@@ -2122,11 +2355,13 @@ def fire_weapon(equipment):
 
         if damage > 0:
 
-            # Zap it!
+            # Shoot it!
+            # Critical hit
             if random_fac == 5:
                 message('Critical hit! ' + player_name + ' shoots the ' + monster.name +
                         ' with the ' + equipment.owner.name + '! The damage is ' +
                         str(damage) + ' hit points.', TEXT_COLORS['crit'])
+            # Normal
             else:
                 message(player_name + ' shoots the ' + monster.name +
                         ' with the ' + equipment.owner.name + '! The damage is ' +
@@ -2135,13 +2370,15 @@ def fire_weapon(equipment):
             monster.fighter.take_damage(damage)
 
         else:
-
+            # No damage
             message(player_name + ' shoots the ' + monster.name +
                 ' with the ' + equipment.owner.name +
                 'but the shot reflects off the armor!', TEXT_COLORS['bad'])
 
+        # Animate a bullet
         animate_bolt(libtcod.yellow, player.x, player.y, monster.x, monster.y)
     else:
+        # Failure message if blind
         message('You can\'t shoot while blind!', TEXT_COLORS['fail'])
 
 def fov_recompute():
@@ -2149,6 +2386,7 @@ def fov_recompute():
 
     global world
 
+    # Move the camera
     camera.move(player.x, player.y)
 
     # Recompute FOV if needed (the player moved or something)
@@ -2159,6 +2397,7 @@ def fov_recompute():
     # Go through all tiles, and set their background color according to the FOV
     for y in range(CAMERA_HEIGHT):
         for x in range(CAMERA_WIDTH):
+
             (map_x, map_y) = (camera.x + x, camera.y + y)
             visible = libtcod.map_is_in_fov(fov_map, map_x, map_y)
 
@@ -2169,6 +2408,7 @@ def fov_recompute():
                 #   if it's explored
                 if world[map_x][map_y].explored:
                     # It's out of the player's FOV
+                    # Still decorate walls
                     if wall:
                         c = wallselect(world, map_x, map_y)
                         tcod_put_char_ex(con, x, y, c, colors.color_light_ground, colors.color_dark_wall)
@@ -2177,6 +2417,7 @@ def fov_recompute():
                             bg_set=libtcod.BKGND_SET)
             else:
                 # It's visible
+                # Decorate walls
                 if wall:
                     c = wallselect(world, map_x, map_y)
                     tcod_put_char_ex(con, x, y, c, colors.color_accent, colors.color_light_wall)
@@ -2536,6 +2777,7 @@ def get_equipped_in_slot(slot):
     ''' Returns the equipment in a slot, or None if it's empty '''
 
     for obj in inventory:
+        # If it's an equipped equipment in the slot return it
         if obj.equipment and obj.equipment.slot == \
         slot and obj.equipment.is_equipped:
             return obj.equipment
@@ -2544,9 +2786,12 @@ def get_equipped_in_slot(slot):
 def get_all_equipped(obj):
     ''' Returns a list of equipped items '''
 
+    # Maybe sort of possible to have monsters with equipments?
     if obj == player:
         equipped_list = []
         for item in inventory:
+            # Append equipment if it's an equipment that's equipped
+            # Bit of a tongue twister
             if item.equipment and item.equipment.is_equipped:
                 equipped_list.append(item.equipment)
         return equipped_list
@@ -2555,6 +2800,8 @@ def get_all_equipped(obj):
 
 def get_rand_unblocked_coord():
     ''' Get a random, unblocked coordinate on the map '''
+    # If you don't understand what this does, then maybe you should learn some
+    # Python before diving into the source code
     return random.choice(unblocked_world)
 
 def git_screen():
@@ -2580,7 +2827,12 @@ def git_screen():
 
 def handle_keys():
     ''' Handle keypresses sent to the console. Executes other things,
-    makes game playable '''
+    makes game playable
+
+    Q: Why not use a switch statement?
+    A: They don't exist in python.
+
+    '''
 
     global game_state, objects, player_action, key, timer
 
@@ -2785,6 +3037,7 @@ def how_to_play():
     CHARACTER_SCREEN_WIDTH)
 
 def id_err(id):
+    ''' Log a critical error with monster/item genereation '''
     logger.severe('Error: ' + id + ' is missing data!')
     logger.write('----- STACK TRACE: -----')
     logger.write(traceback.print_exc())
@@ -2804,7 +3057,7 @@ def initialize_fov():
             libtcod.map_set_properties(fov_map, x, y, not world[x][y].block_sight, not world[x][y].blocked)
 
 def initialize_theme(theme):
-    ''' Change theme on the fly. Don't judge '''
+    ''' Change theme on the fly. Basically a wrapper function'''
     colors.set_theme(theme)
 
 def intro_cutscene():
@@ -2841,18 +3094,23 @@ def intro_cutscene():
 def inventory_menu(header):
     ''' Show a menu with each item of the inventory as an option '''
 
+    # If inventory is empty...
     if len(inventory) == 0:
         options = ['Inventory is empty.']
+    # Otherwise...
     else:
         options = []
         sort_inventory()
+        # For item in inventory...
         for item in inventory:
             text = item.name
-            #show additional information, in case it's equipped
+            # Show additional information, in case it's equipped
             if item.equipment and item.equipment.is_equipped:
                 text = text + ' (on ' + item.equipment.slot + ')'
+            # Append item to list
             options.append(text)
 
+    # Get selection
     index = menu(header, options, INVENTORY_WIDTH)
 
     # If an item was chosen, return it
@@ -2875,8 +3133,7 @@ def is_blocked(x, y):
     return False
 
 def json_get_color(color_str):
-    ''' Translate json color string into libtcod colors '''
-
+    ''' Translate json color string into libtcod colors. Wrapper function '''
     return COLORS[color_str]
 
 def load_game():
@@ -3209,17 +3466,14 @@ def monster_death_talk(monster):
     # Transform it into a nasty corpse! it doesn't block, can't be
     # Attacked and doesn't move
 
-    # This function requires something special from the monster json so
-    # let's look for that
+    # This function assumes that the assertions for the death functions worked
+    # However the death talk isn't asserted
 
-    mon = None
-    for json in monster_data:
-        if monster.name == monster_data[json]['name']:
-            mon = monster_data[json]['id']
-
+    # Try to get it
     try:
         assert monster_data[mon]['death_talk'] is not None
         mon_death_talk = monster_data[mon]['death_talk']
+    # No big deal, just a problem for the JSON
     except AssertionError as e:
         logger.error('AssertionError: death_talk not found for ' + monster.name)
         logger.info('Defaulting death talk...')
@@ -3230,8 +3484,10 @@ def monster_death_talk(monster):
 
     message(' '.join([monster.name.capitalize(), 'is dead!']),
         TEXT_COLORS['very_bad'])
+
     message('You gain ' + str(monster.fighter.xp) + ' experience points.',
         TEXT_COLORS['level_up'])
+
     monster.set_corpse()
 
 def monster_occupy_check(dx, dy):
@@ -3252,22 +3508,26 @@ def mouse_move_astar(tx, ty):
 
     # Initially check for monsters
     for obj in objects:
+        # If it's a fighter and in the fov, and it has an ai
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
-        obj.fighter and \
-        obj.name != player.name:
-            if obj.ai:
-                if not obj.ai.tamed:
-                    message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
-                    monster = True
+        obj.fighter and obj.ai:
+            # AND it's not tamed
+            if not obj.ai.tamed:
+                message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
+                monster = True
 
     try:
+        # Can't move to blocked locations
         if is_blocked(tx, ty):
             message('Cannot move: Location is unexplored', TEXT_COLORS['debug'])
+        # Can't move to unexplored locations
         elif not world[tx][ty].explored:
             message('Cannot move: Location is unexplored', TEXT_COLORS['debug'])
+        # Can't move if blind
         elif blind:
             message('Cannot move: You are blind',
                 libtcod.pink)
+        # If there's no monster, start moving
         elif not monster:
             while not libtcod.console_is_window_closed() and not monster and \
             (player.x, player.y) != (tx, ty):
@@ -3276,15 +3536,15 @@ def mouse_move_astar(tx, ty):
                 libtcod.console_flush()
 
                 for obj in objects:
+                    # Continually scan for monsters
                     if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and \
-                    obj.fighter and \
-                    obj.name != player.name:
-                        if obj.ai:
-                            if not obj.ai.tamed:
-                                message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
-                                monster = True
-                                continue
+                    obj.fighter and if obj.ai:
+                        if not obj.ai.tamed:
+                            message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
+                            monster = True
+                            continue
 
+                # Move A*
                 player.move_astar(tx, ty, True)
                 fov_recompute()
 
@@ -3293,8 +3553,10 @@ def mouse_move_astar(tx, ty):
                     if obj.ai:
                         obj.ai.take_turn()
 
+                # Check the ground
                 check_ground()
 
+    # Player clicks outside of map
     except IndexError:
         message('Cannot move: Out of range', TEXT_COLORS['debug'])
 
@@ -3334,10 +3596,9 @@ def new_game():
 
     objects.append(generate_monster('tameddog', 0, 0))
 
+    # let player know they're invisible
     if INVISIBLE:
         player.color = libtcod.black
-
-    player.level = 1
 
     # Initialize dungeon level
     dungeon_level = 1
@@ -3365,6 +3626,7 @@ def next_level():
 
     global dungeon_level, max_dungeon_level, stairs_up
 
+    # Go up
     dungeon_level += 1
 
     stairs_up = True
@@ -3404,8 +3666,6 @@ def place_objects():
 
     for i in range(num_monsters):
         x, y = get_rand_unblocked_coord()
-        while is_blocked(x, y):
-            x, y = get_rand_unblocked_coord()
 
         choice = random_choice(monster_chances)
 
@@ -3421,8 +3681,6 @@ def place_objects():
 
     for i in range(num_items):
         x, y = get_rand_unblocked_coord()
-        while is_blocked(x, y):
-            x, y = get_rand_unblocked_coord()
 
         # Only place it if the tile is not blocked
         choice = random_choice(item_chances)
@@ -3496,6 +3754,7 @@ def player_death(player):
         game_over()
 
     else:
+        # God mode debug hacks
         message('...But it refused!', TEXT_COLORS['fail'])
         player.fighter.hp = player.fighter.max_hp
 
@@ -3515,8 +3774,10 @@ def player_move(dx, dy):
 
     # Attack if target found, move otherwise
     if target is not None:
+        # Displace tamed monsters
         if target.ai.tamed:
             target.displace(dx, dy)
+        # Or attack monsters
         else:
             player.fighter.attack(target)
     else:
@@ -3529,15 +3790,19 @@ def previous_level():
     global dungeon_level, stairs_up
     # In case if you're that guy who likes going back for some reason
 
+    # Go up
     dungeon_level -= 1
 
+    # Set what stairs spawn
     stairs_up = False
 
+    # Check win
     if dungeon_level == 0:
         # Win condition
         for item in inventory:
             if item.name == 'StatTrak Fedora | Fade (Fac New)':
                 game_win()
+        # Quitters are also failures
         else:
             choice = menu('Leave the Dungeon?', ['Yes', 'No'], 30)
 
@@ -3550,6 +3815,7 @@ def previous_level():
                 choice = menu('You head back down into the depths...',
                                 ['Continue'], 30)
 
+    # Otherwise, continue ascent
     else:
         message('After a rare moment of peace, you ascend upwards towards \
             the surface...', TEXT_COLORS['neutral'])
@@ -3573,6 +3839,7 @@ def random_choice_index(chances):
     # Go through all chances, keeping the sum so far
     running_sum = 0
     choice = 0
+
     for w in chances:
         running_sum += w
 
@@ -3586,9 +3853,13 @@ def render_all():
 
     global blind, blind_counter
 
+    # Move the camera
     camera.move(player.x, player.y)
 
+    # Make sure the player isn't blind
     if not blind:
+        # Do normal rendering
+        # Recompute fov
         if camera.check_fov:
             camera.check_fov = False
             fov_recompute()
@@ -3599,25 +3870,32 @@ def render_all():
             if obj.name != player.name:
                 obj.draw()
 
-    else:
-        if blind_counter == BLIND_LENGTH:
-            blind = False
-            blind_counter = 0
-            message("Your vision returns!", TEXT_COLORS['magic'])
-    player.draw()
+        # Always draw the player
+        player.draw()
 
-    if not blind:
         # Display a cursor under mouse coords
         tcod_set_char_bg(con, mouse.cx, mouse.cy, colors.color_ground_highlight)
         # blit the contents of 'con' to the root console
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
         fov_recompute()
+
+    # Blind players see nothing but themselves. (Deep, huh?)
     else:
+        # Reduce time until vision returns
+        if blind_counter == BLIND_LENGTH:
+            blind = False
+            blind_counter = 0
+            message("Your vision returns!", TEXT_COLORS['magic'])
+
+        # Always draw the player
+        player.draw()
+
         tcod_clear(con)
         tcod_set_bg(con, libtcod.black)
         player.draw()
         libtcod.console_blit(con, 0, 0, MAP_WIDTH, MAP_HEIGHT, 0, 0, 0)
 
+    # Render the gui elements
     render_gui()
 
 def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color):
@@ -3643,8 +3921,11 @@ def render_bar(x, y, total_width, name, value, maximum, bar_color, back_color):
 
 def render_bar_simple(x, y, total_width, name, value, color):
     ''' Extremely simple bar rendering
+
     Not intended to have values increase and decrease, but rather display
-    one static value instead (attack, defense)'''
+    one static value instead (attack, defense)
+
+    '''
 
     # Render the background first
     tcod_set_bg(panel, color)
@@ -3683,6 +3964,8 @@ def render_equips(y_offset, slot):
     render_bar_simple(1, y_offset, BAR_WIDTH, slot.capitalize(), equip, libtcod.black)
 
 def render_gui():
+    ''' Render all gui elements from the message console, to the enemies in the room '''
+
     # Prepare to render the GUI panel
     tcod_set_bg(panel, libtcod.black)
     tcod_clear(panel)
@@ -3713,60 +3996,67 @@ def render_gui():
         libtcod.light_red, libtcod.darker_red)
 
     # Self-explanatory bars
+    # Edge
     render_bar(1, 2, BAR_WIDTH, 'Edge', player.fighter.mana,
         player.fighter.max_mana, libtcod.dark_fuchsia, libtcod.darker_fuchsia)
 
+    # XP
     render_bar(1, 3, BAR_WIDTH, 'XP', player.fighter.xp, (LEVEL_UP_BASE +
         player.level * LEVEL_UP_FACTOR), libtcod.dark_yellow,
         libtcod.darker_yellow)
 
+    # Dungeon level
     render_bar_simple(1, 4, BAR_WIDTH, 'Floor', str(dungeon_level),
         libtcod.light_blue)
 
+    # Power
     render_bar_simple(1, 6, BAR_WIDTH/2, 'STR', str(player.fighter.power),
         libtcod.darker_chartreuse)
 
+    # Defense
     render_bar_simple(1, 7, BAR_WIDTH/2, 'DEF', str(player.fighter.defense),
         libtcod.flame)
 
+    # Accuracy
     render_bar_simple(BAR_WIDTH/2+1, 7, BAR_WIDTH/2, 'ACU', str(player.fighter.accuracy),
         libtcod.dark_blue)
 
-    # Render equipment
-    slot_list = [
-        'right hand',
-        'left hand',
-        'head',
-        'face',
-        'neck',
-        'torso',
-        'hands',
-        'legs',
-        'feet',
-        'accessory'
-    ]
-
     # Render a list of equipment slots and items in each slot
-    for y, slot in enumerate(slot_list):
-        render_equips(SCREEN_HEIGHT - len(slot_list) + y, slot)
+    for y, slot in enumerate(SLOT_LIST):
+        render_equips(SCREEN_HEIGHT - len(SLOT_LIST) + y, slot)
 
     # Show all the monsters that the player can see and shows their health
     monsters_in_room = 0
     for obj in objects:
+        # If it's in the player's fov, and the it's a fighter, and it's not the player
+        # AND the player isn't blind...
         if libtcod.map_is_in_fov(fov_map, obj.x, obj.y) and obj.fighter and \
         obj.name != player.name and not blind:
+
+            # Get the total monsters in the room, but limit it as we don't
+            # want this to overlap the rendering of equips in slots
             monsters_in_room += 1
             if monsters_in_room > (SCREEN_HEIGHT - 18) / 2:
                 continue
             else:
+                # Basically for each closest monster, show it's full name
+                # And a health bar
+
+                # Set fg for the name
                 tcod_set_fg(panel, obj.color)
+
+                # Tamed AIs have a special flair
                 flair = ""
                 if obj.ai:
                     if obj.ai.tamed:
                         flair = '(tamed)'
+
+                # Print the name of the monster
                 tcod_print_ex(panel, 1, 7+(2*monsters_in_room),
                     libtcod.BKGND_NONE, libtcod.LEFT, ''.join([obj.char, ' ',
                     obj.name.capitalize() + ' ' + flair]))
+
+                # And a health bar
                 render_health_bar(1, 8+(2*monsters_in_room), BAR_WIDTH,
                     obj.fighter.hp, obj.fighter.base_max_hp, libtcod.red,
                     libtcod.dark_red)
@@ -3774,7 +4064,8 @@ def render_gui():
     # Display names of objects under the mouse
     if not blind:
         tcod_set_fg(msg_panel, libtcod.light_gray)
-        tcod_print_ex(msg_panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, camera.get_names_under_mouse(mouse, objects, COORDS_UNDER_MOUSE))
+        tcod_print_ex(msg_panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, \
+            camera.get_names_under_mouse(mouse, objects, COORDS_UNDER_MOUSE))
 
     # Print the game messages, one line at a time
     y = 1
@@ -3811,7 +4102,7 @@ def render_health_bar(x, y, total_width, value, maximum, bar_color, back_color):
     tcod_print_ex(panel, x + total_width / 2, y, libtcod.BKGND_NONE, libtcod.CENTER, '')
 
 def render_perks(y):
-    ''' Render the perks '''
+    ''' Render the perks at a certain y level on the panel '''
 
     if perk_mtndew >= PERK_BASE:
         tcod_set_fg(panel, libtcod.light_green)
@@ -3879,7 +4170,7 @@ def sort_inventory():
 
     # Sort them...
     # I'll be honest I have no idea what the lambda thing does
-    #   but it looks like it sorts the object list by the names of the object
+    # but it looks like it sorts the object list by the names of the object
     equips = sorted(equips, key=lambda obj: obj.name)
     items = sorted(items, key=lambda obj: obj.name)
 
@@ -3915,6 +4206,7 @@ def target_tile(max_range=None):
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
         render_all()
+
         # Present the root console
         libtcod.console_flush()
         (x, y) = (mouse.cx, mouse.cy)
@@ -3942,6 +4234,7 @@ def taunt():
         'You fell for the meme, kiddo'
     ]
 
+    # Say a random taunt
     message(''.join(['You say \'', random.choice(taunts), '\'']))
 
 def toggle_fullscreen():
@@ -3949,10 +4242,14 @@ def toggle_fullscreen():
 
     libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
-    logger.info('[:] Toggled fullscreen mode')
+    logger.info('Toggled fullscreen mode')
 
 def toggle_siphon():
-    ''' Toggle the siphon spell '''
+    ''' Toggle the siphon spell
+
+    Siphon just drains health. This is enabled at start.
+
+    '''
 
     global activate_siphon
     if activate_siphon:
@@ -3973,13 +4270,17 @@ def weapon_action_knife(weapon):
     message('You inspect your latest knife', TEXT_COLORS['neutral'])
 
 def weapon_action_awp(weapon):
-    ''' AWP action '''
+    ''' AWP action.
+
+    The AWP is basically a magic wand that casts Lightning
+
+    '''
 
     message('You no-scope with the AWP', TEXT_COLORS['magic'])
     cast_lightning()
 
 def weapon_action_firearm(weapon):
-    ''' Firearm action '''
+    ''' Firearm action. Fires the gun. '''
 
     fire_weapon(weapon.equipment)
 
@@ -3992,6 +4293,7 @@ def weapon_action_else(weapon):
 
 # Start ------------------------------------------------------------------------
 
+# Logging is good!
 logger.info('EdgeQuest Start')
 
 # Backup in case if python -B doesn't get ran

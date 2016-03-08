@@ -1,5 +1,19 @@
 # Colors.py
 
+# Generate color themes from colors.json
+
+'''
+
+This file is kind of weird because it's a mix between a core and settings module
+
+Really this file is great for setting the color themes of EdgeQuest in a crazy easy
+way and it has a lot of fallbacks and error handling that allows modders to know
+that they suck at making JSON, which isn't even a programming language.
+
+Max made this, therefore it might be completely confusing.
+
+'''
+
 # Imports ----------------------------------------------------------------------
 
 import traceback
@@ -24,6 +38,7 @@ color_accent           = libtcod.Color(255, 255, 255)
 
 # ------------------------------------------------------------------------------
 
+# Open the colors.json file
 with open(COLOR_JSON_PATH) as json_data:
     color_data = json.load(json_data)
 

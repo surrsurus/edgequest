@@ -1,3 +1,18 @@
+# Wallselect.py
+
+# Wall decorations
+
+'''
+
+Get random characters to display on top of walls in EdgeQuest
+
+* wallselect - takes the world, an x y coordinate pair, and returns a character
+based on the surrounding walls that are connected
+
+'''
+
+# wallselect function ----------------------------------------------------------
+
 def wallselect(world, x, y):
 
     # 4 Way Intersection
@@ -37,3 +52,5 @@ def wallselect(world, x, y):
     # Pillars/Columns
     else:
         return '#'
+
+# ------------------------------------------------------------------------------

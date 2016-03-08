@@ -2,6 +2,15 @@
 
 # Fortune generator for the fortune cookie item
 
+'''
+
+This file contains a list with random rumours and quotes and a function to
+randomly return one of these entries with quotes around it.
+
+* get_fortune - get a random fortune from the fortunes list
+
+'''
+
 # Imports ----------------------------------------------------------------------
 
 from random import choice
@@ -33,6 +42,7 @@ fortunes = [
     'Consumption of home-made food is strictly forbidden in this dungeon.',
     'Didn\'t your mother tell you not to eat food off the floor?',
     'Help!  I\'m being held prisoner in a fortune cookie factory!',
+    "It's not tax evasion if it's not illegal",
     'They say that fortune cookies are food for thought.',
     'Ever find a bomb? I hear it\'s a great one-use item!',
     'They say bombs must be planted at bomb sites.',
@@ -46,6 +56,7 @@ fortunes = [
 # Fortune function -------------------------------------------------------------
 
 def get_fortune():
+    ''' Get a random fortune from the list and return it with surrounding quotes '''
     return '    "' + choice(fortunes) + '"'
 
 # ------------------------------------------------------------------------------

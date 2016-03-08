@@ -2,6 +2,25 @@
 
 # Move the camera view of the world
 
+'''
+
+This file contains functions for manipulating and controlling the camera view of
+the map. The idea is that the map is too big to fit in the constrained view,
+and a camera follows the player as he or she walks around, without having
+the camera go beyond the map bounds
+
+* get_names_under_mouse - self explanatory. When the cursor is hovering over a
+tile or object it will display the name of it on the screen. If the player is in
+debug mode, it will also show the coordinates of the tile and the tile the monster
+would travel to if it does not see the player
+
+* move - move the camera around the map to a target spot
+
+* to_coords - turn coordinates on the map to coodinates on the screen. Good for
+animations.
+
+'''
+
 # Imports ----------------------------------------------------------------------
 
 # You only need to import the camera settings
