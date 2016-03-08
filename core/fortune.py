@@ -42,7 +42,7 @@ fortunes = [
     'Consumption of home-made food is strictly forbidden in this dungeon.',
     'Didn\'t your mother tell you not to eat food off the floor?',
     'Help!  I\'m being held prisoner in a fortune cookie factory!',
-    "It's not tax evasion if it's not illegal",
+    "It's not tax evasion; it's legal.",
     'They say that fortune cookies are food for thought.',
     'Ever find a bomb? I hear it\'s a great one-use item!',
     'They say bombs must be planted at bomb sites.',
