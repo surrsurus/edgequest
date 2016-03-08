@@ -32,7 +32,7 @@ class Logger:
         ['%H:%M:%S'] TIMESTAMP_FORMAT: The format string supplied to `time.strftime()`
     '''
     def __init__(self, USE_STDIO=True, FILE_OUTPUT=True, USE_TIMESTAMPS=True,
-                 TIMESTAMP_FORMAT='%H:%M:%S', STDERR_THRESHOLD=20, LOGFILE_DIR='../logs'):
+                 TIMESTAMP_FORMAT='%H:%M:%S', STDERR_THRESHOLD=20, LOGFILE_DIR='./logs'):
         self.WRITE_TO_STDIO   = USE_STDIO
         self.WRITE_TO_FILE    = FILE_OUTPUT
         self.TIMESTAMP_FORMAT = TIMESTAMP_FORMAT
