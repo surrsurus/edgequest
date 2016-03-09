@@ -42,6 +42,9 @@ from modules import libtcodpy as libtcod
 # JSON parsing library
 from modules import simplejson as json
 
+# Structure generation
+from structures import struct_proc
+
 # Settings
 from settings.keymap import *
 from settings.settings import *
@@ -1552,6 +1555,30 @@ def animate_blast(color, tx, ty, radius):
         render_gui()
         libtcod.console_flush()
 
+def build_struct():
+    ''' Place a random structure on an unblocked coordinate pair on the map '''
+    global world
+
+    struct = struct_proc.get_struct()   # Get a structure
+    tx, ty = get_rand_unblocked_coord() # Get a coordinate
+
+    try:
+        # For each row
+        for y, row in enumerate(struct):
+            # For each column
+            for x, obj in enumerate(row):
+                # Build a wall
+                if obj == '#':
+                    world[tx+x][ty+y].blocked = True
+                    world[tx+x][ty+y].block_sight = True
+                # Build a floor
+                elif obj == '.':
+                    world[tx+x][ty+y].blocked = False
+                    world[tx+x][ty+y].block_sight = False
+    # Has the chance to go beyond map limits
+    except IndexError:
+        logger.error('Structure has gone beyond map bounds. Truncating...')
+
 def cast_confuse():
     ''' Ask the player for a target to confuse '''
 
@@ -3049,16 +3076,11 @@ def handle_keys():
 
         # Reset the map (DEBUG)
         elif key_char == RELOAD_MAP_KEY:
-            # Clear screen
-            for x in range(SCREEN_WIDTH):
-                for y in range(SCREEN_HEIGHT):
-                    tcod_put_char(con, x, y, ' ', libtcod.BKGND_BURN)
-
             # Make a new map
             make_map()
             fov_recompute()
+            render_all()
             player_action = 'didnt-take-turn'
-
         else:
             player_action = 'didnt-take-turn'
 
@@ -3328,18 +3350,6 @@ def make_map():
                             world[x][y].blocked = True
                             world[x][y].block_sight = True
 
-    # Make an FOV map
-    fov_map = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
-
-    # Set FOV map
-    for y in range(MAP_HEIGHT):
-        for x in range(MAP_WIDTH):
-            libtcod.map_set_properties(fov_map, x, y, not world[x][y].block_sight, not world[x][y].blocked)
-
-    # Create stairs at some random ass location
-    x = libtcod.random_get_int(0,0, MAP_WIDTH-1)
-    y = libtcod.random_get_int(0,0, MAP_HEIGHT-1)
-
     # Reset the unblocked coords
     unblocked_world = []
 
@@ -3348,6 +3358,29 @@ def make_map():
         for x in range(MAP_WIDTH):
             if not world[x][y].blocked:
                 unblocked_world.append((x, y))
+
+    # Add structures
+    num_struct = random.randint(0, 3)
+    for i in range(num_struct):
+        if random.randint(0, 100) > STRUCT_CHANCE:
+            build_struct()
+
+    # Create solid wall around map
+    for x in range(MAP_WIDTH):
+        world[x][MAP_HEIGHT-2].blocked = True
+        world[x][1].block_sight = True
+
+    for y in range(MAP_HEIGHT):
+        world[MAP_WIDTH-2][y].blocked = True
+        world[1][y].block_sight = True
+
+    # Make an FOV map
+    fov_map = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
+
+    # Set FOV map
+    for y in range(MAP_HEIGHT):
+        for x in range(MAP_WIDTH):
+            libtcod.map_set_properties(fov_map, x, y, not world[x][y].block_sight, not world[x][y].blocked)
 
     # Put player at a random position
     x, y = get_rand_unblocked_coord()
