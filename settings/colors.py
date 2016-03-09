@@ -22,6 +22,7 @@ from modules import libtcodpy as libtcod
 from modules import simplejson as json
 from core.logger import logger
 from settings import COLOR_JSON_PATH, CURRENT_THEME
+import random
 
 # ------------------------------------------------------------------------------
 
@@ -92,7 +93,16 @@ def default_colors():
     color_ground_highlight = libtcod.Color(200, 180, 50)
     color_accent           = libtcod.Color(255, 255, 255)
 
+def rand_color():
+    ''' Get a random RGB color '''
+    r = random.randint(0, 255)
+    g = random.randint(0, 255)
+    b = random.randint(0, 255)
+    return libtcod.Color(r, g, b)
+
+
 def set_theme(theme):
+    ''' Set theme '''
     global color_light_ground, color_light_wall, \
         color_dark_wall, color_dark_ground, \
         color_wall_highlight, color_ground_highlight, \

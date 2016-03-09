@@ -325,4 +325,6 @@ FALLBACK_MONSTER = {
 
 CURRENT_THEME = 'torchlight'
 
+RAINBOW_MODE = False
+
 # ------------------------------------------------------------------------------

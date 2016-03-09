@@ -2411,18 +2411,38 @@ def fov_recompute():
                     # Still decorate walls
                     if wall:
                         c = wallselect(world, map_x, map_y)
-                        tcod_put_char_ex(con, x, y, c, colors.color_light_ground, colors.color_dark_wall)
+                        if RAINBOW_MODE:
+                            lg = colors.rand_color()
+                            dw = colors.rand_color()
+                        else:
+                            lg = colors.color_light_ground
+                            dw = colors.color_dark_wall
+                        tcod_put_char_ex(con, x, y, c, lg, dw)
                     else:
-                        tcod_set_char_bg(con, x, y, colors.color_dark_ground,
+                        if RAINBOW_MODE:
+                            dg = colors.rand_color()
+                        else:
+                            dg = colors.color_dark_ground
+                        tcod_set_char_bg(con, x, y, dg,
                             bg_set=libtcod.BKGND_SET)
             else:
                 # It's visible
                 # Decorate walls
                 if wall:
                     c = wallselect(world, map_x, map_y)
-                    tcod_put_char_ex(con, x, y, c, colors.color_accent, colors.color_light_wall)
+                    if RAINBOW_MODE:
+                        ca = colors.rand_color()
+                        lw = colors.rand_color()
+                    else:
+                        ca = colors.color_accent
+                        lw = colors.color_light_wall
+                    tcod_put_char_ex(con, x, y, c, ca, lw)
                 else:
-                    tcod_set_char_bg(con, x, y, colors.color_light_ground,
+                    if RAINBOW_MODE:
+                        lg = colors.rand_color()
+                    else:
+                        lg = colors.color_light_ground
+                    tcod_set_char_bg(con, x, y, lg,
                         bg_set=libtcod.BKGND_SET)
                 # Since it's visible, explore it
                 world[map_x][map_y].explored = True
@@ -3471,7 +3491,7 @@ def monster_death_talk(monster):
 
     # Try to get it
     try:
-        assert monster_data[mon]['death_talk'] is not None
+        assert monster_data[monster]['death_talk'] is not None
         mon_death_talk = monster_data[mon]['death_talk']
     # No big deal, just a problem for the JSON
     except AssertionError as e:
