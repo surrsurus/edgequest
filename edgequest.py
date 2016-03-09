@@ -1860,16 +1860,21 @@ def check_args():
             logger.info('No args found')
             main_menu()
 
-        # Do stuff based on flags
-        if FLAGS.MENU:
-            main_menu()
-        if FLAGS.NEWGAME:
-            new_game()
-        if FLAGS.PLAYGAME:
-            play_game()
     except IndexError:
         logger.error('IndexError: Problem with flags. Defaulting to main menu...')
         main_menu()
+
+    # Do stuff based on flags
+    # We move these out of the try catch to fix every single problem.
+    # "check_args: seems to get called half the time when an exception in uncaught.
+    #   Try to put try blocks around as much as possible." - Max
+    # Okay Max. Okay.
+    if FLAGS.MENU:
+        main_menu()
+    if FLAGS.NEWGAME:
+        new_game()
+    if FLAGS.PLAYGAME:
+        play_game()
 
 def check_ground():
     ''' Look for an item in the player's tile '''
@@ -3285,11 +3290,27 @@ def main_menu():
             exit()
 
 def make_map():
-    ''' Make a map '''
+    ''' Make a map
+
+    Prepare the loading of the level by:
+        * Randomly generating a map
+        * Saving a list of all open coordinates
+        * Placing random structures on the map
+        * Placing Objects on the map
+
+    '''
 
     global world, fov_map, objects, dstairs, ustairs, unblocked_world
 
+    #
+    # Initial stages
+    #
+
+    # Ensure that everything goes smoothly
+
     # Tamed monsters follow player up and down stairs
+    # We do this by creating a new list and appending the monster object
+    # There, then re-adding it to the master objects list
     saved_monsters = []
     if objects:
         for mon in objects:
@@ -3297,7 +3318,7 @@ def make_map():
                 if mon.ai.tamed:
                     saved_monsters.append(mon)
 
-    # The list of objects with just the player
+    # Clear objects and append the player
     objects = []
     objects.append(player)
 
@@ -3305,6 +3326,11 @@ def make_map():
     for mon in saved_monsters:
         objects.append(mon)
 
+    #
+    # Map Generation
+    #
+
+    # Start with a blank slate, then writing data onto the 2d array
 
     # fill map with 'blocked' tiles
     world = [[Tile(True) for y in range(MAP_HEIGHT)] for x in range(MAP_WIDTH)]
@@ -3329,26 +3355,44 @@ def make_map():
     the rooms are pretty.
     '''
 
-    # Template original map:
+    # Template of original map generator:
     #   themap.makeMap(MAP_WIDTH,MAP_HEIGHT-2,250,1,MAX_ROOMS*4)
+
+    # This code is messy, apologies. It basically makes dungeons more complex
+    # as time goes on, and by time I mean the dungeon level
+
+    # Calculate number of rooms
     rooms = MAX_ROOMS + dungeon_level + int(math.floor((dungeon_level/4)*4)) + 2
+    # Calculate fail rate
     fail = 150 * int(math.floor((dungeon_level/3)*3)) + 100
+    # Calculate b1
     b1 = int(math.floor((dungeon_level / 6)*3)) + 1
 
+    # Generate a map
     themap.makeMap(MAP_WIDTH, MAP_HEIGHT-2, fail, b1, rooms)
 
-    # Turn ones and zeros into magic
+    # The class generates the map as ones, zeros, twos, threes... basically all
+    # numbers so we just read the 2D list and turn that into the game map with
+    # Some for loops and if statements
     for y in range(MAP_HEIGHT-2):
             for x in range(MAP_WIDTH):
                     if themap.mapArr[y][x]==0:
                             world[x][y].blocked = False
                             world[x][y].block_sight = False
-                    if themap.mapArr[y][x]==1:
+                    elif themap.mapArr[y][x]==1:
                             world[x][y].blocked = True
                             world[x][y].block_sight = True
-                    if themap.mapArr[y][x]==2:
+                    elif themap.mapArr[y][x]==2:
                             world[x][y].blocked = True
                             world[x][y].block_sight = True
+
+    #
+    # Set unblocked coords
+    #
+
+    # Crucial to speeding up certain parts of the game. Instead of randomly
+    # picking a coordinate and hoping it's unblocked, just index all locations
+    # that are availible
 
     # Reset the unblocked coords
     unblocked_world = []
@@ -3359,20 +3403,39 @@ def make_map():
             if not world[x][y].blocked:
                 unblocked_world.append((x, y))
 
+    #
+    # Structure Generation
+    #
+
+    # Add premade structures to the map
+
     # Add structures
     num_struct = random.randint(0, 3)
     for i in range(num_struct):
         if random.randint(0, 100) > STRUCT_CHANCE:
             build_struct()
 
+    #
+    # Close off map
+    #
+
     # Create solid wall around map
+
+    # Top and bottom
     for x in range(MAP_WIDTH):
         world[x][MAP_HEIGHT-2].blocked = True
         world[x][1].block_sight = True
 
+    # Left and right
     for y in range(MAP_HEIGHT):
         world[MAP_WIDTH-2][y].blocked = True
         world[1][y].block_sight = True
+
+    #
+    # FOV
+    #
+
+    # The core of a playable game. The FOV makes a lot of the ai possible
 
     # Make an FOV map
     fov_map = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
@@ -3382,12 +3445,18 @@ def make_map():
         for x in range(MAP_WIDTH):
             libtcod.map_set_properties(fov_map, x, y, not world[x][y].block_sight, not world[x][y].blocked)
 
+    #
+    # Place objects
+    #
+
+    # Place objects around the map randomly
+
     # Put player at a random position
     x, y = get_rand_unblocked_coord()
     player.x = x
     player.y = y
 
-    # Place tamed monster on same tile
+    # Place tamed monster on same tile as player
     for mon in objects:
         if mon.ai:
             if mon.ai.tamed:
@@ -3649,6 +3718,8 @@ def mouse_move_astar(tx, ty):
     # Player clicks outside of map
     except IndexError:
         message('Cannot move: Out of range', TEXT_COLORS['debug'])
+
+    raise IndexError
 
 def msgbox(text, width=50):
     ''' use menu() as a sort of \'message box\' '''
