@@ -3120,8 +3120,9 @@ def id_err(id):
     ''' Log a critical error with monster/item genereation '''
     logger.severe('Error: ' + id + ' is missing data!')
     logger.write('----- STACK TRACE: -----')
-    logger.write(traceback.print_exc())
+    traceback.print_exc()
     logger.write('------------------------')
+    logger.write('The stack trace has not been appended to your log file.')
     exit()
 
 def initialize_fov():

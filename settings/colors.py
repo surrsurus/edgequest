@@ -128,8 +128,9 @@ def set_theme(theme):
             logger.severe('KeyError: JSON error occurred while loading... Using defaults...')
             default_colors()
             logger.write('----- STACK TRACE: -----')
-            logger.write(traceback.print_exc())
+            traceback.print_exc()
             logger.write('------------------------')
+            logger.write('\nThe stack trace has not been appended to your log file.')
 
         # Simple assertion testing to make sure all the colors loaded properly
         try:
@@ -145,8 +146,9 @@ def set_theme(theme):
                 theme + '` theme! Using defaults...')
             default_colors()
             logger.write('----- STACK TRACE: -----')
-            logger.write(traceback.print_exc())
+            traceback.print_exc()
             logger.write('------------------------')
+            logger.write('\nThe stack trace has not been appended to your log file.')
     else:
         logger.warn('No theme passed to set_theme()!')
         logger.info('Defaulting theme...')

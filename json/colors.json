@@ -107,6 +107,24 @@
         }
     },
 
+    "magma": {
+        "highlight": {
+            "wall": "#ff0000",
+            "ground": "#ff0000"
+        },
+        "ground": {
+            "light": "#c62828",
+            "dark": "#424242"
+        },
+        "wall": {
+            "light": "#b71c1c",
+            "dark": "#212121"
+        },
+        "accent": {
+            "light": "#ff7043"
+        }
+    },
+
     "erroneous": {}
 
 }
