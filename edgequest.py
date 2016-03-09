@@ -537,12 +537,40 @@ class TamedMonster:
 
     '''
     def __init__(self):
-        # Create a coordinate the monster travels to if it
-        #   doesn't see the player
-        self.backup_coord = get_rand_unblocked_coord()
+        # Get coord around player
+        self.backup_coord = self.spot_around(player.x, player.y)
 
         # Tamed is true! This monster is special.
         self.tamed = True
+
+    def spot_around(self, tx, ty):
+        ''' Get a random spot around the player
+
+        1 2 3
+        4 @ 5
+        6 7 8
+
+        Coords correspond to detail above
+
+        '''
+
+        coord = random.randint(1, 8)
+        if coord == 1: # NW
+            return (tx-1, ty+1)
+        if coord == 2: # N
+            return (tx, ty+1)
+        if coord == 3: # NE
+            return (tx+1, ty+1)
+        if coord == 4: # W
+            return (tx-1, ty)
+        if coord == 5: # E
+            return (tx+1, ty)
+        if coord == 6: # SW
+            return (tx-1, ty-1)
+        if coord == 7: # S
+            return (tx, ty-1)
+        if coord == 8: # SE
+            return (tx+1, ty-1)
 
     def take_turn(self):
         '''Monster takes its turn. If you can see it, it can see you '''
@@ -576,16 +604,21 @@ class TamedMonster:
 
             # Move towards player
             elif monster.distance_to(player) >= 2:
-                monster.move_astar(player.x, player.y, False)
+                (x, y) = (self.backup_coord)
+                monster.move_astar(x, y, False)
+
+            # Move around randomly
+            else:
+                (x, y) = (self.backup_coord)
+                monster.move_astar(x, y, False)
 
         # Otherwise it moves to a random map location
         else:
-            x, y = self.backup_coord
+            (x, y) = (self.backup_coord)
             monster.move_astar(x, y, False)
 
         # If the monster has reached the coord position, make a new one
-        if (monster.x, monster.y) == self.backup_coord:
-            self.backup_coord = get_rand_unblocked_coord()
+        self.backup_coord = self.spot_around(player.x, player.y)
 
 class RangedTalkerMonster:
     ''' An AI that says things and shoots
@@ -3325,7 +3358,7 @@ def make_map():
     for mon in objects:
         if mon.ai:
             if mon.ai.tamed:
-                mon.backup_coord = get_rand_unblocked_coord()
+                mon.backup_coord = (x, y)
                 (mon.x, mon.y) = (x, y)
 
     # If player is moving downwards
