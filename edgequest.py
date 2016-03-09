@@ -3490,8 +3490,12 @@ def monster_death_talk(monster):
     # However the death talk isn't asserted
 
     # Try to get it
+    mon = None
+    for id in monster_data:
+        if monster.name == monster_data[id]['name']:
+            mon = id
     try:
-        assert monster_data[monster]['death_talk'] is not None
+        assert monster_data[mon]['death_talk'] is not None
         mon_death_talk = monster_data[mon]['death_talk']
     # No big deal, just a problem for the JSON
     except AssertionError as e:
