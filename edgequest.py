@@ -1486,6 +1486,9 @@ class Namespace(object): pass
 
 def animate_bolt(color, dx, dy, tx, ty):
     ''' Animate a lightning bolt from the player to an enemy '''
+
+    logger.info('Animating bolt')
+
     if not blind:
         # While, the distance to the monster is greater than 2
         # Aka go towards it until it's one space away
@@ -1531,6 +1534,8 @@ def animate_bolt(color, dx, dy, tx, ty):
 def animate_blast(color, tx, ty, radius):
     ''' Animate an explosion '''
 
+    logger.info('Animating blast')
+
     for i in range(radius):
 
         fov_recompute()
@@ -1561,6 +1566,8 @@ def build_struct():
     ''' Place a random structure on an unblocked coordinate pair on the map '''
     global world
 
+    logger.info('Generating a structure')
+
     struct = struct_proc.get_struct()   # Get a structure
     tx, ty = get_rand_unblocked_coord() # Get a coordinate
 
@@ -1583,6 +1590,8 @@ def build_struct():
 
 def cast_confuse():
     ''' Ask the player for a target to confuse '''
+
+    logger.info('Casting confuse')
 
     message('Left-click an enemy to confuse it, or right-click to cancel.',
         TEXT_COLORS['magic'])
@@ -1607,6 +1616,8 @@ def cast_confuse():
 def cast_death():
     ''' Ask the player for a target tile to kill '''
 
+    logger.info('Casting death')
+
     message('Left-click a target monster to report, or right-click to cancel.',
             TEXT_COLORS['magic'])
 
@@ -1624,6 +1635,8 @@ def cast_death():
 
 def cast_explode():
     ''' Detonate a bomb '''
+
+    logger.info('Casting explode')
 
     message('The bomb explodes, burning everything within ' +
         str(FIREBALL_RADIUS*2) + ' tiles!', TEXT_COLORS['very_bad'])
@@ -1643,6 +1656,8 @@ def cast_explode():
 
 def cast_fireball():
     ''' Ask the player for a target tile to throw a fireball at '''
+
+    logger.info('Casting fireball')
 
     message('Left-click a target tile for the fireball, or \
         right-click to cancel.', TEXT_COLORS['magic'])
@@ -1670,6 +1685,8 @@ def cast_fortune():
     ''' Eat a fortune cookie. Not really a spell, more of a usable effect
     specific to the fortune cookie item '''
 
+    logger.info('Casting fortune')
+
     message('You break open the fortune cookie and eat the shell.', TEXT_COLORS['neutral'])
 
     # Do nothing if full health
@@ -1685,6 +1702,8 @@ def cast_fortune():
 def cast_heal():
     ''' Heal the player '''
 
+    logger.info('Casting heal')
+
     if player.fighter.hp == player.fighter.max_hp:
         message('You are already at full health.', TEXT_COLORS['neutral'])
         return 'cancelled'
@@ -1695,6 +1714,8 @@ def cast_heal():
 def cast_inflict_blindness():
     ''' Inflict blindness. Basically just limit what gets rendered '''
 
+    logger.info('Inflicting blindness')
+
     global blind, blind_counter
     blind = True
     blind_counter = 0
@@ -1702,6 +1723,8 @@ def cast_inflict_blindness():
 
 def cast_mana():
     ''' Give some mana back '''
+
+    logger.info('Casting mana')
 
     if player.fighter.mana == player.fighter.max_mana:
         message('You already have enough edge.', TEXT_COLORS['neutral'])
@@ -1713,6 +1736,8 @@ def cast_mana():
 def cast_magic_missile(fighter_owner):
     ''' Find closest enemy (inside a maximum range) and damage it
     assumes that you already have a monster in range '''
+
+    logger.info('Casting magic missile')
 
     obj = fighter_owner.fighter
 
@@ -1747,6 +1772,8 @@ def cast_magic_missile(fighter_owner):
 
 def cast_lightning():
     ''' Find closest enemy (inside a maximum range) and damage it '''
+
+    logger.info('Casting lightning')
 
     monster = closest_monster(LIGHTNING_RANGE)
     if monster is None:  # No enemy found within maximum range
@@ -1807,6 +1834,7 @@ def check_args():
         FLAGS.MENU = False
         FLAGS.NEWGAME = True
         FLAGS.PLAYGAME = True
+        logger.info('Arg: Quickstart enabled')
 
     def ARG_DEBUG():
         ''' Enable debug mode '''
@@ -1818,6 +1846,7 @@ def check_args():
         STAIR_HACK = True
         SEE_ALL = True
         COORDS_UNDER_MOUSE = True
+        logger.info('Arg: Debug enabled')
 
     try:
         # Function lookup for sysargs
@@ -1845,6 +1874,7 @@ def check_args():
                         # Look up function and call it
                         ARG_LOOKUP[expanded_arg]()
                         FLAGS.FOUND = True
+                        logger.info('Arg: Found miniarg')
                     except (IndexError, KeyError) as e:
                         logger.error('Arg: invalid argument `' + minarg + '`, continuing as normal')
             # Look for large arguments like `--help`
@@ -1855,6 +1885,7 @@ def check_args():
                     # Look up function and call it
                     ARG_LOOKUP[expanded_arg]()
                     FLAGS.FOUND = True
+                    logger.info('Arg: Found arg')
                 except (IndexError, KeyError) as e:
                     logger.error('Arg: invalid argument `' + expanded_arg + '`, continuing as normal')
         # If there are no args found, run this
@@ -1882,6 +1913,7 @@ def check_ground():
     ''' Look for an item in the player's tile '''
     for obj in objects:
         if obj.x == player.x and obj.y == player.y and obj != player:
+            logger.debug('{0} is on the ground'.format(obj.name))
             message(' '.join(['You see a', obj.name, 'here.']), TEXT_COLORS['neutral'])
 
 def check_level_up():
@@ -1899,6 +1931,8 @@ def check_level_up():
         player.fighter.xp = 0
         message('Your battle skills grow stronger! You reached level ' +
             str(player.level) + '!', TEXT_COLORS['level_up'])
+
+        logger.info('Leveled up to {0}'.format(str(player.level)))
 
         choice = None
         while choice == None:  # Keep asking until a choice is made
@@ -1930,6 +1964,7 @@ def check_level_up():
             if obj.ai.tamed:
                 if obj.fighter.xp >= obj.fighter.level_up_xp:
                     message('Your ' + obj.name + ' has grown!')
+                    logger.info('{0} Leveled up to {1}'.format(obj.name, str(player.level)))
                     obj.fighter.base_power += 2
                     obj.fighter.base_defense += 2
                     obj.fighter.base_max_hp += 20
@@ -1943,6 +1978,7 @@ def check_timer():
         if obj.fighter:
             if obj.fighter.hp != obj.fighter.max_hp:
                 if timer % REGEN_SPEED == 0:
+                    logger.debug('Regenerating 1 health for {0}'.format(obj.name))
                     obj.fighter.heal(1)
                     timer += 1
 
@@ -1956,6 +1992,8 @@ def choose_name():
     # In case if the name isn't anything
     if name == '':
         name = DEFAULT_NAME
+
+    logger.info('Player name is: {0}'.format(player_name))
 
     player_name = name.capitalize()
 
@@ -2162,6 +2200,7 @@ def consumables_menu(header):
     # If an item was chosen, return it
     if index is None or len(consum_inven) == 0:
         return None
+    logger.debug('Selected a "{0}" from consumables menu'.format(consum_inven[index].item))
     return consum_inven[index].item
 
 def credits_screen():
@@ -2192,6 +2231,8 @@ def credits_screen():
 
 def debug_spawn_console(json_list):
     ''' Spawn a mini-console to spawn-in monsters or items '''
+
+    logger.debug('Opening debug console')
 
     # Needs to have JSON data
     if json_list not in ['monster', 'item']:
@@ -2254,6 +2295,8 @@ def debug_spawn_console(json_list):
 def debug_kill_all():
     ''' Kill everything with an ai that's not tamed '''
 
+    logger.debug('Killing everything')
+
     for obj in objects:
         if obj.ai:
             if not obj.ai.tamed:
@@ -2261,6 +2304,13 @@ def debug_kill_all():
 
 def de_dust():
     ''' Place objects on level. Easter egg '''
+
+    logger.debug('Round begins in 5...')
+    logger.debug('Round begins in 4...')
+    logger.debug('Round begins in 3...')
+    logger.debug('Round begins in 2...')
+    logger.debug('Round begins in 1...')
+
     # Maximum number of monsters per level
     max_monsters = from_dungeon_level([[4, 1], [7, 2], [13, 4],
         [20, 6], [30, 12]])
@@ -2392,6 +2442,7 @@ def equipment_menu(header):
     # If an item was chosen, return it
     if index is None or len(equip_inven) == 0:
         return None
+    logger.debug('Selected {0} from equipment menu'.format(equip_inven[index].item))
     return equip_inven[index].item
 
 def fire_weapon(equipment):
@@ -2452,6 +2503,9 @@ def fov_recompute():
     ''' Recompute fov '''
 
     global world
+
+    # Disabled
+    # logger.debug('Recomputing FOV...')
 
     # Move the camera
     camera.move(player.x, player.y)
@@ -2533,12 +2587,16 @@ def from_dungeon_level(table):
 def game_over():
     ''' Lose the game '''
 
+    logger.debug('Game lost!')
+
     msgbox_stats('You lose!')
 
     main_menu()
 
 def game_win():
     ''' Win the game! '''
+
+    logger.debug('Game won!')
 
     msgbox_stats('You win!')
 
@@ -2548,6 +2606,8 @@ def game_win():
 
 def generate_monster(monster_id, x, y):
     ''' Generate monster from json '''
+
+    logger.debug('Generating monster with id {0} at ({1}, {2})'.format(monster_id, str(x), str(y)))
 
     # Dictionary of death functions
     dict_death_func = {
@@ -2678,6 +2738,8 @@ def generate_item(item_id, x, y):
 
     Please look at the json for more info on properties of both
     '''
+
+    logger.debug('Generating item with id {0} at ({1}, {2})'.format(item_id, str(x), str(y)))
 
     # Dictionary of all effects of items
     dict_effects = {
@@ -2867,11 +2929,15 @@ def get_equipped_in_slot(slot):
         # If it's an equipped equipment in the slot return it
         if obj.equipment and obj.equipment.slot == \
         slot and obj.equipment.is_equipped:
+            logger.debug("{0} is in slot {1}".format(obj.name, slot))
             return obj.equipment
     return None
 
 def get_all_equipped(obj):
     ''' Returns a list of equipped items '''
+
+    # Disabled
+    # logger.debug("Getting all equipped items...")
 
     # Maybe sort of possible to have monsters with equipments?
     if obj == player:
@@ -2889,7 +2955,9 @@ def get_rand_unblocked_coord():
     ''' Get a random, unblocked coordinate on the map '''
     # If you don't understand what this does, then maybe you should learn some
     # Python before diving into the source code
-    return random.choice(unblocked_world)
+    coord = random.choice(unblocked_world)
+    logger.debug('Unblocked coord: {0}'.format(str(coord)))
+    return coord
 
 def git_screen():
     ''' Show a screen reminding the player to check for updates '''
@@ -2922,6 +2990,9 @@ def handle_keys():
     '''
 
     global game_state, objects, player_action, key, timer
+
+    # Disabled
+    # logger.debug('Handling input...')
 
     # F4 for Fullscreen
     if key.vk in FULLSCREEN_KEYS:
@@ -3129,6 +3200,8 @@ def id_err(id):
 def initialize_fov():
     ''' Initialize the fov '''
 
+    logger.debug('Initializing FOV...')
+
     global fov_map
     camera.check_fov = True
 
@@ -3144,6 +3217,8 @@ def initialize_theme(theme):
 
 def intro_cutscene():
     ''' Show a cutscene '''
+
+    logger.debug('Showing cutscene...')
 
     # Set Colors
     tcod_set_bg(con, libtcod.black)
@@ -3198,6 +3273,7 @@ def inventory_menu(header):
     # If an item was chosen, return it
     if index is None or len(inventory) == 0:
         return None
+    logger.debug('Selected {0} from inventory menu'.format(inventory[index].item.name))
     return inventory[index].item
 
 def is_blocked(x, y):
@@ -3210,8 +3286,10 @@ def is_blocked(x, y):
     # Now check for any blocking objects
     for obj in objects:
         if obj.blocks and obj.x == x and obj.y == y:
+            logger.debug("({0}, {1}) is blocked".format(x, y))
             return True
 
+    logger.debug("({0}, {1}) is not blocked".format(x, y))
     return False
 
 def json_get_color(color_str):
@@ -3224,6 +3302,8 @@ def load_game():
     # I have no idea how shelve works but it's magic
     global world, objects, player, inventory, game_msgs, game_state, \
             dungeon_level, dstairs, ustairs, blind, blind_counter
+
+    logger.debug('Loading game...')
 
     file = shelve.open('savegame', 'r')
     world = file['world']
@@ -3240,6 +3320,8 @@ def load_game():
     blind_counter = file['blind_counter']
     file.close()
 
+    logger.debug('Loaded!')
+
     if not blind:
         initialize_fov()
     else:
@@ -3247,6 +3329,8 @@ def load_game():
 
 def main_menu():
     ''' Show the main menu '''
+
+    logger.debug('Main menu started')
 
     img = libtcod.image_load(MENU_IMAGE)
 
@@ -3310,6 +3394,8 @@ def make_map():
 
     # Ensure that everything goes smoothly
 
+    logger.debug('Initializing map of {0} by {1}'.format(MAP_WIDTH, MAP_HEIGHT))
+
     # Tamed monsters follow player up and down stairs
     # We do this by creating a new list and appending the monster object
     # There, then re-adding it to the master objects list
@@ -3331,6 +3417,8 @@ def make_map():
     #
     # Map Generation
     #
+
+    logger.debug('Generating map...')
 
     # Start with a blank slate, then writing data onto the 2d array
 
@@ -3396,6 +3484,8 @@ def make_map():
     # picking a coordinate and hoping it's unblocked, just index all locations
     # that are availible
 
+    logger.debug('Getting unblocked coordinates...')
+
     # Reset the unblocked coords
     unblocked_world = []
 
@@ -3421,6 +3511,8 @@ def make_map():
     # Close off map
     #
 
+    logger.debug('Putting the finishing touches on the map...')
+
     # Create solid wall around map
 
     # Top and bottom
@@ -3437,6 +3529,8 @@ def make_map():
     # FOV
     #
 
+    logger.debug('Creating FOV...')
+
     # The core of a playable game. The FOV makes a lot of the ai possible
 
     # Make an FOV map
@@ -3450,6 +3544,7 @@ def make_map():
     #
     # Place objects
     #
+    logger.debug('Placing objects...')
 
     # Place objects around the map randomly
 
@@ -3511,6 +3606,8 @@ def make_map():
         # initialize_theme()
         pass
 
+    logger.debug('Map is ready')
+
 def menu(header, options, width):
     ''' Create a menu that options can be selected from using the alphabet '''
 
@@ -3563,6 +3660,8 @@ def message(new_msg, color=TEXT_COLORS['default']):
 
     global old_msg, msg_counter
 
+    logger.info('Sending message: "{0}"'.format(new_msg))
+
     # If the same message is going to be re-outputted, add a convenient counter
     if old_msg == new_msg:
         msg_counter += 1
@@ -3594,6 +3693,8 @@ def message(new_msg, color=TEXT_COLORS['default']):
 def monster_death(monster):
     ''' Function called when monster dies '''
 
+    logger.debug('Monster death: {0}'.format(monster.name))
+
     # Transform it into a nasty corpse! it doesn't block, can't be
     # Attacked and doesn't move
     message(' '.join([monster.name.capitalize(), 'is dead!']),
@@ -3604,6 +3705,8 @@ def monster_death(monster):
 
 def monster_death_slock(monster):
     ''' Function called when monster dies. Blinds player '''
+
+    logger.debug('Slock death activated by {0}'.format(monster.name))
 
     # Transform it into a nasty corpse! it doesn't block, can't be
     # Attacked and doesn't move
@@ -3625,6 +3728,8 @@ def monster_death_talk(monster):
 
     # This function assumes that the assertions for the death functions worked
     # However the death talk isn't asserted
+
+    logger.debug('Monster death talk for {0}'.format(monster.name))
 
     # Try to get it
     mon = None
@@ -3656,11 +3761,14 @@ def monster_occupy_check(dx, dy):
 
     for obj in objects:
         if (obj.x, obj.y) == (dx, dy) and obj.blocks:
+            logger.debug('Monster occupies ({0}, {1})'.format(str(dx), str(dy)))
             return True
     return False
 
 def mouse_move_astar(tx, ty):
     ''' Click on a space to send player there '''
+
+    logger.debug('Player used A* movement')
 
     monster = False
 
@@ -3717,6 +3825,8 @@ def mouse_move_astar(tx, ty):
                 # Check the ground
                 check_ground()
 
+                logger.debug('Player stopped moving based on A*')
+
     # Player clicks outside of map
     except IndexError:
         message('Cannot move: Out of range', TEXT_COLORS['debug'])
@@ -3747,6 +3857,8 @@ def new_game():
     global player, edge, inventory, game_msgs, game_state, dungeon_level, \
             monster_data, items_data, dog, objects
 
+    logger.debug('Starting new game...')
+
     # Player
     # create object representing the player
     fighter_component = Fighter(hp=100, defense=1, power=4, xp=0, mana=100,
@@ -3755,11 +3867,16 @@ def new_game():
     player = Object(0, 0, PLAYER_CHARACTER, player_name, PLAYER_COLOR, blocks=True,
         fighter=fighter_component)
 
+    logger.debug('Player initialized')
+
     objects.append(generate_monster('tameddog', 0, 0))
+
+    logger.debug('Dog initialized')
 
     # let player know they're invisible
     if INVISIBLE:
         player.color = libtcod.black
+        logger.debug('Player is invisible!')
 
     # Initialize dungeon level
     dungeon_level = 1
@@ -3785,6 +3902,8 @@ def new_game():
 def next_level():
     ''' Go to next level '''
 
+    logger.info('Going down stairs...')
+
     global dungeon_level, max_dungeon_level, stairs_up
 
     # Go up
@@ -3800,6 +3919,9 @@ def next_level():
 
 def place_objects():
     ''' Place objects on level '''
+
+    logger.debug('Placing objects on level {0}'.format(str(dungeon_level)))
+
     # Maximum number of monsters per level
     max_monsters = from_dungeon_level([[4, 1], [7, 2], [13, 4],
         [20, 6], [21, 10]])
@@ -3835,6 +3957,8 @@ def place_objects():
         # Add monster to object list
         objects.append(monster)
 
+        logger.debug('Monster created: {0}'.format(monster.name))
+
         # monster.send_to_back()
 
     # Choose random number of items
@@ -3854,6 +3978,8 @@ def place_objects():
         # Items are visible even out-of-FOV, if in an explored area
         item.always_visible = True
 
+        logger.debug('Item created: {0}'.format(item.name))
+
 def play_game():
     ''' Main game loop '''
 
@@ -3863,6 +3989,8 @@ def play_game():
 
     mouse = libtcod.Mouse()
     key = libtcod.Key()
+
+    logger.info('Running main game loop...')
 
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
@@ -3893,11 +4021,17 @@ def play_game():
                 blind_counter += 1
             timer += 1
 
+        # Disabled
+        # logger.debug('Current game state: {0}'.format(game_state))
+
 def player_death(player):
     ''' What happens when player dies '''
 
     # The game ended!
     global game_state
+
+    logger.info('Player died!')
+
     if not GOD_MODE: # Debug
         message('You died!', TEXT_COLORS['very_bad'])
 
@@ -3943,13 +4077,15 @@ def player_move(dx, dy):
             player.fighter.attack(target)
     else:
         player.move(dx, dy)
+        logger.debug('Player is moving to ({0}, {1})'.format(str(player.x+dx), str(player.y+y)))
         fov_recompute()
 
 def previous_level():
     ''' Go back up in the dungeon '''
 
     global dungeon_level, stairs_up
-    # In case if you're that guy who likes going back for some reason
+
+    logger.info('Going up stairs...')
 
     # Go up
     dungeon_level -= 1
@@ -4013,6 +4149,9 @@ def render_all():
     ''' Draw everything to the screen '''
 
     global blind, blind_counter
+
+    # Disabled
+    # logger.debug('Rendering everything...')
 
     # Move the camera
     camera.move(player.x, player.y)
@@ -4289,6 +4428,8 @@ def save_game():
     ''' Open a new empty shelve (possibly overwriting an old one)
     to write the game data '''
 
+    logger.info('Saving game...')
+
     choice = menu('Save and Quit?', ['Yes', 'No'], 24)
 
     if choice == 0:  # Yes
@@ -4309,6 +4450,7 @@ def save_game():
         render_all()
         # Present the root console
         libtcod.console_flush()
+        logger.info('Saved!')
         choice = menu('Bye!', [], 6)
         exit()
     elif choice == 1:  # No
@@ -4318,6 +4460,8 @@ def sort_inventory():
     ''' Sorts inventory with equipment first followed by items '''
 
     global inventory
+
+    logger.debug('Sorting inventory...')
 
     equips = []
     items = []
@@ -4351,6 +4495,7 @@ def target_monster(max_range=None):
         # Return the first clicked monster, otherwise continue looping
         for obj in objects:
             if obj.x == x and obj.y == y and obj.fighter and obj != player:
+                logger.debug('Target monster is: {0}'.format(obj.name))
                 return obj
 
 def target_tile(max_range=None):

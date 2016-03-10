@@ -70,6 +70,12 @@ class Logger:
         self.log(1, '{0: <4}'.format('[INFO]'), *args)
     def important(self, *args):
         self.log(10, '{0: <4}'.format('[IMP]'), *args)
+    def item(self, *args):
+        self.log(10, '{0: <4}'.format('[ITEM]'), *args)
+    def map(self, *args):
+        self.log(10, '{0: <4}'.format('[MAP]'), *args)
+    def monster(self, *args):
+        self.log(10, '{0: <4}'.format('[MONSTER]'), *args)
     def warn(self, *args):
         self.log(15, '{0: <4}'.format('[WARN]'), *args)
     def error(self, *args):
