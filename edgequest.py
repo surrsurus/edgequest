@@ -1383,12 +1383,17 @@ class Object:
         or player_move:
             #Find the next coordinates in the computed full path
             x, y = libtcod.path_walk(my_path, True)
+
+            # Displace objects if needed
+            '''
             if self == player:
                 for obj in objects:
                     if obj.ai:
                         if obj.ai.tamed:
                             if (obj.x, obj.y) == (x, y):
                                 obj.displace(x-player.x, y-player.y)
+            '''
+            
             if x or y:
                 #Set self's coordinates to the next path tile
                 self.x = x
