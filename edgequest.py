@@ -55,10 +55,12 @@ from settings.settings import *
 # Paths are defined in settings.py
 
 # Load monsters
+logger.info('Loading ' + MONSTER_JSON_PATH)
 with open(MONSTER_JSON_PATH) as json_data:
     monster_data = json.load(json_data)
 
 # Load items
+logger.info('Loading ' + ITEM_JSON_PATH)
 with open(ITEM_JSON_PATH) as json_data:
     items_data = json.load(json_data)
 
@@ -3719,8 +3721,6 @@ def mouse_move_astar(tx, ty):
     except IndexError:
         message('Cannot move: Out of range', TEXT_COLORS['debug'])
 
-    raise IndexError
-
 def msgbox(text, width=50):
     ''' use menu() as a sort of \'message box\' '''
     menu(text, [], width)
@@ -4381,6 +4381,7 @@ def target_tile(max_range=None):
         #   and in case a range is specified, if it's in that range
         if (mouse.lbutton_pressed and libtcod.map_is_in_fov(fov_map, x, y) and \
         (max_range is None or player.distance(x, y) <= max_range)):
+            logger.debug('Target tile is ({0}, {1})'.format(x, y))
             return x, y
 
 def taunt():
@@ -4401,9 +4402,9 @@ def taunt():
 def toggle_fullscreen():
     ''' Toggle fullscreen mode in libtcod '''
 
-    libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-
     logger.info('Toggled fullscreen mode')
+
+    libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
 def toggle_siphon():
     ''' Toggle the siphon spell
@@ -4413,6 +4414,7 @@ def toggle_siphon():
     '''
 
     global activate_siphon
+    logger.debug('Siphon toggled')
     if activate_siphon:
         activate_siphon = False
         message('You deativate your siphon ability', TEXT_COLORS['debug'])
