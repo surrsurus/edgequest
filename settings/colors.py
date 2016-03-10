@@ -85,6 +85,8 @@ def default_colors():
         color_wall_highlight, color_ground_highlight, \
         color_accent
 
+    logger.info('Setting to default color scheme...')
+
     color_light_ground     = libtcod.Color(110, 109, 91)
     color_light_wall       = libtcod.Color(128, 127, 98)
     color_dark_wall        = libtcod.Color(51, 51, 51)
@@ -99,7 +101,6 @@ def rand_color():
     g = random.randint(0, 255)
     b = random.randint(0, 255)
     return libtcod.Color(r, g, b)
-
 
 def set_theme(theme):
     ''' Set theme '''
@@ -123,14 +124,12 @@ def set_theme(theme):
             color_wall_highlight   = get_color(color_data[theme]['highlight']['wall'])
             color_ground_highlight = get_color(color_data[theme]['highlight']['ground'])
             color_accent           = get_color(color_data[theme]['accent']['light'])
-
         except KeyError as e:
-            logger.severe('KeyError: JSON error occurred while loading... Using defaults...')
+            logger.severe("KeyError({0}): {1}".format(e.errno, e.strerror))
             default_colors()
             logger.write('----- STACK TRACE: -----')
-            traceback.print_exc()
+            logger.write(traceback.extract_stack())
             logger.write('------------------------')
-            logger.write('\nThe stack trace has not been appended to your log file.')
 
         # Simple assertion testing to make sure all the colors loaded properly
         try:
@@ -142,13 +141,11 @@ def set_theme(theme):
             assert color_ground_highlight is not None
             assert color_accent           is not None
         except AssertionError as e:
-            logger.severe('AssertionError: Looks like there is invalid or missing data in the `' +\
-                theme + '` theme! Using defaults...')
+            logger.severe("AssertionError ({0}): {1}".format(e.errno, e.strerror))
             default_colors()
             logger.write('----- STACK TRACE: -----')
-            traceback.print_exc()
+            logger.write(traceback.extract_stack())
             logger.write('------------------------')
-            logger.write('\nThe stack trace has not been appended to your log file.')
     else:
         logger.warn('No theme passed to set_theme()!')
         logger.info('Defaulting theme...')
