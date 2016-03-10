@@ -15,6 +15,7 @@ GitHub issue tracker
 
 '''
 
+
 # Libtcod settings -------------------------------------------------------------
 
 # Screen width and height

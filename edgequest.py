@@ -77,6 +77,9 @@ dog = None
 # We need to set this to prevent a segfault because py2.7 nested functions do weird stuff
 player_name = DEFAULT_NAME
 
+# player path object
+player_path = None
+
 # Object List
 objects = []
 
@@ -1331,6 +1334,9 @@ class Object:
         libtcod has this built in... Thank goodness
 
         '''
+
+        global player_path
+
         # Create a FOV map that has the dimensions of the map
         fov = libtcod.map_new(MAP_WIDTH, MAP_HEIGHT)
 
@@ -1356,6 +1362,8 @@ class Object:
         # The 1.41 is the normal diagonal cost of moving,
         #   it can be set as 0.0 if diagonal moves are prohibited
         my_path = libtcod.path_new_using_map(fov, 1.41)
+        if self == player:
+            player_path = my_path
 
         # Compute the path between self's coordinates and the
         # target's coordinates
@@ -1375,6 +1383,12 @@ class Object:
         or player_move:
             #Find the next coordinates in the computed full path
             x, y = libtcod.path_walk(my_path, True)
+            if self == player:
+                for obj in objects:
+                    if obj.ai:
+                        if obj.ai.tamed:
+                            if (obj.x, obj.y) == (x, y):
+                                obj.displace(x-player.x, y-player.y)
             if x or y:
                 #Set self's coordinates to the next path tile
                 self.x = x
@@ -3812,10 +3826,16 @@ def mouse_move_astar(tx, ty):
                             message('Cannot move: Monster in view!', TEXT_COLORS['debug'])
                             monster = True
                             continue
+                        else:
+                            obj.move_astar(tx, ty, True)
 
-                # Move A*
                 player.move_astar(tx, ty, True)
                 fov_recompute()
+
+                # Test to see if location is reachable
+                if libtcod.path_is_empty(player_path):
+                    message('Path is blocked!', TEXT_COLORS['debug'])
+                    break
 
                 # AI takes turn
                 for obj in objects:
@@ -3825,11 +3845,11 @@ def mouse_move_astar(tx, ty):
                 # Check the ground
                 check_ground()
 
-                logger.debug('Player stopped moving based on A*')
-
     # Player clicks outside of map
     except IndexError:
         message('Cannot move: Out of range', TEXT_COLORS['debug'])
+
+    logger.debug('Player stopped moving based on A*')
 
 def msgbox(text, width=50):
     ''' use menu() as a sort of \'message box\' '''

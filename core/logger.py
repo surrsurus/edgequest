@@ -32,13 +32,15 @@ class Logger:
         ['%H:%M:%S'] TIMESTAMP_FORMAT: The format string supplied to `time.strftime()`
     '''
     def __init__(self, USE_STDIO=True, FILE_OUTPUT=True, USE_TIMESTAMPS=True,
-                 TIMESTAMP_FORMAT='%H:%M:%S', STDERR_THRESHOLD=20, LOGFILE_DIR='./logs'):
+                 TIMESTAMP_FORMAT='%H:%M:%S', STDERR_THRESHOLD=20, LOGFILE_DIR='./logs',
+                 log_threshold=0):
         self.WRITE_TO_STDIO   = USE_STDIO
         self.WRITE_TO_FILE    = FILE_OUTPUT
         self.TIMESTAMP_FORMAT = TIMESTAMP_FORMAT
         self.USE_TIMESTAMPS   = USE_TIMESTAMPS
         self.STDERR_THRESHOLD = STDERR_THRESHOLD
         self.LOGFILE_DIR      = LOGFILE_DIR
+        self.log_threshold    = log_threshold
         if self.WRITE_TO_FILE:
             try:
                 if not os.path.exists(self.LOGFILE_DIR):
@@ -56,12 +58,13 @@ class Logger:
 
     def write(self, msg, level=0):
         ''' Write to a log file and/or print to stdout '''
-        if self.WRITE_TO_STDIO:
-            if self.STDERR_THRESHOLD > level:
-                sys.stdout.write(msg)
-            else:
-                sys.stderr.write(msg)
-        if self.WRITE_TO_FILE: self.LOGFILE.write(msg)
+        if level >= self.log_threshold:
+            if self.WRITE_TO_STDIO:
+                if self.STDERR_THRESHOLD > level:
+                    sys.stdout.write(msg)
+                else:
+                    sys.stderr.write(msg)
+            if self.WRITE_TO_FILE: self.LOGFILE.write(msg)
 
     # Helper functions for pre-formatted thingymajigs
     def debug(self, *args):
@@ -95,8 +98,14 @@ logger = Logger(
     FILE_OUTPUT      = True,
     USE_TIMESTAMPS   = True,
     TIMESTAMP_FORMAT = '%H:%M:%S',
-    STDERR_THRESHOLD = 15
+    STDERR_THRESHOLD = 15,
+    log_threshold    = 1
 )
+
+BUILD = 'TESTING'
+
+if BUILD == 'TESTING':
+    logger.log_threshold = 0
 
 # ------------------------------------------------------------------------------
 
