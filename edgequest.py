@@ -16,7 +16,7 @@ import core.camera as camera
 
 # This import is different because the theme can change
 # So we want to use the latest variables, not what the defaults are
-import settings.colors as colors
+import core.colors as colors
 
 # Animation tools
 import core.animtools as anim
@@ -56,11 +56,15 @@ from settings.settings import *
 
 # Load monsters
 with open(MONSTER_JSON_PATH) as json_data:
+    logger.info('Loading monster data from `' + MONSTER_JSON_PATH + '`')
     monster_data = json.load(json_data)
+    logger.info('Done')
 
 # Load items
 with open(ITEM_JSON_PATH) as json_data:
+    logger.info('Loading item data from `' + ITEM_JSON_PATH + '`')
     items_data = json.load(json_data)
+    logger.info('Done')
 
 # ------------------------------------------------------------------------------
 
@@ -1559,7 +1563,7 @@ def build_struct():
     ''' Place a random structure on an unblocked coordinate pair on the map '''
     global world
 
-    struct = struct_proc.get_struct()   # Get a structure
+    struct, struct_name = struct_proc.get_struct()   # Get a structure
     tx, ty = get_rand_unblocked_coord() # Get a coordinate
 
     try:
@@ -1577,7 +1581,7 @@ def build_struct():
                     world[tx+x][ty+y].block_sight = False
     # Has the chance to go beyond map limits
     except IndexError:
-        logger.error('Structure has gone beyond map bounds. Truncating...')
+        logger.error('Structure from `' + struct_name + '` has gone beyond map bounds. Truncating...')
 
 def cast_confuse():
     ''' Ask the player for a target to confuse '''
@@ -1805,6 +1809,7 @@ def check_args():
         FLAGS.MENU = False
         FLAGS.NEWGAME = True
         FLAGS.PLAYGAME = True
+        logger.info('Quickstart mode activated')
 
     def ARG_DEBUG():
         ''' Enable debug mode '''
@@ -1816,6 +1821,7 @@ def check_args():
         STAIR_HACK = True
         SEE_ALL = True
         COORDS_UNDER_MOUSE = True
+        logger.info('Debug mode activated')
 
     try:
         # Function lookup for sysargs
@@ -1844,7 +1850,7 @@ def check_args():
                         ARG_LOOKUP[expanded_arg]()
                         FLAGS.FOUND = True
                     except (IndexError, KeyError) as e:
-                        logger.error('Arg: invalid argument `' + minarg + '`, continuing as normal')
+                        logger.warn('Arg: invalid argument `' + minarg + '`, continuing as normal')
             # Look for large arguments like `--help`
             if arg[0:2] == '--':
                 # We already have the expanded argument
@@ -1854,7 +1860,7 @@ def check_args():
                     ARG_LOOKUP[expanded_arg]()
                     FLAGS.FOUND = True
                 except (IndexError, KeyError) as e:
-                    logger.error('Arg: invalid argument `' + expanded_arg + '`, continuing as normal')
+                    logger.warn('Arg: invalid argument `' + expanded_arg + '`, continuing as normal')
         # If there are no args found, run this
         if not FLAGS.FOUND:
             logger.info('No args found')
@@ -3119,10 +3125,7 @@ def how_to_play():
 def id_err(id):
     ''' Log a critical error with monster/item genereation '''
     logger.severe('Error: ' + id + ' is missing data!')
-    logger.write('----- STACK TRACE: -----')
-    traceback.print_exc()
-    logger.write('------------------------')
-    logger.write('The stack trace has not been appended to your log file.')
+    logger.print_exception()
     exit()
 
 def initialize_fov():
@@ -3368,6 +3371,8 @@ def make_map():
     fail = 150 * int(math.floor((dungeon_level/3)*3)) + 100
     # Calculate b1
     b1 = int(math.floor((dungeon_level / 6)*3)) + 1
+
+    logger.info('Making map: `rooms={0}, fail={1}, b1={2}`'.format(rooms, fail, b1))
 
     # Generate a map
     themap.makeMap(MAP_WIDTH, MAP_HEIGHT-2, fail, b1, rooms)
@@ -3719,8 +3724,7 @@ def mouse_move_astar(tx, ty):
     # Player clicks outside of map
     except IndexError:
         message('Cannot move: Out of range', TEXT_COLORS['debug'])
-
-    raise IndexError
+        raise IndexError
 
 def msgbox(text, width=50):
     ''' use menu() as a sort of \'message box\' '''
@@ -4293,6 +4297,7 @@ def save_game():
     choice = menu('Save and Quit?', ['Yes', 'No'], 24)
 
     if choice == 0:  # Yes
+        logger.info('Opening savefile')
         file = shelve.open('savegame', 'n')
         file['world'] = world
         file['objects'] = objects
@@ -4307,6 +4312,7 @@ def save_game():
         file['blind'] = blind
         file['blind_counter'] = blind_counter
         file.close()
+        logger.info('Wrote objects to savefile')
         render_all()
         # Present the root console
         libtcod.console_flush()
@@ -4456,7 +4462,7 @@ def weapon_action_else(weapon):
 # Start ------------------------------------------------------------------------
 
 # Logging is good!
-logger.info('EdgeQuest Start')
+logger.info('Starting Edgequest')
 
 # Backup in case if python -B doesn't get ran
 sys.dont_write_bytecode = True
@@ -4469,6 +4475,7 @@ initialize_theme(CURRENT_THEME)
 
 # Check the arguments that are ran with edgequest.py
 # If this gives problems, replace with `main_menu()`
+logger.info('Checking args')
 check_args()
 
 # ------------------------------------------------------------------------------

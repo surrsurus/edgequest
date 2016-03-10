@@ -31,7 +31,7 @@ def get_struct():
         struct.append(row)
 
     # Return a 2d list, randomly rotated
-    return rotate(random.randint(0,3), struct)
+    return (rotate(random.randint(0,3), struct), file.name)
 
 def rotate(times, list):
     ''' Rotate a 2d array '''

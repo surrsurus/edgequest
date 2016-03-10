@@ -1,6 +1,6 @@
 # Logger.py
 
-# Amazing logger Max made'
+# Amazing logger Max made
 
 '''
 
@@ -17,6 +17,7 @@ The code might be hard to understand because it's certified MaxCode(tm)
 import sys
 import time
 import os
+import re
 import errno
 import traceback
 
@@ -25,45 +26,76 @@ import traceback
 # Logger class -----------------------------------------------------------------
 
 class Logger:
-    '''
-        [True]       USE_STDIO:        Write to standard console output if enabled
-        [True]       FILE_OUTPUT:      Write to a logfile if enabled. Formatted `log_%Y-%m-%d_%H-%M-%S`
-        [True]       USE_TIMESTAMPS:   Whether or not to prefix timestamps
-        ['%H:%M:%S'] TIMESTAMP_FORMAT: The format string supplied to `time.strftime()`
-    '''
-    def __init__(self, USE_STDIO=True, FILE_OUTPUT=True, USE_TIMESTAMPS=True,
-                 TIMESTAMP_FORMAT='%H:%M:%S', STDERR_THRESHOLD=20, LOGFILE_DIR='./logs'):
-        self.WRITE_TO_STDIO   = USE_STDIO
-        self.WRITE_TO_FILE    = FILE_OUTPUT
-        self.TIMESTAMP_FORMAT = TIMESTAMP_FORMAT
-        self.USE_TIMESTAMPS   = USE_TIMESTAMPS
-        self.STDERR_THRESHOLD = STDERR_THRESHOLD
-        self.LOGFILE_DIR      = LOGFILE_DIR
-        if self.WRITE_TO_FILE:
+    def __init__(self,
+            # Defaults.
+            use_stdio        = True,
+            file_output      = True,
+            use_timestamps   = True,
+            timestamp_format = '%H:%M:%S',
+            stderr_threshold = 20,
+            logfile_dir      = '../logs'):
+        # Set the internals...
+        self.write_to_stdio   = use_stdio
+        self.write_to_file    = file_output
+        self.timestamp_format = timestamp_format
+        self.use_timestamps   = use_timestamps
+        self.stderr_threshold = stderr_threshold
+        self.logfile_dir      = logfile_dir
+        if self.write_to_file:
+            # Try to open the file
             try:
-                if not os.path.exists(self.LOGFILE_DIR):
-                    os.mkdir(self.LOGFILE_DIR)
-                self.LOGFILE = open(self.LOGFILE_DIR + '/log_' + time.strftime('%Y-%m-%d_%H-%M-%S') + '.eqlg', 'a')
+                # Make the directory if it does not exist
+                if not os.path.exists(self.logfile_dir):
+                    os.mkdir(self.logfile_dir)
+                self.LOGFILE = open(self.logfile_dir + '/log_' + time.strftime('%Y-%m-%d_%H-%M-%S') + '.eqlg', 'a')
             except (IOError, OSError) as e:
-                self.WRITE_TO_FILE = False
+                self.write_to_file = False
+                print 'LOGGER INIT ERROR: CANNOT WRITE TO FILE'
+                print 'NONFATAL'
+                print 'This is likely because edgequest does not have write permissions'
+                traceback.print_exc()
 
     def log(self, level=0, *args):
         ''' Log from any amounts of arguments'''
-        self.write('[' + time.strftime(self.TIMESTAMP_FORMAT) + '] ', level)
+        # NOTE: This function DOES NOT generate a [LOG] stamp.
+        # NOTE: It will only print a timestamp and the args passed to it.
+        self.write('[' + time.strftime(self.timestamp_format) + '] ', level)
         for v in args:
-            self.write(v + ' ', level)
+            self.write(str(v) + ' ', level)
         self.write('\n', level)
 
     def write(self, msg, level=0):
         ''' Write to a log file and/or print to stdout '''
-        if self.WRITE_TO_STDIO:
-            if self.STDERR_THRESHOLD > level:
+        if self.write_to_stdio:
+            if self.stderr_threshold > level:
                 sys.stdout.write(msg)
             else:
                 sys.stderr.write(msg)
-        if self.WRITE_TO_FILE: self.LOGFILE.write(msg)
+        if self.write_to_file: self.LOGFILE.write(msg)
 
     # Helper functions for pre-formatted thingymajigs
+    # Guide --------------------------------------------------------------------
+    #
+    #   Debug:
+    #       Use this if you are printing generally unhelpful but
+    #       very internal information.
+    #   Info:
+    #       Use this if you need something printed. Basically the default.
+    #   Important:
+    #       Use this if you want higher priority than info but not
+    #       conveyed as a warning.
+    #       May be used for noting something.
+    #   Warn:
+    #       Use this to log conflicts or unstable things
+    #       This may also be helpful when logging things that are mildly wrong
+    #       or should not be used in the future.
+    #   Error:
+    #       Use this if you have had a non-game-breaking error
+    #   Severe:
+    #       Use this to convey that something went horribly wrong
+    #       Usually a game breaking issue or system issue
+    #
+    # --------------------------------------------------------------------------
     def debug(self, *args):
         self.log(0, '{0: <4}'.format('[DEBUG]'), *args)
     def info(self, *args):
@@ -77,6 +109,26 @@ class Logger:
     def severe(self, *args):
         self.log(100, '{0: <4}'.format('[SEVERE]'), *args)
 
+    def print_exception(self):
+        etype, evalue, etb = sys.exc_info()
+        fetype  = re.compile(r'.*\.(.*)\'').match(str(etype)).group(1)
+        # evalue is already nice and readable!
+        self.error(str(fetype) + ': ' + str(evalue))
+
+        # Get a list of the call stack at the time
+        # Each entry is a tuple: (filename, line number, function name, text)
+        tbl = traceback.extract_tb(etb)
+        for t in tbl:
+            filename = t[0]
+            linenum  = t[1]
+            funcname = t[2]
+            text     = t[3]
+
+            if text is None: text = ''
+
+            v = filename + ':' + str(linenum) + '\tat ' + funcname
+            self.error(v)
+
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -85,11 +137,11 @@ class Logger:
 # class
 
 logger = Logger(
-    USE_STDIO        = True,
-    FILE_OUTPUT      = True,
-    USE_TIMESTAMPS   = True,
-    TIMESTAMP_FORMAT = '%H:%M:%S',
-    STDERR_THRESHOLD = 15
+    use_stdio        = True,
+    file_output      = True,
+    use_timestamps   = True,
+    timestamp_format = '%H:%M:%S',
+    stderr_threshold = 15
 )
 
 # ------------------------------------------------------------------------------
@@ -98,11 +150,11 @@ logger = Logger(
 
 '''
 l = Logger(
-    USE_STDIO        = True,
-    FILE_OUTPUT      = True,
-    USE_TIMESTAMPS   = True,
-    TIMESTAMP_FORMAT = '%H:%M:%S',
-    STDERR_THRESHOLD = 15
+    use_stdio        = True,
+    file_output      = True,
+    use_timestamps   = True,
+    timestamp_format = '%H:%M:%S',
+    stderr_threshold = 15
 )
 
 l.debug('This is a debug')

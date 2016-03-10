@@ -326,8 +326,9 @@ FALLBACK_MONSTER = {
 
 # Theme settings ---------------------------------------------------------------
 
-CURRENT_THEME = 'torchlight'
+CURRENT_THEME = 'magma'
 
+# Seizure warning!
 RAINBOW_MODE = False
 
 # ------------------------------------------------------------------------------
