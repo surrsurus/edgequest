@@ -1,13 +1,14 @@
 # edgequest
 
-Official website [here](https://edgequest.github.io/)
-
 EdgeQuest is a 'roguelike' in Python based on the [Roguebasin Tutorial](http://www.roguebasin.com/index.php?title=Complete_Roguelike_Tutorial,_using_python%2Blibtcod) but with several key differences, namely being the feature to store items and monsters inside of JSON files, making modular additions possible without needing to alter the python source in any way.
 
 A roguelike is a game featuring perma-death, random map generation, turn-based combat, and RPG elements.
 
 Some say making a roguelike in python is pointless, due to the slow speeds that may come as a part of constant A* pathfinding, FOV, djikstra maps, and dynamic lighting, but to the naysayers I say "Eh, you're probably right"
 
+# Note
+
+I am no longer continuing to work on EdgeQuest at the moment. There are so many bugs and problems with the game architecture that the whole thing looks like a giant hack. The master version is full of bugs, and you're better off geting one of the releases. Also the windows version is very buggy, for some reason.
 
 # Why EdgeQuest?
 
