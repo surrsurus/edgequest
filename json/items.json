@@ -9,7 +9,7 @@
         "type": "item",
         "effect": "heal"
     },
-
+    
     "fcookie": {
         "name": "fortune cookie",
         "id": "fcookie",
@@ -17,7 +17,7 @@
         "color": "orange",
         "chance": [[10, 1]],
         "type": "item",
-        "effect": "fortune"
+        "effect": "heal"
     },
 
     "bomb": {
