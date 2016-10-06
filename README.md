@@ -4,7 +4,7 @@ EdgeQuest is a 'roguelike' in Python based on the [Roguebasin Tutorial](http://w
 
 A roguelike is a game featuring perma-death, random map generation, turn-based combat, and RPG elements.
 
-Some say making a roguelike in python is pointless, due to the slow speeds that may come as a part of constant A* pathfinding, FOV, djikstra maps, and dynamic lighting, but to the naysayers I say "Eh, you're probably right"
+Some say making a roguelike in python is pointless, due to the slow speeds that may come as a part of constant A* pathfinding, FOV, djikstra maps, and dynamic lighting, but to the naysayers I say let's try anyway.
 
 # Note
 
@@ -45,7 +45,7 @@ If you get an SDL error along the lines of `libsdl1.2.0 not found` try:
 
 `sudo apt-get --reinstall libsdl1.2debian`
 
-Max tried to run the code in Manjaro Linux and it didn't work so there is an issue with pacman-based distros.
+Manjaro Linux had issues running the game so it is possible that there is an issue with pacman-based distros.
 
 #### Windows (7 & 10)
 
@@ -56,14 +56,6 @@ Make sure it's the 32 bit version!
 Once you have it downloaded, simply extract the zip file and double click on the `edgequest` file. (It should have a little blue and yellow snake icon on it!)
 
 If you have any problems please notify me by creating an issue on the issue tracker [here](https://github.com/surrsurus/edgequest/issues).
-
-I was not intending to support Windows, so there may be minor issues.
-
-#### Mac OS
-
-Kevin playtested it on his Macbook Air and he used a live USB of linux mint.
-Considering he's the only one I know with a mac, and he found a way to circumvent this problem, there is no planned mac version.
-
 
 ## Issue Tracking
 
