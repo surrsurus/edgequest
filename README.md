@@ -8,7 +8,7 @@ Some say making a roguelike in python is pointless, due to the slow speeds that 
 
 # Note
 
-I am no longer continuing to work on EdgeQuest at the moment. There are so many bugs and problems with the game architecture that the whole thing looks like a giant hack. The master version is full of bugs, and you're better off geting one of the releases. Also the windows version is very buggy, for some reason.
+I am no longer continuing to work on EdgeQuest at the moment. The current master and release work completely fine and are bug free (mostly). Edgequest will return shortly, but until then, enjoy the game!
 
 # Why EdgeQuest?
 
