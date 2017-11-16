@@ -1,18 +1,17 @@
-//! Codename for the Edgequest Revival Project
+//! 
+//! Edgequest Season 2
+//! 
 
 extern crate tcod;
-
-// #[macro_use] extern crate serde_derive;
-// extern crate serde_yaml;
+extern crate rand;
 
 // Local imports. Set as public so docs are generated for them
-pub mod init;
-pub mod config;
+pub mod dungeon;
 pub mod game;
+pub mod init;
 pub mod object;
-pub mod tile;
-pub mod map;
 
+// Defer to game to start playing.
 fn main() {
   game::play();
 }

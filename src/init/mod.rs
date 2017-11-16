@@ -9,7 +9,9 @@
 use tcod::Console;
 use tcod::console;
 
-use config;
+pub mod config;
+
+mod init_tests;
 
 ///
 /// Initialize the root console.
@@ -29,19 +31,5 @@ pub fn root() -> console::Root {
     .font_type(cfg.fonttype)
     .renderer(cfg.renderer)
     .init();
-
-}
-
-// Test the root console creation
-#[test]
-fn test_root() {
-
-  let cfg = config::load("config/cfg.yml");
-  let root = root();
-
-  assert_eq!(root.width(), cfg.width);
-  assert_eq!(root.height(), cfg.height);
-  assert_eq!(root.is_active(), true);
-  assert_eq!(root.is_fullscreen(), cfg.fullscreen);
 
 }
