@@ -1,5 +1,6 @@
 language: rust
 
+# Test on linux and osx
 os:
   - linux
   - osx
