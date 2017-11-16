@@ -2,6 +2,8 @@
 
 Currently rewriting in Rust. Under heavy construction
 
+[Docs](http://surrsur.us/edgequest/)
+
 Linux:
 
 ```
