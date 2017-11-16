@@ -1,0 +1,33 @@
+# See the documentation for more information
+# on what each of these do
+
+# Dimensions of screen in characters
+width: 80
+height: 50
+
+# Fullscreen mode
+fullscreen: false
+
+# Path to desired font
+fontpath: "fonts/terminal10x16_gs_tc.png"
+
+# Font type. Default: Default
+# Options:
+# * Default
+# * Greyscale
+fonttype: "Greyscale"
+
+# Font layout. Default: Tcod
+# Options:
+# * Tcod
+# * AsciiInRow
+# * AsciiInCol
+fontlayout: "Tcod"
+
+
+# Desired renderer. Default: SDL
+# Options:
+# * SDL
+# * GLSL
+# * OpenGL
+renderer: "SDL"

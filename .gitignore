@@ -1,4 +1,4 @@
-*.pyc
-*.eqlg
-logs/*
-savegame
+/target/
+**/*.rs.bk
+Cargo.lock
+docker.bat
