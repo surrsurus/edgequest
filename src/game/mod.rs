@@ -9,11 +9,13 @@ use tcod::console::Root;
 use tcod::colors::Color;
 use tcod::input;
 
-use dungeon::Dungeon;
+pub mod dungeon;
+use self::dungeon::Dungeon;
 
-use init;
+pub mod init;
 
-use object::{Pos, Entity, Map, Tile};
+pub mod object;
+use self::object::{Pos, Entity, Map, Tile};
 
 ///
 /// Game struct. Holds a player and a map
