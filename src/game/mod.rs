@@ -3,7 +3,6 @@
 //! 
 
 extern crate tcod;
-
 use self::tcod::Console;
 use self::tcod::console::Root;
 use self::tcod::colors::Color;

@@ -197,6 +197,31 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
 </pre><pre class="rust ">
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Hold the fundamental structs, `Entity` and `Pos`</span>
@@ -204,6 +229,7 @@
 
 <span class="comment">// Operator overloading</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::{<span class="ident">Add</span>, <span class="ident">Sub</span>};
+<span class="kw">use</span> <span class="ident">tcod</span>::<span class="ident">colors</span>::<span class="ident">Color</span>;
 
 <span class="doccomment">/// </span>
 <span class="doccomment">/// Hold an x, y cartesian coordinate</span>
@@ -216,6 +242,17 @@
   <span class="comment">// i32 because of tcod</span>
   <span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">i32</span>,
   <span class="kw">pub</span> <span class="ident">y</span>: <span class="ident">i32</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Pos</span> {
+
+  <span class="doccomment">///</span>
+  <span class="doccomment">/// Return a new `Pos`</span>
+  <span class="doccomment">/// </span>
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="ident">Pos</span> {
+    <span class="kw">return</span> <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="ident">x</span>, <span class="ident">y</span>: <span class="ident">y</span>};
+  }
+
 }
 
 <span class="doccomment">/// </span>
@@ -252,12 +289,16 @@
 <span class="doccomment">/// and 2) a character to represent them on the screen.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// * `pos` - [`Pos`](struct.Pos.html)</span>
-<span class="doccomment">/// * `ch` - Character to represent entity on screen</span>
+<span class="doccomment">/// * `glyph` - Character to represent entity on screen</span>
+<span class="doccomment">/// * `fg` - Tcod Color struct representing the foreground color</span>
+<span class="doccomment">/// * `bg` - Tcod Color struct representing the background color</span>
 <span class="doccomment">/// </span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Entity</span> {
   <span class="kw">pub</span> <span class="ident">pos</span>: <span class="ident">Pos</span>,
-  <span class="kw">pub</span> <span class="ident">ch</span>: <span class="ident">char</span>,
+  <span class="kw">pub</span> <span class="ident">glyph</span>: <span class="ident">char</span>,
+  <span class="kw">pub</span> <span class="ident">fg</span>: <span class="ident">Color</span>,
+  <span class="kw">pub</span> <span class="ident">bg</span>: <span class="ident">Color</span>,
 }
 
 <span class="doccomment">/// </span>
@@ -276,7 +317,7 @@
   <span class="doccomment">/// * `y` - ammount to move in the x direction</span>
   <span class="doccomment">/// </span>
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">move_cart</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>, <span class="ident">y</span>: <span class="ident">i32</span>) {
-    <span class="self">self</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="self">self</span>.<span class="ident">pos</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">x</span>, <span class="ident">y</span>: <span class="self">self</span>.<span class="ident">pos</span>.<span class="ident">y</span> <span class="op">+</span> <span class="ident">y</span> };
+    <span class="self">self</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">pos</span>.<span class="ident">x</span> <span class="op">+</span> <span class="ident">x</span>, <span class="self">self</span>.<span class="ident">pos</span>.<span class="ident">y</span> <span class="op">+</span> <span class="ident">y</span>);
   }
 
   <span class="doccomment">/// </span>
@@ -293,8 +334,15 @@
     <span class="self">self</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span> <span class="ident">pos</span>;
   }
 
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ch</span>: <span class="ident">char</span>) {
-    <span class="self">self</span>.<span class="ident">ch</span> <span class="op">=</span> <span class="ident">ch</span>;
+  <span class="doccomment">///</span>
+  <span class="doccomment">/// Return a new `Entity`</span>
+  <span class="doccomment">/// </span>
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pos</span>: <span class="ident">Pos</span>, <span class="ident">glyph</span>: <span class="ident">char</span>, <span class="ident">fg</span>: <span class="ident">Color</span>, <span class="ident">bg</span>: <span class="ident">Color</span>) <span class="op">-&gt;</span> <span class="ident">Entity</span> {
+    <span class="kw">return</span> <span class="ident">Entity</span> {<span class="ident">pos</span>: <span class="ident">pos</span>, <span class="ident">glyph</span>: <span class="ident">glyph</span>, <span class="ident">fg</span>: <span class="ident">fg</span>, <span class="ident">bg</span>: <span class="ident">bg</span>};
+  }
+
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">glyph</span>: <span class="ident">char</span>) {
+    <span class="self">self</span>.<span class="ident">glyph</span> <span class="op">=</span> <span class="ident">glyph</span>;
   }
 
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_pos</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">Pos</span>) {
@@ -307,13 +355,13 @@
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="kw">fn</span> <span class="ident">test_pos</span>() {
 
-  <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="number">4</span>, <span class="ident">y</span>: <span class="op">-</span><span class="number">3</span> };
-  <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="number">1</span>, <span class="ident">y</span>: <span class="number">1</span> };
-  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>, <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="number">5</span>, <span class="ident">y</span>: <span class="op">-</span><span class="number">2</span> });
+  <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="number">4</span>, <span class="op">-</span><span class="number">3</span>);
+  <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">1</span>);
+  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>, <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="number">5</span>, <span class="op">-</span><span class="number">2</span>));
 
   <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="number">0</span>, <span class="ident">y</span>: <span class="number">5</span> };
   <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="op">-</span><span class="number">2</span>, <span class="ident">y</span>: <span class="number">1</span> };
-  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span> <span class="op">-</span> <span class="ident">d</span>, <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="number">2</span>, <span class="ident">y</span>: <span class="number">4</span> });
+  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">c</span> <span class="op">-</span> <span class="ident">d</span>, <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="number">2</span>, <span class="number">4</span>));
 
 }
 
@@ -322,7 +370,7 @@
 <span class="attribute">#[<span class="ident">should_panic</span>]</span>
 <span class="kw">fn</span> <span class="ident">test_upper_bound_pos</span>() {
   <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">i32</span>::<span class="ident">MAX</span>;
-  <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="ident">MAX</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">y</span>: <span class="ident">MAX</span> <span class="op">+</span> <span class="number">1</span> };
+  <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="ident">MAX</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">MAX</span> <span class="op">+</span> <span class="number">1</span>);
 }
 
 <span class="comment">// Trigger an underflow error for the Sub impl</span>
@@ -330,27 +378,29 @@
 <span class="attribute">#[<span class="ident">should_panic</span>]</span>
 <span class="kw">fn</span> <span class="ident">test_lower_bound_pos</span>() {
   <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">i32</span>::<span class="ident">MIN</span>;
-  <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="ident">MIN</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">y</span>: <span class="ident">MIN</span> <span class="op">-</span> <span class="number">1</span> };
+  <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="ident">MIN</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">MIN</span> <span class="op">-</span> <span class="number">1</span>);
 }
 
 <span class="comment">// Test creating Entities and it&#39;s methods</span>
 <span class="attribute">#[<span class="ident">test</span>]</span>
 <span class="kw">fn</span> <span class="ident">test_entity</span>() {
-  <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Entity</span> {<span class="ident">pos</span>: <span class="ident">Pos</span> {<span class="ident">x</span>: <span class="number">1</span>, <span class="ident">y</span>: <span class="number">2</span>}, <span class="ident">ch</span>: <span class="string">&#39;@&#39;</span>};
-  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">pos</span>, <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="number">1</span>, <span class="ident">y</span>: <span class="number">2</span> });
-  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">ch</span>, <span class="string">&#39;@&#39;</span>);
+
+  <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">Entity</span>::<span class="ident">new</span>(<span class="ident">Pos</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">2</span>), <span class="string">&#39;@&#39;</span>, <span class="ident">Color</span>::<span class="ident">new</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>), <span class="ident">Color</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>));
+  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">pos</span>, <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="number">1</span>, <span class="number">2</span>));
+  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">glyph</span>, <span class="string">&#39;@&#39;</span>);
 
   <span class="ident">a</span>.<span class="ident">move_cart</span>(<span class="number">2</span>, <span class="number">1</span>);
-  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">pos</span>, <span class="ident">Pos</span> {<span class="ident">x</span>: <span class="number">3</span>, <span class="ident">y</span>: <span class="number">3</span>});
+  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">pos</span>, <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="number">3</span>, <span class="number">3</span>));
 
   <span class="ident">a</span>.<span class="ident">move_cart</span>(<span class="op">-</span><span class="number">5</span>, <span class="op">-</span><span class="number">2</span>);
-  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">pos</span>, <span class="ident">Pos</span> {<span class="ident">x</span>: <span class="op">-</span><span class="number">2</span>, <span class="ident">y</span>: <span class="number">1</span>});
+  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">pos</span>, <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="op">-</span><span class="number">2</span>, <span class="number">1</span>));
 
   <span class="ident">a</span>.<span class="ident">set_pos</span>(<span class="ident">Pos</span> { <span class="ident">x</span>: <span class="number">0</span>, <span class="ident">y</span>: <span class="number">0</span> });
-  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">pos</span>, <span class="ident">Pos</span> { <span class="ident">x</span>: <span class="number">0</span>, <span class="ident">y</span>: <span class="number">0</span> });
+  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">pos</span>, <span class="ident">Pos</span>::<span class="ident">new</span>(<span class="number">0</span>, <span class="number">0</span>));
 
   <span class="ident">a</span>.<span class="ident">set_char</span>(<span class="string">&#39;!&#39;</span>);
-  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">ch</span>, <span class="string">&#39;!&#39;</span>);
+  <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">a</span>.<span class="ident">glyph</span>, <span class="string">&#39;!&#39;</span>);
+
 }</pre>
 </section>
     <section id='search' class="content hidden"></section>
