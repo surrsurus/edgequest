@@ -4,10 +4,10 @@
 
 extern crate tcod;
 
-use tcod::Console;
-use tcod::console::Root;
-use tcod::colors::Color;
-use tcod::input;
+use self::tcod::Console;
+use self::tcod::console::Root;
+use self::tcod::colors::Color;
+use self::tcod::input;
 
 pub mod dungeon;
 use self::dungeon::Dungeon;

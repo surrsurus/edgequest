@@ -1,4 +1,4 @@
-use tcod::colors::Color;
+use game::tcod::colors::Color;
 
 pub use game::object::pos::Pos;
 

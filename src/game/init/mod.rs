@@ -6,8 +6,8 @@
 
 // We need tcod::Console to keep our consoles in scope
 #[allow(unused_imports)]
-use tcod::Console;
-use tcod::console;
+use game::tcod::Console;
+use game::tcod::console;
 
 pub mod config;
 

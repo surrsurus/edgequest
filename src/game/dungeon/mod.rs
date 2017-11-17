@@ -2,7 +2,9 @@
 //! Generate a super simple dungeon
 //! 
 
-use rand::{thread_rng, Rng};
+extern crate rand;
+
+use self::rand::{thread_rng, Rng};
 
 use game::object::Pos;
 
