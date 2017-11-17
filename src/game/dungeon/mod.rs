@@ -3,16 +3,21 @@
 //! 
 
 extern crate rand;
-
 use self::rand::{thread_rng, Rng};
-
-use game::object::Pos;
 
 mod rect;
 use self::rect::Rect;
 
 mod corr;
 use self::corr::Corr;
+
+mod cellular_automata;
+
+mod drunkards_walk;
+
+mod dungeon_tests;
+
+mod simplex;
 
 /// 
 /// `Dungeon` struct to generate a bitmap dungeon (1s and 0s)
@@ -53,10 +58,10 @@ impl Dungeon {
 
     for _ in 0..n {
 
-      let x: i32 = rng.gen_range(1, self.w - 1);
-      let y: i32 = rng.gen_range(1, self.h - 1);
-      let l: i32 = rng.gen_range(5, 10);
-      let w: i32 = rng.gen_range(5, 10);
+      let x: i32 = rng.gen_range(1, self.w - 2);
+      let y: i32 = rng.gen_range(1, self.h - 2);
+      let l: i32 = rng.gen_range(5, 20);
+      let w: i32 = rng.gen_range(5, 20);
 
       // Check bounds
       if w + x >= self.w || l + y >= self.h {
@@ -78,29 +83,29 @@ impl Dungeon {
   /// 
   fn build_corr(&mut self, c: &Corr) {
 
-    let mut mover = Pos::new(c.start.x, c.start.y);
+    let mut mover = (c.start.0, c.start.1);
 
-    while mover.x != c.end.x {
+    while mover.0 != c.end.0 {
 
-      if mover.x < c.end.x {
-        mover.x += 1;
-      } else if mover.x > c.end.x {
-        mover.x -= 1;
+      if mover.0 < c.end.0 {
+        mover.0 += 1;
+      } else if mover.0 > c.end.0 {
+        mover.0 -= 1;
       } 
 
-      self.grid[mover.x as usize][mover.y as usize] = 1;
+      self.grid[mover.0 as usize][mover.1 as usize] = 1;
 
     }
 
-    while mover.y != c.end.y {
+    while mover.1 != c.end.1 {
 
-      if mover.y < c.end.y {
-        mover.y += 1;
-      } else if mover.y > c.end.y {
-        mover.y -= 1;
+      if mover.1 < c.end.1 {
+        mover.1 += 1;
+      } else if mover.1 > c.end.1 {
+        mover.1 -= 1;
       } 
 
-      self.grid[mover.x as usize][mover.y as usize] = 1;
+      self.grid[mover.0 as usize][mover.1 as usize] = 1;
 
     }
 
@@ -129,8 +134,8 @@ impl Dungeon {
 
     for r in 0..self.rooms.len() - 1 {
 
-      let c1 : Pos;
-      let c2 : Pos;
+      let c1 : (i32, i32);
+      let c2 : (i32, i32);
 
       // Wrap around
       if r == self.rooms.len() - 1 {
@@ -154,7 +159,7 @@ impl Dungeon {
   ///
   /// Get the player's starting location as a `Pos`
   /// 
-  pub fn get_starting_location(&self) -> Pos {
+  pub fn get_starting_location(&self) -> (i32, i32) {
     return self.rooms[0].center();
   }
 
@@ -192,6 +197,20 @@ impl Dungeon {
     d.add_rooms(rooms);
     d.connect_rooms();
 
+    for _ in 0..3 {
+      d.grid = drunkards_walk::generate(&mut d.grid, 0, 1, 1500);
+    }
+
+    let mut sn = simplex::Simplex::new();
+    sn.seed();
+
+    // for i in 0..w {
+    //   for j in 0..h {
+    //     print!("{}", sn.noise_2d(i as f32, j as f32));
+    //   }
+    //   print!("\n");
+    // }
+    
     return d;
 
   }

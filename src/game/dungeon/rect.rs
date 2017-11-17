@@ -1,5 +1,3 @@
-use game::object::Pos;
-
 ///
 /// Rectangle struct to represent rooms for `Dungeon`
 /// 
@@ -35,8 +33,8 @@ impl Rect {
   /// assert_eq!(pos, Pos::new(20, 15));
   /// ```
   /// 
-  pub fn center(&self) -> Pos {
-    return Pos::new(
+  pub fn center(&self) -> (i32, i32) {
+    return (
       (self.w / 2) + self.x, 
       (self.l / 2) + self.y
     );
@@ -59,20 +57,4 @@ impl Rect {
     return Rect { x: x, y: y, l: l, w: w};
   }
   
-}
-
-// Test `new()` for `Rect`
-#[test]
-fn test_rect() {
-  let r = Rect::new(10, 5, 20, 20);
-  let pos = r.center();
-  assert_eq!(pos, Pos::new(20, 15));
-}
-
-// Test `center()` for `Rect`
-#[test]
-fn test_rect_center() {
-  let r = Rect::new(10, 5, 20, 20);
-  let pos = r.center();
-  assert_eq!(pos, Pos::new(20, 15));
 }

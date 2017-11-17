@@ -2,107 +2,41 @@
 //! Hold the `Game` struct and the `play()` function
 //! 
 
+// Tcod
 extern crate tcod;
 use self::tcod::Console;
 use self::tcod::console::Root;
 use self::tcod::colors::Color;
 use self::tcod::input;
 
+// game::dungeon
 pub mod dungeon;
 use self::dungeon::Dungeon;
 
+// game::init
 pub mod init;
 
+// game::object
 pub mod object;
-use self::object::{Pos, Entity, Map, Tile};
+use self::object::{Pos, Entity, Floor, Tile};
 
 ///
-/// Game struct. Holds a player and a map
+/// Helper for rendering things to the screen
 /// 
-/// * `player` - `Entity` to represent the player
-/// * `map` - `Map` object to represent the current floor
+/// Tracks the player and automatically scrolls the screen around to match where they go.
+/// This will never try to draw things outside of the given dimensions due to the way it handles
+/// determining whether something should be drawn or not. 
 /// 
-pub struct Game {
-    pub player: Entity,
-    pub map: Map,
-    pub dungeon: Dungeon,
+pub struct Camera {
+
+  map: Pos,
+  screen: Pos,
+  
+  camera: Pos,
+
 }
 
-impl Game {
-
-  ///
-  /// Return a new player `Entity`
-  /// 
-  pub fn new_player() -> Entity {
-    return Entity::new(
-      Pos::new(40, 25), 
-      '@', 
-      Color::new(255, 255, 255), 
-      Color::new(0, 0, 0)
-    );
-  }
-
-  ///
-  /// Return a new empty `Map`
-  /// 
-  /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
-  /// so inputs are i32s instead of usizes (they get converted)
-  /// 
-  pub fn new_map(width: i32, height: i32) -> Map {
-    return Map::new(
-      width as usize, 
-      height as usize, 
-      Vec::<Tile>::new(), 
-      Vec::<Entity>::new()
-    );
-  }
-
-  pub fn new_dungeon(width: i32, height: i32) -> Dungeon {
-    return Dungeon::new(width, height, 15);
-  }
-
-  ///
-  /// Return a new `Game`
-  /// 
-  /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
-  /// so inputs are i32s instead of usizes (they get converted)
-  /// 
-  pub fn new(width: i32, height: i32) -> Game {
-
-    let mut g = Game {player: Game::new_player(), map: Game::new_map(width, height), dungeon: Game::new_dungeon(width, height) };
-
-    for x in 0..g.dungeon.w {
-      for y in 0..g.dungeon.h {
-        if g.dungeon.grid[x as usize][y as usize] == 1 {
-          g.map.tile_vec.push(
-            Tile::new(
-                Pos::new(x, y), 
-                ' ', 
-                Color::new(255, 255, 255), 
-                Color::new(0, 0, 0), 
-                false
-              )
-            );
-        } else {
-          g.map.tile_vec.push(
-            Tile::new(
-              Pos::new(x, y), 
-              ' ', 
-              Color::new(255, 255, 255), 
-              Color::new(33, 33, 33), 
-              true
-            )
-          );
-        }
-        
-      }
-
-    }
-
-    g.player.pos = g.dungeon.get_starting_location();
-
-    return g;
-  }
+impl Camera {
 
   ///
   /// Draw all.
@@ -110,50 +44,122 @@ impl Game {
   /// You'll have to render this console to root (unless you passed root in)
   /// and always `flush()` the root console.
   /// 
-  pub fn draw_all(&mut self, con: &mut tcod::console::Console) {
-    
+  pub fn draw_all(&mut self, con: &mut Console, game: &Game) {
+
     // Clear console
     con.clear();
 
-    // Draw tiles
-    for t in self.map.tile_vec.iter() {
-      if t.entity.glyph == ' ' {
-        con.set_char_background(
-          t.entity.pos.x,
-          t.entity.pos.y,
-          t.entity.bg,
-          tcod::console::BackgroundFlag::Set
-        );
-      } else {
-        con.put_char_ex(
-          t.entity.pos.x, 
-          t.entity.pos.y, 
-          t.entity.glyph,
-          t.entity.fg,
-          t.entity.bg
-        );
-      }
+    self.move_to(game.player.pos);
 
-    }
+    // Draw tiles
+    for t in game.floor.tile_vec.iter() { self.draw_entity(con, &t.entity); }
 
     // Draw entities
-    for e in self.map.entity_vec.iter() {
-        con.put_char_ex(e.pos.x, e.pos.y, e.glyph, e.fg, e.bg);
-    }
+    for e in game.floor.entity_vec.iter() { self.draw_entity(con, e); }
 
-    // Draw player
-    con.put_char_ex(
-      self.player.pos.x, 
-      self.player.pos.y, 
-      self.player.glyph, 
-      self.player.fg, 
-      self.player.bg
-    );
+    // Draw player. Player is always in the camera since
+    // we move the camera over it.
+    self.draw_entity(con, &game.player);
 
   }
 
   ///
-  /// Capture keyboard input and process it with tcod
+  /// Put an `Entity` on the console
+  /// 
+  /// * `con` - Tcod `Console`
+  /// * `entity` - `Entity`
+  /// 
+  pub fn draw_entity(&self, con: &mut Console, entity: &Entity) {
+
+    // Check if it's in the camera first
+    if !self.is_in_camera(entity.pos) {
+      return;
+    }
+
+    // New pos with respect to camera
+    let pos = entity.pos + self.camera;
+
+    if entity.glyph == ' ' {
+      con.set_char_background(
+        pos.x,
+        pos.y,
+        entity.bg,
+        tcod::console::BackgroundFlag::Set
+      );
+    } else {
+      con.put_char_ex(
+        pos.x, 
+        pos.y, 
+        entity.glyph,
+        entity.fg,
+        entity.bg
+      );
+    }
+
+  }
+
+  ///
+  /// Check if a `Pos` is in the camera
+  /// 
+  pub fn is_in_camera(&self, pos: Pos) -> bool {
+
+    // New pos to compare things to
+    let npos = pos + self.camera;
+
+    if npos.x >= 0 && npos.x < self.screen.x && npos.y >= 0 && npos.y < self.screen.y { return true; } else { return false; };
+
+  }
+
+  ///
+  /// Move camera over a position on the map
+  /// 
+  /// The camera will prevent itself from going OOB.
+  /// 
+  fn move_to(&mut self, pos: Pos) {
+
+    let mut x = pos.x - (self.screen.x / 2);
+    let mut y = pos.y - (self.screen.y / 2);
+
+    if x < 0 { x = 0; }
+    if y < 0 { y = 0; }
+    if x > self.map.x - self.screen.x - 1 { x = self.map.x - self.screen.x - 1; }
+    if y > self.map.y - self.screen.y - 1 { y = self.map.y - self.screen.y - 1; }
+
+    self.camera = Pos::new(-x, -y);
+
+  }
+
+  ///
+  /// Return a new `Camera`
+  /// 
+  /// * `map` - `Pos` that holds the map dimensions
+  /// * `screen` - `Pos` that holds the screen dimensions
+  /// 
+  pub fn new(map: Pos, screen: Pos) -> Camera {
+    return Camera { map: map, screen: screen, camera: Pos::origin() };
+  }
+
+}
+
+///
+/// Game struct. Holds a player and a floor
+/// 
+/// * `player` - `Entity` to represent the player
+/// * `floor` - `Floor` object to represent the current floor the player is on
+/// 
+pub struct Game {
+
+  pub player: Entity,
+  pub floor: Floor,
+
+  dungeon: Dungeon,
+
+}
+
+impl Game {
+
+  ///
+  /// Capture keyboard input from tcod
   /// 
   pub fn capture_keypress(&mut self, root: &mut Root) {
 
@@ -182,7 +188,7 @@ impl Game {
             
           }
 
-          for t in self.map.tile_vec.iter() {
+          for t in self.floor.tile_vec.iter() {
             if t.blocks && t.entity.pos == self.player.pos {
               self.player.pos = oldpos;
             }
@@ -195,6 +201,87 @@ impl Game {
       }
 
     }
+    
+  }
+
+  ///
+  /// Get a new `Dungeon`
+  /// 
+  pub fn new_dungeon(width: i32, height: i32) -> Dungeon {
+    return Dungeon::new(width, height, (width + height) / 10);
+  }
+
+  ///
+  /// Return a new empty `Floor`
+  /// 
+  /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
+  /// so inputs are i32s instead of usizes (they get converted)
+  /// 
+  pub fn new_floor(width: i32, height: i32) -> Floor {
+    return Floor::new(
+      width as usize, 
+      height as usize, 
+      Vec::<Tile>::new(), 
+      Vec::<Entity>::new()
+    );
+  }
+
+  ///
+  /// Return a new player `Entity`
+  /// 
+  pub fn new_player() -> Entity {
+    return Entity::new(
+      Pos::new(40, 25), 
+      '@', 
+      Color::new(255, 255, 255), 
+      Color::new(0, 0, 0)
+    );
+  }
+
+  ///
+  /// Return a new `Game`
+  /// 
+  /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
+  /// so inputs are i32s instead of usizes (they get converted)
+  /// 
+  pub fn new(width: i32, height: i32) -> Game {
+
+    let mut g = Game {player: Game::new_player(), floor: Game::new_floor(width, height), dungeon: Game::new_dungeon(width, height) };
+
+    for x in 0..g.dungeon.w {
+      for y in 0..g.dungeon.h {
+        if g.dungeon.grid[x as usize][y as usize] == 1 {
+          g.floor.tile_vec.push(
+            Tile::new(
+              Pos::new(x, y), 
+              ' ', 
+              Color::new(255, 255, 255), 
+              Color::new(0, 0, 0), 
+              false
+            )
+          );
+        } else {
+          g.floor.tile_vec.push(
+            Tile::new(
+              Pos::new(x, y), 
+              ' ', 
+              Color::new(255, 255, 255), 
+              Color::new(33, 33, 33), 
+              true
+            )
+          );
+        }
+        
+      }
+
+    }
+    
+    let start_tup = g.dungeon.get_starting_location();
+    g.player.pos.x = start_tup.0;
+    g.player.pos.y = start_tup.1;
+
+    return g;
+    
   }
 
 }
@@ -207,16 +294,27 @@ pub fn play() {
   // Get root console
   let mut root = init::root();
 
+  // Get map height
+  let map_dim = init::map_dimensions();
+
+  // Get a new camera
+  let mut cam = Camera::new(Pos::new(map_dim.0, map_dim.1), Pos::new(root.width(), root.height()));
+
   // Get a new game
-  let mut game = Game::new(root.width(), root.height());
+  let mut game = Game::new(map_dim.0, map_dim.1);
 
   // Draw all and capture keypresses
   while !(root.window_closed()) {
 
-    game.draw_all(&mut root);
+    // AI actions go here
 
+    // Draw what the camera sees
+    cam.draw_all(&mut root, &game);
+
+    // Flush all draws to root
     root.flush();
 
+    // Capture keypresses
     game.capture_keypress(&mut root);
 
   }

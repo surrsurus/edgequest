@@ -11,7 +11,7 @@ pub use self::entity::Entity;
 pub mod tile;
 pub use self::tile::Tile;
 
-pub mod map;
-pub use self::map::Map;
+pub mod floor;
+pub use self::floor::Floor;
 
 mod object_tests;

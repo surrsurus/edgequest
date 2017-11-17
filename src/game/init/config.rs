@@ -15,11 +15,11 @@ use game::tcod::console;
 
 ///
 /// A struct to hold data gathered from a config.yml file. You should not need to create your own,
-/// instead, get a filled out struct from [`load()`](fn.load.html)
+/// instead, get a filled out struct from `load()`
 /// 
 /// # What data should be in your configuration file
 /// 
-/// See [`load()`](fn.load.html)
+/// See `load()`
 /// 
 /// # Determining font settings
 /// 
@@ -43,8 +43,10 @@ use game::tcod::console;
 #[derive(Clone)]
 pub struct Config {
   // i32 because of tcod
-  pub width: i32,
-  pub height: i32,
+  pub screen_width: i32,
+  pub screen_height: i32,
+  pub map_width: i32,
+  pub map_height: i32,
   pub fullscreen: bool,
   pub fontpath: String,
   pub fonttype: console::FontType,
@@ -53,17 +55,17 @@ pub struct Config {
 }
 
 ///
-/// Load configuration data from a path. returns a [`Config`](struct.Config.html) struct.
+/// Load configuration data from a path. returns a `Config` struct.
 /// 
 /// This function expects to be passed in a valid YAML file that has YAML for each attribute
-/// in [`Config`](struct.Config.html).
-/// 
+/// in `Config`.
+///
 /// * `path` - Path to desired YAML file.
 /// 
 /// # What data should be in your configuration file
 /// 
-/// * `width` - Width of the window in characters.
-/// * `height` - Height of the window in characters.
+/// * `screen_width` - screen_width of the window in characters.
+/// * `screen_height` - screen_height of the window in characters.
 /// * `fullscreen` - Determines whether or not game will start in fullscreen mode.
 /// * `fontpath` - Path to desired font to use.
 /// * `fonttype` - Type of font, either Default or Greyscale.
@@ -77,7 +79,7 @@ pub struct Config {
 /// * The path is invalid
 /// * The file is invalid
 /// * The file is not a YAML file
-/// * The file is missing YAML for any attribute of [`Config`](struct.Config.html)
+/// * The file is missing YAML for any attribute of `Config`
 /// * The YAML for each attribute is not the correct type
 /// * The YAML for fonttype, fontlayout, or renderer are not in their tcod enums
 /// 
@@ -104,10 +106,13 @@ pub fn load(path: &str) -> Config {
   // Return a Config struct
   return Config { 
 
-    // Width and height can only be read as i64s (why???) so we use as i32
+    // screen_width and screen_height can only be read as i64s so we use as i32
     // to convert them down
-    width: cfg["width"].as_i64().unwrap() as i32,
-    height: cfg["height"].as_i64().unwrap() as i32,
+    screen_width: cfg["screen_width"].as_i64().unwrap() as i32,
+    screen_height: cfg["screen_height"].as_i64().unwrap() as i32,
+
+    map_width: cfg["map_width"].as_i64().unwrap() as i32,
+    map_height: cfg["map_height"].as_i64().unwrap() as i32,
 
     // Font path should be a String so it doesnt have a lifetime
     fontpath: cfg["fontpath"].as_str().unwrap().to_string(),

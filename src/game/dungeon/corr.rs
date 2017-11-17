@@ -1,5 +1,3 @@
-use game::object::Pos;
-
 ///
 /// Struct to represent a corridor for `Dungeon`
 /// 
@@ -11,8 +9,8 @@ use game::object::Pos;
 /// 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub struct Corr {
-  pub start: Pos,
-  pub end: Pos,
+  pub start: (i32, i32),
+  pub end: (i32, i32),
 }
 
 impl Corr {
@@ -28,15 +26,8 @@ impl Corr {
   /// assert_eq!(c.end, Pos::new(1, 2));
   /// ```
   /// 
-  pub fn new(start: Pos, end: Pos) -> Corr {
+  pub fn new(start: (i32, i32), end: (i32, i32)) -> Corr {
     return Corr { start: start, end: end };
   }
 
-}
-
-#[test]
-fn test_corr() {
-  let c = Corr::new(Pos::new(0, 1), Pos::new(1, 2));
-  assert_eq!(c.start, Pos::new(0, 1));
-  assert_eq!(c.end, Pos::new(1, 2));
 }

@@ -1,5 +1,5 @@
 // Operator overloading
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, BitXor};
 
 /// 
 /// Hold an x, y cartesian coordinate
@@ -23,7 +23,27 @@ impl Pos {
     return Pos { x: x, y: y};
   }
 
+  ///
+  /// Return a `Pos` at the origin (0, 0)
+  /// 
+  pub fn origin() -> Pos {
+    return Pos { x: 0, y: 0 };
+  }
+
 }
+
+///
+/// Implement distance formula for `Pos` as ^ in order to find distances between `Pos` structs
+/// 
+impl BitXor for Pos {
+
+  type Output = f32;
+  fn bitxor(self, other: Pos) -> f32 {
+    return (((other.x - self.x).pow(2) + (other.y - self.y).pow(2)) as f32).sqrt();
+  }
+
+}
+
 
 /// 
 /// Allow for the addition of two `Pos` structs

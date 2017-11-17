@@ -1,8 +1,12 @@
 # Missing values
 
 # Dimensions of screen in characters
-width: 80
-height: 50
+screen_width: 80
+screen_height: 50
+
+# Dimensions of map in characters
+map_width: 160
+map_height: 100
 
 # Fullscreen mode
 fullscreen: false

@@ -13,8 +13,8 @@ mod tests {
     let cfg = config::load("config/cfg.yml");
     let root = init::root();
 
-    assert_eq!(root.width(), cfg.width);
-    assert_eq!(root.height(), cfg.height);
+    assert_eq!(root.width(), cfg.screen_width);
+    assert_eq!(root.height(), cfg.screen_height);
     assert_eq!(root.is_active(), true);
     assert_eq!(root.is_fullscreen(), cfg.fullscreen);
 

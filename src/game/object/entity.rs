@@ -9,7 +9,7 @@ pub use game::object::pos::Pos;
 /// be rendered need 1) a place to be rendered on the screen
 /// and 2) a character to represent them on the screen.
 ///
-/// * `pos` - [`Pos`](struct.Pos.html)
+/// * `pos` - `Pos` representing where the entity is on the map
 /// * `glyph` - Character to represent entity on screen
 /// * `fg` - Tcod Color struct representing the foreground color
 /// * `bg` - Tcod Color struct representing the background color
@@ -39,13 +39,13 @@ impl Entity {
   }
 
   /// 
-  /// Move the `Entity` by adding a new [`Pos`](struct.Pos.html) to it
+  /// Move the `Entity` by adding a new `Pos` to it
   /// 
   /// This does not overwrite the positon, only add to it.
-  /// If values in [`Pos`](struct.Pos.html) are negative, 
+  /// If values in `Pos` are negative, 
   /// this will then just subtract the appropriate values.
   /// 
-  /// * `pos` - [`Pos`](struct.Pos.html) struct of ammount to
+  /// * `pos` - `Pos` struct of ammount to
   /// move in both x and y directions 
   ///  
   pub fn move_pos(&mut self, pos: Pos) {
