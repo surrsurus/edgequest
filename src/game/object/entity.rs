@@ -11,18 +11,37 @@ pub use game::object::pos::Pos;
 ///
 /// * `pos` - `Pos` representing where the entity is on the map
 /// * `glyph` - Character to represent entity on screen
-/// * `fg` - Tcod Color struct representing the foreground color
-/// * `bg` - Tcod Color struct representing the background color
+/// * `fg` - Triple representing the foreground color RGB values
+/// * `bg` - Triple representing the background color RGB values
 /// 
-#[derive(Copy, Clone, PartialEq, Debug, Default)]
+#[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub struct Entity {
   pub pos: Pos,
   pub glyph: char,
-  pub fg: Color,
-  pub bg: Color,
+  // We make these triples so that we can derive Eq for this struct
+  // because tcod colors don't, and if we want 2d vecs of tiles
+  // they need to have Eq
+  pub fg: (u8, u8, u8),
+  pub bg: (u8, u8, u8),
 }
 
 impl Entity {
+
+  ///
+  /// Get the background triple as a `tcod::Color`
+  /// 
+  #[inline]
+  pub fn get_bg(&self) -> Color {
+    return Color::new(self.bg.0, self.bg.1, self.bg.2);
+  }
+
+  ///
+  /// Get the foreground triple as a `tcod::Color`
+  /// 
+  #[inline]
+  pub fn get_fg(&self) -> Color {
+    return Color::new(self.fg.0, self.fg.1, self.fg.2);
+  }
 
   /// 
   /// Move the `Entity` by `x` in the x direction and `y` in
@@ -55,7 +74,7 @@ impl Entity {
   ///
   /// Return a new `Entity`
   /// 
-  pub fn new(pos: Pos, glyph: char, fg: Color, bg: Color) -> Entity {
+  pub fn new(pos: Pos, glyph: char, fg: (u8, u8, u8), bg: (u8, u8, u8)) -> Entity {
     return Entity {
       pos: pos, 
       glyph: glyph, 
@@ -64,10 +83,12 @@ impl Entity {
     };
   }
 
+  #[inline]
   pub fn set_char(&mut self, glyph: char) {
     self.glyph = glyph;
   }
 
+  #[inline]
   pub fn set_pos(&mut self, pos: Pos) {
     self.pos = pos
   }

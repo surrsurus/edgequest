@@ -7,3 +7,4 @@ authors = ["surrsurus"]
 tcod = "0.12"
 yaml-rust = "0.3"
 rand = "0.3"
+fuss = { git = "https://github.com/surrsurus/fuss.git" }

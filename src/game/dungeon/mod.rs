@@ -5,6 +5,8 @@
 extern crate rand;
 use self::rand::{thread_rng, Rng};
 
+extern crate fuss;
+
 mod rect;
 use self::rect::Rect;
 
@@ -16,8 +18,6 @@ mod cellular_automata;
 mod drunkards_walk;
 
 mod dungeon_tests;
-
-mod simplex;
 
 /// 
 /// `Dungeon` struct to generate a bitmap dungeon (1s and 0s)
@@ -200,16 +200,6 @@ impl Dungeon {
     for _ in 0..3 {
       d.grid = drunkards_walk::generate(&mut d.grid, 0, 1, 1500);
     }
-
-    let mut sn = simplex::Simplex::new();
-    sn.seed();
-
-    // for i in 0..w {
-    //   for j in 0..h {
-    //     print!("{}", sn.noise_2d(i as f32, j as f32));
-    //   }
-    //   print!("\n");
-    // }
     
     return d;
 

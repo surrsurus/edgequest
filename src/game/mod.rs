@@ -6,7 +6,6 @@
 extern crate tcod;
 use self::tcod::Console;
 use self::tcod::console::Root;
-use self::tcod::colors::Color;
 use self::tcod::input;
 
 // game::dungeon
@@ -29,10 +28,16 @@ use self::object::{Pos, Entity, Floor, Tile};
 /// 
 pub struct Camera {
 
-  map: Pos,
-  screen: Pos,
-  
+  // Position that the camera is panned to on the map
+  // Must be within map bounds, or camera will just go to the region,
+  // though the target won't be exactly in the center of the screen.
   camera: Pos,
+
+  // Map dimensions
+  map: Pos,
+
+  // Screen dimensions
+  screen: Pos,
 
 }
 
@@ -83,7 +88,7 @@ impl Camera {
       con.set_char_background(
         pos.x,
         pos.y,
-        entity.bg,
+        entity.get_bg(),
         tcod::console::BackgroundFlag::Set
       );
     } else {
@@ -91,8 +96,8 @@ impl Camera {
         pos.x, 
         pos.y, 
         entity.glyph,
-        entity.fg,
-        entity.bg
+        entity.get_fg(),
+        entity.get_bg()
       );
     }
 
@@ -101,6 +106,7 @@ impl Camera {
   ///
   /// Check if a `Pos` is in the camera
   /// 
+  #[inline]
   pub fn is_in_camera(&self, pos: Pos) -> bool {
 
     // New pos to compare things to
@@ -136,7 +142,7 @@ impl Camera {
   /// * `screen` - `Pos` that holds the screen dimensions
   /// 
   pub fn new(map: Pos, screen: Pos) -> Camera {
-    return Camera { map: map, screen: screen, camera: Pos::origin() };
+    return Camera { camera: Pos::origin(), map: map, screen: screen };
   }
 
 }
@@ -207,8 +213,8 @@ impl Game {
   ///
   /// Get a new `Dungeon`
   /// 
-  pub fn new_dungeon(width: i32, height: i32) -> Dungeon {
-    return Dungeon::new(width, height, (width + height) / 10);
+  pub fn new_dungeon(map_dim: Pos) -> Dungeon {
+    return Dungeon::new(map_dim.x, map_dim.y, (map_dim.x + map_dim.y) / 10);
   }
 
   ///
@@ -217,10 +223,10 @@ impl Game {
   /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
   /// so inputs are i32s instead of usizes (they get converted)
   /// 
-  pub fn new_floor(width: i32, height: i32) -> Floor {
+  pub fn new_floor(map_dim: Pos) -> Floor {
     return Floor::new(
-      width as usize, 
-      height as usize, 
+      map_dim.x as usize, 
+      map_dim.y as usize, 
       Vec::<Tile>::new(), 
       Vec::<Entity>::new()
     );
@@ -229,12 +235,13 @@ impl Game {
   ///
   /// Return a new player `Entity`
   /// 
+  #[inline]
   pub fn new_player() -> Entity {
     return Entity::new(
       Pos::new(40, 25), 
       '@', 
-      Color::new(255, 255, 255), 
-      Color::new(0, 0, 0)
+      (255, 255, 255), 
+      (0, 0, 0)
     );
   }
 
@@ -244,9 +251,13 @@ impl Game {
   /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
   /// so inputs are i32s instead of usizes (they get converted)
   /// 
-  pub fn new(width: i32, height: i32) -> Game {
+  pub fn new(map_dim: Pos) -> Game {
 
-    let mut g = Game {player: Game::new_player(), floor: Game::new_floor(width, height), dungeon: Game::new_dungeon(width, height) };
+    let mut g = Game {
+      player: Game::new_player(), 
+      floor: Game::new_floor(map_dim), 
+      dungeon: Game::new_dungeon(map_dim) 
+    };
 
     for x in 0..g.dungeon.w {
       for y in 0..g.dungeon.h {
@@ -255,8 +266,8 @@ impl Game {
             Tile::new(
               Pos::new(x, y), 
               ' ', 
-              Color::new(255, 255, 255), 
-              Color::new(0, 0, 0), 
+              (255, 255, 255), 
+              (0, 0, 0), 
               false
             )
           );
@@ -265,8 +276,8 @@ impl Game {
             Tile::new(
               Pos::new(x, y), 
               ' ', 
-              Color::new(255, 255, 255), 
-              Color::new(33, 33, 33), 
+              (255, 255, 255), 
+              (33, 33, 33), 
               true
             )
           );
@@ -298,10 +309,10 @@ pub fn play() {
   let map_dim = init::map_dimensions();
 
   // Get a new camera
-  let mut cam = Camera::new(Pos::new(map_dim.0, map_dim.1), Pos::new(root.width(), root.height()));
+  let mut cam = Camera::new(map_dim, Pos::new(root.width(), root.height()));
 
   // Get a new game
-  let mut game = Game::new(map_dim.0, map_dim.1);
+  let mut game = Game::new(map_dim);
 
   // Draw all and capture keypresses
   while !(root.window_closed()) {

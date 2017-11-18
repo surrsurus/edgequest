@@ -33,6 +33,7 @@ impl Rect {
   /// assert_eq!(pos, Pos::new(20, 15));
   /// ```
   /// 
+  #[inline]
   pub fn center(&self) -> (i32, i32) {
     return (
       (self.w / 2) + self.x, 
@@ -53,6 +54,7 @@ impl Rect {
   /// assert_eq!(r.w, 20);
   /// ```
   /// 
+  #[inline]
   pub fn new(x: i32, y: i32, l: i32, w: i32) -> Rect {
     return Rect { x: x, y: y, l: l, w: w};
   }

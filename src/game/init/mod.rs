@@ -13,6 +13,8 @@ pub mod config;
 
 mod init_tests;
 
+use game::object::pos::Pos;
+
 ///
 /// Initialize the root console.
 /// 
@@ -34,10 +36,10 @@ pub fn root() -> console::Root {
 
 }
 
-pub fn map_dimensions() -> (i32, i32) {
+pub fn map_dimensions() -> Pos {
   
   let cfg = config::load("config/cfg.yml");
 
-  return (cfg.map_width, cfg.map_height);
+  return Pos::new(cfg.map_width, cfg.map_height);
 
 }

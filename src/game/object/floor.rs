@@ -19,6 +19,7 @@ impl Floor {
   ///
   /// Return a new `Floor`
   /// 
+  #[inline]
   pub fn new(width: usize, height: usize, tile_vec: Vec<Tile>, entity_vec: Vec<Entity>) -> Floor {
     return Floor { 
       width: width, 

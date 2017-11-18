@@ -9,8 +9,10 @@
 /// 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub struct Corr {
+
   pub start: (i32, i32),
   pub end: (i32, i32),
+
 }
 
 impl Corr {
@@ -26,6 +28,7 @@ impl Corr {
   /// assert_eq!(c.end, Pos::new(1, 2));
   /// ```
   /// 
+  #[inline]
   pub fn new(start: (i32, i32), end: (i32, i32)) -> Corr {
     return Corr { start: start, end: end };
   }

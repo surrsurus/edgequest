@@ -19,6 +19,7 @@ impl Pos {
   ///
   /// Return a new `Pos`
   /// 
+  #[inline]
   pub fn new(x: i32, y: i32) -> Pos {
     return Pos { x: x, y: y};
   }
@@ -26,6 +27,7 @@ impl Pos {
   ///
   /// Return a `Pos` at the origin (0, 0)
   /// 
+  #[inline]
   pub fn origin() -> Pos {
     return Pos { x: 0, y: 0 };
   }
@@ -38,6 +40,7 @@ impl Pos {
 impl BitXor for Pos {
 
   type Output = f32;
+  
   fn bitxor(self, other: Pos) -> f32 {
     return (((other.x - self.x).pow(2) + (other.y - self.y).pow(2)) as f32).sqrt();
   }

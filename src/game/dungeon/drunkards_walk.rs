@@ -4,8 +4,8 @@ pub fn generate(grid: &mut Vec<Vec<u8>>, find: u8, replace: u8, iterations: u32)
 
   let mut rng = thread_rng();
 
-  let mut x: i32 = rng.gen_range(1, grid.len() as i32 - 1);
-  let mut y: i32 = rng.gen_range(1, grid[0].len() as i32 - 1);
+  let mut x: i32 = rng.gen_range(1, grid.len() as i32 - 2);
+  let mut y: i32 = rng.gen_range(1, grid[0].len() as i32 - 2);
 
   for _ in 0..iterations {
 

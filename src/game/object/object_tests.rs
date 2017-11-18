@@ -40,7 +40,7 @@ mod tests {
   #[test]
   fn test_entity() {
 
-    let mut a = Entity::new(Pos::new(1, 2), '@', Color::new(255, 255, 255), Color::new(0, 0, 0));
+    let mut a = Entity::new(Pos::new(1, 2), '@', (255, 255, 255), (0, 0, 0));
     assert_eq!(a.pos, Pos::new(1, 2));
     assert_eq!(a.glyph, '@');
 
