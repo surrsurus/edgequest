@@ -1,5 +1,5 @@
-pub use game::object::tile::Tile;
-pub use game::object::entity::Entity;
+pub use core::object::tile::Tile;
+pub use core::object::entity::Entity;
 
 ///
 /// Hold the current floor, including tiles and entities.

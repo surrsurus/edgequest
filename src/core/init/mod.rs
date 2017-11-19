@@ -6,14 +6,14 @@
 
 // We need tcod::Console to keep our consoles in scope
 #[allow(unused_imports)]
-use game::tcod::Console;
-use game::tcod::console;
+use core::tcod::Console;
+use core::tcod::console;
 
 pub mod config;
 
 mod init_tests;
 
-use game::object::pos::Pos;
+use core::object::pos::Pos;
 
 ///
 /// Initialize the root console.

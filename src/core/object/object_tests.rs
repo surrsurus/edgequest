@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
-  use game::tcod::colors::Color;
+  use core::tcod::colors::Color;
 
-  use game::object::pos::Pos;
-  use game::object::entity::Entity;
+  use core::object::pos::Pos;
+  use core::object::entity::Entity;
 
   // Test creating Pos structs and adding/subtracting them
   #[test]

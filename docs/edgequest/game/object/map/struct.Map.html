@@ -7,7 +7,7 @@
     <meta name="description" content="API documentation for the Rust `Map` struct in crate `edgequest`.">
     <meta name="keywords" content="rust, rustlang, rust-lang, Map">
 
-    <title>edgequest::game::object::map::Map - Rust</title>
+    <title>edgequest::core::object::map::Map - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../../../normalize.css">
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
@@ -52,8 +52,8 @@
 <pre class='rust struct'>pub struct Map {
     pub width: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>,
     pub height: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>,
-    pub tile_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/tile/struct.Tile.html" title="struct edgequest::game::object::tile::Tile">Tile</a>&gt;,
-    pub entity_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/entity/struct.Entity.html" title="struct edgequest::game::object::entity::Entity">Entity</a>&gt;,
+    pub tile_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/tile/struct.Tile.html" title="struct edgequest::core::object::tile::Tile">Tile</a>&gt;,
+    pub entity_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/entity/struct.Entity.html" title="struct edgequest::core::object::entity::Entity">Entity</a>&gt;,
 }</pre><div class='docblock'><p>Hold the current floor, including tiles and entities.</p>
 </div><h2 id='fields' class='fields small-section-header'>
                        Fields<a href='#fields' class='anchor'></a></h2><span id='structfield.width' class="structfield">
@@ -64,16 +64,16 @@
                            <code>height: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a></code>
                            </span></span><span id='structfield.tile_vec' class="structfield">
                            <span id='tile_vec.v' class='invisible'>
-                           <code>tile_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/tile/struct.Tile.html" title="struct edgequest::game::object::tile::Tile">Tile</a>&gt;</code>
+                           <code>tile_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/tile/struct.Tile.html" title="struct edgequest::core::object::tile::Tile">Tile</a>&gt;</code>
                            </span></span><span id='structfield.entity_vec' class="structfield">
                            <span id='entity_vec.v' class='invisible'>
-                           <code>entity_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/entity/struct.Entity.html" title="struct edgequest::game::object::entity::Entity">Entity</a>&gt;</code>
+                           <code>entity_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/entity/struct.Entity.html" title="struct edgequest::core::object::entity::Entity">Entity</a>&gt;</code>
                            </span></span>
                     <h2 id='methods' class='small-section-header'>
                       Methods<a href='#methods' class='anchor'></a>
                     </h2>
-                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../../../../edgequest/game/object/map/struct.Map.html" title="struct edgequest::game::object::map::Map">Map</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/edgequest/game/object/map.rs.html#15-29' title='goto source code'>[src]</a></span></h3>
-<div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;width: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;height: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;tile_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/tile/struct.Tile.html" title="struct edgequest::game::object::tile::Tile">Tile</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;entity_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/entity/struct.Entity.html" title="struct edgequest::game::object::entity::Entity">Entity</a>&gt;<br>) -&gt; <a class="struct" href="../../../../edgequest/game/object/map/struct.Map.html" title="struct edgequest::game::object::map::Map">Map</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/edgequest/game/object/map.rs.html#20-27' title='goto source code'>[src]</a></span></h4>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../../../../edgequest/game/object/map/struct.Map.html" title="struct edgequest::core::object::map::Map">Map</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/edgequest/game/object/map.rs.html#15-29' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>fn <a href='#method.new' class='fnname'>new</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;width: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;height: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;tile_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/tile/struct.Tile.html" title="struct edgequest::core::object::tile::Tile">Tile</a>&gt;, <br>&nbsp;&nbsp;&nbsp;&nbsp;entity_vec: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="../../../../edgequest/game/object/entity/struct.Entity.html" title="struct edgequest::core::object::entity::Entity">Entity</a>&gt;<br>) -&gt; <a class="struct" href="../../../../edgequest/game/object/map/struct.Map.html" title="struct edgequest::core::object::map::Map">Map</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../../src/edgequest/game/object/map.rs.html#20-27' title='goto source code'>[src]</a></span></h4>
 <div class='docblock'><p>Return a new <code>Map</code></p>
 </div></div></section>
     <section id='search' class="content hidden"></section>

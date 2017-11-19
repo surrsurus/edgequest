@@ -1,6 +1,7 @@
-use game::tcod::colors::Color;
+use core::tcod::colors;
 
-pub use game::object::pos::Pos;
+pub use core::object::pos::Pos;
+pub use core::object::rgb::RGB;
 
 /// 
 /// Holds a position and a character.
@@ -21,8 +22,8 @@ pub struct Entity {
   // We make these triples so that we can derive Eq for this struct
   // because tcod colors don't, and if we want 2d vecs of tiles
   // they need to have Eq
-  pub fg: (u8, u8, u8),
-  pub bg: (u8, u8, u8),
+  pub fg: RGB,
+  pub bg: RGB,
 }
 
 impl Entity {
@@ -31,16 +32,16 @@ impl Entity {
   /// Get the background triple as a `tcod::Color`
   /// 
   #[inline]
-  pub fn get_bg(&self) -> Color {
-    return Color::new(self.bg.0, self.bg.1, self.bg.2);
+  pub fn get_bg(&self) -> colors::Color {
+    return colors::Color::new(self.bg.0, self.bg.1, self.bg.2);
   }
 
   ///
   /// Get the foreground triple as a `tcod::Color`
   /// 
   #[inline]
-  pub fn get_fg(&self) -> Color {
-    return Color::new(self.fg.0, self.fg.1, self.fg.2);
+  pub fn get_fg(&self) -> colors::Color {
+    return colors::Color::new(self.fg.0, self.fg.1, self.fg.2);
   }
 
   /// 
@@ -74,7 +75,7 @@ impl Entity {
   ///
   /// Return a new `Entity`
   /// 
-  pub fn new(pos: Pos, glyph: char, fg: (u8, u8, u8), bg: (u8, u8, u8)) -> Entity {
+  pub fn new(pos: Pos, glyph: char, fg: RGB, bg: RGB) -> Entity {
     return Entity {
       pos: pos, 
       glyph: glyph, 

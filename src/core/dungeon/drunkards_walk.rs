@@ -1,4 +1,4 @@
-use game::dungeon::rand::{thread_rng, Rng};
+use core::dungeon::rand::{thread_rng, Rng};
 
 pub fn generate(grid: &mut Vec<Vec<u8>>, find: u8, replace: u8, iterations: u32) -> Vec<Vec<u8>> {
 

@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests {
-  use game::tcod::Console;
-  use game::tcod::console;
+  use core::tcod::Console;
+  use core::tcod::console;
 
-  use game::init;
-  use game::init::config;
+  use core::init;
+  use core::init::config;
 
   // Test the root console creation
   #[test]

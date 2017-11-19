@@ -11,7 +11,7 @@ use std::fs::File;
 use std::io::prelude::*;
 
 // Use this for three enums that are used in the Config struct
-use game::tcod::console;
+use core::tcod::console;
 
 ///
 /// A struct to hold data gathered from a config.yml file. You should not need to create your own,

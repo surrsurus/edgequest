@@ -1,8 +1,8 @@
 
 #[cfg(test)]
 mod tests {
-  use game::dungeon::corr::Corr;
-  use game::dungeon::rect::Rect;
+  use core::dungeon::corr::Corr;
+  use core::dungeon::rect::Rect;
 
   #[test]
   fn test_corr() {

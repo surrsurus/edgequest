@@ -3,9 +3,9 @@
 //! 
 
 // Local imports. Set as public so docs are generated for them
-pub mod game;
+pub mod core;
 
 // Defer to game to start playing.
 fn main() {
-  game::play();
+  core::play();
 }
