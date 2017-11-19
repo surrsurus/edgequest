@@ -5,19 +5,17 @@
 extern crate rand;
 extern crate fuss;
 
-mod corr;
+use core::object::{Pos, Tile, RGB};
 
-mod drunkards_walk;
+mod constructs;
+use self::constructs::{Corr, Grid, Rect};
+
+mod automata;
+use self::automata::DrunkardsWalk;
 
 mod dungeon_tests;
 
-mod rect;
-
-use self::corr::Corr;
-
 use self::rand::{thread_rng, Rng};
-
-use self::rect::Rect;
 
 use self::fuss::Simplex;
 
@@ -37,7 +35,7 @@ use self::fuss::Simplex;
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Dungeon {
 
-  pub grid: Vec<Vec<u8>>,
+  pub grid: Grid<Tile>,
   // i32 because of tcod
   pub w: i32,
   pub h: i32,
@@ -95,7 +93,13 @@ impl Dungeon {
         mover.0 -= 1;
       } 
 
-      self.grid[mover.0 as usize][mover.1 as usize] = 1;
+      self.grid.0[mover.0 as usize][mover.1 as usize] = Tile::new(
+        Pos::new(mover.0, mover.1),
+        ' ',
+        RGB(255, 255, 255), 
+        RGB(0, 0, 0), 
+        false
+      );
 
     }
 
@@ -107,7 +111,13 @@ impl Dungeon {
         mover.1 -= 1;
       } 
 
-      self.grid[mover.0 as usize][mover.1 as usize] = 1;
+      self.grid.0[mover.0 as usize][mover.1 as usize] = Tile::new(
+        Pos::new(mover.0, mover.1),
+        ' ',
+        RGB(255, 255, 255), 
+        RGB(0, 0, 0), 
+        false
+      );
 
     }
 
@@ -119,7 +129,13 @@ impl Dungeon {
   fn build_rect(&mut self, r: &Rect) {
     for w in 0..r.w {
       for l in 0..r.l {
-        self.grid[(w + r.x) as usize][(l + r.y) as usize] = 1;
+        self.grid.0[(w + r.x) as usize][(l + r.y) as usize] = Tile::new(
+          Pos::new((w + r.x), (l + r.y)),
+          ' ',
+          RGB(255, 255, 255), 
+          RGB(0, 0, 0), 
+          false
+        );
       }
     }
   }
@@ -171,19 +187,25 @@ impl Dungeon {
   pub fn new(w: i32, h: i32, rooms: i32) -> Dungeon {
 
     // Make a grid
-    let mut grid = Vec::<Vec<u8>>::new();
+    let mut grid : Grid<Tile> = Grid(vec![]);
 
     // Fill it with Vecs
-    for _x in 0..w {
+    for x in 0..w {
 
       // Fill new vecs with 0s
-      let mut vec = Vec::<u8>::new();
+      let mut vec = Vec::<Tile>::new();
 
-      for _y in 0..h {
-        vec.push(0);
+      for y in 0..h {
+        vec.push(Tile::new(
+          Pos::new(x, y),
+          ' ',
+          RGB(255, 255, 255), 
+          RGB(33, 33, 33), 
+          true
+        ));
       }
 
-      grid.push(vec);
+      grid.0.push(vec);
 
     }
 
@@ -199,9 +221,9 @@ impl Dungeon {
     d.add_rooms(rooms);
     d.connect_rooms();
 
-    for _ in 0..3 {
-      d.grid = drunkards_walk::generate(&mut d.grid, 0, 1, 1500);
-    }
+    // for _ in 0..3 {
+    //   d.grid = drunkards_walk::generate(&mut d.grid, 0, 1, 1500);
+    // }
     
     return d;
 

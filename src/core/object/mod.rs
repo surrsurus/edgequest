@@ -8,9 +8,6 @@ pub use self::entity::Entity;
 pub mod floor;
 pub use self::floor::Floor;
 
-pub mod grid;
-pub use self::grid::Grid;
-
 pub mod pos;
 pub use self::pos::Pos;
 

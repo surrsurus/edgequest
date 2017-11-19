@@ -2,7 +2,7 @@
 mod tests {
   use core::tcod::colors::Color;
 
-  use core::object::{Entity, Floor, Grid, Pos, RGB, Tile};
+  use core::object::{Entity, Floor, Pos, RGB, Tile};
 
   // Test creating Pos structs and adding/subtracting them
   #[test]

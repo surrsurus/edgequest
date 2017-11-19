@@ -1,4 +1,5 @@
-pub struct Grid<T>(Vec<Vec<T>>);
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
+pub struct Grid<T>(pub Vec<Vec<T>>);
 
 impl<T> Grid<T> {
 

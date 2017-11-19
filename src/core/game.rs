@@ -5,6 +5,8 @@ use core::object::{Pos, Entity, Floor, Tile, RGB};
 use core::tcod::console::Root;
 use core::tcod::input;
 
+// use core::renderer::Screen;
+
 ///
 /// Game struct. Holds a player and a floor
 /// 
@@ -14,6 +16,7 @@ use core::tcod::input;
 pub struct Game {
   pub player: Entity,
   pub floor: Floor,
+  // pub screen: Box<Screen>,
 
   dungeon: Dungeon,
 }
@@ -116,33 +119,7 @@ impl Game {
       dungeon: Game::new_dungeon(map_dim) 
     };
 
-    for x in 0..g.dungeon.w {
-      for y in 0..g.dungeon.h {
-        if g.dungeon.grid[x as usize][y as usize] == 1 {
-          g.floor.tile_vec.push(
-            Tile::new(
-              Pos::new(x, y), 
-              ' ', 
-              RGB(255, 255, 255), 
-              RGB(0, 0, 0), 
-              false
-            )
-          );
-        } else {
-          g.floor.tile_vec.push(
-            Tile::new(
-              Pos::new(x, y), 
-              ' ', 
-              RGB(255, 255, 255), 
-              RGB(33, 33, 33), 
-              true
-            )
-          );
-        }
-        
-      }
-
-    }
+    g.floor.tile_vec = g.dungeon.grid.clone().collapse();
     
     let start_tup = g.dungeon.get_starting_location();
     g.player.pos.x = start_tup.0;

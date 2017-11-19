@@ -12,6 +12,12 @@ use core::object::{Pos, Entity};
 
 use core::tcod::{Console, console};
 
+pub trait Screen {
+
+  fn draw_all(&mut self, con: Console, game: &Game);
+
+}
+
 ///
 /// Helper for rendering things to the screen
 /// 
@@ -37,6 +43,8 @@ impl Renderer {
   /// and always `flush()` the root console.
   /// 
   pub fn draw_all(&mut self, con: &mut Console, game: &Game) {
+
+    println!("{}", &game.player.glyph);
 
     // Clear console
     con.clear();
@@ -82,7 +90,7 @@ impl Renderer {
         pos.y, 
         entity.glyph,
         entity.fg.to_tcod_color(),
-        entity.fg.to_tcod_color()
+        entity.bg.to_tcod_color()
       );
     }
 
