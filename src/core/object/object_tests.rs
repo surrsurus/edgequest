@@ -2,8 +2,7 @@
 mod tests {
   use core::tcod::colors::Color;
 
-  use core::object::pos::Pos;
-  use core::object::entity::Entity;
+  use core::object::{Entity, Floor, Grid, Pos, RGB, Tile};
 
   // Test creating Pos structs and adding/subtracting them
   #[test]
@@ -40,7 +39,7 @@ mod tests {
   #[test]
   fn test_entity() {
 
-    let mut a = Entity::new(Pos::new(1, 2), '@', (255, 255, 255), (0, 0, 0));
+    let mut a = Entity::new(Pos::new(1, 2), '@', RGB(255, 255, 255), RGB(0, 0, 0));
     assert_eq!(a.pos, Pos::new(1, 2));
     assert_eq!(a.glyph, '@');
 

@@ -21,7 +21,7 @@ impl Pos {
   /// 
   #[inline]
   pub fn new(x: i32, y: i32) -> Pos {
-    return Pos { x: x, y: y};
+    Pos { x: x, y: y }
   }
 
   ///
@@ -29,7 +29,7 @@ impl Pos {
   /// 
   #[inline]
   pub fn origin() -> Pos {
-    return Pos { x: 0, y: 0 };
+    Pos { x: 0, y: 0 }
   }
 
 }
@@ -42,7 +42,7 @@ impl BitXor for Pos {
   type Output = f32;
   
   fn bitxor(self, other: Pos) -> f32 {
-    return (((other.x - self.x).pow(2) + (other.y - self.y).pow(2)) as f32).sqrt();
+    (((other.x - self.x).pow(2) + (other.y - self.y).pow(2)) as f32).sqrt()
   }
 
 }
@@ -56,7 +56,7 @@ impl Add for Pos {
     type Output = Pos;
 
     fn add(self, other: Pos) -> Pos {
-      return Pos::new(self.x + other.x, self.y + other.y);
+      Pos::new(self.x + other.x, self.y + other.y)
     }
 
 }
@@ -69,7 +69,7 @@ impl Sub for Pos {
     type Output = Pos;
 
     fn sub(self, other: Pos) -> Pos {
-      return Pos::new(self.x - other.x, self.y - other.y);
+      Pos::new(self.x - other.x, self.y - other.y)
     }
 
 }

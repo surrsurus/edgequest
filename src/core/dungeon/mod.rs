@@ -3,21 +3,23 @@
 //! 
 
 extern crate rand;
-use self::rand::{thread_rng, Rng};
-
 extern crate fuss;
 
-mod rect;
-use self::rect::Rect;
-
 mod corr;
-use self::corr::Corr;
-
-mod cellular_automata;
 
 mod drunkards_walk;
 
 mod dungeon_tests;
+
+mod rect;
+
+use self::corr::Corr;
+
+use self::rand::{thread_rng, Rng};
+
+use self::rect::Rect;
+
+use self::fuss::Simplex;
 
 /// 
 /// `Dungeon` struct to generate a bitmap dungeon (1s and 0s)
@@ -209,10 +211,8 @@ impl Dungeon {
   /// Regenerate the dungeon map
   /// 
   pub fn regen(&mut self) {
-
     let d = Dungeon::new(self.w, self.h, self.rooms.len() as i32);
     self.grid = d.grid;
-
   }
 
 }

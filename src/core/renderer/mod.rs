@@ -1,10 +1,16 @@
-use core::tcod::colors;
-use core::tcod::Console;
-use core::tcod::console;
-use core::object::pos::Pos;
-use core::object::rgb::RGB;
-use core::object::entity::Entity;
+//!
+//! Metapackage for renderer
+//! 
+
+pub mod camera;
+
+pub use self::camera::Camera;
+
 use core::Game;
+
+use core::object::{Pos, Entity};
+
+use core::tcod::{Console, console};
 
 ///
 /// Helper for rendering things to the screen
@@ -14,22 +20,12 @@ use core::Game;
 /// determining whether something should be drawn or not. 
 /// 
 pub struct Renderer {
-
-  // Position that the camera is panned to on the map
-  // Must be within map bounds, or camera will just go to the region,
-  // though the target won't be exactly in the center of the screen.
-  camera: Pos,
-
+  // Camera object
+  camera: Camera,
   // Map dimensions
   map: Pos,
-
   // Screen dimensions
   screen: Pos,
-
-}
-
-fn to_tcod_color(rgb: RGB) -> colors::Color {
-  return colors::Color::new(rgb.0, rgb.1, rgb.2)
 }
 
 impl Renderer {
@@ -45,7 +41,7 @@ impl Renderer {
     // Clear console
     con.clear();
 
-    self.move_to(game.player.pos);
+    self.camera.move_to(game.player.pos);
 
     // Draw tiles
     for t in game.floor.tile_vec.iter() { self.draw_entity(con, &t.entity); }
@@ -68,18 +64,16 @@ impl Renderer {
   pub fn draw_entity(&self, con: &mut Console, entity: &Entity) {
 
     // Check if it's in the camera first
-    if !self.is_in_camera(entity.pos) {
-      return;
-    }
+    if !self.camera.is_in_camera(entity.pos) { return }
 
     // New pos with respect to camera
-    let pos = entity.pos + self.camera;
+    let pos = entity.pos + self.camera.pos;
 
     if entity.glyph == ' ' {
       con.set_char_background(
         pos.x,
         pos.y,
-        entity.get_bg(),
+        entity.bg.to_tcod_color(),
         console::BackgroundFlag::Set
       );
     } else {
@@ -87,42 +81,10 @@ impl Renderer {
         pos.x, 
         pos.y, 
         entity.glyph,
-        entity.get_fg(),
-        entity.get_bg()
+        entity.fg.to_tcod_color(),
+        entity.fg.to_tcod_color()
       );
     }
-
-  }
-
-  ///
-  /// Check if a `Pos` is in the camera
-  /// 
-  #[inline]
-  pub fn is_in_camera(&self, pos: Pos) -> bool {
-
-    // New pos to compare things to
-    let npos = pos + self.camera;
-
-    if npos.x >= 0 && npos.x < self.screen.x && npos.y >= 0 && npos.y < self.screen.y { return true; } else { return false; };
-
-  }
-
-  ///
-  /// Move camera over a position on the map
-  /// 
-  /// The camera will prevent itself from going OOB.
-  /// 
-  fn move_to(&mut self, pos: Pos) {
-
-    let mut x = pos.x - (self.screen.x / 2);
-    let mut y = pos.y - (self.screen.y / 2);
-
-    if x < 0 { x = 0; }
-    if y < 0 { y = 0; }
-    if x > self.map.x - self.screen.x - 1 { x = self.map.x - self.screen.x - 1; }
-    if y > self.map.y - self.screen.y - 1 { y = self.map.y - self.screen.y - 1; }
-
-    self.camera = Pos::new(-x, -y);
 
   }
 
@@ -132,8 +94,9 @@ impl Renderer {
   /// * `map` - `Pos` that holds the map dimensions
   /// * `screen` - `Pos` that holds the screen dimensions
   /// 
+  #[inline]
   pub fn new(map: Pos, screen: Pos) -> Renderer {
-    return Renderer { camera: Pos::origin(), map: map, screen: screen };
+    Renderer { camera: Camera::new(map, screen), map: map, screen: screen }
   }
 
 }

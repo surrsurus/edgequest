@@ -1,7 +1,4 @@
-use core::tcod::colors;
-
-pub use core::object::pos::Pos;
-pub use core::object::rgb::RGB;
+pub use core::object::{Pos, RGB};
 
 /// 
 /// Holds a position and a character.
@@ -28,22 +25,6 @@ pub struct Entity {
 
 impl Entity {
 
-  ///
-  /// Get the background triple as a `tcod::Color`
-  /// 
-  #[inline]
-  pub fn get_bg(&self) -> colors::Color {
-    return colors::Color::new(self.bg.0, self.bg.1, self.bg.2);
-  }
-
-  ///
-  /// Get the foreground triple as a `tcod::Color`
-  /// 
-  #[inline]
-  pub fn get_fg(&self) -> colors::Color {
-    return colors::Color::new(self.fg.0, self.fg.1, self.fg.2);
-  }
-
   /// 
   /// Move the `Entity` by `x` in the x direction and `y` in
   /// the y direction.
@@ -54,6 +35,7 @@ impl Entity {
   /// * `x` - ammount to move in the x direction
   /// * `y` - ammount to move in the x direction
   /// 
+  #[inline]
   pub fn move_cart(&mut self, x: i32, y: i32) {
     self.pos = Pos::new(self.pos.x + x, self.pos.y + y);
   }
@@ -68,20 +50,22 @@ impl Entity {
   /// * `pos` - `Pos` struct of ammount to
   /// move in both x and y directions 
   ///  
+  #[inline]
   pub fn move_pos(&mut self, pos: Pos) {
     self.pos = self.pos + pos;
   }
 
   ///
   /// Return a new `Entity`
-  /// 
+  ///
+  #[inline]
   pub fn new(pos: Pos, glyph: char, fg: RGB, bg: RGB) -> Entity {
-    return Entity {
+    Entity {
       pos: pos, 
       glyph: glyph, 
       fg: fg, 
       bg: bg
-    };
+    }
   }
 
   #[inline]

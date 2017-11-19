@@ -1,6 +1,4 @@
-pub use core::object::entity::Entity;
-pub use core::object::pos::Pos;
-pub use core::object::rgb::RGB;
+pub use core::object::{Entity, Pos, RGB};
 
 ///
 /// Tile represents an environmental entity
@@ -18,10 +16,10 @@ impl Tile {
   /// 
   #[inline]
   pub fn new(pos: Pos, glyph: char, fg: RGB, bg: RGB, blocks: bool) -> Tile {
-    return Tile { 
+    Tile { 
       entity: Entity::new(pos, glyph, fg, bg), 
       blocks: blocks
-    };
+    }
   }
 
   #[inline]

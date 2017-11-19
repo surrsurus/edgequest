@@ -35,10 +35,8 @@ impl Rect {
   /// 
   #[inline]
   pub fn center(&self) -> (i32, i32) {
-    return (
-      (self.w / 2) + self.x, 
-      (self.l / 2) + self.y
-    );
+    ((self.w / 2) + self.x, 
+     (self.l / 2) + self.y)
   }
 
   ///
@@ -56,7 +54,7 @@ impl Rect {
   /// 
   #[inline]
   pub fn new(x: i32, y: i32, l: i32, w: i32) -> Rect {
-    return Rect { x: x, y: y, l: l, w: w};
+    Rect { x: x, y: y, l: l, w: w }
   }
   
 }

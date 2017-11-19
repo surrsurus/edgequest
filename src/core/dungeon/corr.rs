@@ -9,10 +9,8 @@
 /// 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub struct Corr {
-
   pub start: (i32, i32),
   pub end: (i32, i32),
-
 }
 
 impl Corr {

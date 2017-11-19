@@ -4,7 +4,6 @@
 
 // Use to parse YAML
 extern crate yaml_rust;
-use self::yaml_rust::YamlLoader;
 
 // Use to read files
 use std::fs::File;
@@ -12,6 +11,8 @@ use std::io::prelude::*;
 
 // Use this for three enums that are used in the Config struct
 use core::tcod::console;
+
+use self::yaml_rust::YamlLoader;
 
 ///
 /// A struct to hold data gathered from a config.yml file. You should not need to create your own,

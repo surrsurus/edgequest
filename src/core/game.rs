@@ -1,5 +1,7 @@
-use core::object::{Pos, Entity, Floor, Tile, RGB};
 use core::dungeon::Dungeon;
+
+use core::object::{Pos, Entity, Floor, Tile, RGB};
+
 use core::tcod::console::Root;
 use core::tcod::input;
 
@@ -10,12 +12,10 @@ use core::tcod::input;
 /// * `floor` - `Floor` object to represent the current floor the player is on
 /// 
 pub struct Game {
-
   pub player: Entity,
   pub floor: Floor,
 
   dungeon: Dungeon,
-
 }
 
 impl Game {
@@ -70,7 +70,7 @@ impl Game {
   /// Get a new `Dungeon`
   /// 
   pub fn new_dungeon(map_dim: Pos) -> Dungeon {
-    return Dungeon::new(map_dim.x, map_dim.y, (map_dim.x + map_dim.y) / 10);
+    Dungeon::new(map_dim.x, map_dim.y, (map_dim.x + map_dim.y) / 10)
   }
 
   ///
@@ -79,13 +79,14 @@ impl Game {
   /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
   /// so inputs are i32s instead of usizes (they get converted)
   /// 
+  #[inline]
   pub fn new_floor(map_dim: Pos) -> Floor {
-    return Floor::new(
+    Floor::new(
       map_dim.x as usize, 
       map_dim.y as usize, 
       Vec::<Tile>::new(), 
       Vec::<Entity>::new()
-    );
+    )
   }
 
   ///
@@ -93,12 +94,12 @@ impl Game {
   /// 
   #[inline]
   pub fn new_player() -> Entity {
-    return Entity::new(
+    Entity::new(
       Pos::new(40, 25), 
       '@', 
       RGB(255, 255, 255), 
       RGB(0, 0, 0)
-    );
+    )
   }
 
   ///

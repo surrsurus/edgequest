@@ -24,9 +24,7 @@ impl<T> IntoIterator for Grid<T> {
     type IntoIter = ::std::vec::IntoIter<T>;
 
     fn into_iter(self) -> Self::IntoIter {
-
-      return self.collapse().into_iter();
-
+      self.collapse().into_iter()
     }
 
 }

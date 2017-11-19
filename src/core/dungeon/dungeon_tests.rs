@@ -1,9 +1,8 @@
 
 #[cfg(test)]
 mod tests {
-  use core::dungeon::corr::Corr;
-  use core::dungeon::rect::Rect;
-
+  use core::dungeon::{Corr, Rect};
+  
   #[test]
   fn test_corr() {
     let c = Corr::new((0, 1), (1, 2));
