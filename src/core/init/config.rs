@@ -44,10 +44,10 @@ use self::yaml_rust::YamlLoader;
 #[derive(Clone)]
 pub struct Config {
   // i32 because of tcod
-  pub screen_width: i32,
-  pub screen_height: i32,
-  pub map_width: i32,
-  pub map_height: i32,
+  pub screen_width: isize,
+  pub screen_height: isize,
+  pub map_width: isize,
+  pub map_height: isize,
   pub fullscreen: bool,
   pub fontpath: String,
   pub fonttype: console::FontType,
@@ -109,11 +109,11 @@ pub fn load(path: &str) -> Config {
 
     // screen_width and screen_height can only be read as i64s so we use as i32
     // to convert them down
-    screen_width: cfg["screen_width"].as_i64().unwrap() as i32,
-    screen_height: cfg["screen_height"].as_i64().unwrap() as i32,
+    screen_width: cfg["screen_width"].as_i64().unwrap() as isize,
+    screen_height: cfg["screen_height"].as_i64().unwrap() as isize,
 
-    map_width: cfg["map_width"].as_i64().unwrap() as i32,
-    map_height: cfg["map_height"].as_i64().unwrap() as i32,
+    map_width: cfg["map_width"].as_i64().unwrap() as isize,
+    map_height: cfg["map_height"].as_i64().unwrap() as isize,
 
     // Font path should be a String so it doesnt have a lifetime
     fontpath: cfg["fontpath"].as_str().unwrap().to_string(),

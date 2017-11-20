@@ -1,4 +1,4 @@
-pub use core::object::{Entity, Tile};
+pub use core::object::{Entity, Grid, Tile};
 
 ///
 /// Hold the current floor, including tiles and entities.
@@ -6,8 +6,7 @@ pub use core::object::{Entity, Tile};
 pub struct Floor {
   pub width: usize,
   pub height: usize,
-  pub tile_vec: Vec<Tile>,
-  pub entity_vec: Vec<Entity>,
+  pub tile_vec: Grid<Tile>,
 }
 
 impl Floor {
@@ -16,12 +15,11 @@ impl Floor {
   /// Return a new `Floor`
   /// 
   #[inline]
-  pub fn new(width: usize, height: usize, tile_vec: Vec<Tile>, entity_vec: Vec<Entity>) -> Floor {
+  pub fn new(width: usize, height: usize, tile_vec: Grid<Tile>) -> Floor {
     Floor { 
       width: width, 
       height: height, 
-      tile_vec: tile_vec, 
-      entity_vec: entity_vec
+      tile_vec: tile_vec,
     }
   }
 

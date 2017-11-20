@@ -1,8 +1,18 @@
+///
+/// Hold a 2D vector of `T`s
+/// 
+/// Primarily used for dungeon generation and cellular automatons
+/// The idea of this is to generate your maps onto a `Grid` and then pass it back
+/// up as a `collapse()`d grid.
+/// 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Grid<T>(pub Vec<Vec<T>>);
 
 impl<T> Grid<T> {
 
+  ///
+  /// Go from a 2D vector to a 1D. Consumes the `Grid`
+  /// 
   pub fn collapse(self) -> Vec<T> {
 
     let mut collapsed_grid = Vec::<T>::new();
@@ -19,6 +29,9 @@ impl<T> Grid<T> {
 
 }
 
+/// 
+/// Allow for iteration over `Grid`s
+/// 
 impl<T> IntoIterator for Grid<T> {
     
     type Item = T;

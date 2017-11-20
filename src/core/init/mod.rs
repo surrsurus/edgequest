@@ -25,7 +25,7 @@ pub fn root() -> console::Root {
   let cfg = config::load("config/cfg.yml");
 
   return console::Root::initializer()
-    .size(cfg.screen_width, cfg.screen_height)
+    .size(cfg.screen_width as i32, cfg.screen_height as i32)
     .title("EQ")
     .fullscreen(cfg.fullscreen)
     .font(cfg.fontpath, cfg.fontlayout)
@@ -35,6 +35,9 @@ pub fn root() -> console::Root {
 
 }
 
+///
+/// Get map dimensions as a `Pos`
+/// 
 pub fn map_dimensions() -> Pos {
   
   let cfg = config::load("config/cfg.yml");

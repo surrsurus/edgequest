@@ -1,25 +1,80 @@
-use core::dungeon::rand::{thread_rng, Rng};
-use core::dungeon::automata::CellularAutomata;
-use core::dungeon::constructs::Grid;
+extern crate rand;
+use self::rand::{thread_rng, Rng};
 
+use core::dungeon::automata::Automaton;
+
+use core::object::{Grid, Tile};
+
+///
+/// Struct to hold the implementation details for the Drunkards' Walk cellular automaton
+/// 
+/// * `chaos` - Chaos chance from [0.0, 1.0]. Represents the chance that the automaton changes it's direction. 
+/// 1.0 represents total chaos, 0.0 represents total order. 
+/// 
+#[derive(Clone, PartialEq, Debug, Default)]
 pub struct DrunkardsWalk {
-  pub chaos: i32
+  pub chaos: f32
 }
 
-impl CellularAutomata for DrunkardsWalk {
+impl DrunkardsWalk {
 
-  type Output = u8;
+  ///
+  /// Return a new `DrunkardsWalk`
+  /// 
+  pub fn new(chaos: f32) -> DrunkardsWalk {
+    DrunkardsWalk { chaos: chaos }
+  }
 
-  fn generate(grid: &mut Grid<u8>, find: u8, replace: u8, iterations: u32) -> Grid<u8> {
+}
 
+impl Automaton for DrunkardsWalk {
+
+  type Output = Tile;
+
+  fn generate(&self, grid: &mut Grid<Tile>, sx: Option<usize>, sy: Option<usize>, find: Option<Tile>, replace: Tile, iterations: u32) -> Grid<Tile> {
+
+    // Start our RNG
     let mut rng = thread_rng();
 
-    let mut x: i32 = rng.gen_range(1, grid.0.len() as i32 - 2);
-    let mut y: i32 = rng.gen_range(1, grid.0[0].len() as i32 - 2);
+    // Get our starting x and y
+
+    // If x exists, use that x to start
+    // Otherwise, randomly generate one
+    let mut x : usize;
+    match sx {
+      Some(sx) => x = sx,
+      // Use the length of the outside vectors to determine length
+      None => x = rng.gen_range(1, grid.0.len() - 2)
+    }
+
+    // If y exists, use that y to start
+    // Otherwise, randomly generate one
+    let mut y : usize;
+    match sy {
+      Some(sy) => y = sy,
+      // Use the length of one of the inside vectors to determine length
+      None => y = rng.gen_range(1, grid.0[0].len() - 2)
+    }
+    
+    // Store old dice positions
+    let mut old_dice : i32 = rng.gen_range(1, 5);
 
     for _ in 0..iterations {
 
-      let dice = rng.gen_range(1, 5);
+      let dice : i32;
+
+      // Generate chaos
+      let chaos = rng.gen::<f32>();
+
+      // Determine order/chaos
+      if chaos > self.chaos {
+        // Order; same as last time
+        dice = old_dice;
+      } else {
+        // Chaos; randomize
+        dice = rng.gen_range(1, 5);
+        old_dice = dice;
+      }
 
       match dice {
         1 => x += 1,
@@ -33,15 +88,24 @@ impl CellularAutomata for DrunkardsWalk {
       // Obviously if your grid is a 1x1 this will cause an issue.
       if x < 1 { x = 1; }
       if y < 1 { y = 1; }
-      if x >= grid.0.len() as i32 - 2 { x = grid.0.len() as i32 - 2; }
-      if y >= grid.0[0].len() as i32 - 2 { y = grid.0[0].len() as i32 - 2; }
+      if x >= grid.0.len() - 2 { x = grid.0.len() - 2; }
+      if y >= grid.0[0].len() - 2 { y = grid.0[0].len() - 2; }
 
-      if grid.0[x as usize][y as usize] == find {
-        grid.0[x as usize][y as usize] = replace;
+      // Determine what to do based on if `find` is present
+      match find.clone() {
+        Some(find) => {
+          if grid.0[x][y] == find.clone() {
+            grid.0[x][y] = replace.clone();
+          }
+        },
+        None => {
+          grid.0[x][y] = replace.clone();
+        }
       }
 
     }
 
+    // Return a clone of the grid
     return grid.clone();
 
   }

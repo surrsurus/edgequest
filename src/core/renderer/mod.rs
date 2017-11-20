@@ -8,7 +8,7 @@ pub use self::camera::Camera;
 
 use core::Game;
 
-use core::object::{Pos, Entity};
+use core::object::{Pos, RenderableEntity};
 
 use core::tcod::{Console, console};
 
@@ -28,10 +28,6 @@ pub trait Screen {
 pub struct Renderer {
   // Camera object
   camera: Camera,
-  // Map dimensions
-  map: Pos,
-  // Screen dimensions
-  screen: Pos,
 }
 
 impl Renderer {
@@ -44,22 +40,25 @@ impl Renderer {
   /// 
   pub fn draw_all(&mut self, con: &mut Console, game: &Game) {
 
-    println!("{}", &game.player.glyph);
-
     // Clear console
     con.clear();
 
     self.camera.move_to(game.player.pos);
 
     // Draw tiles
-    for t in game.floor.tile_vec.iter() { self.draw_entity(con, &t.entity); }
+    for x in 0..game.floor.tile_vec.0.len() {
 
-    // Draw entities
-    for e in game.floor.entity_vec.iter() { self.draw_entity(con, e); }
+      for y in 0..game.floor.tile_vec.0[0].len() {
+        
+        self.draw_entity(con, Pos::new(x as isize, y as isize), &game.floor.tile_vec.0[x][y]);
+
+      }
+
+    }
 
     // Draw player. Player is always in the camera since
     // we move the camera over it.
-    self.draw_entity(con, &game.player);
+    self.draw_entity(con, game.player.pos, &game.player);
 
   }
 
@@ -69,28 +68,28 @@ impl Renderer {
   /// * `con` - Tcod `Console`
   /// * `entity` - `Entity`
   /// 
-  pub fn draw_entity(&self, con: &mut Console, entity: &Entity) {
-
+  pub fn draw_entity(&self, con: &mut Console, pos: Pos, ce: &RenderableEntity) {
+    
     // Check if it's in the camera first
-    if !self.camera.is_in_camera(entity.pos) { return }
+    if !self.camera.is_in_camera(pos) { return }
 
     // New pos with respect to camera
-    let pos = entity.pos + self.camera.pos;
+    let pos = pos + self.camera.pos;
 
-    if entity.glyph == ' ' {
+    if ce.get_glyph() == ' ' {
       con.set_char_background(
-        pos.x,
-        pos.y,
-        entity.bg.to_tcod_color(),
+        pos.x as i32,
+        pos.y as i32,
+        ce.get_bg().to_tcod(),
         console::BackgroundFlag::Set
       );
     } else {
       con.put_char_ex(
-        pos.x, 
-        pos.y, 
-        entity.glyph,
-        entity.fg.to_tcod_color(),
-        entity.bg.to_tcod_color()
+        pos.x as i32, 
+        pos.y as i32, 
+        ce.get_glyph(),
+        ce.get_fg().to_tcod(),
+        ce.get_bg().to_tcod()
       );
     }
 
@@ -104,7 +103,7 @@ impl Renderer {
   /// 
   #[inline]
   pub fn new(map: Pos, screen: Pos) -> Renderer {
-    Renderer { camera: Camera::new(map, screen), map: map, screen: screen }
+    Renderer { camera: Camera::new(map, screen) }
   }
 
 }

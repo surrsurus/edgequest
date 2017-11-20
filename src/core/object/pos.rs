@@ -10,8 +10,8 @@ use std::ops::{Add, Sub, BitXor};
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub struct Pos {
   // i32 because of tcod
-  pub x: i32,
-  pub y: i32,
+  pub x: isize,
+  pub y: isize,
 }
 
 impl Pos {
@@ -20,8 +20,16 @@ impl Pos {
   /// Return a new `Pos`
   /// 
   #[inline]
-  pub fn new(x: i32, y: i32) -> Pos {
+  pub fn new(x: isize, y: isize) -> Pos {
     Pos { x: x, y: y }
+  }
+
+  ///
+  /// Return a new `Pos` from usize's
+  /// 
+  #[inline]
+  pub fn from_usize(x: usize, y: usize) -> Pos {
+    Pos { x: x as isize, y: y as isize }
   }
 
   ///

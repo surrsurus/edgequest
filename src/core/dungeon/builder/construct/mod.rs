@@ -1,12 +1,9 @@
 //!
-//! Hold constructs
+//! Metapackage to expose an interface to get constructs
 //! 
 
 pub mod corr;
 pub use self::corr::Corr;
-
-pub mod grid;
-pub use self::grid::Grid;
 
 pub mod rect;
 pub use self::rect::Rect;

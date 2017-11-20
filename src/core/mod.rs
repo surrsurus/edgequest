@@ -39,7 +39,7 @@ pub fn play() {
   let map_dim = init::map_dimensions();
 
   // Get a new renderer
-  let mut ren = Renderer::new(map_dim, Pos::new(root.width(), root.height()));
+  let mut ren = Renderer::new(map_dim, Pos::new(root.width() as isize, root.height() as isize));
 
   // Get a new game
   let mut game = Game::new(map_dim);

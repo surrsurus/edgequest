@@ -14,27 +14,19 @@
 /// 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub struct Rect {
-  pub x: i32,
-  pub y: i32,
-  pub l: i32,
-  pub w: i32,
+  pub x: usize,
+  pub y: usize,
+  pub l: usize,
+  pub w: usize,
 }
 
 impl Rect {
 
   ///
-  /// Find the center of the `Rect` and return it's `Pos`ition
-  /// 
-  /// # Examples
-  /// 
-  /// ```
-  /// let r = Rect::new(10, 5, 20, 20);
-  /// let pos = r.center();
-  /// assert_eq!(pos, Pos::new(20, 15));
-  /// ```
+  /// Find the center of the `Rect` and return it's position
   /// 
   #[inline]
-  pub fn center(&self) -> (i32, i32) {
+  pub fn center(&self) -> (usize, usize) {
     ((self.w / 2) + self.x, 
      (self.l / 2) + self.y)
   }
@@ -53,7 +45,7 @@ impl Rect {
   /// ```
   /// 
   #[inline]
-  pub fn new(x: i32, y: i32, l: i32, w: i32) -> Rect {
+  pub fn new(x: usize, y: usize, l: usize, w: usize) -> Rect {
     Rect { x: x, y: y, l: l, w: w }
   }
   

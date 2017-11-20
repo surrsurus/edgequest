@@ -1,6 +1,6 @@
 use core::dungeon::Dungeon;
 
-use core::object::{Pos, Entity, Floor, Tile, RGB};
+use core::object::{Pos, Fighter, Grid, Floor, RGB};
 
 use core::tcod::console::Root;
 use core::tcod::input;
@@ -14,7 +14,7 @@ use core::tcod::input;
 /// * `floor` - `Floor` object to represent the current floor the player is on
 /// 
 pub struct Game {
-  pub player: Entity,
+  pub player: Fighter,
   pub floor: Floor,
   // pub screen: Box<Screen>,
 
@@ -53,10 +53,8 @@ impl Game {
             
           }
 
-          for t in self.floor.tile_vec.iter() {
-            if t.blocks && t.entity.pos == self.player.pos {
-              self.player.pos = oldpos;
-            }
+          if self.floor.tile_vec.0[self.player.pos.x as usize][self.player.pos.y as usize].blocks {
+            self.player.pos = oldpos;
           }
 
         } else {
@@ -73,7 +71,7 @@ impl Game {
   /// Get a new `Dungeon`
   /// 
   pub fn new_dungeon(map_dim: Pos) -> Dungeon {
-    Dungeon::new(map_dim.x, map_dim.y, (map_dim.x + map_dim.y) / 10)
+    Dungeon::new(map_dim.x as usize, map_dim.y as usize)
   }
 
   ///
@@ -87,8 +85,7 @@ impl Game {
     Floor::new(
       map_dim.x as usize, 
       map_dim.y as usize, 
-      Vec::<Tile>::new(), 
-      Vec::<Entity>::new()
+      Grid(vec![]), 
     )
   }
 
@@ -96,10 +93,11 @@ impl Game {
   /// Return a new player `Entity`
   /// 
   #[inline]
-  pub fn new_player() -> Entity {
-    Entity::new(
-      Pos::new(40, 25), 
+  pub fn new_player() -> Fighter {
+    Fighter::new(
+      "Player".to_string(),
       '@', 
+      Pos::new(40, 25), 
       RGB(255, 255, 255), 
       RGB(0, 0, 0)
     )
@@ -119,11 +117,9 @@ impl Game {
       dungeon: Game::new_dungeon(map_dim) 
     };
 
-    g.floor.tile_vec = g.dungeon.grid.clone().collapse();
+    g.floor.tile_vec = g.dungeon.build();
     
-    let start_tup = g.dungeon.get_starting_location();
-    g.player.pos.x = start_tup.0;
-    g.player.pos.y = start_tup.1;
+    g.player.pos = g.dungeon.get_starting_location();
 
     return g;
     

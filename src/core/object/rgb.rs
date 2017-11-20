@@ -6,7 +6,7 @@ pub struct RGB(pub u8, pub u8, pub u8);
 impl RGB {
 
   #[inline]
-  pub fn to_tcod_color(&self) -> colors::Color {
+  pub fn to_tcod(&self) -> colors::Color {
     colors::Color::new(self.0, self.1, self.2)
   }
 
