@@ -3,7 +3,7 @@ use self::fuss::Simplex;
 
 use core::dungeon::builder::Buildable;
 
-use core::object::Grid;
+use core::map::Grid;
 
 pub struct Fussy {
   pub grid: Grid<u8>,

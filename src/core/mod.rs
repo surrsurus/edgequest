@@ -12,6 +12,9 @@ pub mod dungeon;
 // core::init
 pub mod init;
 
+// core::map
+pub mod map;
+
 // core::object
 pub mod object;
 
@@ -57,6 +60,8 @@ pub fn play() {
 
     // Capture keypresses
     game.capture_keypress(&mut root);
+
+    // game.update_scent_map();
 
   }
 

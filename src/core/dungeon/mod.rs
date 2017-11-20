@@ -11,7 +11,9 @@ use self::automata::{Automaton, DrunkardsWalk};
 pub mod builder;
 use self::builder::{Buildable, Fussy, Simple};
 
-use core::object::{Pos, Grid, RGB, Tile};
+use core::map::{Grid, Tile};
+
+use core::object::{Pos, RGB};
 
 mod dungeon_tests;
 

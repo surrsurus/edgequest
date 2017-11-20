@@ -4,7 +4,9 @@ use self::rand::{thread_rng, Rng};
 use core::dungeon::builder::Buildable;
 use core::dungeon::builder::construct::{Corr, Rect};
 
-use core::object::{Grid, RGB, Tile};
+use core::map::{Grid, Tile};
+
+use core::object::RGB;
 
 ///
 /// Simple dungeon builder

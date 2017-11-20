@@ -1,4 +1,4 @@
-use core::object::Grid;
+use core::map::Grid;
 
 ///
 /// `Automaton` trait to define a set of behavior for all cellular automatons

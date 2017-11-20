@@ -1,6 +1,8 @@
 use core::dungeon::Dungeon;
 
-use core::object::{Pos, Fighter, Grid, Floor, RGB};
+use core::map::{Grid, Floor};
+
+use core::object::{Pos, Fighter, RGB};
 
 use core::tcod::console::Root;
 use core::tcod::input;
