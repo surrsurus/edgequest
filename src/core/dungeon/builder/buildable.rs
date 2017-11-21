@@ -1,4 +1,4 @@
-use core::map::Grid;
+use core::dungeon::map::Grid;
 ///
 /// Buildable trait to define a set of behaviors that all dungeon builders will inherit
 /// 

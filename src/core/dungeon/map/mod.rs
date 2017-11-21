@@ -1,6 +1,3 @@
-pub mod floor;
-pub use self::floor::Floor;
-
 pub mod grid;
 pub use self::grid::Grid;
 

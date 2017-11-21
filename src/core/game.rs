@@ -1,6 +1,6 @@
 use core::dungeon::Dungeon;
 
-use core::map::{Grid, Floor};
+use core::dungeon::map::Grid;
 
 use core::object::{Pos, Fighter, RGB};
 
@@ -17,10 +17,9 @@ use core::tcod::input;
 /// 
 pub struct Game {
   pub player: Fighter,
-  pub floor: Floor,
   // pub screen: Box<Screen>,
 
-  dungeon: Dungeon,
+  pub dungeon: Dungeon,
 }
 
 impl Game {
@@ -55,7 +54,7 @@ impl Game {
             
           }
 
-          if self.floor.tile_vec.0[self.player.pos.x as usize][self.player.pos.y as usize].blocks {
+          if self.dungeon.grid.0[self.player.pos.x as usize][self.player.pos.y as usize].blocks {
             self.player.pos = oldpos;
           }
 
@@ -74,21 +73,6 @@ impl Game {
   /// 
   pub fn new_dungeon(map_dim: Pos) -> Dungeon {
     Dungeon::new(map_dim.x as usize, map_dim.y as usize)
-  }
-
-  ///
-  /// Return a new empty `Floor`
-  /// 
-  /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
-  /// so inputs are i32s instead of usizes (they get converted)
-  /// 
-  #[inline]
-  pub fn new_floor(map_dim: Pos) -> Floor {
-    Floor::new(
-      map_dim.x as usize, 
-      map_dim.y as usize, 
-      Grid(vec![]), 
-    )
   }
 
   ///
@@ -115,11 +99,10 @@ impl Game {
 
     let mut g = Game {
       player: Game::new_player(), 
-      floor: Game::new_floor(map_dim), 
       dungeon: Game::new_dungeon(map_dim) 
     };
 
-    g.floor.tile_vec = g.dungeon.build();
+    g.dungeon.build();
     
     g.player.pos = g.dungeon.get_starting_location();
 

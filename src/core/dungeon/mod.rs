@@ -5,15 +5,16 @@
 extern crate rand;
 use self::rand::{thread_rng, Rng};
 
-pub mod automata;
+mod automata;
 use self::automata::{Automaton, DrunkardsWalk};
 
-pub mod builder;
+mod builder;
 use self::builder::{Buildable, Fussy, Simple};
 
-use core::map::{Grid, Tile};
+pub mod map;
+use self::map::{Grid, Scent, ScentMap, Tile};
 
-use core::object::{Pos, RGB};
+use core::object::{Fighter, Pos, RGB};
 
 mod dungeon_tests;
 
@@ -22,7 +23,10 @@ mod dungeon_tests;
 /// 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Dungeon {
-  pub grid: Grid<Tile>
+  pub width: usize,
+  pub height: usize,
+  pub grid: Grid<Tile>,
+  pub scent_map: ScentMap,
 }
 
 impl Dungeon {
@@ -51,36 +55,45 @@ impl Dungeon {
   pub fn new(w: usize, h: usize) -> Dungeon {
 
     // Make a grid
-    let mut grid : Grid<Tile> = Grid(vec![]);
+    let mut map_grid : Grid<Tile> = Grid(vec![]);
+    let mut scent_grid : ScentMap = Grid(vec![]);
 
     // Fill it with Vecs
     for _x in 0..w {
 
       // Fill new vecs with walls
-      let mut vec = Vec::<Tile>::new();
+      let mut map_vec = Vec::<Tile>::new();
+      let mut scent_vec = Vec::<Scent>::new();
 
       for _y in 0..h {
-        vec.push(Tile::new(
+        map_vec.push(Tile::new(
           "Wall".to_string(),
           ' ',
           RGB(255, 255, 255), 
           RGB(33, 33, 33), 
           true
         ));
+        scent_vec.push(Scent::new());
       }
 
-      grid.0.push(vec);
+      map_grid.0.push(map_vec);
+      scent_grid.0.push(scent_vec);
 
     }
 
-    return Dungeon { grid: grid };
+    return Dungeon { 
+      width: w,
+      height: h,
+      grid: map_grid,
+      scent_map: scent_grid 
+      };
 
   }
 
   ///
   /// Make the dungeon
   /// 
-  pub fn build(&mut self) -> Grid<Tile> {
+  pub fn build(&mut self) {
 
     // Apply simple builder first
     let mut grid = Simple::new(self.grid.clone()).build();
@@ -140,8 +153,10 @@ impl Dungeon {
 
     self.grid = grid;
 
-    return self.grid.clone();
+  }
 
+  pub fn update_scentmap(&mut self, player: &Fighter) {
+    self.scent_map.update(&mut self.grid, player);
   }
 
 }

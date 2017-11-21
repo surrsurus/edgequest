@@ -3,7 +3,7 @@ use self::rand::{thread_rng, Rng};
 
 use core::dungeon::automata::Automaton;
 
-use core::map::{Grid, Tile};
+use core::dungeon::map::{Grid, Tile};
 
 ///
 /// Struct to hold the implementation details for the Drunkards' Walk cellular automaton

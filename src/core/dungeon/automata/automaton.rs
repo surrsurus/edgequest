@@ -1,4 +1,4 @@
-use core::map::Grid;
+use core::dungeon::map::Grid;
 
 ///
 /// `Automaton` trait to define a set of behavior for all cellular automatons

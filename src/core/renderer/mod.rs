@@ -8,7 +8,7 @@ pub use self::camera::Camera;
 
 use core::Game;
 
-use core::map::Tile;
+use core::dungeon::map::Tile;
 
 use core::object::{Pos, RenderableEntity, RGB};
 
@@ -36,14 +36,20 @@ impl Renderer {
 
   pub fn debug_render_scent_map(&mut self, con: &mut Console, game: &Game) {
 
-    for x in 0..game.floor.width {
-      for y in 0..game.floor.height {
-        if game.floor.scent_map.0[x][y].value != 0 {
+    for x in 0..game.dungeon.width {
+      for y in 0..game.dungeon.height {
+        if game.dungeon.scent_map.0[x][y].value != 0 {
+          let b : u8;
+          if game.dungeon.scent_map.0[x][y].value < 30 {
+            b = 70 + game.dungeon.scent_map.0[x][y].value * 6;
+          } else {
+            b = 100;
+          }
           self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Scent".to_string(),
             ' ',
             RGB(255, 255, 255),
-            RGB(game.floor.scent_map.0[x][y].value + 100, 0, 0),
+            RGB(game.dungeon.scent_map.0[x][y].value, b / 2, b),
             false
           ));
         }
@@ -66,11 +72,11 @@ impl Renderer {
     self.camera.move_to(game.player.pos);
 
     // Draw tiles
-    for x in 0..game.floor.width {
+    for x in 0..game.dungeon.width {
 
-      for y in 0..game.floor.height {
+      for y in 0..game.dungeon.height {
         
-        self.draw_entity(con, Pos::new(x as isize, y as isize), &game.floor.tile_vec.0[x][y]);
+        self.draw_entity(con, Pos::new(x as isize, y as isize), &game.dungeon.grid.0[x][y]);
 
       }
 
