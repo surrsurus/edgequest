@@ -58,8 +58,14 @@ pub fn play() {
     // Capture keypresses
     game.capture_keypress(&mut root);
 
-    game.dungeon.scent_map.0[game.player.pos.x as usize][game.player.pos.y as usize].max();
-    game.dungeon.update_scentmap(&game.player);
+    for nx in -1..2 {
+      for ny in -1..2 {
+        if game.player.pos.x - nx > 0 && game.player.pos.x - nx < game.dungeon.width as isize && game.player.pos.y - ny > 0 && game.player.pos.y - ny < game.dungeon.height as isize && !game.dungeon.grid.0[(game.player.pos.x - nx) as usize][(game.player.pos.y - ny) as usize].blocks{ 
+          game.dungeon.scent_map.0[(game.player.pos.x - nx) as usize][(game.player.pos.y - ny) as usize].inc(150);
+        }
+      }
+    }
+    game.dungeon.update_scentmap();
 
   }
 

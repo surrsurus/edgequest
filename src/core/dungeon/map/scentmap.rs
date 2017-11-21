@@ -5,51 +5,52 @@ use core::object::Fighter;
 pub type ScentMap = Grid<Scent>;
 
 impl ScentMap {
+
+  fn avg_of_neighbors(&self, buffer: &ScentMap, x: usize, y: usize) -> f32 {
+
+    (
+      (buffer.0[x - 1][y].as_f32() +
+      buffer.0[x + 1][y].as_f32() +
+      buffer.0[x][y - 1].as_f32() +
+      buffer.0[x][y + 1].as_f32() +
+      buffer.0[x + 1][y + 1].as_f32() +
+      buffer.0[x - 1][y - 1].as_f32() +
+      buffer.0[x + 1][y - 1].as_f32() +
+      buffer.0[x - 1][y + 1].as_f32()) / 
+      (((buffer.0[x - 1][y].filter() +
+      buffer.0[x + 1][y].filter() +
+      buffer.0[x][y - 1].filter() +
+      buffer.0[x][y + 1].filter() +
+      buffer.0[x + 1][y + 1].filter() +
+      buffer.0[x - 1][y - 1].filter() +
+      buffer.0[x + 1][y - 1].filter() +
+      buffer.0[x - 1][y + 1].filter()) + 0.05) * (255.0/256.0))
+    ) 
+
+  }
   
-  pub fn update(&mut self, grid: &Grid<Tile>, player: &Fighter) {
+  pub fn update(&mut self, grid: &Grid<Tile>) {
 
-    let width = self.0.len();
-    let height = self.0[0].len();
+    let width : usize = self.0.len();
+    let height : usize = self.0[0].len();
 
-    for nx in -1..2 {
-      for ny in -1..2 {
-        if player.pos.x - nx > 0 && player.pos.x - nx < width as isize &&player.pos.y - ny > 0 && player.pos.y - ny < height as isize && !grid.0[(player.pos.x - nx) as usize][(player.pos.y - ny) as usize].blocks{ 
-          self.0[(player.pos.x - nx) as usize][(player.pos.y - ny) as usize].max();
-        }
+    let mut buffer : ScentMap = Grid(vec![]);
+    for x in 0..width {
+      let mut scent_vec = Vec::<Scent>::new();
+      for y in 0..height {
+        scent_vec.push(self.0[x][y].clone());
       }
+      buffer.0.push(scent_vec);
     }
 
     for x in 0..width {
       for y in 0..height {
-        self.0[x][y].update();
-        if self.0[x][y].value > 3 {
-          if x + 1 > 0 && x + 1 < width && y > 0 && y < height && !grid.0[(x + 1) as usize][(y) as usize].blocks{
-            if self.0[(x + 1) as usize][(y) as usize].value < self.0[x][y].value {
-              self.0[(x + 1) as usize][(y) as usize].inc();
-              self.0[x][y].dec();
-            }
-          }
-          if x - 1 > 0 && x - 1 < width && y > 0 && y < height && !grid.0[(x - 1) as usize][(y) as usize].blocks{
-            if self.0[(x - 1) as usize][(y) as usize].value < self.0[x][y].value {
-              self.0[(x - 1) as usize][(y) as usize].inc();
-              self.0[x][y].dec();
-            }
-          }
-          if x > 0 && x < width && y - 1 > 0 && y - 1 < height && !grid.0[(x) as usize][(y - 1) as usize].blocks{
-            if self.0[(x) as usize][(y - 1) as usize].value < self.0[x][y].value {
-              self.0[(x) as usize][(y - 1) as usize].inc();
-              self.0[x][y].dec();
-            }
-          }
-          if x > 0 && x < width && y + 1 > 0 && y + 1 < height && !grid.0[(x) as usize][(y + 1) as usize].blocks{
-            if self.0[(x) as usize][(y + 1) as usize].value < self.0[x][y].value {
-              self.0[(x) as usize][(y + 1) as usize].inc();
-              self.0[x][y].dec();
-            }
-          }
-        }
+         if x + 2 > 0 && x + 2 < width && y > 1 && y + 2 < height && !grid.0[x][y].blocks {
+          self.0[x][y].value = self.avg_of_neighbors(&buffer, x, y) as u8;
+         }
       }
     }
+
   }
 
 }

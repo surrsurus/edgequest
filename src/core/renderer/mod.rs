@@ -38,7 +38,7 @@ impl Renderer {
 
     for x in 0..game.dungeon.width {
       for y in 0..game.dungeon.height {
-        if game.dungeon.scent_map.0[x][y].value != 0 {
+        if game.dungeon.scent_map.0[x][y].value > 0 {
           let b : u8;
           if game.dungeon.scent_map.0[x][y].value < 30 {
             b = 70 + game.dungeon.scent_map.0[x][y].value * 6;
@@ -49,7 +49,7 @@ impl Renderer {
             "Debug Scent".to_string(),
             ' ',
             RGB(255, 255, 255),
-            RGB(game.dungeon.scent_map.0[x][y].value, b / 2, b),
+            RGB(game.dungeon.scent_map.0[x][y].value + 50 as u8, 0, game.dungeon.scent_map.0[x][y].value + 25 as u8),
             false
           ));
         }

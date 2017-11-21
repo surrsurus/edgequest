@@ -21,7 +21,7 @@ mod dungeon_tests;
 /// 
 /// `Dungeon` struct to stitch together all builders and cellular automatons
 /// 
-#[derive(Clone, PartialEq, Eq, Debug, Default)]
+#[derive(Clone, PartialEq, Debug, Default)]
 pub struct Dungeon {
   pub width: usize,
   pub height: usize,
@@ -155,8 +155,8 @@ impl Dungeon {
 
   }
 
-  pub fn update_scentmap(&mut self, player: &Fighter) {
-    self.scent_map.update(&mut self.grid, player);
+  pub fn update_scentmap(&mut self) {
+    self.scent_map.update(&mut self.grid);
   }
 
 }
