@@ -13,12 +13,6 @@ use core::object::{Pos, Entity};
 
 use core::tcod::{Console, console};
 
-pub trait Screen {
-
-  fn draw_all(&mut self, con: Console, game: &Game);
-
-}
-
 ///
 /// Helper for rendering things to the screen
 /// 
@@ -37,12 +31,12 @@ impl Renderer {
 
     for x in 0..game.dungeon.width {
       for y in 0..game.dungeon.height {
-        if game.dungeon.scent_map.0[x][y].value > 0 {
+        if game.dungeon.grid.0[x][y].scent > 0 {
           self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Scent".to_string(),
             ' ',
             (255, 255, 255),
-            (game.dungeon.scent_map.0[x][y].value + 50 as u8, 0, game.dungeon.scent_map.0[x][y].value + 25 as u8),
+            (game.dungeon.grid.0[x][y].scent + 50 as u8, 0, game.dungeon.grid.0[x][y].scent + 25 as u8),
             false
           ));
         }

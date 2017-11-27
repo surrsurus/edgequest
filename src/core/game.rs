@@ -142,7 +142,7 @@ impl Game {
   /// 
   pub fn update_world(&mut self) {
     if self.state == "act".to_string() {
-      self.dungeon.scent_map.update(&self.dungeon.grid, self.player.pos.as_tup());
+      self.dungeon.update_scent(self.player.pos.as_tup());
     }
   }
 

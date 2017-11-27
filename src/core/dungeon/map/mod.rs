@@ -5,9 +5,5 @@
 pub mod grid;
 pub use self::grid::Grid;
 
-pub mod scentmap;
-pub use self::scentmap::Scent;
-pub use self::scentmap::ScentMap;
-
 pub mod tile;
 pub use self::tile::Tile;

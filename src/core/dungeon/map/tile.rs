@@ -10,7 +10,8 @@ pub struct Tile {
   pub blocks: bool,
   fg: RGB,
   bg: RGB,
-  pub biome: String
+  pub biome: String,
+  pub scent: u8
 }
 
 impl Tile {
@@ -26,7 +27,8 @@ impl Tile {
       fg: RGB::from_tup(fg),
       bg: RGB::from_tup(bg),
       blocks: blocks,
-      biome: "dungeon".to_string()
+      biome: "dungeon".to_string(),
+      scent: 0
     }
   }
 
