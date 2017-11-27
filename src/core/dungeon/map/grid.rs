@@ -34,11 +34,11 @@ impl<T> Grid<T> {
 /// 
 impl<T> IntoIterator for Grid<T> {
     
-    type Item = T;
-    type IntoIter = ::std::vec::IntoIter<T>;
+  type Item = T;
+  type IntoIter = ::std::vec::IntoIter<T>;
 
-    fn into_iter(self) -> Self::IntoIter {
-      self.collapse().into_iter()
-    }
+  fn into_iter(self) -> Self::IntoIter {
+    self.collapse().into_iter()
+  }
 
 }

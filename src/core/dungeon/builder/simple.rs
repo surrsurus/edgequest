@@ -6,7 +6,7 @@ use core::dungeon::builder::construct::{Corr, Rect};
 
 use core::dungeon::map::{Grid, Tile};
 
-use core::object::RGB;
+use core::renderer::RGB;
 
 ///
 /// Simple dungeon builder

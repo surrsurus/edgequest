@@ -14,7 +14,8 @@ use self::builder::{Buildable, Fussy, Simple};
 pub mod map;
 use self::map::{Grid, Scent, ScentMap, Tile};
 
-use core::object::{Fighter, Pos, RGB};
+use core::object::Entity;
+use core::renderer::RGB;
 
 mod dungeon_tests;
 
@@ -36,7 +37,7 @@ impl Dungeon {
   /// 
   /// NOTE: Should be deprecated and removed once stairs show up
   /// 
-  pub fn get_starting_location(&self) -> Pos {
+  pub fn get_starting_location(&self) -> (usize, usize) {
     let mut rng = thread_rng();
     let mut x : usize = rng.gen_range(1, self.grid.0.len() - 2);
     let mut y : usize = rng.gen_range(1, self.grid.0[0].len() - 2);
@@ -45,27 +46,27 @@ impl Dungeon {
       y = rng.gen_range(1, self.grid.0[0].len() - 2);
     };
 
-    return Pos::from_usize(x, y);
+    return (x, y);
 
   }
 
   /// 
   /// Return a new `Dungeon`
   /// 
-  pub fn new(w: usize, h: usize) -> Dungeon {
+  pub fn new(map_dim: (usize, usize)) -> Dungeon {
 
-    // Make a grid
+    // Make grids
     let mut map_grid : Grid<Tile> = Grid(vec![]);
     let mut scent_grid : ScentMap = Grid(vec![]);
 
     // Fill it with Vecs
-    for _x in 0..w {
+    for _x in 0..map_dim.0 {
 
       // Fill new vecs with walls
       let mut map_vec = Vec::<Tile>::new();
       let mut scent_vec = Vec::<Scent>::new();
 
-      for _y in 0..h {
+      for _y in 0..map_dim.1 {
         map_vec.push(Tile::new(
           "Wall".to_string(),
           ' ',
@@ -82,11 +83,11 @@ impl Dungeon {
     }
 
     return Dungeon { 
-      width: w,
-      height: h,
+      width: map_dim.0,
+      height: map_dim.1,
       grid: map_grid,
       scent_map: scent_grid 
-      };
+    };
 
   }
 
@@ -148,15 +149,32 @@ impl Dungeon {
     );
 
     // Apply noise
-    // let mut f = Fussy::new(grid, 1.2);
-    // grid = f.build();
+    let mut bin_grid : Grid<u8> = Grid(vec![]);
+    for _x in 0..self.width {
+      let mut bin_vec = Vec::<u8>::new();
+      for _y in 0..self.height {
+        bin_vec.push(0);
+      }
+      bin_grid.0.push(bin_vec);
+    }
+
+    let mut f = Fussy::new(bin_grid, 1.2);
+    bin_grid = f.build();
+
+    for x in 0..self.width {
+      for y in 0..self.height {
+        if bin_grid.0[x][y] == 1 {
+          if grid.0[x][y].blocks {
+            grid.0[x][y].set_bg(RGB(100, 100, 60));
+          } else {
+            grid.0[x][y].set_bg(RGB(50, 50, 40));
+          } 
+        }
+      }
+    }
 
     self.grid = grid;
 
-  }
-
-  pub fn update_scentmap(&mut self) {
-    self.scent_map.update(&mut self.grid);
   }
 
 }

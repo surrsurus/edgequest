@@ -2,9 +2,6 @@
 //! Metapackage to expose an interface to get builders
 //! 
 
-pub mod biome;
-pub use self::biome::Biome;
-
 pub mod buildable;
 pub use self::buildable::Buildable;
 

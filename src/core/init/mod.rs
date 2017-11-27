@@ -12,8 +12,6 @@ pub mod config;
 
 mod init_tests;
 
-use core::object::Pos;
-
 ///
 /// Initialize the root console.
 /// 
@@ -38,10 +36,10 @@ pub fn root() -> console::Root {
 ///
 /// Get map dimensions as a `Pos`
 /// 
-pub fn map_dimensions() -> Pos {
+pub fn map_dimensions() -> (isize, isize) {
   
   let cfg = config::load("config/cfg.yml");
 
-  return Pos::new(cfg.map_width, cfg.map_height);
+  return (cfg.map_width, cfg.map_height);
 
 }

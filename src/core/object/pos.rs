@@ -2,7 +2,8 @@
 use std::ops::{Add, Sub, BitXor};
 
 /// 
-/// Hold an x, y cartesian coordinate
+/// Hold an x, y cartesian coordinate. Should be used when explicitly needing ability to add/subtract
+/// and find distance between `Pos`s, otherwise just use a tuple.
 /// 
 /// `x` - x axis location
 /// `y` - y axis location
@@ -33,6 +34,22 @@ impl Pos {
   }
 
   ///
+  /// Return a `Pos` from a tuple
+  /// 
+  #[inline]
+  pub fn from_tup(pos: (isize, isize)) -> Pos {
+    Pos { x: pos.0, y: pos.1 }
+  }
+
+  ///
+  /// Return a tuple from a `Pos`
+  /// 
+  #[inline]
+  pub fn as_tup(&self) -> (isize, isize) {
+    (self.x, self.y)
+  }
+
+  ///
   /// Return a `Pos` at the origin (0, 0)
   /// 
   #[inline]
@@ -49,23 +66,24 @@ impl BitXor for Pos {
 
   type Output = f32;
   
+  #[inline]
   fn bitxor(self, other: Pos) -> f32 {
     (((other.x - self.x).pow(2) + (other.y - self.y).pow(2)) as f32).sqrt()
   }
 
 }
 
-
 /// 
 /// Allow for the addition of two `Pos` structs
 /// 
 impl Add for Pos {
 
-    type Output = Pos;
+  type Output = Pos;
 
-    fn add(self, other: Pos) -> Pos {
-      Pos::new(self.x + other.x, self.y + other.y)
-    }
+  #[inline]
+  fn add(self, other: Pos) -> Pos {
+    Pos::new(self.x + other.x, self.y + other.y)
+  }
 
 }
 
@@ -74,10 +92,10 @@ impl Add for Pos {
 /// 
 impl Sub for Pos {
 
-    type Output = Pos;
+  type Output = Pos;
 
-    fn sub(self, other: Pos) -> Pos {
-      Pos::new(self.x - other.x, self.y - other.y)
-    }
+  fn sub(self, other: Pos) -> Pos {
+    Pos::new(self.x - other.x, self.y - other.y)
+  }
 
 }

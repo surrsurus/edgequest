@@ -23,8 +23,6 @@ pub mod game;
 
 use self::game::Game;
 
-use self::object::Pos;
-
 use self::renderer::Renderer;
 
 ///
@@ -39,7 +37,7 @@ pub fn play() {
   let map_dim = init::map_dimensions();
 
   // Get a new renderer
-  let mut ren = Renderer::new(map_dim, Pos::new(root.width() as isize, root.height() as isize));
+  let mut ren = Renderer::new(map_dim, (root.width() as isize, root.height() as isize));
 
   // Get a new game
   let mut game = Game::new(map_dim);
@@ -58,14 +56,7 @@ pub fn play() {
     // Capture keypresses
     game.capture_keypress(&mut root);
 
-    for nx in -1..2 {
-      for ny in -1..2 {
-        if game.player.pos.x - nx > 0 && game.player.pos.x - nx < game.dungeon.width as isize && game.player.pos.y - ny > 0 && game.player.pos.y - ny < game.dungeon.height as isize && !game.dungeon.grid.0[(game.player.pos.x - nx) as usize][(game.player.pos.y - ny) as usize].blocks{ 
-          game.dungeon.scent_map.0[(game.player.pos.x - nx) as usize][(game.player.pos.y - ny) as usize].inc(150);
-        }
-      }
-    }
-    game.dungeon.update_scentmap();
+    game.update_world();
 
   }
 

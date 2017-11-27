@@ -1,4 +1,5 @@
-use core::object::{Pos, Entity, RenderableEntity, RGB, Renderable};
+use core::object::{Pos, Entity};
+use core::renderer::RGB;
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Fighter {
@@ -65,20 +66,6 @@ impl Fighter {
 impl Entity for Fighter {
 
   #[inline]
-  fn get_name(&self) -> String {
-    self.name.clone()
-  }
-
-  #[inline]
-  fn set_name(&mut self, name: String) {
-    self.name = name;
-  }
-
-}
-
-impl Renderable for Fighter {
-
-  #[inline]
   fn get_bg(&self) -> RGB {
     self.bg
   }
@@ -91,6 +78,11 @@ impl Renderable for Fighter {
   #[inline]
   fn get_glyph(&self) -> char {
     self.glyph
+  }
+
+  #[inline]
+  fn get_name(&self) -> String {
+    self.name.clone()
   }
 
   #[inline]
@@ -108,6 +100,9 @@ impl Renderable for Fighter {
     self.glyph = glyph
   }
 
-}
+  #[inline]
+  fn set_name(&mut self, name: String) {
+    self.name = name;
+  }
 
-impl RenderableEntity for Fighter {}
+}

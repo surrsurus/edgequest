@@ -30,9 +30,7 @@ impl Fussy {
           self.grid.0[x][y] = 1;
         }
       }
-
     }
-    
   }
 
   ///

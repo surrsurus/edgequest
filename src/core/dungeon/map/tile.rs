@@ -1,11 +1,12 @@
-use core::object::{Entity, RenderableEntity, RGB, Renderable};
+use core::object::Entity;
+use core::renderer::RGB;
 
 ///
 /// Tile represents an environmental entity
 /// 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Tile {
-  pub name: String,
+  name: String,
   pub glyph: char,
   pub blocks: bool,
   fg: RGB,
@@ -35,20 +36,6 @@ impl Tile {
 impl Entity for Tile {
 
   #[inline]
-  fn get_name(&self) -> String {
-    self.name.clone()
-  }
-
-  #[inline]
-  fn set_name(&mut self, name: String) {
-    self.name = name;
-  }
-
-}
-
-impl Renderable for Tile {
-
-  #[inline]
   fn get_bg(&self) -> RGB {
     self.bg
   }
@@ -61,6 +48,11 @@ impl Renderable for Tile {
   #[inline]
   fn get_glyph(&self) -> char {
     self.glyph
+  }
+
+  #[inline]
+  fn get_name(&self) -> String {
+    self.name.clone()
   }
 
   #[inline]
@@ -78,6 +70,9 @@ impl Renderable for Tile {
     self.glyph = glyph
   }
 
-}
+  #[inline]
+  fn set_name(&mut self, name: String) {
+    self.name = name;
+  }
 
-impl RenderableEntity for Tile {}
+}

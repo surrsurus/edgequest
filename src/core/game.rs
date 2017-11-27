@@ -1,8 +1,8 @@
 use core::dungeon::Dungeon;
 
-use core::dungeon::map::Grid;
+use core::object::{Pos, Fighter};
 
-use core::object::{Pos, Fighter, RGB};
+use core::renderer::RGB;
 
 use core::tcod::console::Root;
 use core::tcod::input;
@@ -20,6 +20,7 @@ pub struct Game {
   // pub screen: Box<Screen>,
 
   pub dungeon: Dungeon,
+  pub state: String
 }
 
 impl Game {
@@ -42,20 +43,46 @@ impl Game {
         
           match keypress.printable {
 
-            'h' => self.player.move_cart(-1, 0),
-            'j' => self.player.move_cart(0, 1),
-            'k' => self.player.move_cart(0, -1),
-            'l' => self.player.move_cart(1, 0),
-            'y' => self.player.move_cart(-1, -1),
-            'u' => self.player.move_cart(1, -1),
-            'b' => self.player.move_cart(-1, 1),
-            'n' => self.player.move_cart(1, 1),
-            _ => { println!("{}", keypress.printable) }
+            'h' => { 
+              self.player.move_cart(-1, 0);
+              self.state = "act".to_string();
+            },
+            'j' => { 
+              self.player.move_cart(0, 1);
+              self.state = "act".to_string();
+            },
+            'k' => {
+              self.player.move_cart(0, -1);
+              self.state = "act".to_string();
+            },
+            'l' => {
+              self.player.move_cart(1, 0);
+              self.state = "act".to_string();  
+            },
+            'y' => {
+              self.player.move_cart(-1, -1);
+              self.state = "act".to_string();
+            },
+            'u' => {
+              self.player.move_cart(1, -1);
+              self.state = "act".to_string();
+            },
+            'b' => {
+              self.player.move_cart(-1, 1);
+              self.state = "act".to_string();
+            },
+            'n' => { 
+              self.player.move_cart(1, 1);
+              self.state = "act".to_string();
+            },
+            '.' => { self.state = "act".to_string() },
+            _ => { self.state = "unknown".to_string() }
             
           }
 
           if self.dungeon.grid.0[self.player.pos.x as usize][self.player.pos.y as usize].blocks {
             self.player.pos = oldpos;
+            self.state = "unknown".to_string();
           }
 
         } else {
@@ -71,8 +98,8 @@ impl Game {
   ///
   /// Get a new `Dungeon`
   /// 
-  pub fn new_dungeon(map_dim: Pos) -> Dungeon {
-    Dungeon::new(map_dim.x as usize, map_dim.y as usize)
+  pub fn new_dungeon(map_dim: (isize, isize)) -> Dungeon {
+    Dungeon::new((map_dim.0 as usize, map_dim.1 as usize))
   }
 
   ///
@@ -95,18 +122,28 @@ impl Game {
   /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
   /// so inputs are i32s instead of usizes (they get converted)
   /// 
-  pub fn new(map_dim: Pos) -> Game {
+  pub fn new(map_dim: (isize, isize)) -> Game {
 
     let mut g = Game {
       player: Game::new_player(), 
-      dungeon: Game::new_dungeon(map_dim) 
+      dungeon: Game::new_dungeon(map_dim),
+      state: "new".to_string()
     };
 
     g.dungeon.build();
     
-    g.player.pos = g.dungeon.get_starting_location();
+    let start_loc = g.dungeon.get_starting_location();
+    g.player.pos.x = start_loc.0 as isize;
+    g.player.pos.y = start_loc.1 as isize;
 
     return g;
+    
+  }
+
+  pub fn update_world(&mut self) {
+    if self.state == "act".to_string() {
+      self.dungeon.scent_map.update(&self.dungeon.grid, self.player.pos.as_tup());
+    }
     
   }
 

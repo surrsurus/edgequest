@@ -10,9 +10,12 @@ use core::Game;
 
 use core::dungeon::map::Tile;
 
-use core::object::{Pos, RenderableEntity, RGB};
+use core::object::{Pos, Entity};
 
 use core::tcod::{Console, console};
+
+pub mod rgb;
+pub use self::rgb::RGB;
 
 pub trait Screen {
 
@@ -39,12 +42,6 @@ impl Renderer {
     for x in 0..game.dungeon.width {
       for y in 0..game.dungeon.height {
         if game.dungeon.scent_map.0[x][y].value > 0 {
-          let b : u8;
-          if game.dungeon.scent_map.0[x][y].value < 30 {
-            b = 70 + game.dungeon.scent_map.0[x][y].value * 6;
-          } else {
-            b = 100;
-          }
           self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Scent".to_string(),
             ' ',
@@ -97,7 +94,7 @@ impl Renderer {
   /// * `con` - Tcod `Console`
   /// * `entity` - `Entity`
   /// 
-  pub fn draw_entity(&self, con: &mut Console, pos: Pos, ce: &RenderableEntity) {
+  pub fn draw_entity(&self, con: &mut Console, pos: Pos, ce: &Entity) {
     
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
@@ -131,7 +128,7 @@ impl Renderer {
   /// * `screen` - `Pos` that holds the screen dimensions
   /// 
   #[inline]
-  pub fn new(map: Pos, screen: Pos) -> Renderer {
+  pub fn new(map: (isize, isize), screen: (isize, isize)) -> Renderer {
     Renderer { camera: Camera::new(map, screen) }
   }
 

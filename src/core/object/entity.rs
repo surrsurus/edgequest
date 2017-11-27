@@ -1,17 +1,30 @@
+use core::renderer::RGB;
+
 /// 
 /// Holds a position and a character.
-/// 
-/// Used for everything, basically, since all things in order to
-/// be rendered need 1) a place to be rendered on the screen
-/// and 2) a character to represent them on the screen.
-///
-/// * `pos` - `Pos` representing where the entity is on the map
-/// * `glyph` - Character to represent entity on screen
 /// 
 pub trait Entity {
 
   #[inline]
+  fn get_bg(&self) -> RGB;
+
+  #[inline]
+  fn get_fg(&self) -> RGB;
+
+  #[inline]
+  fn get_glyph(&self) -> char;
+
+  #[inline]
   fn get_name(&self) -> String;
+
+  #[inline]
+  fn set_bg(&mut self, bg: RGB);
+
+  #[inline]
+  fn set_fg(&mut self, fg: RGB);
+
+  #[inline]
+  fn set_glyph(&mut self, glyph: char);
 
   #[inline]
   fn set_name(&mut self, name: String);
