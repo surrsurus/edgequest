@@ -1,5 +1,4 @@
-use core::object::{Pos, Entity};
-use core::renderer::RGB;
+use core::object::{Entity, Pos, RGB};
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Fighter {
@@ -46,13 +45,13 @@ impl Fighter {
   /// Return a new `Entity`
   ///
   #[inline]
-  pub fn new(name: String, glyph: char, pos: Pos, fg: RGB, bg: RGB) -> Fighter {
+  pub fn new(name: String, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8)) -> Fighter {
     Fighter {
       name: name,
       glyph: glyph, 
-      pos: pos, 
-      fg: fg, 
-      bg: bg
+      pos: Pos::from_tup(pos), 
+      fg: RGB::from_tup(fg), 
+      bg: RGB::from_tup(bg)
     }
   }
 
@@ -86,13 +85,13 @@ impl Entity for Fighter {
   }
 
   #[inline]
-  fn set_bg(&mut self, bg: RGB) {
-    self.bg = bg;
+  fn set_bg(&mut self, bg: (u8, u8, u8)) {
+    self.bg = RGB::from_tup(bg);
   }
 
   #[inline]
-  fn set_fg(&mut self, fg: RGB) {
-    self.fg = fg;
+  fn set_fg(&mut self, fg: (u8, u8, u8)) {
+    self.fg = RGB::from_tup(fg);
   }
 
   #[inline]

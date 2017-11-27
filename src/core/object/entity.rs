@@ -1,4 +1,4 @@
-use core::renderer::RGB;
+use core::object::RGB;
 
 /// 
 /// Holds a position and a character.
@@ -18,10 +18,10 @@ pub trait Entity {
   fn get_name(&self) -> String;
 
   #[inline]
-  fn set_bg(&mut self, bg: RGB);
+  fn set_bg(&mut self, bg: (u8, u8, u8));
 
   #[inline]
-  fn set_fg(&mut self, fg: RGB);
+  fn set_fg(&mut self, fg: (u8, u8, u8));
 
   #[inline]
   fn set_glyph(&mut self, glyph: char);

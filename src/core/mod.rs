@@ -17,13 +17,11 @@ pub mod object;
 
 // core::renderer
 pub mod renderer;
+use self::renderer::Renderer;
 
 // core::game
 pub mod game;
-
 use self::game::Game;
-
-use self::renderer::Renderer;
 
 ///
 /// Play the game.
@@ -43,9 +41,7 @@ pub fn play() {
   let mut game = Game::new(map_dim);
 
   // Draw all and capture keypresses
-  while !(root.window_closed()) {
-
-    // AI actions go here \\
+  while !root.window_closed() {
 
     // Draw what the camera sees
     ren.draw_all(&mut root, &game);

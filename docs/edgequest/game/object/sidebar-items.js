@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["entity",""],["map",""],["pos",""],["tile",""]]});

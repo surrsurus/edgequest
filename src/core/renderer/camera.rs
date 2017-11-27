@@ -30,16 +30,17 @@ impl Camera {
   /// The camera will prevent itself from going OOB.
   /// 
   pub fn move_to(&mut self, pos: Pos) {
+    
+    let mut new_pos = pos.clone();
+    new_pos -= Pos::new(self.screen.x / 2, self.screen.y / 2);
 
-    let mut x = pos.x - (self.screen.x / 2);
-    let mut y = pos.y - (self.screen.y / 2);
+    // Boundary checks
+    if new_pos.x < 0 { new_pos.x = 0; }
+    if new_pos.y < 0 { new_pos.y = 0; }
+    if new_pos.x > self.map.x - self.screen.x - 1 { new_pos.x = self.map.x - self.screen.x - 1; }
+    if new_pos.y > self.map.y - self.screen.y - 1 { new_pos.y = self.map.y - self.screen.y - 1; }
 
-    if x < 0 { x = 0; }
-    if y < 0 { y = 0; }
-    if x > self.map.x - self.screen.x - 1 { x = self.map.x - self.screen.x - 1; }
-    if y > self.map.y - self.screen.y - 1 { y = self.map.y - self.screen.y - 1; }
-
-    self.pos = Pos::new(-x, -y);
+    self.pos = -new_pos;
 
   }
 

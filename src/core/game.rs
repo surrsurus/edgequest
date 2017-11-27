@@ -1,8 +1,6 @@
 use core::dungeon::Dungeon;
 
-use core::object::{Pos, Fighter};
-
-use core::renderer::RGB;
+use core::object::Fighter;
 
 use core::tcod::console::Root;
 use core::tcod::input;
@@ -17,7 +15,6 @@ use core::tcod::input;
 /// 
 pub struct Game {
   pub player: Fighter,
-  // pub screen: Box<Screen>,
 
   pub dungeon: Dungeon,
   pub state: String
@@ -110,9 +107,9 @@ impl Game {
     Fighter::new(
       "Player".to_string(),
       '@', 
-      Pos::new(40, 25), 
-      RGB(255, 255, 255), 
-      RGB(0, 0, 0)
+      (40, 25), 
+      (255, 255, 255), 
+      (0, 0, 0)
     )
   }
 
@@ -140,11 +137,13 @@ impl Game {
     
   }
 
+  ///
+  /// Update the game world
+  /// 
   pub fn update_world(&mut self) {
     if self.state == "act".to_string() {
       self.dungeon.scent_map.update(&self.dungeon.grid, self.player.pos.as_tup());
     }
-    
   }
 
 }

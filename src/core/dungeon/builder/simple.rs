@@ -6,8 +6,6 @@ use core::dungeon::builder::construct::{Corr, Rect};
 
 use core::dungeon::map::{Grid, Tile};
 
-use core::renderer::RGB;
-
 ///
 /// Simple dungeon builder
 /// 
@@ -81,8 +79,8 @@ impl Simple {
       self.grid.0[mover.0 as usize][mover.1 as usize] = Tile::new(
         "Floor".to_string(),
         ' ',
-        RGB(255, 255, 255), 
-        RGB(0, 0, 0), 
+        (255, 255, 255), 
+        (0, 0, 0), 
         false
       );
 
@@ -99,8 +97,8 @@ impl Simple {
       self.grid.0[mover.0][mover.1] = Tile::new(
         "Floor".to_string(),
         ' ',
-        RGB(255, 255, 255), 
-        RGB(0, 0, 0), 
+        (255, 255, 255), 
+        (0, 0, 0), 
         false
       );
 
@@ -117,8 +115,8 @@ impl Simple {
         self.grid.0[(w + r.x)][(l + r.y)] = Tile::new(
           "Floor".to_string(),
           ' ',
-          RGB(255, 255, 255), 
-          RGB(0, 0, 0), 
+          (255, 255, 255), 
+          (0, 0, 0), 
           false
         );
       }

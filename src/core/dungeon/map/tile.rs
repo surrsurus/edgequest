@@ -1,5 +1,4 @@
-use core::object::Entity;
-use core::renderer::RGB;
+use core::object::{Entity, RGB};
 
 ///
 /// Tile represents an environmental entity
@@ -20,12 +19,12 @@ impl Tile {
   /// Return a new `Tile`
   /// 
   #[inline]
-  pub fn new(name: String, glyph: char, fg: RGB, bg: RGB, blocks: bool) -> Tile {
+  pub fn new(name: String, glyph: char, fg: (u8, u8, u8), bg: (u8, u8, u8), blocks: bool) -> Tile {
     Tile { 
       name: name,
       glyph: glyph,
-      fg: fg,
-      bg: bg,
+      fg: RGB::from_tup(fg),
+      bg: RGB::from_tup(bg),
       blocks: blocks,
       biome: "dungeon".to_string()
     }
@@ -56,13 +55,13 @@ impl Entity for Tile {
   }
 
   #[inline]
-  fn set_bg(&mut self, bg: RGB) {
-    self.bg = bg;
+  fn set_bg(&mut self, bg: (u8, u8, u8)) {
+    self.bg = RGB::from_tup(bg);
   }
 
   #[inline]
-  fn set_fg(&mut self, fg: RGB) {
-    self.fg = fg;
+  fn set_fg(&mut self, fg: (u8, u8, u8)) {
+    self.fg = RGB::from_tup(fg);
   }
 
   #[inline]

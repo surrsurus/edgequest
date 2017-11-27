@@ -3,7 +3,6 @@
 //! 
 
 pub mod camera;
-
 pub use self::camera::Camera;
 
 use core::Game;
@@ -13,9 +12,6 @@ use core::dungeon::map::Tile;
 use core::object::{Pos, Entity};
 
 use core::tcod::{Console, console};
-
-pub mod rgb;
-pub use self::rgb::RGB;
 
 pub trait Screen {
 
@@ -45,8 +41,8 @@ impl Renderer {
           self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Scent".to_string(),
             ' ',
-            RGB(255, 255, 255),
-            RGB(game.dungeon.scent_map.0[x][y].value + 50 as u8, 0, game.dungeon.scent_map.0[x][y].value + 25 as u8),
+            (255, 255, 255),
+            (game.dungeon.scent_map.0[x][y].value + 50 as u8, 0, game.dungeon.scent_map.0[x][y].value + 25 as u8),
             false
           ));
         }

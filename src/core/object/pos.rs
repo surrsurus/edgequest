@@ -1,5 +1,5 @@
 // Operator overloading
-use std::ops::{Add, Sub, BitXor};
+use std::ops::{Add, AddAssign, BitXor, Neg, Sub, SubAssign};
 
 /// 
 /// Hold an x, y cartesian coordinate. Should be used when explicitly needing ability to add/subtract
@@ -59,20 +59,6 @@ impl Pos {
 
 }
 
-///
-/// Implement distance formula for `Pos` as ^ in order to find distances between `Pos` structs
-/// 
-impl BitXor for Pos {
-
-  type Output = f32;
-  
-  #[inline]
-  fn bitxor(self, other: Pos) -> f32 {
-    (((other.x - self.x).pow(2) + (other.y - self.y).pow(2)) as f32).sqrt()
-  }
-
-}
-
 /// 
 /// Allow for the addition of two `Pos` structs
 /// 
@@ -88,14 +74,69 @@ impl Add for Pos {
 }
 
 /// 
+/// Allow for the addition assignment of `Pos`s
+/// 
+impl AddAssign for Pos {
+
+  #[inline]
+  fn add_assign(&mut self, other: Pos) {
+    self.x = self.x + other.x;
+    self.y = self.y + other.y;
+  }
+
+}
+
+///
+/// Implement distance formula for `Pos` as ^ in order to find distances between `Pos` structs
+/// 
+impl BitXor for Pos {
+
+  type Output = f32;
+  
+  #[inline]
+  fn bitxor(self, other: Pos) -> f32 {
+    (((other.x - self.x).pow(2) + (other.y - self.y).pow(2)) as f32).sqrt()
+  }
+
+}
+
+///
+/// Allow for unary - on `Pos`
+/// 
+impl Neg for Pos {
+
+  type Output = Pos;
+
+  #[inline]
+  fn neg(self) -> Pos {
+    Pos::new(-self.x, -self.y)
+  }
+
+}
+
+/// 
 /// Allow for the subtraction of two `Pos` structs
 /// 
 impl Sub for Pos {
 
   type Output = Pos;
 
+  #[inline]
   fn sub(self, other: Pos) -> Pos {
     Pos::new(self.x - other.x, self.y - other.y)
+  }
+
+}
+
+/// 
+/// Allow for the subtraction assignment of `Pos`s
+/// 
+impl SubAssign for Pos {
+
+  #[inline]
+  fn sub_assign(&mut self, other: Pos) {
+    self.x = self.x - other.x;
+    self.y = self.y - other.y;
   }
 
 }

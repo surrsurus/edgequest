@@ -15,7 +15,6 @@ pub mod map;
 use self::map::{Grid, Scent, ScentMap, Tile};
 
 use core::object::Entity;
-use core::renderer::RGB;
 
 mod dungeon_tests;
 
@@ -70,8 +69,8 @@ impl Dungeon {
         map_vec.push(Tile::new(
           "Wall".to_string(),
           ' ',
-          RGB(255, 255, 255), 
-          RGB(33, 33, 33), 
+          (255, 255, 255), 
+          (33, 33, 33), 
           true
         ));
         scent_vec.push(Scent::new());
@@ -102,16 +101,16 @@ impl Dungeon {
     let wall = Tile::new(
       "Wall".to_string(),
       ' ',
-      RGB(255, 255, 255), 
-      RGB(33, 33, 33), 
+      (255, 255, 255), 
+      (33, 33, 33), 
       true
     );
 
     let floor = Tile::new(
       "Floor".to_string(),
       ' ',
-      RGB(255, 255, 255), 
-      RGB(0, 0, 0), 
+      (255, 255, 255), 
+      (0, 0, 0), 
       false
     );
 
@@ -165,9 +164,9 @@ impl Dungeon {
       for y in 0..self.height {
         if bin_grid.0[x][y] == 1 {
           if grid.0[x][y].blocks {
-            grid.0[x][y].set_bg(RGB(100, 100, 60));
+            grid.0[x][y].set_bg((100, 100, 60));
           } else {
-            grid.0[x][y].set_bg(RGB(50, 50, 40));
+            grid.0[x][y].set_bg((50, 50, 40));
           } 
         }
       }
