@@ -50,7 +50,12 @@ pub fn play() {
     root.flush();
 
     // Capture keypresses
-    game.capture_keypress(&mut root);
+    let keypress = root.wait_for_keypress(true);
+    if keypress.printable == 'r' {
+      ren.debug = !ren.debug;
+      ren.draw_all(&mut root, &game);
+    }
+    game.process_keypress(keypress);
 
     game.update_world();
 

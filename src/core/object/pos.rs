@@ -2,8 +2,9 @@
 use std::ops::{Add, AddAssign, BitXor, Neg, Sub, SubAssign};
 
 /// 
-/// Hold an x, y cartesian coordinate. Should be used when explicitly needing ability to add/subtract
-/// and find distance between `Pos`s, otherwise just use a tuple.
+/// Hold an x, y cartesian coordinate. Should be used when explicitly needing to
+/// manipulate points, not just store them. Length and width should be stored as tuples, 
+/// however a monster should be a pos to calculate distance between it and the player.
 /// 
 /// `x` - x axis location
 /// `y` - y axis location
@@ -62,7 +63,7 @@ impl Pos {
 /// 
 /// Allow for the addition of two `Pos` structs
 /// 
-impl Add for Pos {
+impl Add<Pos> for Pos {
 
   type Output = Pos;
 
@@ -74,9 +75,23 @@ impl Add for Pos {
 }
 
 /// 
+/// Allow for the addition of a `Pos` and a tuple
+/// 
+impl Add<(isize, isize)> for Pos {
+
+  type Output = Pos;
+
+  #[inline]
+  fn add(self, other: (isize, isize)) -> Pos {
+    Pos::new(self.x + other.0, self.y + other.1)
+  }
+
+}
+
+/// 
 /// Allow for the addition assignment of `Pos`s
 /// 
-impl AddAssign for Pos {
+impl AddAssign<Pos> for Pos {
 
   #[inline]
   fn add_assign(&mut self, other: Pos) {
@@ -86,16 +101,43 @@ impl AddAssign for Pos {
 
 }
 
+/// 
+/// Allow for the addition assignment of `Pos` with a tuple
+/// 
+impl AddAssign<(isize, isize)> for Pos {
+
+  #[inline]
+  fn add_assign(&mut self, other: (isize, isize)) {
+    self.x = self.x + other.0;
+    self.y = self.y + other.1;
+  }
+
+}
+
 ///
 /// Implement distance formula for `Pos` as ^ in order to find distances between `Pos` structs
 /// 
-impl BitXor for Pos {
+impl BitXor<Pos> for Pos {
 
   type Output = f32;
   
   #[inline]
   fn bitxor(self, other: Pos) -> f32 {
     (((other.x - self.x).pow(2) + (other.y - self.y).pow(2)) as f32).sqrt()
+  }
+
+}
+
+///
+/// Implement distance formula for `Pos` and a tuple as ^ in order to find distances between them
+/// 
+impl BitXor<(isize, isize)> for Pos {
+
+  type Output = f32;
+  
+  #[inline]
+  fn bitxor(self, other: (isize, isize)) -> f32 {
+    (((other.0 - self.x).pow(2) + (other.1 - self.y).pow(2)) as f32).sqrt()
   }
 
 }
@@ -117,7 +159,7 @@ impl Neg for Pos {
 /// 
 /// Allow for the subtraction of two `Pos` structs
 /// 
-impl Sub for Pos {
+impl Sub<Pos> for Pos {
 
   type Output = Pos;
 
@@ -129,14 +171,41 @@ impl Sub for Pos {
 }
 
 /// 
+/// Allow for the subtraction of a `Pos` with a tuple
+/// 
+impl Sub<(isize, isize)> for Pos {
+
+  type Output = Pos;
+
+  #[inline]
+  fn sub(self, other: (isize, isize)) -> Pos {
+    Pos::new(self.x - other.0, self.y - other.1)
+  }
+
+}
+
+/// 
 /// Allow for the subtraction assignment of `Pos`s
 /// 
-impl SubAssign for Pos {
+impl SubAssign<Pos> for Pos {
 
   #[inline]
   fn sub_assign(&mut self, other: Pos) {
     self.x = self.x - other.x;
     self.y = self.y - other.y;
+  }
+
+}
+
+/// 
+/// Allow for the subtraction assignment of `Pos` with a tuple
+/// 
+impl SubAssign<(isize, isize)> for Pos {
+
+  #[inline]
+  fn sub_assign(&mut self, other: (isize, isize)) {
+    self.x = self.x - other.0;
+    self.y = self.y - other.1;
   }
 
 }

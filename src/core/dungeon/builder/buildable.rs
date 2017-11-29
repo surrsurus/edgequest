@@ -8,7 +8,7 @@ pub trait Buildable {
   /// 
   /// What type `T` of `Grid<T>` is on output
   /// 
-  type Output;
+  type Output : Clone;
 
   ///
   /// Build the dungeon and return a `Grid<Self::Output>`

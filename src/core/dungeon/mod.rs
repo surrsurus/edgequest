@@ -45,6 +45,28 @@ pub struct Dungeon {
 
 impl Dungeon {
 
+  fn generate_grid<T : Clone>(w: usize, h: usize, init: T) -> Grid<T> {
+    // Make grid
+    let mut grid : Grid<T> = Grid(vec![]);
+
+    // Fill it with Vecs
+    for _x in 0..w {
+
+      // Fill new vecs with init
+      let mut vec = Vec::<T>::new();
+
+      for _y in 0..h {
+        vec.push(init.clone());
+      }
+
+      grid.0.push(vec);
+
+    }
+
+    return grid;
+
+  }
+
   ///
   /// Get the player's starting location as a `Pos`
   /// 
@@ -71,34 +93,14 @@ impl Dungeon {
     return Dungeon { 
       width: map_dim.0,
       height: map_dim.1,
-      grid: {
-
-        // Make grids
-        let mut map_grid : Grid<Tile> = Grid(vec![]);
-
-        // Fill it with Vecs
-        for _x in 0..map_dim.0 {
-
-          // Fill new vecs with walls
-          let mut map_vec = Vec::<Tile>::new();
-
-          for _y in 0..map_dim.1 {
-            map_vec.push(Tile::new(
-              "Wall".to_string(),
-              ' ',
-              (255, 255, 255), 
-              (33, 33, 33), 
-              true
-            ));
-          }
-
-          map_grid.0.push(map_vec);
-
-        }
-
-        map_grid
-
-      }
+      grid: Dungeon::generate_grid(map_dim.0, map_dim.1, Tile::new(
+        "Wall".to_string(),
+        ' ',
+        (255, 255, 255), 
+        (33, 33, 33), 
+        true
+      ))
+    
     };
 
   }
@@ -127,51 +129,31 @@ impl Dungeon {
       false
     );
 
+    // Closure for generating drunkards walks
+    let drunk = |chaos: f32, iter: u32, grid: &mut Grid<Tile> | -> Grid<Tile> {
+      let d = DrunkardsWalk::new(chaos);
+      d.generate(
+        grid, 
+        None, 
+        None, 
+        Some(wall.clone()),
+        floor.clone(),
+        iter
+      )
+    };
+
     // Total randomness
-    let d1 = DrunkardsWalk::new(1.0);
-    grid = d1.generate(
-      &mut grid, 
-      None, 
-      None, 
-      Some(wall.clone()),
-      floor.clone(),
-      1000
-    );
+    grid = drunk(1.0, 1000, &mut grid);
 
     // Semi random
-    let d2 = DrunkardsWalk::new(0.5);
-    grid = d2.generate(
-      &mut grid, 
-      None, 
-      None, 
-      Some(wall.clone()),
-      floor.clone(),
-      750
-    );
+    grid = drunk(0.5, 1000, &mut grid);
 
     // Mostly orderly
-    let d3 = DrunkardsWalk::new(0.25);
-    grid = d3.generate(
-      &mut grid, 
-      None, 
-      None, 
-      Some(wall.clone()),
-      floor.clone(),
-      750
-    );
+    grid = drunk(0.25, 1000, &mut grid);
 
     // Apply noise
-    let mut bin_grid : Grid<u8> = Grid(vec![]);
-    for _x in 0..self.width {
-      let mut bin_vec = Vec::<u8>::new();
-      for _y in 0..self.height {
-        bin_vec.push(0);
-      }
-      bin_grid.0.push(bin_vec);
-    }
-
-    let mut f = Fussy::new(bin_grid, 1.2);
-    bin_grid = f.build();
+    let mut f = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.2);
+    let bin_grid = f.build();
 
     for x in 0..self.width {
       for y in 0..self.height {
@@ -202,7 +184,7 @@ impl Dungeon {
     // Create initial bloom around player
     for nx in -1..2 {
       for ny in -1..2 {
-        if self.is_valid((player_pos.0 - nx) as usize , (player_pos.1 - ny) as usize) {
+        if self.is_valid((player_pos.0 - nx) as usize, (player_pos.1 - ny) as usize) {
           self.grid.0[(player_pos.0 - nx) as usize][(player_pos.1 - ny) as usize].scent = INC;
         }
       }
@@ -219,26 +201,29 @@ impl Dungeon {
     // This is not a "true" average of all neighboring `Scent`s.
     let avg_of_neighbors = |x: usize, y: usize| -> f32 {
       // Add all tile values
-      (buffer.0[x - 1][y].scent as f32 +
-      buffer.0[x + 1][y].scent as f32 +
-      buffer.0[x][y - 1].scent as f32 +
-      buffer.0[x][y + 1].scent as f32 +
+      (
+      buffer.0[x - 1][  y  ].scent as f32 +
+      buffer.0[x + 1][  y  ].scent as f32 +
+      buffer.0[  x  ][y - 1].scent as f32 +
+      buffer.0[  x  ][y + 1].scent as f32 +
       buffer.0[x + 1][y + 1].scent as f32 +
       buffer.0[x - 1][y - 1].scent as f32 +
       buffer.0[x + 1][y - 1].scent as f32 +
-      buffer.0[x - 1][y + 1].scent as f32) / 
+      buffer.0[x - 1][y + 1].scent as f32
+      ) / 
       
       // Divide by num tiles present, to get the average
       // Add a little bit more on top to make the bloom around player larger
       (((
-      filter(&buffer.0[x - 1][y]) +
-      filter(&buffer.0[x + 1][y]) +
-      filter(&buffer.0[x][y - 1]) +
-      filter(&buffer.0[x][y + 1]) +
+      filter(&buffer.0[x - 1][  y  ]) +
+      filter(&buffer.0[x + 1][  y  ]) +
+      filter(&buffer.0[  x  ][y - 1]) +
+      filter(&buffer.0[  x  ][y + 1]) +
       filter(&buffer.0[x + 1][y + 1]) +
       filter(&buffer.0[x - 1][y - 1]) +
       filter(&buffer.0[x + 1][y - 1]) +
-      filter(&buffer.0[x - 1][y + 1])) + BLOOM) 
+      filter(&buffer.0[x - 1][y + 1]
+      )) + BLOOM) 
       
       // Decay factor
       * DECAY)

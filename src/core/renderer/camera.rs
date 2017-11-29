@@ -32,7 +32,7 @@ impl Camera {
   pub fn move_to(&mut self, pos: Pos) {
     
     let mut new_pos = pos.clone();
-    new_pos -= Pos::new(self.screen.x / 2, self.screen.y / 2);
+    new_pos -= (self.screen.x / 2, self.screen.y / 2);
 
     // Boundary checks
     if new_pos.x < 0 { new_pos.x = 0; }

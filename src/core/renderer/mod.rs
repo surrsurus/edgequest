@@ -23,6 +23,7 @@ use core::tcod::{Console, console};
 pub struct Renderer {
   // Camera object
   camera: Camera,
+  pub debug: bool
 }
 
 impl Renderer {
@@ -36,7 +37,7 @@ impl Renderer {
             "Debug Scent".to_string(),
             ' ',
             (255, 255, 255),
-            (game.dungeon.grid.0[x][y].scent + 50 as u8, 0, game.dungeon.grid.0[x][y].scent + 25 as u8),
+            (game.dungeon.grid.0[x][y].scent + 50, 0, game.dungeon.grid.0[x][y].scent + 25),
             false
           ));
         }
@@ -60,17 +61,15 @@ impl Renderer {
 
     // Draw tiles
     for x in 0..game.dungeon.width {
-
       for y in 0..game.dungeon.height {
-        
         self.draw_entity(con, Pos::new(x as isize, y as isize), &game.dungeon.grid.0[x][y]);
-
       }
-
     }
 
     // Debug
-    self.debug_render_scent_map(con, game);
+    if self.debug {
+      self.debug_render_scent_map(con, game);
+    }
 
     // Draw player. Player is always in the camera since
     // we move the camera over it.
@@ -119,7 +118,7 @@ impl Renderer {
   /// 
   #[inline]
   pub fn new(map: (isize, isize), screen: (isize, isize)) -> Renderer {
-    Renderer { camera: Camera::new(map, screen) }
+    Renderer { camera: Camera::new(map, screen), debug: false }
   }
 
 }

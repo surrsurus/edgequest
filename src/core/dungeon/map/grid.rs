@@ -6,12 +6,12 @@
 /// up as a `collapse()`d grid.
 /// 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
-pub struct Grid<T>(pub Vec<Vec<T>>);
+pub struct Grid<T : Clone>(pub Vec<Vec<T>>);
 
-impl<T> Grid<T> {
+impl<T : Clone> Grid<T> {
 
   ///
-  /// Go from a 2D vector to a 1D. Consumes the `Grid`
+  /// Go from a 2D vector to a 1D.
   /// 
   pub fn collapse(self) -> Vec<T> {
 
@@ -23,7 +23,7 @@ impl<T> Grid<T> {
       }
     }
 
-    return collapsed_grid;
+    return collapsed_grid.clone();
 
   }
 
@@ -32,7 +32,7 @@ impl<T> Grid<T> {
 /// 
 /// Allow for iteration over `Grid`s
 /// 
-impl<T> IntoIterator for Grid<T> {
+impl<T : Clone> IntoIterator for Grid<T> {
     
   type Item = T;
   type IntoIter = ::std::vec::IntoIter<T>;

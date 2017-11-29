@@ -2,7 +2,6 @@ use core::dungeon::Dungeon;
 
 use core::object::Fighter;
 
-use core::tcod::console::Root;
 use core::tcod::input;
 
 // use core::renderer::Screen;
@@ -25,9 +24,7 @@ impl Game {
   ///
   /// Capture keyboard input from tcod
   /// 
-  pub fn capture_keypress(&mut self, root: &mut Root) {
-
-    let keypress = root.wait_for_keypress(true);
+  pub fn process_keypress(&mut self, keypress: input::Key) {
 
     match keypress.code {
 
@@ -77,7 +74,7 @@ impl Game {
             
           }
 
-          if self.dungeon.grid.0[self.player.pos.x as usize][self.player.pos.y as usize].blocks {
+          if !self.dungeon.is_valid(self.player.pos.x as usize, self.player.pos.y as usize) {
             self.player.pos = oldpos;
             self.state = "unknown".to_string();
           }

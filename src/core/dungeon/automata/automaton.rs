@@ -8,7 +8,7 @@ pub trait Automaton {
   /// 
   /// What type `T` of `Grid<T>` is on output and input
   /// 
-  type Output;
+  type Output : Clone;
 
   ///
   /// Generate the cellular automata

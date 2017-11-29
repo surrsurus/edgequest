@@ -22,6 +22,7 @@ impl DrunkardsWalk {
   /// Return a new `DrunkardsWalk`
   /// 
   pub fn new(chaos: f32) -> DrunkardsWalk {
+    assert!(chaos >= 0.0 && chaos <= 1.0);
     DrunkardsWalk { chaos: chaos }
   }
 
@@ -81,7 +82,7 @@ impl Automaton for DrunkardsWalk {
         2 => x -= 1,
         3 => y += 1,
         4 => y -= 1,
-        _ => panic!("Literally should never be possible.")
+        _ => unreachable!("dice machine broke")
       }
 
       // Check bounds, leave a gap though between the border.
