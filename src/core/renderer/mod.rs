@@ -32,12 +32,12 @@ impl Renderer {
 
     for x in 0..game.dungeon.width {
       for y in 0..game.dungeon.height {
-        if game.dungeon.grid.0[x][y].scent > 0 {
+        if game.dungeon.grid[x][y].scent > 0 {
           self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Scent".to_string(),
             ' ',
             (255, 255, 255),
-            (game.dungeon.grid.0[x][y].scent + 50, 0, game.dungeon.grid.0[x][y].scent + 25),
+            (game.dungeon.grid[x][y].scent + 50, 0, game.dungeon.grid[x][y].scent + 25),
             false
           ));
         }
@@ -62,7 +62,7 @@ impl Renderer {
     // Draw tiles
     for x in 0..game.dungeon.width {
       for y in 0..game.dungeon.height {
-        self.draw_entity(con, Pos::new(x as isize, y as isize), &game.dungeon.grid.0[x][y]);
+        self.draw_entity(con, Pos::new(x as isize, y as isize), &game.dungeon.grid[x][y]);
       }
     }
 

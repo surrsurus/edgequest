@@ -47,7 +47,7 @@ impl Dungeon {
 
   fn generate_grid<T : Clone>(w: usize, h: usize, init: T) -> Grid<T> {
     // Make grid
-    let mut grid : Grid<T> = Grid(vec![]);
+    let mut grid = Grid::<T>::new();
 
     // Fill it with Vecs
     for _x in 0..w {
@@ -59,7 +59,7 @@ impl Dungeon {
         vec.push(init.clone());
       }
 
-      grid.0.push(vec);
+      grid.push(vec);
 
     }
 
@@ -74,11 +74,11 @@ impl Dungeon {
   /// 
   pub fn get_starting_location(&self) -> (usize, usize) {
     let mut rng = thread_rng();
-    let mut x : usize = rng.gen_range(1, self.grid.0.len() - 2);
-    let mut y : usize = rng.gen_range(1, self.grid.0[0].len() - 2);
-    while self.grid.0[x][y].blocks == true {
-      x = rng.gen_range(1, self.grid.0.len() - 2);
-      y = rng.gen_range(1, self.grid.0[0].len() - 2);
+    let mut x : usize = rng.gen_range(1, self.grid.len() - 2);
+    let mut y : usize = rng.gen_range(1, self.grid[0].len() - 2);
+    while self.grid[x][y].blocks == true {
+      x = rng.gen_range(1, self.grid.len() - 2);
+      y = rng.gen_range(1, self.grid[0].len() - 2);
     };
 
     return (x, y);
@@ -157,11 +157,11 @@ impl Dungeon {
 
     for x in 0..self.width {
       for y in 0..self.height {
-        if bin_grid.0[x][y] == 1 {
-          if grid.0[x][y].blocks {
-            grid.0[x][y].set_bg((100, 100, 60));
+        if bin_grid[x][y] == 1 {
+          if grid[x][y].blocks {
+            grid[x][y].set_bg((100, 100, 60));
           } else {
-            grid.0[x][y].set_bg((50, 50, 40));
+            grid[x][y].set_bg((50, 50, 40));
           } 
         }
       }
@@ -172,7 +172,7 @@ impl Dungeon {
   }
 
   pub fn is_valid(&self, x: usize, y: usize) -> bool {
-    if !self.grid.0[x][y].blocks {
+    if !self.grid[x][y].blocks {
       x > 0 && x + 1 < self.width && y > 0 && y + 1 < self.height
     } else {
       false
@@ -185,7 +185,7 @@ impl Dungeon {
     for nx in -1..2 {
       for ny in -1..2 {
         if self.is_valid((player_pos.0 - nx) as usize, (player_pos.1 - ny) as usize) {
-          self.grid.0[(player_pos.0 - nx) as usize][(player_pos.1 - ny) as usize].scent = INC;
+          self.grid[(player_pos.0 - nx) as usize][(player_pos.1 - ny) as usize].scent = INC;
         }
       }
     }
@@ -202,27 +202,27 @@ impl Dungeon {
     let avg_of_neighbors = |x: usize, y: usize| -> f32 {
       // Add all tile values
       (
-      buffer.0[x - 1][  y  ].scent as f32 +
-      buffer.0[x + 1][  y  ].scent as f32 +
-      buffer.0[  x  ][y - 1].scent as f32 +
-      buffer.0[  x  ][y + 1].scent as f32 +
-      buffer.0[x + 1][y + 1].scent as f32 +
-      buffer.0[x - 1][y - 1].scent as f32 +
-      buffer.0[x + 1][y - 1].scent as f32 +
-      buffer.0[x - 1][y + 1].scent as f32
+      buffer[x - 1][  y  ].scent as f32 +
+      buffer[x + 1][  y  ].scent as f32 +
+      buffer[  x  ][y - 1].scent as f32 +
+      buffer[  x  ][y + 1].scent as f32 +
+      buffer[x + 1][y + 1].scent as f32 +
+      buffer[x - 1][y - 1].scent as f32 +
+      buffer[x + 1][y - 1].scent as f32 +
+      buffer[x - 1][y + 1].scent as f32
       ) / 
       
       // Divide by num tiles present, to get the average
       // Add a little bit more on top to make the bloom around player larger
       (((
-      filter(&buffer.0[x - 1][  y  ]) +
-      filter(&buffer.0[x + 1][  y  ]) +
-      filter(&buffer.0[  x  ][y - 1]) +
-      filter(&buffer.0[  x  ][y + 1]) +
-      filter(&buffer.0[x + 1][y + 1]) +
-      filter(&buffer.0[x - 1][y - 1]) +
-      filter(&buffer.0[x + 1][y - 1]) +
-      filter(&buffer.0[x - 1][y + 1]
+      filter(&buffer[x - 1][  y  ]) +
+      filter(&buffer[x + 1][  y  ]) +
+      filter(&buffer[  x  ][y - 1]) +
+      filter(&buffer[  x  ][y + 1]) +
+      filter(&buffer[x + 1][y + 1]) +
+      filter(&buffer[x - 1][y - 1]) +
+      filter(&buffer[x + 1][y - 1]) +
+      filter(&buffer[x - 1][y + 1]
       )) + BLOOM) 
       
       // Decay factor
@@ -233,7 +233,7 @@ impl Dungeon {
     for x in 0..self.width {
       for y in 0..self.height {
         if self.is_valid(x, y) {
-          self.grid.0[x][y].scent = avg_of_neighbors(x, y) as u8;
+          self.grid[x][y].scent = avg_of_neighbors(x, y) as u8;
         }
       }
     }

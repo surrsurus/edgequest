@@ -76,7 +76,7 @@ impl Simple {
         mover.0 -= 1;
       } 
 
-      self.grid.0[mover.0 as usize][mover.1 as usize] = Tile::new(
+      self.grid[mover.0 as usize][mover.1 as usize] = Tile::new(
         "Floor".to_string(),
         ' ',
         (255, 255, 255), 
@@ -94,7 +94,7 @@ impl Simple {
         mover.1 -= 1;
       } 
 
-      self.grid.0[mover.0][mover.1] = Tile::new(
+      self.grid[mover.0][mover.1] = Tile::new(
         "Floor".to_string(),
         ' ',
         (255, 255, 255), 
@@ -112,7 +112,7 @@ impl Simple {
   fn build_rect(&mut self, r: &Rect) {
     for w in 0..r.w {
       for l in 0..r.l {
-        self.grid.0[(w + r.x)][(l + r.y)] = Tile::new(
+        self.grid[(w + r.x)][(l + r.y)] = Tile::new(
           "Floor".to_string(),
           ' ',
           (255, 255, 255), 
@@ -167,8 +167,8 @@ impl Simple {
     let s = Simple { 
       grid: grid.clone(), 
       rooms: Vec::<Rect>::new(), 
-      w: grid.0.len(), 
-      h: grid.0[0].len() 
+      w: grid.len(), 
+      h: grid[0].len() 
     };
     
     return s;

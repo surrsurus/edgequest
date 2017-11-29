@@ -27,7 +27,7 @@ impl Fussy {
     for x in 0..self.w {
       for y in 0..self.h {
         if self.noise.sum_octave_2d(16, x as f32, y as f32, 0.5, 0.007) + 1.0 > self.threshold {
-          self.grid.0[x][y] = 1;
+          self.grid[x][y] = 1;
         }
       }
     }
@@ -41,8 +41,8 @@ impl Fussy {
     // Make a new dungeon with our fresh grid of size `w` by `h`
     let f = Fussy { 
       grid: grid.clone(), 
-      w: grid.0.len(), 
-      h: grid.0[0].len(),
+      w: grid.len(), 
+      h: grid[0].len(),
       noise: Simplex::new(),
       threshold: threshold
     };

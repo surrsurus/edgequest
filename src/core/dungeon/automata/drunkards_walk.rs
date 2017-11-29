@@ -45,7 +45,7 @@ impl Automaton for DrunkardsWalk {
     match sx {
       Some(sx) => x = sx,
       // Use the length of the outside vectors to determine length
-      None => x = rng.gen_range(1, grid.0.len() - 2)
+      None => x = rng.gen_range(1, grid.len() - 2)
     }
 
     // If y exists, use that y to start
@@ -54,7 +54,7 @@ impl Automaton for DrunkardsWalk {
     match sy {
       Some(sy) => y = sy,
       // Use the length of one of the inside vectors to determine length
-      None => y = rng.gen_range(1, grid.0[0].len() - 2)
+      None => y = rng.gen_range(1, grid[0].len() - 2)
     }
     
     // Store old dice positions
@@ -89,18 +89,18 @@ impl Automaton for DrunkardsWalk {
       // Obviously if your grid is a 1x1 this will cause an issue.
       if x < 1 { x = 1; }
       if y < 1 { y = 1; }
-      if x >= grid.0.len() - 2 { x = grid.0.len() - 2; }
-      if y >= grid.0[0].len() - 2 { y = grid.0[0].len() - 2; }
+      if x >= grid.len() - 2 { x = grid.len() - 2; }
+      if y >= grid[0].len() - 2 { y = grid[0].len() - 2; }
 
       // Determine what to do based on if `find` is present
       match find.clone() {
         Some(find) => {
-          if grid.0[x][y] == find.clone() {
-            grid.0[x][y] = replace.clone();
+          if grid[x][y] == find.clone() {
+            grid[x][y] = replace.clone();
           }
         },
         None => {
-          grid.0[x][y] = replace.clone();
+          grid[x][y] = replace.clone();
         }
       }
 
