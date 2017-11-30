@@ -1,15 +1,20 @@
 use core::object::{Entity, Pos, RGB};
+use core::ai::AI;
+
+use core::dungeon::map::Grid;
+use core::dungeon::map::Tile;
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
-pub struct Fighter {
+pub struct Fighter<T: AI> {
   name: String,
   glyph: char,
   pub pos: Pos,
   fg: RGB,
-  bg: RGB
+  bg: RGB,
+  ai: T
 }
 
-impl Fighter {
+impl<T: AI> Fighter<T> {
 
   /// 
   /// Move the `Entity` by `x` in the x direction and `y` in
@@ -45,13 +50,14 @@ impl Fighter {
   /// Return a new `Entity`
   ///
   #[inline]
-  pub fn new(name: String, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8)) -> Fighter {
+  pub fn new(name: String, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), ai: T) -> Fighter<T> {
     Fighter {
       name: name,
       glyph: glyph, 
       pos: Pos::from_tup(pos), 
       fg: RGB::from_tup(fg), 
-      bg: RGB::from_tup(bg)
+      bg: RGB::from_tup(bg),
+      ai: ai
     }
   }
 
@@ -62,7 +68,7 @@ impl Fighter {
 
 }
 
-impl Entity for Fighter {
+impl<T: AI> Entity for Fighter<T> {
 
   #[inline]
   fn get_bg(&self) -> RGB {
