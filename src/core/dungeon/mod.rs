@@ -31,7 +31,9 @@ const BLOOM : f32 = 0.05;
 ///
 /// Decay value applied to tiles inheriting scent from neighbors
 /// 
-const DECAY : f32 = (255.0/256.0);
+/// Currently 255/256
+/// 
+const DECAY : f32 = 0.99609375;
 
 /// 
 /// `Dungeon` struct to stitch together all builders and cellular automatons
