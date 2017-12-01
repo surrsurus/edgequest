@@ -6,8 +6,8 @@ use core::dungeon::map::Tile;
 use core::object::Fighter;
 
 pub struct Creature<T: AI> {
-  fighter: Fighter,
-  ai: T
+  pub fighter: Fighter,
+  pub ai: T
 }
 
 impl<T: AI> Creature<T> {
