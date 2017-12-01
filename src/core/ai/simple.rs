@@ -14,11 +14,9 @@ impl SimpleAI {
 }
 
 impl AI for SimpleAI {
-
-  type Me = SimpleAI;
   
-  fn take_turn<T: AI>(&mut self, map: &Grid<Tile>, player: &Fighter<T>, me: &mut Fighter<Self::Me>) {
-
+  fn take_turn(&mut self, map: &Grid<Tile>, player: &Fighter, me: &mut Fighter) {
+    
   }
 
 }

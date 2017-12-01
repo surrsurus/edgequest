@@ -1,5 +1,3 @@
-use core::ai::Player;
-
 use core::dungeon::Dungeon;
 
 use core::object::Fighter;
@@ -15,7 +13,7 @@ use core::tcod::input;
 /// * `floor` - `Floor` object to represent the current floor the player is on
 /// 
 pub struct Game {
-  pub player: Fighter<Player>,
+  pub player: Fighter,
 
   pub dungeon: Dungeon,
   pub state: String
@@ -102,14 +100,13 @@ impl Game {
   /// Return a new player `Entity`
   /// 
   #[inline]
-  pub fn new_player() -> Fighter<Player> {
+  pub fn new_player() -> Fighter {
     Fighter::new(
       "Player".to_string(),
       '@', 
       (40, 25), 
       (255, 255, 255), 
-      (0, 0, 0),
-      Player::new()
+      (0, 0, 0)
     )
   }
 
