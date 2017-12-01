@@ -14,7 +14,9 @@ use self::builder::{Buildable, Fussy, Simple};
 pub mod map;
 use self::map::{Grid, Tile};
 
-use core::object::Entity;
+use core::object::{Entity, Creature};
+
+use core::ai::SimpleAI;
 
 mod dungeon_tests;
 
@@ -38,11 +40,12 @@ const DECAY : f32 = 0.99609375;
 /// 
 /// `Dungeon` struct to stitch together all builders and cellular automatons
 /// 
-#[derive(Clone, PartialEq, Debug, Default)]
+#[derive(Default)]
 pub struct Dungeon {
   pub width: usize,
   pub height: usize,
   pub grid: Grid<Tile>,
+  pub creatures: Vec<Box<Creature>>
 }
 
 impl Dungeon {
@@ -74,35 +77,31 @@ impl Dungeon {
   /// 
   /// NOTE: Should be deprecated and removed once stairs show up
   /// 
-  pub fn get_starting_location(&self) -> (usize, usize) {
+  pub fn get_valid_location(grid: &Grid<Tile>) -> (usize, usize) {
     let mut rng = thread_rng();
-    let mut x : usize = rng.gen_range(1, self.grid.len() - 2);
-    let mut y : usize = rng.gen_range(1, self.grid[0].len() - 2);
-    while self.grid[x][y].blocks == true {
-      x = rng.gen_range(1, self.grid.len() - 2);
-      y = rng.gen_range(1, self.grid[0].len() - 2);
-    };
-
-    return (x, y);
-
+    loop {
+      let x : usize = rng.gen_range(1, grid.len() - 2);
+      let y : usize = rng.gen_range(1, grid[0].len() - 2);
+      if !grid[x][y].blocks { return (x, y) }
+    }
   }
 
   /// 
   /// Return a new `Dungeon`
   /// 
   pub fn new(map_dim: (usize, usize)) -> Dungeon {
-
-    return Dungeon { 
-      width: map_dim.0,
-      height: map_dim.1,
-      grid: Dungeon::generate_grid(map_dim.0, map_dim.1, Tile::new(
+    let g = Dungeon::generate_grid(map_dim.0, map_dim.1, Tile::new(
         "Wall".to_string(),
         ' ',
         (255, 255, 255), 
         (33, 33, 33), 
-        true
-      ))
-    
+        true));
+
+    return Dungeon { 
+      width: map_dim.0,
+      height: map_dim.1,
+      grid: g.clone(),
+      creatures: Vec::new()
     };
 
   }

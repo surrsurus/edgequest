@@ -25,7 +25,9 @@ impl AI for SimpleAI {
     
     let mut x : usize;
     let mut y : usize;
+    let mut count : usize = 0;
     loop {
+      count += 1;
       x = me.pos.x as usize;
       y = me.pos.y as usize;
       dice = rng.gen_range(1, 5);
@@ -37,7 +39,12 @@ impl AI for SimpleAI {
         _ => unreachable!("dice machine broke")
       }
 
-      if !map[x][y].blocks { break; }
+      if !map[x][y].blocks { break; } 
+      else if count > 100 {
+        x = me.pos.x as usize;
+        y = me.pos.y as usize;
+        break; 
+      }
     }
     
     me.pos.x = x as isize;

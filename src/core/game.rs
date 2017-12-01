@@ -1,6 +1,8 @@
 use core::dungeon::Dungeon;
 
-use core::object::Fighter;
+use core::object::{Fighter, Creature};
+
+use core::ai::SimpleAI;
 
 use core::tcod::input;
 
@@ -125,8 +127,40 @@ impl Game {
     };
 
     g.dungeon.build();
+
+    let mut creatures = Vec::<Box<Creature>>::new();
+    creatures.push(
+      Box::new(
+        Creature::new(
+          "ant".to_string(), 
+          'a', 
+          {
+            let pos = Dungeon::get_valid_location(&g.dungeon.grid);
+            (pos.0 as isize, pos.1 as isize)
+          }, 
+          (255, 0, 0), (0, 0, 0), 
+          SimpleAI::new()
+        )
+      )
+    );
+    creatures.push(
+      Box::new(
+        Creature::new(
+          "bee".to_string(), 
+          'b', 
+          {
+            let pos = Dungeon::get_valid_location(&g.dungeon.grid);
+            (pos.0 as isize, pos.1 as isize)
+          },  
+          (150, 150, 0), (0, 0, 0), 
+          SimpleAI::new()
+        )
+      )
+    );
+
+    g.dungeon.creatures = creatures;
     
-    let start_loc = g.dungeon.get_starting_location();
+    let start_loc = Dungeon::get_valid_location(&g.dungeon.grid);
     g.player.pos.x = start_loc.0 as isize;
     g.player.pos.y = start_loc.1 as isize;
 
@@ -140,6 +174,9 @@ impl Game {
   pub fn update_world(&mut self) {
     if self.state == "act".to_string() {
       self.dungeon.update_scent(self.player.pos.as_tup());
+      for c in &mut self.dungeon.creatures {
+        c.take_turn(&self.dungeon.grid, &self.player)
+      }
     }
   }
 

@@ -5,17 +5,17 @@ use core::dungeon::map::Tile;
 
 use core::object::Fighter;
 
-pub struct Creature<T: AI> {
+pub struct Creature {
   pub fighter: Fighter,
-  pub ai: T
+  pub ai: Box<AI>
 }
 
-impl<T: AI> Creature<T> {
+impl Creature {
 
-  pub fn new(name: String, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), ai: T) -> Creature<T> {
+  pub fn new<T: AI + 'static>(name: String, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), ai: T) -> Creature {
     Creature {
       fighter: Fighter::new(name, glyph, pos, fg, bg),
-      ai: ai
+      ai: Box::new(ai)
     }
   }
 
