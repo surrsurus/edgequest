@@ -5,7 +5,9 @@
 pub mod camera;
 pub use self::camera::Camera;
 
-use core::Game;
+use core::world::World;
+
+use core::dungeon::Dungeon;
 
 use core::dungeon::map::Tile;
 
@@ -28,16 +30,16 @@ pub struct Renderer {
 
 impl Renderer {
 
-  pub fn debug_render_scent_map(&mut self, con: &mut Console, game: &Game) {
+  pub fn debug_render_scent_map(&mut self, con: &mut Console, dungeon: &Dungeon) {
 
-    for x in 0..game.dungeon.width {
-      for y in 0..game.dungeon.height {
-        if game.dungeon.grid[x][y].scent > 0 {
+    for x in 0..dungeon.width {
+      for y in 0..dungeon.height {
+        if dungeon.grid[x][y].scent > 0 {
           self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Scent".to_string(),
             ' ',
             (255, 255, 255),
-            (game.dungeon.grid[x][y].scent + 50, 0, game.dungeon.grid[x][y].scent + 25),
+            (dungeon.grid[x][y].scent + 50, 0, dungeon.grid[x][y].scent + 25),
             false
           ));
         }
@@ -52,28 +54,32 @@ impl Renderer {
   /// You'll have to render this console to root (unless you passed root in)
   /// and always `flush()` the root console.
   /// 
-  pub fn draw_all(&mut self, con: &mut Console, game: &Game) {
+  pub fn draw_all(&mut self, con: &mut Console, world: &World) {
 
     // Clear console
     con.clear();
 
-    self.camera.move_to(game.player.pos);
+    self.camera.move_to(world.player.pos);
 
     // Draw tiles
-    for x in 0..game.dungeon.width {
-      for y in 0..game.dungeon.height {
-        self.draw_entity(con, Pos::new(x as isize, y as isize), &game.dungeon.grid[x][y]);
+    for x in 0..world.cur_dungeon.width {
+      for y in 0..world.cur_dungeon.height {
+        self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
       }
     }
 
     // Debug
     if self.debug {
-      self.debug_render_scent_map(con, game);
+      self.debug_render_scent_map(con, &world.cur_dungeon);
+    }
+
+    for c in &world.creatures {
+      self.draw_entity(con, c.fighter.pos, &c.fighter);
     }
 
     // Draw player. Player is always in the camera since
     // we move the camera over it.
-    self.draw_entity(con, game.player.pos, &game.player);
+    self.draw_entity(con, world.player.pos, &world.player);
 
   }
 

@@ -11,6 +11,9 @@ pub mod ai;
 // core::dungeon
 pub mod dungeon;
 
+// core::world
+pub mod world;
+
 // core::init
 pub mod init;
 
@@ -46,11 +49,7 @@ pub fn play() {
   while !root.window_closed() {
 
     // Draw what the camera sees
-    ren.draw_all(&mut root, &game);
-
-    for c in &game.dungeon.creatures {
-      ren.draw_entity(&mut root, c.fighter.pos, &c.fighter);
-    }
+    ren.draw_all(&mut root, &game.world);
 
     // Flush all draws to root
     root.flush();
@@ -59,11 +58,11 @@ pub fn play() {
     let keypress = root.wait_for_keypress(true);
     if keypress.printable == 'r' {
       ren.debug = !ren.debug;
-      ren.draw_all(&mut root, &game);
+      ren.draw_all(&mut root, &game.world);
     }
     game.process_keypress(keypress);
 
-    game.update_world();
+    game.world.update(&game.state);
 
   } 
 

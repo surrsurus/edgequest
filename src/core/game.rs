@@ -1,8 +1,5 @@
-use core::dungeon::Dungeon;
 
-use core::object::{Fighter, Creature};
-
-use core::ai::SimpleAI;
+use core::world::World;
 
 use core::tcod::input;
 
@@ -15,9 +12,7 @@ use core::tcod::input;
 /// * `floor` - `Floor` object to represent the current floor the player is on
 /// 
 pub struct Game {
-  pub player: Fighter,
-
-  pub dungeon: Dungeon,
+  pub world: World,
   pub state: String
 }
 
@@ -35,40 +30,40 @@ impl Game {
   
         if keypress.printable != ' ' {
 
-          let oldpos = self.player.pos.clone();
+          let oldpos = self.world.player.pos.clone();
         
           match keypress.printable {
 
             'h' => { 
-              self.player.move_cart(-1, 0);
+              self.world.player.move_cart(-1, 0);
               self.state = "act".to_string();
             },
             'j' => { 
-              self.player.move_cart(0, 1);
+              self.world.player.move_cart(0, 1);
               self.state = "act".to_string();
             },
             'k' => {
-              self.player.move_cart(0, -1);
+              self.world.player.move_cart(0, -1);
               self.state = "act".to_string();
             },
             'l' => {
-              self.player.move_cart(1, 0);
+              self.world.player.move_cart(1, 0);
               self.state = "act".to_string();  
             },
             'y' => {
-              self.player.move_cart(-1, -1);
+              self.world.player.move_cart(-1, -1);
               self.state = "act".to_string();
             },
             'u' => {
-              self.player.move_cart(1, -1);
+              self.world.player.move_cart(1, -1);
               self.state = "act".to_string();
             },
             'b' => {
-              self.player.move_cart(-1, 1);
+              self.world.player.move_cart(-1, 1);
               self.state = "act".to_string();
             },
             'n' => { 
-              self.player.move_cart(1, 1);
+              self.world.player.move_cart(1, 1);
               self.state = "act".to_string();
             },
             '.' => { self.state = "act".to_string() },
@@ -76,8 +71,8 @@ impl Game {
             
           }
 
-          if !self.dungeon.is_valid(self.player.pos.x as usize, self.player.pos.y as usize) {
-            self.player.pos = oldpos;
+          if !self.world.cur_dungeon.is_valid(self.world.player.pos.x as usize, self.world.player.pos.y as usize) {
+            self.world.player.pos = oldpos;
             self.state = "unknown".to_string();
           }
 
@@ -92,27 +87,6 @@ impl Game {
   }
 
   ///
-  /// Get a new `Dungeon`
-  /// 
-  pub fn new_dungeon(map_dim: (isize, isize)) -> Dungeon {
-    Dungeon::new((map_dim.0 as usize, map_dim.1 as usize))
-  }
-
-  ///
-  /// Return a new player `Entity`
-  /// 
-  #[inline]
-  pub fn new_player() -> Fighter {
-    Fighter::new(
-      "Player".to_string(),
-      '@', 
-      (40, 25), 
-      (255, 255, 255), 
-      (0, 0, 0)
-    )
-  }
-
-  ///
   /// Return a new `Game`
   /// 
   /// This function assumes you will just be passing in tcod::console::Root.width() and height(),
@@ -120,64 +94,11 @@ impl Game {
   /// 
   pub fn new(map_dim: (isize, isize)) -> Game {
 
-    let mut g = Game {
-      player: Game::new_player(), 
-      dungeon: Game::new_dungeon(map_dim),
+    Game {
+      world: World::new(map_dim),
       state: "new".to_string()
-    };
-
-    g.dungeon.build();
-
-    let mut creatures = Vec::<Box<Creature>>::new();
-    creatures.push(
-      Box::new(
-        Creature::new(
-          "ant".to_string(), 
-          'a', 
-          {
-            let pos = Dungeon::get_valid_location(&g.dungeon.grid);
-            (pos.0 as isize, pos.1 as isize)
-          }, 
-          (255, 0, 0), (0, 0, 0), 
-          SimpleAI::new()
-        )
-      )
-    );
-    creatures.push(
-      Box::new(
-        Creature::new(
-          "bee".to_string(), 
-          'b', 
-          {
-            let pos = Dungeon::get_valid_location(&g.dungeon.grid);
-            (pos.0 as isize, pos.1 as isize)
-          },  
-          (150, 150, 0), (0, 0, 0), 
-          SimpleAI::new()
-        )
-      )
-    );
-
-    g.dungeon.creatures = creatures;
-    
-    let start_loc = Dungeon::get_valid_location(&g.dungeon.grid);
-    g.player.pos.x = start_loc.0 as isize;
-    g.player.pos.y = start_loc.1 as isize;
-
-    return g;
-    
-  }
-
-  ///
-  /// Update the game world
-  /// 
-  pub fn update_world(&mut self) {
-    if self.state == "act".to_string() {
-      self.dungeon.update_scent(self.player.pos.as_tup());
-      for c in &mut self.dungeon.creatures {
-        c.take_turn(&self.dungeon.grid, &self.player)
-      }
     }
+    
   }
 
 }
