@@ -34,4 +34,4 @@ fontlayout: "Tcod"
 # * SDL
 # * GLSL
 # * OpenGL
-renderer: "SDL"
+renderer: "OpenGL"
