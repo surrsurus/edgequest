@@ -7,9 +7,9 @@ pub use self::camera::Camera;
 
 use core::world::World;
 
-use core::dungeon::Dungeon;
+use core::world::dungeon::Dungeon;
 
-use core::dungeon::map::Tile;
+use core::world::dungeon::map::Tile;
 
 use core::object::{Pos, Entity};
 

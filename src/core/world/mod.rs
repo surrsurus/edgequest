@@ -1,9 +1,10 @@
-use core::dungeon::Dungeon;
-use core::dungeon::map::{Grid, Tile};
+
+pub mod dungeon;
+use self::dungeon::Dungeon;
+use self::dungeon::map::{Grid, Tile};
 
 use core::object::{Creature, Fighter};
-
-use core::ai::SimpleAI;
+use core::object::ai::SimpleAI;
 
 ///
 /// What value the player sets the scent of nearby tiles to

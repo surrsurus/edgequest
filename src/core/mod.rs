@@ -6,11 +6,6 @@
 extern crate tcod;
 use self::tcod::Console;
 
-pub mod ai;
-
-// core::dungeon
-pub mod dungeon;
-
 // core::world
 pub mod world;
 

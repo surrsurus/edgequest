@@ -1,6 +1,8 @@
 //!
 //! Metapackage to hold all object submodules together
 //! 
+pub mod ai;
+
 pub mod creature;
 pub use self::creature::Creature;
 

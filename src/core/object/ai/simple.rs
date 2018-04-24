@@ -1,9 +1,8 @@
-use core::ai::AI;
-
-use core::dungeon::map::Grid;
-use core::dungeon::map::Tile;
+use core::world::dungeon::map::Grid;
+use core::world::dungeon::map::Tile;
 
 use core::object::Fighter;
+use core::object::ai::AI;
 
 extern crate rand;
 use self::rand::{thread_rng, Rng};

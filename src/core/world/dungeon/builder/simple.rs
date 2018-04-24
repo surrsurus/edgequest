@@ -1,10 +1,10 @@
 extern crate rand;
 use self::rand::{thread_rng, Rng};
 
-use core::dungeon::builder::Buildable;
-use core::dungeon::builder::construct::{Corr, Rect};
+use core::world::dungeon::builder::Buildable;
+use core::world::dungeon::builder::construct::{Corr, Rect};
 
-use core::dungeon::map::{Grid, Tile};
+use core::world::dungeon::map::{Grid, Tile};
 
 ///
 /// Simple dungeon builder

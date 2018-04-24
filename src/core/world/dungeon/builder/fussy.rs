@@ -1,9 +1,9 @@
 extern crate fuss;
 use self::fuss::Simplex;
 
-use core::dungeon::builder::Buildable;
+use core::world::dungeon::builder::Buildable;
 
-use core::dungeon::map::Grid;
+use core::world::dungeon::map::Grid;
 
 ///
 /// Builder for generating noise maps
