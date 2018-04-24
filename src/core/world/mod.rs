@@ -1,26 +1,26 @@
 use core::dungeon::Dungeon;
 use core::dungeon::map::{Grid, Tile};
 
-use core::object::{Fighter, Creature};
+use core::object::{Creature, Fighter};
 
 use core::ai::SimpleAI;
 
 ///
 /// What value the player sets the scent of nearby tiles to
 /// 
-const INC : u8 = 150;
+const SC_INC : u8 = 150;
 
 ///
 /// Affects distance that bloom around player travels
 /// 
-const BLOOM : f32 = 0.05; 
+const SC_BLOOM : f32 = 0.05; 
 
 ///
 /// Decay value applied to tiles inheriting scent from neighbors
 /// 
 /// Currently 255/256
 /// 
-const DECAY : f32 = 0.99609375;
+const SC_DECAY : f32 = 0.99609375;
 
 #[derive(Default)]
 pub struct World {
@@ -33,20 +33,9 @@ pub struct World {
 impl World {
 
   ///
-  /// Return a new player `Entity`
-  /// 
-  #[inline]
-  pub fn fresh_player() -> Fighter {
-    Fighter::new(
-      "Player".to_string(),
-      '@', 
-      (40, 25), 
-      (255, 255, 255), 
-      (0, 0, 0)
-    )
-  }
-
-  pub fn create_test_creatures(g: &Grid<Tile>) -> Vec<Box<Creature>> {
+  /// Create a set of creatures for testing
+  ///
+  fn create_test_creatures(g: &Grid<Tile>) -> Vec<Box<Creature>> {
     let mut creatures = Vec::<Box<Creature>>::new();
     creatures.push(
       Box::new(
@@ -82,7 +71,10 @@ impl World {
 
   }
 
-  pub fn create_test_dungeon(map_dim: (isize, isize)) -> Dungeon {
+  ///
+  /// Create a basic dungeon for testing
+  ///
+  fn create_test_dungeon(map_dim: (isize, isize)) -> Dungeon {
 
     let mut d = Dungeon::new((map_dim.0 as usize, map_dim.1 as usize));
 
@@ -90,6 +82,20 @@ impl World {
 
     return d;
 
+  }
+
+  ///
+  /// Return a new player `Entity`
+  /// 
+  #[inline]
+  fn fresh_player() -> Fighter {
+    Fighter::new(
+      "Player".to_string(),
+      '@', 
+      (40, 25), 
+      (255, 255, 255), 
+      (0, 0, 0)
+    )
   }
 
   /// 
@@ -115,13 +121,16 @@ impl World {
   
   }
 
-  pub fn update_scent(&mut self) {
+  ///
+  /// Update the scent map
+  ///
+  fn update_scent(&mut self) {
 
     // Create initial bloom around player
     for nx in -1..2 {
       for ny in -1..2 {
         if self.cur_dungeon.is_valid((self.player.pos.x - nx) as usize, (self.player.pos.y - ny) as usize) {
-          self.cur_dungeon.grid[(self.player.pos.x - nx) as usize][(self.player.pos.y - ny) as usize].scent = INC;
+          self.cur_dungeon.grid[(self.player.pos.x - nx) as usize][(self.player.pos.y - ny) as usize].scent = SC_INC;
         }
       }
     }
@@ -131,7 +140,7 @@ impl World {
       for nx in -1..2 {
         for ny in -1..2 {
           if self.cur_dungeon.is_valid((c.fighter.pos.x - nx) as usize, (c.fighter.pos.y - ny) as usize) {
-            self.cur_dungeon.grid[(c.fighter.pos.x - nx) as usize][(c.fighter.pos.y - ny) as usize].scent = INC;
+            self.cur_dungeon.grid[(c.fighter.pos.x - nx) as usize][(c.fighter.pos.y - ny) as usize].scent = SC_INC;
           }
         }
       }
@@ -141,6 +150,9 @@ impl World {
     let buffer = self.cur_dungeon.grid.clone();
 
     let filter = |tile: &Tile| -> f32 {
+      // So, interestingly, if a tile has no scent and is given 0.0 scent after the filter,
+      // it creates square scents that travel further, though for some reason a 0.1 value there creates
+      // very nice circular scents... I assume this is due to averages now being fuzzy in terms of accuracy?
       if tile.scent == 0 { 0.1 } else { 1.0 }
     };
 
@@ -170,10 +182,10 @@ impl World {
       filter(&buffer[x - 1][y - 1]) +
       filter(&buffer[x + 1][y - 1]) +
       filter(&buffer[x - 1][y + 1]
-      )) + BLOOM) 
+      )) + SC_BLOOM) 
       
       // Decay factor
-      * DECAY)
+      * SC_DECAY)
     };
 
     // Change values of map based on averages from the buffer
@@ -190,13 +202,10 @@ impl World {
   ///
   /// Update the game world
   /// 
-  pub fn update(&mut self, state: &String) {
-    if state == &"act".to_string() {
-      self.update_scent();
-      for c in &mut self.creatures {
-        c.take_turn(&self.cur_dungeon.grid, &self.player)
-      }
+  pub fn update(&mut self) {
+    self.update_scent();
+    for c in &mut self.creatures {
+      c.take_turn(&self.cur_dungeon.grid, &self.player)
     }
   }
-
 }

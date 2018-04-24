@@ -57,12 +57,13 @@ pub fn play() {
     // Capture keypresses
     let keypress = root.wait_for_keypress(true);
     if keypress.printable == 'r' {
-      ren.debug = !ren.debug;
+      ren.sc_debug = !ren.sc_debug;
       ren.draw_all(&mut root, &game.world);
     }
     game.process_keypress(keypress);
 
-    game.world.update(&game.state);
+    // Update game
+    game.update();
 
   } 
 

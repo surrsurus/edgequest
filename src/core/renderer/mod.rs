@@ -25,7 +25,7 @@ use core::tcod::{Console, console};
 pub struct Renderer {
   // Camera object
   camera: Camera,
-  pub debug: bool
+  pub sc_debug: bool,
 }
 
 impl Renderer {
@@ -69,7 +69,7 @@ impl Renderer {
     }
 
     // Debug
-    if self.debug {
+    if self.sc_debug {
       self.debug_render_scent_map(con, &world.cur_dungeon);
     }
 
@@ -124,7 +124,7 @@ impl Renderer {
   /// 
   #[inline]
   pub fn new(map: (isize, isize), screen: (isize, isize)) -> Renderer {
-    Renderer { camera: Camera::new(map, screen), debug: false }
+    Renderer { camera: Camera::new(map, screen), sc_debug: false }
   }
 
 }

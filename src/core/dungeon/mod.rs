@@ -132,16 +132,48 @@ impl Dungeon {
     grid = drunk(0.25, 1000, &mut grid);
 
     // Apply noise
-    let mut f = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.2);
-    let bin_grid = f.build();
+    let mut f1 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.2);
+    let bin_grid1 = f1.build();
 
     for x in 0..self.width {
       for y in 0..self.height {
-        if bin_grid[x][y] == 1 {
+        if bin_grid1[x][y] == 1 {
           if grid[x][y].blocks {
-            grid[x][y].set_bg((100, 100, 60));
+            grid[x][y].set_bg((60, 50, 50));
           } else {
-            grid[x][y].set_bg((50, 50, 40));
+            grid[x][y].set_bg((35, 20, 20));
+          } 
+        }
+      }
+    }
+
+    // Apply noise 2
+    let mut f2 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.2);
+    let bin_grid2 = f2.build();
+
+    for x in 0..self.width {
+      for y in 0..self.height {
+        if bin_grid2[x][y] == 1 {
+          if grid[x][y].blocks {
+            grid[x][y].set_bg((50, 50, 50));
+          } else {
+            grid[x][y].set_bg((20, 20, 20));
+          } 
+        }
+      }
+    }
+
+    // Apply noise 3
+    let mut f3 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.4);
+    let bin_grid3 = f3.build();
+
+    for x in 0..self.width {
+      for y in 0..self.height {
+        if bin_grid3[x][y] == 1 {
+          if grid[x][y].blocks {
+
+          } else {
+            grid[x][y].set_bg((0, 150, 150));
           } 
         }
       }
@@ -152,11 +184,12 @@ impl Dungeon {
   }
 
   pub fn is_valid(&self, x: usize, y: usize) -> bool {
-    if !self.grid[x][y].blocks {
-      x > 0 && x + 1 < self.width && y > 0 && y + 1 < self.height
-    } else {
-      false
+    if x > 0 && x + 1 < self.width && y > 0 && y + 1 < self.height {
+      if !self.grid[x][y].blocks {
+        return true;
+      }
     }
+    return false;
   }
 
 }

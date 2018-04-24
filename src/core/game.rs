@@ -5,15 +5,31 @@ use core::tcod::input;
 
 // use core::renderer::Screen;
 
+pub enum Actions {
+  // Player moved
+  Move,
+  // Player waited
+  Wait,
+  // Unknown action
+  Unknown
+}
+
+pub enum State {
+  // Game just created
+  New,
+  // Player acted
+  Act(Actions),
+}
+
 ///
 /// Game struct. Holds a player and a floor
 /// 
-/// * `player` - `Entity` to represent the player
-/// * `floor` - `Floor` object to represent the current floor the player is on
+/// * `world` - `World` to represent the game world
+/// * `state` - represents the game state
 /// 
 pub struct Game {
   pub world: World,
-  pub state: String
+  pub state: State
 }
 
 impl Game {
@@ -36,54 +52,66 @@ impl Game {
 
             'h' => { 
               self.world.player.move_cart(-1, 0);
-              self.state = "act".to_string();
+              self.state = State::Act(Actions::Move);
             },
             'j' => { 
               self.world.player.move_cart(0, 1);
-              self.state = "act".to_string();
+              self.state = State::Act(Actions::Move);
             },
             'k' => {
               self.world.player.move_cart(0, -1);
-              self.state = "act".to_string();
+              self.state = State::Act(Actions::Move);
             },
             'l' => {
               self.world.player.move_cart(1, 0);
-              self.state = "act".to_string();  
+              self.state = State::Act(Actions::Move);  
             },
             'y' => {
               self.world.player.move_cart(-1, -1);
-              self.state = "act".to_string();
+              self.state = State::Act(Actions::Move);
             },
             'u' => {
               self.world.player.move_cart(1, -1);
-              self.state = "act".to_string();
+              self.state = State::Act(Actions::Move);
             },
             'b' => {
               self.world.player.move_cart(-1, 1);
-              self.state = "act".to_string();
+              self.state = State::Act(Actions::Move);
             },
             'n' => { 
               self.world.player.move_cart(1, 1);
-              self.state = "act".to_string();
+              self.state = State::Act(Actions::Move);
             },
-            '.' => { self.state = "act".to_string() },
-            _ => { self.state = "unknown".to_string() }
+            '.' => { self.state = State::Act(Actions::Wait) },
+            _ => { self.state = State::Act(Actions::Unknown) }
             
           }
 
           if !self.world.cur_dungeon.is_valid(self.world.player.pos.x as usize, self.world.player.pos.y as usize) {
             self.world.player.pos = oldpos;
-            self.state = "unknown".to_string();
+            self.state = State::Act(Actions::Unknown);
           }
 
-        } else {
+        } 
+        
+        /* 
+        else {
           println!("{:?}", keypress.code);
         }
+        */
 
       }
 
     }
     
+  }
+
+  pub fn update(&mut self) {
+    match &self.state {
+      &State::Act(Actions::Move) => self.world.update(),
+      &State::Act(Actions::Wait) => self.world.update(),
+      _ => ()
+    }
   }
 
   ///
@@ -96,7 +124,7 @@ impl Game {
 
     Game {
       world: World::new(map_dim),
-      state: "new".to_string()
+      state: State::New
     }
     
   }

@@ -6,8 +6,8 @@ screen_width: 80
 screen_height: 50
 
 # Dimensions of map in characters
-map_width: 160
-map_height: 100
+map_width: 100
+map_height: 70
 
 # Fullscreen mode
 fullscreen: false
