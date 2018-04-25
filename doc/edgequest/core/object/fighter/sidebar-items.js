@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Fighter","A Fighter is something that can fight, but also be rendered to the screen"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["ai","Metapackage to extend an interface to ai"],["creature",""],["entity",""],["fighter",""],["pos",""],["rgb",""]]});

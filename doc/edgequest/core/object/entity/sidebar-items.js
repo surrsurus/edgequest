@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Entity","Holds a position and a character."]]});

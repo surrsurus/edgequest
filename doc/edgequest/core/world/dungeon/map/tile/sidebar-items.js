@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["TileType","Tiles have types"]],"struct":[["Tile","Tile represents an environmental entity"]]});

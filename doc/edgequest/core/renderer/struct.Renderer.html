@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Renderer` struct in crate `edgequest`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Renderer">
+
+    <title>edgequest::core::renderer::Renderer - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <div class="sidebar-menu">&#9776;</div>
+        
+        <p class='location'>Struct Renderer</p><div class="sidebar-elems"><div class="block items"><a class="sidebar-title" href="#fields">Fields</a><div class="sidebar-links"><a href="#structfield.sc_debug">sc_debug</a></div><a class="sidebar-title" href="#methods">Methods</a><div class="sidebar-links"><a href="#method.debug_render_scent_map">debug_render_scent_map</a><a href="#method.draw_all">draw_all</a><a href="#method.draw_creature">draw_creature</a><a href="#method.draw_entity">draw_entity</a><a href="#method.new">new</a></div></div><p class='location'><a href='../../index.html'>edgequest</a>::<wbr><a href='../index.html'>core</a>::<wbr><a href='index.html'>renderer</a></p><script>window.sidebarCurrent = {name: 'Renderer', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script></div>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>edgequest</a>::<wbr><a href='../index.html'>core</a>::<wbr><a href='index.html'>renderer</a>::<wbr><a class="struct" href=''>Renderer</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../../src/edgequest/core/renderer/mod.rs.html#25-29' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Renderer {
+    pub sc_debug: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>,
+    // some fields omitted
+}</pre><div class='docblock'><p>Helper for rendering things to the screen</p>
+
+<p>Tracks the player and automatically scrolls the screen around to match where they go.
+This will never try to draw things outside of the given dimensions due to the way it handles
+determining whether something should be drawn or not. </p>
+</div><h2 id='fields' class='fields small-section-header'>
+                       Fields<a href='#fields' class='anchor'></a></h2><span id="structfield.sc_debug" class="structfield small-section-header">
+                           <a href="#structfield.sc_debug" class="anchor field"></a>
+                           <span id="sc_debug.v" class='invisible'>
+                           <code>sc_debug: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code>
+                           </span></span>
+                    <h2 id='methods' class='small-section-header'>
+                      Methods<a href='#methods' class='anchor'></a>
+                    </h2>
+                <h3 id='impl' class='impl'><span class='in-band'><code>impl <a class="struct" href="../../../edgequest/core/renderer/struct.Renderer.html" title="struct edgequest::core::renderer::Renderer">Renderer</a></code><a href='#impl' class='anchor'></a></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/edgequest/core/renderer/mod.rs.html#31-170' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.debug_render_scent_map' class="method"><span id='debug_render_scent_map.v' class='invisible'><code>pub fn <a href='#method.debug_render_scent_map' class='fnname'>debug_render_scent_map</a>(&amp;mut self, con: &amp;mut <a class="trait" href="../../../tcod/console/trait.Console.html" title="trait tcod::console::Console">Console</a>, dungeon: &amp;<a class="struct" href="../../../edgequest/core/world/dungeon/struct.Dungeon.html" title="struct edgequest::core::world::dungeon::Dungeon">Dungeon</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/edgequest/core/renderer/mod.rs.html#36-52' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Render scent as a fine, purple mist, just like real life</p>
+</div><h4 id='method.draw_all' class="method"><span id='draw_all.v' class='invisible'><code>pub fn <a href='#method.draw_all' class='fnname'>draw_all</a>(&amp;mut self, con: &amp;mut <a class="trait" href="../../../tcod/console/trait.Console.html" title="trait tcod::console::Console">Console</a>, world: &amp;<a class="struct" href="../../../edgequest/core/world/struct.World.html" title="struct edgequest::core::world::World">World</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/edgequest/core/renderer/mod.rs.html#60-87' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Draw all.</p>
+
+<p>You&#39;ll have to render this console to root (unless you passed root in)
+and always <code>flush()</code> the root console.</p>
+</div><h4 id='method.draw_creature' class="method"><span id='draw_creature.v' class='invisible'><code>pub fn <a href='#method.draw_creature' class='fnname'>draw_creature</a>(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;self, <br>&nbsp;&nbsp;&nbsp;&nbsp;con: &amp;mut <a class="trait" href="../../../tcod/console/trait.Console.html" title="trait tcod::console::Console">Console</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;pos: <a class="struct" href="../../../edgequest/core/object/pos/struct.Pos.html" title="struct edgequest::core::object::pos::Pos">Pos</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;ce: &amp;<a class="trait" href="../../../edgequest/core/object/entity/trait.Entity.html" title="trait edgequest::core::object::entity::Entity">Entity</a>, <br>&nbsp;&nbsp;&nbsp;&nbsp;world: &amp;<a class="struct" href="../../../edgequest/core/world/struct.World.html" title="struct edgequest::core::world::World">World</a><br>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/edgequest/core/renderer/mod.rs.html#95-124' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Draw creatures with &quot;transparent&quot; backgrounds</p>
+
+<p>NOTE: Way too similar to draw_entity(). Plus, the whole bg thing seems weird.
+Better way to do it?</p>
+</div><h4 id='method.draw_entity' class="method"><span id='draw_entity.v' class='invisible'><code>pub fn <a href='#method.draw_entity' class='fnname'>draw_entity</a>(&amp;self, con: &amp;mut <a class="trait" href="../../../tcod/console/trait.Console.html" title="trait tcod::console::Console">Console</a>, pos: <a class="struct" href="../../../edgequest/core/object/pos/struct.Pos.html" title="struct edgequest::core::object::pos::Pos">Pos</a>, ce: &amp;<a class="trait" href="../../../edgequest/core/object/entity/trait.Entity.html" title="trait edgequest::core::object::entity::Entity">Entity</a>)</code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/edgequest/core/renderer/mod.rs.html#132-157' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Put an <code>Entity</code> on the console</p>
+
+<ul>
+<li><code>con</code> - Tcod <code>Console</code></li>
+<li><code>entity</code> - <code>Entity</code></li>
+</ul>
+</div><h4 id='method.new' class="method"><span id='new.v' class='invisible'><code>pub fn <a href='#method.new' class='fnname'>new</a>(map: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>, screen: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.isize.html">isize</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>) -&gt; <a class="struct" href="../../../edgequest/core/renderer/struct.Renderer.html" title="struct edgequest::core::renderer::Renderer">Renderer</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../../src/edgequest/core/renderer/mod.rs.html#166-168' title='goto source code'>[src]</a></span></h4>
+<div class='docblock'><p>Return a new <code>Renderer</code></p>
+
+<ul>
+<li><code>map</code> - <code>Pos</code> that holds the map dimensions</li>
+<li><code>screen</code> - <code>Pos</code> that holds the screen dimensions</li>
+</ul>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>↑</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>↓</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>↹</dt>
+                    <dd>Switch tab</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt style="width:31px;">+ / -</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "edgequest";
+    </script>
+    <script src="../../../main.js"></script>
+    <script defer src="../../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Actions","Enum representing possible actions the player can take"],["State","Enum representing the state of the game"]],"struct":[["Game","Game struct. Holds a player and a floor"]]});

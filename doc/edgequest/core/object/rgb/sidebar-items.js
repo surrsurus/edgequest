@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RGB","Wrap tcod::Color with a struct to keep tcod integration with the renderer"]]});
