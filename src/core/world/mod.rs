@@ -86,6 +86,29 @@ impl World {
   }
 
   ///
+  /// Empty out the floor
+  ///
+  pub fn test_empty(&mut self) {
+    
+    for x in 0..self.cur_dungeon.width {
+      for y in 0..self.cur_dungeon.height {
+        self.cur_dungeon.grid[x][y] = Tile::new(
+          "Test",
+          ' ',
+          (0, 0, 0),
+          (0, 0, 0),
+          TileType::Floor
+        );
+      }
+    }
+  
+    self.creatures = Vec::new();
+
+    self.player.pos.x = (self.cur_dungeon.width / 2) as isize;
+    self.player.pos.y = (self.cur_dungeon.height / 2) as isize;
+  }
+
+  ///
   /// Return a new player `Entity`
   /// 
   #[inline]
@@ -141,7 +164,7 @@ impl World {
   ///
   /// Temporary function for stair traversal. In the future floors will need to be saved.
   ///
-  fn test_traverse(&mut self) {
+  pub fn test_traverse(&mut self) {
     let d = World::create_test_dungeon((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize));
     let g = d.grid.clone();
     

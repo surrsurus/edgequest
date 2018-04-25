@@ -29,6 +29,8 @@ pub enum State {
   New,
   // Player acted
   Act(Actions),
+  // Debug
+  Debug
 }
 
 ///
@@ -91,6 +93,14 @@ impl Game {
             'n' => { 
               self.world.player.move_cart(1, 1);
               self.state = State::Act(Actions::Move);
+            },
+            'w' => {
+              self.world.test_traverse();
+              self.state = State::Debug;
+            },
+            'q' => {
+              self.world.test_empty();
+              self.state = State::Debug;
             },
             '.' => { self.state = State::Act(Actions::Wait) },
             '>' => { self.state = State::Act(Actions::DownStair) },

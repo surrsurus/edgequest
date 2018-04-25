@@ -62,11 +62,11 @@ pub struct Config {
 ///
 /// NOTE: We want to use this in a future version of `load()`
 ///
-enum ConfigError {
-  BadFontType,
-  BadFontLayout,
-  BadRenderer
-}
+// enum ConfigError {
+//   BadFontType,
+//   BadFontLayout,
+//   BadRenderer
+// }
 
 ///
 /// Load configuration data from a path. returns a `Config` struct.
