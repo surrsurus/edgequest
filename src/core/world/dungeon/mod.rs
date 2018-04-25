@@ -76,6 +76,29 @@ impl Dungeon {
     // Mostly orderly
     grid = drunk(0.25, 1000, &mut grid);
 
+    // Add Stairs
+    //
+    // So I know that get_valid_location() should be deprecated since we started adding stairs
+    // but we're just gonna have to live with it for now
+    //
+    let spos1 = Dungeon::get_valid_location(&grid);
+    grid[spos1.0][spos1.1] = Tile::new(
+      "Down Stair",
+      '>',
+      (255, 255, 255),
+      (0, 0, 0),
+      TileType::DownStair
+    );
+
+    let spos2 = Dungeon::get_valid_location(&grid);
+    grid[spos2.0][spos2.1] = Tile::new(
+      "Up Stair",
+      '<',
+      (255, 255, 255),
+      (0, 0, 0),
+      TileType::UpStair
+    );
+
     // Apply noise
     let mut f1 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.2);
     let bin_grid1 = f1.build();
@@ -120,15 +143,6 @@ impl Dungeon {
         }
       }
     }
-
-    let spos = Dungeon::get_valid_location(&grid);
-    grid[spos.0][spos.1] = Tile::new(
-      "Down Stair",
-      '>',
-      (255, 0, 0),
-      (0, 0, 0),
-      TileType::DownStair
-    );
 
     self.grid = grid;
 

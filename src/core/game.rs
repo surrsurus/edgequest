@@ -144,7 +144,11 @@ impl Game {
           self.world.go_down();
         }
       },
-      &State::Act(Actions::UpStair) => {}
+      &State::Act(Actions::UpStair) => {
+        if self.world.can_go_up() {
+          self.world.go_up();
+        }
+      }
       _ => ()
     }
   }

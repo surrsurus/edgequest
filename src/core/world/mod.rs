@@ -121,7 +121,27 @@ impl World {
   }
 
   pub fn go_down(&mut self) {
+    self.test_traverse();
+  }
 
+  ///
+  /// Go upstairs
+  ///
+  pub fn can_go_up(&self) -> bool {
+    match self.cur_dungeon.grid[self.player.pos.x as usize][self.player.pos.y as usize].tiletype {
+      TileType::UpStair => return true,
+      _ => return false
+    }
+  }
+
+  pub fn go_up(&mut self) {
+    self.test_traverse();
+  }
+
+  ///
+  /// Temporary function for stair traversal. In the future floors will need to be saved.
+  ///
+  fn test_traverse(&mut self) {
     let d = World::create_test_dungeon((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize));
     let g = d.grid.clone();
     
@@ -131,7 +151,6 @@ impl World {
     let start_loc = Dungeon::get_valid_location(&self.cur_dungeon.grid);
     self.player.pos.x = start_loc.0 as isize;
     self.player.pos.y = start_loc.1 as isize;
-
   }
 
 
