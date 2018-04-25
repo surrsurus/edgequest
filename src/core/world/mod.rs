@@ -4,7 +4,7 @@ use self::dungeon::Dungeon;
 use self::dungeon::map::{Grid, Tile, TileType};
 
 use core::object::{Creature, Fighter, Entity, RGB};
-use core::object::ai::SimpleAI;
+use core::object::ai::{SimpleAI, TrackerAI};
 
 ///
 /// What value the player sets the scent of nearby tiles to
@@ -64,6 +64,36 @@ impl World {
           },  
           (150, 150, 0), (0, 0, 0), 
           SimpleAI::new()
+        )
+      )
+    );
+
+    creatures.push(
+      Box::new(
+        Creature::new(
+          "cat", 
+          'c', 
+          {
+            let pos = Dungeon::get_valid_location(&g);
+            (pos.0 as isize, pos.1 as isize)
+          },  
+          (150, 0, 150), (0, 0, 0), 
+          TrackerAI::new()
+        )
+      )
+    );
+
+    creatures.push(
+      Box::new(
+        Creature::new(
+          "dog", 
+          'd', 
+          {
+            let pos = Dungeon::get_valid_location(&g);
+            (pos.0 as isize, pos.1 as isize)
+          },  
+          (150, 150, 150), (0, 0, 0), 
+          TrackerAI::new()
         )
       )
     );

@@ -7,3 +7,6 @@ pub use self::ai::AI;
 
 pub mod simple;
 pub use self::simple::SimpleAI;
+
+pub mod tracker;
+pub use self::tracker::TrackerAI;
