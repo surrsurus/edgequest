@@ -50,7 +50,7 @@ impl Dungeon {
       "Floor",
       ' ',
       (255, 255, 255), 
-      (0, 0, 0), 
+      (10, 10, 10), 
       TileType::Floor
     );
 

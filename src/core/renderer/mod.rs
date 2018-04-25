@@ -26,6 +26,7 @@ pub struct Renderer {
   // Camera object
   camera: Camera,
   pub sc_debug: bool,
+  pub fov: bool
 }
 
 impl Renderer {
@@ -57,17 +58,64 @@ impl Renderer {
   /// You'll have to render this console to root (unless you passed root in)
   /// and always `flush()` the root console.
   /// 
-  pub fn draw_all(&mut self, con: &mut Console, world: &World) {
+  pub fn draw_all(&mut self, con: &mut Console, world: &mut World) {
 
     // Clear console
     con.clear();
 
     self.camera.move_to(world.player.pos);
 
+    // Draw seen tiles. Spaghetti, needs to change
+    for x in 0..world.cur_dungeon.width {
+      for y in 0..world.cur_dungeon.height {
+        if self.fov {
+          if world.cur_dungeon.grid[x][y].seen {
+            match world.cur_dungeon.grid[x][y].tiletype {
+                TileType::Wall => {
+                  self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
+                    "Seen Wall",
+                    ' ',
+                    (0, 0, 0),
+                    (70, 70, 70),
+                    TileType::Unseen
+                  ));
+                }
+                _ => {
+                  self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
+                    "Seen Floor",
+                    ' ',
+                    (0, 0, 0),
+                    (40, 40, 40),
+                    TileType::Unseen
+                  ));
+                },
+            }
+             
+          }
+        }
+      }
+    }
+
     // Draw tiles
     for x in 0..world.cur_dungeon.width {
       for y in 0..world.cur_dungeon.height {
-        self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+        if self.fov {
+          if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
+            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+            world.cur_dungeon.grid[x][y].seen = true;
+          }
+        } else {
+          self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+        }
+        match world.cur_dungeon.grid[x][y].tiletype {
+          TileType::UpStair => {
+            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+          },
+          TileType::DownStair => {
+            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+          },
+          _ => {}
+        }
       }
     }
 
@@ -77,7 +125,13 @@ impl Renderer {
     }
 
     for c in &world.creatures {
-      self.draw_creature(con, c.fighter.pos, &c.fighter, world);
+      if self.fov {
+        if world.tcod_map.is_in_fov(c.fighter.pos.x as i32, c.fighter.pos.y as i32) && self.fov {
+          self.draw_creature(con, c.fighter.pos, &c.fighter, world);
+        }
+      } else {
+        self.draw_creature(con, c.fighter.pos, &c.fighter, world);
+      }
     }
 
     // Draw player. Player is always in the camera since
@@ -164,7 +218,7 @@ impl Renderer {
   /// 
   #[inline]
   pub fn new(map: (isize, isize), screen: (isize, isize)) -> Renderer {
-    Renderer { camera: Camera::new(map, screen), sc_debug: false }
+    Renderer { camera: Camera::new(map, screen), sc_debug: false, fov: true }
   }
 
 }

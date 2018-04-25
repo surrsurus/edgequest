@@ -6,6 +6,9 @@ use self::dungeon::map::{Grid, Tile, TileType};
 use core::object::{Creature, Fighter, Entity, RGB};
 use core::object::ai::{SimpleAI, TrackerAI};
 
+use core::tcod::map::Map;
+
+
 ///
 /// What value the player sets the scent of nearby tiles to
 /// 
@@ -14,7 +17,7 @@ const SC_INC : u8 = 150;
 ///
 /// Affects bloom distance. Higher values means less bloom
 /// 
-const SC_BLOOM_CUTOFF : f32 = 0.05; 
+const SC_BLOOM_CUTOFF : f32 = 1.00; 
 
 ///
 /// Decay value applied to tiles inheriting scent from neighbors
@@ -23,12 +26,13 @@ const SC_BLOOM_CUTOFF : f32 = 0.05;
 /// 
 const SC_DECAY : f32 = 0.99609375;
 
-#[derive(Default)]
 pub struct World {
   pub player: Fighter,
   pub cur_dungeon: Dungeon,
   pub creatures: Vec<Box<Creature>>,
-  pub dungeon_stack: Vec<Dungeon>
+  pub dungeon_stack: Vec<Dungeon>,
+  pub tcod_map: Map
+  // Need to add http://tomassedovic.github.io/tcod-rs/tcod/map/struct.Map.html
 }
 
 impl World {
@@ -126,11 +130,14 @@ impl World {
           "Test",
           ' ',
           (0, 0, 0),
-          (0, 0, 0),
+          (50, 50, 0),
           TileType::Floor
         );
       }
     }
+
+    let tm = World::new_tcod_map((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize), &self.cur_dungeon);
+    self.tcod_map = tm;
   
     self.creatures = Vec::new();
 
@@ -210,13 +217,35 @@ impl World {
   pub fn test_traverse(&mut self) {
     let d = World::create_test_dungeon((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize));
     let g = d.grid.clone();
+    let tm = World::new_tcod_map((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize), &d);
     
     self.cur_dungeon = d;
     self.creatures = World::create_test_creatures(&g);
+    self.tcod_map = tm;
 
     let start_loc = Dungeon::get_valid_location(&self.cur_dungeon.grid);
     self.player.pos.x = start_loc.0 as isize;
     self.player.pos.y = start_loc.1 as isize;
+  }
+
+  pub fn new_tcod_map(map_dim: (isize, isize), dungeon: &Dungeon) -> Map {
+    let mut tm = Map::new(map_dim.0 as i32, map_dim.1 as i32);
+
+    for x in 0..dungeon.width {
+      for y in 0..dungeon.height {
+        match dungeon.grid[x][y].tiletype {
+          TileType::Wall => {
+            tm.set(x as i32, y as i32, false, false);
+          },
+          _ => {
+            tm.set(x as i32, y as i32, true, true);
+          }
+        }
+      }
+    }
+
+    return tm;
+
   }
 
 
@@ -227,12 +256,14 @@ impl World {
 
     let d = World::create_test_dungeon(map_dim);
     let g = d.grid.clone();
-    
+    let tm =  World::new_tcod_map(map_dim, &d);
+
     let mut w = World {
       player: World::fresh_player(), 
       cur_dungeon: d,
       creatures: World::create_test_creatures(&g),
-      dungeon_stack: Vec::new()
+      dungeon_stack: Vec::new(),
+      tcod_map: tm
     };
       
     let start_loc = Dungeon::get_valid_location(&w.cur_dungeon.grid);

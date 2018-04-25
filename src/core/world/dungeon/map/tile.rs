@@ -10,6 +10,7 @@ pub enum TileType {
   DownStair,
   UpStair,
   Water,
+  Unseen,
   Debug
 }
 
@@ -33,7 +34,8 @@ pub struct Tile {
   pub biome: Biome,
   pub scent: u8,
   pub sound: u8, // Not in use (yet)
-  pub tiletype: TileType
+  pub tiletype: TileType,
+  pub seen: bool
 }
 
 impl Tile {
@@ -51,7 +53,8 @@ impl Tile {
       biome: Biome::Dungeon,
       scent: 0,
       sound: 0,
-      tiletype: tiletype
+      tiletype: tiletype,
+      seen: false
     }
   }
 

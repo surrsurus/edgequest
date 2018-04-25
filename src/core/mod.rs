@@ -39,12 +39,13 @@ pub fn play() {
 
   // Get a new game
   let mut game = Game::new(map_dim);
+  game.update();
 
   // Draw all and capture keypresses
   while !root.window_closed() {
 
     // Draw what the camera sees
-    ren.draw_all(&mut root, &game.world);
+    ren.draw_all(&mut root, &mut game.world);
 
     // Flush all draws to root
     root.flush();
@@ -53,7 +54,12 @@ pub fn play() {
     let keypress = root.wait_for_keypress(true);
     if keypress.printable == 'r' {
       ren.sc_debug = !ren.sc_debug;
-      ren.draw_all(&mut root, &game.world);
+      ren.draw_all(&mut root, &mut game.world);
+    }
+    if keypress.printable == 'f' {
+      ren.fov = !ren.fov;
+      game.update();
+      ren.draw_all(&mut root, &mut game.world);
     }
     game.process_keypress(keypress);
 
