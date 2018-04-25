@@ -149,7 +149,6 @@ impl Game {
   /// Update the game depending on the state
   ///
   pub fn update(&mut self) {
-    self.world.tcod_map.compute_fov(self.world.player.pos.x as i32, self.world.player.pos.y as i32, 20, true, FovAlgorithm::Basic);
     match &self.state {
       &State::Act(Actions::Move) | &State::Act(Actions::Wait) => self.world.update(),
       &State::Act(Actions::DownStair) => {
@@ -164,6 +163,7 @@ impl Game {
       }
       _ => ()
     }
+    self.world.tcod_map.compute_fov(self.world.player.pos.x as i32, self.world.player.pos.y as i32, 20, true, FovAlgorithm::Shadow);
   }
 
 }

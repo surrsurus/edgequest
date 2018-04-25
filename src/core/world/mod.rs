@@ -17,7 +17,7 @@ const SC_INC : u8 = 150;
 ///
 /// Affects bloom distance. Higher values means less bloom
 /// 
-const SC_BLOOM_CUTOFF : f32 = 1.00; 
+const SC_BLOOM_CUTOFF : f32 = 0.05; 
 
 ///
 /// Decay value applied to tiles inheriting scent from neighbors
