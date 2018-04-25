@@ -12,9 +12,9 @@ use core::object::ai::SimpleAI;
 const SC_INC : u8 = 150;
 
 ///
-/// Affects distance that bloom around player travels
+/// Affects bloom distance. Higher values means less bloom
 /// 
-const SC_BLOOM : f32 = 0.05; 
+const SC_BLOOM_CUTOFF : f32 = 0.05; 
 
 ///
 /// Decay value applied to tiles inheriting scent from neighbors
@@ -251,7 +251,7 @@ impl World {
       ) / 
       
       // Divide by num tiles present, to get the average
-      // Add a little bit more on top to make the bloom around player larger
+      // Add some value to reduce size of bloom 
       (((
       filter(&buffer[x - 1][  y  ]) +
       filter(&buffer[x + 1][  y  ]) +
@@ -261,7 +261,7 @@ impl World {
       filter(&buffer[x - 1][y - 1]) +
       filter(&buffer[x + 1][y - 1]) +
       filter(&buffer[x - 1][y + 1]
-      )) + SC_BLOOM) 
+      )) + SC_BLOOM_CUTOFF) 
       
       // Decay factor
       * SC_DECAY)
