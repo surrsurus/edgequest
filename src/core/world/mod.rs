@@ -3,7 +3,7 @@ pub mod dungeon;
 use self::dungeon::Dungeon;
 use self::dungeon::map::{Grid, Tile};
 
-use core::object::{Creature, Fighter};
+use core::object::{Creature, Fighter, Entity, RGB};
 use core::object::ai::SimpleAI;
 
 ///
@@ -98,6 +98,18 @@ impl World {
       (0, 0, 0)
     )
   }
+
+  ///
+  /// Return the bg color of a tile at a point
+  ///
+  /// NOTE: Clearly does not give a fuck if you go oob, probably should change
+  ///
+  pub fn get_bg_color_at(&self, x: usize, y: usize) -> RGB {
+
+    self.cur_dungeon.grid[x][y].get_bg()
+
+  }
+
 
   /// 
   /// Return a new `World`

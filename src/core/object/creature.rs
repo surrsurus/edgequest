@@ -5,6 +5,9 @@ use core::world::dungeon::map::Tile;
 
 use core::object::Fighter;
 
+///
+/// Creature holds a `Fighter` and an `AI`, basically a package that we can create monsters from
+///
 pub struct Creature {
   pub fighter: Fighter,
   pub ai: Box<AI>

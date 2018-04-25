@@ -7,6 +7,12 @@ use core::object::ai::AI;
 extern crate rand;
 use self::rand::{thread_rng, Rng};
 
+///
+/// SimpleAI is literally just an AI that walks around randomly
+///
+/// NOTE: There is really no intention to keep this AI around... Maybe as a confused AI?
+/// Definitely will be replaced/refactored.
+///
 pub struct SimpleAI;
 
 impl SimpleAI {
@@ -17,6 +23,9 @@ impl SimpleAI {
 
 impl AI for SimpleAI {
   
+  ///
+  /// Walk around randomly
+  ///
   fn take_turn(&mut self, map: &Grid<Tile>, _player: &Fighter, me: &mut Fighter) {
 
     let mut rng = thread_rng();

@@ -1,5 +1,10 @@
 use core::object::{Entity, Pos, RGB};
 
+///
+/// A Fighter is something that can fight, but also be rendered to the screen
+///
+/// NOTE: From that description, I think something might have to change...
+///
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Fighter {
   name: &'static str,

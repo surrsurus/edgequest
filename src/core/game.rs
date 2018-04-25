@@ -5,6 +5,9 @@ use core::tcod::input;
 
 // use core::renderer::Screen;
 
+///
+/// Enum representing possible actions the player can take
+///
 pub enum Actions {
   // Player moved
   Move,
@@ -14,6 +17,9 @@ pub enum Actions {
   Unknown
 }
 
+///
+/// Enum representing the state of the game
+///
 pub enum State {
   // Game just created
   New,
@@ -106,14 +112,6 @@ impl Game {
     
   }
 
-  pub fn update(&mut self) {
-    match &self.state {
-      &State::Act(Actions::Move) => self.world.update(),
-      &State::Act(Actions::Wait) => self.world.update(),
-      _ => ()
-    }
-  }
-
   ///
   /// Return a new `Game`
   /// 
@@ -127,6 +125,17 @@ impl Game {
       state: State::New
     }
     
+  }
+
+  ///
+  /// Update the game depending on the state
+  ///
+  pub fn update(&mut self) {
+    match &self.state {
+      &State::Act(Actions::Move) => self.world.update(),
+      &State::Act(Actions::Wait) => self.world.update(),
+      _ => ()
+    }
   }
 
 }

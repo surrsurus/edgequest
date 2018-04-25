@@ -2,6 +2,8 @@
 //! Initialize tcod elements.
 //! 
 //! Depends on the `config` module.
+//!
+//! NOTE: Maybe change this so we're only loading config once?
 //! 
 
 // We need tcod::Console to keep our consoles in scope

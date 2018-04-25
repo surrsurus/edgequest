@@ -1,3 +1,7 @@
+//!
+//! Literally not used at all, pretty sure working on UI stuff is definitely not happening soon.
+//!
+
 struct ConsoleString {
   content: &'static str
   fg: RGB,

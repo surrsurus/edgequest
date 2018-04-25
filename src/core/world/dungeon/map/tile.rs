@@ -12,7 +12,7 @@ pub struct Tile {
   bg: RGB,
   pub biome: &'static str,
   pub scent: u8,
-  pub sound: u8
+  pub sound: u8 // Not in use (yet)
 }
 
 impl Tile {

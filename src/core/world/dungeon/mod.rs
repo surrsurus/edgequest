@@ -30,61 +30,6 @@ pub struct Dungeon {
 
 impl Dungeon {
 
-  fn generate_grid<T : Clone>(w: usize, h: usize, init: T) -> Grid<T> {
-    // Make grid
-    let mut grid = Grid::<T>::new();
-
-    // Fill it with Vecs
-    for _x in 0..w {
-
-      // Fill new vecs with init
-      let mut vec = Vec::<T>::new();
-
-      for _y in 0..h {
-        vec.push(init.clone());
-      }
-
-      grid.push(vec);
-
-    }
-
-    return grid;
-
-  }
-
-  ///
-  /// Get the player's starting location as a `Pos`
-  /// 
-  /// NOTE: Should be deprecated and removed once stairs show up
-  /// 
-  pub fn get_valid_location(grid: &Grid<Tile>) -> (usize, usize) {
-    let mut rng = thread_rng();
-    loop {
-      let x : usize = rng.gen_range(1, grid.len() - 2);
-      let y : usize = rng.gen_range(1, grid[0].len() - 2);
-      if !grid[x][y].blocks { return (x, y) }
-    }
-  }
-
-  /// 
-  /// Return a new `Dungeon`
-  /// 
-  pub fn new(map_dim: (usize, usize)) -> Dungeon {
-    let g = Dungeon::generate_grid(map_dim.0, map_dim.1, Tile::new(
-        "Wall",
-        ' ',
-        (255, 255, 255), 
-        (33, 33, 33), 
-        true));
-
-    return Dungeon { 
-      width: map_dim.0,
-      height: map_dim.1,
-      grid: g.clone(),
-    };
-
-  }
-
   ///
   /// Make the dungeon
   /// 
@@ -183,6 +128,45 @@ impl Dungeon {
 
   }
 
+  fn generate_grid<T : Clone>(w: usize, h: usize, init: T) -> Grid<T> {
+    // Make grid
+    let mut grid = Grid::<T>::new();
+
+    // Fill it with Vecs
+    for _x in 0..w {
+
+      // Fill new vecs with init
+      let mut vec = Vec::<T>::new();
+
+      for _y in 0..h {
+        vec.push(init.clone());
+      }
+
+      grid.push(vec);
+
+    }
+
+    return grid;
+
+  }
+
+  ///
+  /// Get the player's starting location as a `Pos`
+  /// 
+  /// NOTE: Should be deprecated and removed once stairs show up
+  /// 
+  pub fn get_valid_location(grid: &Grid<Tile>) -> (usize, usize) {
+    let mut rng = thread_rng();
+    loop {
+      let x : usize = rng.gen_range(1, grid.len() - 2);
+      let y : usize = rng.gen_range(1, grid[0].len() - 2);
+      if !grid[x][y].blocks { return (x, y) }
+    }
+  }
+
+  ///
+  /// Check to see if a specific tile is valid, i.e. walkable and in the map bounds
+  ///
   pub fn is_valid(&self, x: usize, y: usize) -> bool {
     if x > 0 && x + 1 < self.width && y > 0 && y + 1 < self.height {
       if !self.grid[x][y].blocks {
@@ -190,6 +174,25 @@ impl Dungeon {
       }
     }
     return false;
+  }
+
+  /// 
+  /// Return a new `Dungeon`
+  /// 
+  pub fn new(map_dim: (usize, usize)) -> Dungeon {
+    let g = Dungeon::generate_grid(map_dim.0, map_dim.1, Tile::new(
+        "Wall",
+        ' ',
+        (255, 255, 255), 
+        (33, 33, 33), 
+        true));
+
+    return Dungeon { 
+      width: map_dim.0,
+      height: map_dim.1,
+      grid: g.clone(),
+    };
+
   }
 
 }
