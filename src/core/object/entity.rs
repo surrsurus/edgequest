@@ -15,7 +15,7 @@ pub trait Entity {
   fn get_glyph(&self) -> char;
 
   #[inline]
-  fn get_name(&self) -> String;
+  fn get_name(&self) -> &'static str;
 
   #[inline]
   fn set_bg(&mut self, bg: (u8, u8, u8));
@@ -27,6 +27,6 @@ pub trait Entity {
   fn set_glyph(&mut self, glyph: char);
 
   #[inline]
-  fn set_name(&mut self, name: String);
+  fn set_name(&mut self, name: &'static str);
 
 }

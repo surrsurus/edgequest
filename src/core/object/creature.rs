@@ -12,7 +12,7 @@ pub struct Creature {
 
 impl Creature {
 
-  pub fn new<T: AI + 'static>(name: String, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), ai: T) -> Creature {
+  pub fn new<T: AI + 'static>(name: &'static str, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), ai: T) -> Creature {
     Creature {
       fighter: Fighter::new(name, glyph, pos, fg, bg),
       ai: Box::new(ai)

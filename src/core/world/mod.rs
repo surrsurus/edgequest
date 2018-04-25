@@ -41,7 +41,7 @@ impl World {
     creatures.push(
       Box::new(
         Creature::new(
-          "ant".to_string(), 
+          "ant", 
           'a', 
           {
             let pos = Dungeon::get_valid_location(&g);
@@ -56,7 +56,7 @@ impl World {
     creatures.push(
       Box::new(
         Creature::new(
-          "bee".to_string(), 
+          "bee", 
           'b', 
           {
             let pos = Dungeon::get_valid_location(&g);
@@ -91,7 +91,7 @@ impl World {
   #[inline]
   fn fresh_player() -> Fighter {
     Fighter::new(
-      "Player".to_string(),
+      "Player",
       '@', 
       (40, 25), 
       (255, 255, 255), 

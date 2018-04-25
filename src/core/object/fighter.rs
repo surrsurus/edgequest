@@ -2,7 +2,7 @@ use core::object::{Entity, Pos, RGB};
 
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Fighter {
-  name: String,
+  name: &'static str,
   glyph: char,
   pub pos: Pos,
   fg: RGB,
@@ -45,7 +45,7 @@ impl Fighter {
   /// Return a new `Entity`
   ///
   #[inline]
-  pub fn new(name: String, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8)) -> Fighter {
+  pub fn new(name: &'static str, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8)) -> Fighter {
     Fighter {
       name: name,
       glyph: glyph, 
@@ -80,7 +80,7 @@ impl Entity for Fighter {
   }
 
   #[inline]
-  fn get_name(&self) -> String {
+  fn get_name(&self) -> &'static str {
     self.name.clone()
   }
 
@@ -100,7 +100,7 @@ impl Entity for Fighter {
   }
 
   #[inline]
-  fn set_name(&mut self, name: String) {
+  fn set_name(&mut self, name: &'static str) {
     self.name = name;
   }
 

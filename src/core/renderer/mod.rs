@@ -36,7 +36,7 @@ impl Renderer {
       for y in 0..dungeon.height {
         if dungeon.grid[x][y].scent > 0 {
           self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
-            "Debug Scent".to_string(),
+            "Debug Scent",
             ' ',
             (255, 255, 255),
             (dungeon.grid[x][y].scent + 50, 0, dungeon.grid[x][y].scent + 25),

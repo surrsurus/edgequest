@@ -71,7 +71,7 @@ impl Dungeon {
   /// 
   pub fn new(map_dim: (usize, usize)) -> Dungeon {
     let g = Dungeon::generate_grid(map_dim.0, map_dim.1, Tile::new(
-        "Wall".to_string(),
+        "Wall",
         ' ',
         (255, 255, 255), 
         (33, 33, 33), 
@@ -94,7 +94,7 @@ impl Dungeon {
     let mut grid = Simple::new(self.grid.clone()).build();
 
     let wall = Tile::new(
-      "Wall".to_string(),
+      "Wall",
       ' ',
       (255, 255, 255), 
       (33, 33, 33), 
@@ -102,7 +102,7 @@ impl Dungeon {
     );
 
     let floor = Tile::new(
-      "Floor".to_string(),
+      "Floor",
       ' ',
       (255, 255, 255), 
       (0, 0, 0), 

@@ -1,5 +1,5 @@
 struct ConsoleString {
-  content: String
+  content: &'static str
   fg: RGB,
   bg: RGB
 }

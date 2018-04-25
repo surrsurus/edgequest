@@ -77,7 +77,7 @@ impl Simple {
       } 
 
       self.grid[mover.0 as usize][mover.1 as usize] = Tile::new(
-        "Floor".to_string(),
+        "Floor",
         ' ',
         (255, 255, 255), 
         (0, 0, 0), 
@@ -95,7 +95,7 @@ impl Simple {
       } 
 
       self.grid[mover.0][mover.1] = Tile::new(
-        "Floor".to_string(),
+        "Floor",
         ' ',
         (255, 255, 255), 
         (0, 0, 0), 
@@ -113,7 +113,7 @@ impl Simple {
     for w in 0..r.w {
       for l in 0..r.l {
         self.grid[(w + r.x)][(l + r.y)] = Tile::new(
-          "Floor".to_string(),
+          "Floor",
           ' ',
           (255, 255, 255), 
           (0, 0, 0), 

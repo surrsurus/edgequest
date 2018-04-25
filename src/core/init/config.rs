@@ -55,6 +55,12 @@ pub struct Config {
   pub renderer: console::Renderer,
 }
 
+enum ConfigError {
+  BadFontType,
+  BadFontLayout,
+  BadRenderer
+}
+
 ///
 /// Load configuration data from a path. returns a `Config` struct.
 /// 
@@ -118,7 +124,7 @@ pub fn load(path: &str) -> Config {
     // Font path should be a String so it doesnt have a lifetime
     fontpath: cfg["fontpath"].as_str().unwrap().to_string(),
 
-    // Font path should be a String so it doesnt have a lifetime
+    // Fullscreen mode
     fullscreen: cfg["fullscreen"].as_bool().unwrap(),
 
     // Match fonttype based on the FontType enum
