@@ -1,1 +1,0 @@
-initSidebarItems({"mod":[["dungeon","Generate a super simple dungeon"]],"struct":[["World",""]]});

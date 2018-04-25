@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Pos","Hold an x, y cartesian coordinate. Should be used when explicitly needing to manipulate points, not just store them. Length and width should be stored as tuples,  however a monster should be a pos to calculate distance between it and the player."]]});

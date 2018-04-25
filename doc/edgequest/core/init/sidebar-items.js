@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["map_dimensions","Get map dimensions as a `Pos`"],["root","Initialize the root console."]],"mod":[["config","A module for loading a YAML config file."]]});

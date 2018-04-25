@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["AI","Represents basic actions AI can take in the game"]]});

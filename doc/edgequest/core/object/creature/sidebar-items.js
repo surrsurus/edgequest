@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Creature","Creature holds a `Fighter` and an `AI`, basically a package that we can create monsters from"]]});
