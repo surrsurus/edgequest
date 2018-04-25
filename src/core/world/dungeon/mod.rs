@@ -108,7 +108,7 @@ impl Dungeon {
         if bin_grid1[x][y] == 1 {
           match grid[x][y].tiletype {
             TileType::Wall => grid[x][y].set_bg((60, 50, 50)),
-            _ => grid[x][y].set_bg((35, 20, 20))
+            _ => grid[x][y].set_bg((25, 20, 20))
           }
         }
       }
@@ -137,8 +137,26 @@ impl Dungeon {
       for y in 0..self.height {
         if bin_grid3[x][y] == 1 {
           match grid[x][y].tiletype {
-            TileType::Wall => {},
-            _ => grid[x][y].set_bg((0, 150, 150))
+            TileType::Wall => grid[x][y].set_bg((50, 50, 60)),
+            _ => grid[x][y].set_bg((20, 20, 25))
+          }
+        }
+      }
+    }
+
+    // Apply noise 4
+    let mut f4 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.4);
+    let bin_grid4 = f4.build();
+
+    for x in 0..self.width {
+      for y in 0..self.height {
+        if bin_grid4[x][y] == 1 {
+          match grid[x][y].tiletype {
+            TileType::Wall | TileType::DownStair | TileType::UpStair => {},
+            _ => {
+              grid[x][y].set_bg((0, 150, 150));
+              grid[x][y].tiletype = TileType::Water;
+            }
           }
         }
       }
@@ -194,7 +212,7 @@ impl Dungeon {
   pub fn is_valid(&self, x: usize, y: usize) -> bool {
     if x > 0 && x + 1 < self.width && y > 0 && y + 1 < self.height {
       match self.grid[x][y].tiletype {
-        TileType::Floor | TileType::DownStair | TileType::UpStair => return true,
+        TileType::Floor | TileType::DownStair | TileType::UpStair | TileType::Water => return true,
         _ => {}
       }
     }

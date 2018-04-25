@@ -9,7 +9,16 @@ pub enum TileType {
   Floor,
   DownStair,
   UpStair,
+  Water,
   Debug
+}
+
+///
+/// Tiles have biomes
+///
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum Biome {
+  Dungeon
 }
 
 ///
@@ -21,7 +30,7 @@ pub struct Tile {
   pub glyph: char,
   fg: RGB,
   bg: RGB,
-  pub biome: &'static str,
+  pub biome: Biome,
   pub scent: u8,
   pub sound: u8, // Not in use (yet)
   pub tiletype: TileType
@@ -39,7 +48,7 @@ impl Tile {
       glyph: glyph,
       fg: RGB::from_tup(fg),
       bg: RGB::from_tup(bg),
-      biome: "dungeon",
+      biome: Biome::Dungeon,
       scent: 0,
       sound: 0,
       tiletype: tiletype

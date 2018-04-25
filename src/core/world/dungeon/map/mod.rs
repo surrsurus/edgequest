@@ -8,3 +8,4 @@ pub use self::grid::Grid;
 pub mod tile;
 pub use self::tile::Tile;
 pub use self::tile::TileType;
+pub use self::tile::Biome;
