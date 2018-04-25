@@ -109,7 +109,7 @@ impl Game {
             
           }
 
-          if !self.world.cur_dungeon.is_valid(self.world.player.pos.x as usize, self.world.player.pos.y as usize) {
+          if !self.world.is_valid(self.world.player.pos.x as usize, self.world.player.pos.y as usize) {
             self.world.player.pos = oldpos;
             self.state = State::Act(Actions::Unknown);
           }

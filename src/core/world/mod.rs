@@ -123,6 +123,19 @@ impl World {
   }
 
   ///
+  /// Check to see if a specific tile is valid, i.e. walkable and in the map bounds
+  ///
+  pub fn is_valid(&self, x: usize, y: usize) -> bool {
+    if x > 0 && x + 1 < self.cur_dungeon.width && y > 0 && y + 1 < self.cur_dungeon.height {
+      match self.cur_dungeon.grid[x][y].tiletype {
+        TileType::Floor | TileType::DownStair | TileType::UpStair | TileType::Water => return true,
+        _ => {}
+      }
+    }
+    return false;
+  }
+
+  ///
   /// Return the bg color of a tile at a point
   ///
   /// NOTE: Clearly does not give a fuck if you go oob, probably should change
@@ -208,7 +221,7 @@ impl World {
     // Create initial bloom around player
     for nx in -1..2 {
       for ny in -1..2 {
-        if self.cur_dungeon.is_valid((self.player.pos.x - nx) as usize, (self.player.pos.y - ny) as usize) {
+        if self.is_valid((self.player.pos.x - nx) as usize, (self.player.pos.y - ny) as usize) {
           self.cur_dungeon.grid[(self.player.pos.x - nx) as usize][(self.player.pos.y - ny) as usize].scent = SC_INC;
         }
       }
@@ -218,7 +231,7 @@ impl World {
     for c in &self.creatures {
       for nx in -1..2 {
         for ny in -1..2 {
-          if self.cur_dungeon.is_valid((c.fighter.pos.x - nx) as usize, (c.fighter.pos.y - ny) as usize) {
+          if self.is_valid((c.fighter.pos.x - nx) as usize, (c.fighter.pos.y - ny) as usize) {
             self.cur_dungeon.grid[(c.fighter.pos.x - nx) as usize][(c.fighter.pos.y - ny) as usize].scent = SC_INC;
           }
         }
@@ -270,7 +283,7 @@ impl World {
     // Change values of map based on averages from the buffer
     for x in 0..self.cur_dungeon.width {
       for y in 0..self.cur_dungeon.height {
-        if self.cur_dungeon.is_valid(x, y) {
+        if self.is_valid(x, y) {
           self.cur_dungeon.grid[x][y].scent = avg_of_neighbors(x, y) as u8;
         }
       }

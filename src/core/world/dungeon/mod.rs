@@ -206,19 +206,7 @@ impl Dungeon {
     }
   }
 
-  ///
-  /// Check to see if a specific tile is valid, i.e. walkable and in the map bounds
-  ///
-  pub fn is_valid(&self, x: usize, y: usize) -> bool {
-    if x > 0 && x + 1 < self.width && y > 0 && y + 1 < self.height {
-      match self.grid[x][y].tiletype {
-        TileType::Floor | TileType::DownStair | TileType::UpStair | TileType::Water => return true,
-        _ => {}
-      }
-    }
-    return false;
-  }
-
+  
   /// 
   /// Return a new `Dungeon`
   /// 
