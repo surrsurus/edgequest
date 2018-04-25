@@ -1,18 +1,30 @@
 use core::object::{Entity, RGB};
 
 ///
+/// Tiles have types
+///
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum TileType {
+  Wall,
+  Floor,
+  DownStair,
+  UpStair,
+  Debug
+}
+
+///
 /// Tile represents an environmental entity
 /// 
-#[derive(Clone, PartialEq, Eq, Debug, Default)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Tile {
   name: &'static str,
   pub glyph: char,
-  pub blocks: bool,
   fg: RGB,
   bg: RGB,
   pub biome: &'static str,
   pub scent: u8,
-  pub sound: u8 // Not in use (yet)
+  pub sound: u8, // Not in use (yet)
+  pub tiletype: TileType
 }
 
 impl Tile {
@@ -21,16 +33,16 @@ impl Tile {
   /// Return a new `Tile`
   /// 
   #[inline]
-  pub fn new(name: &'static str, glyph: char, fg: (u8, u8, u8), bg: (u8, u8, u8), blocks: bool) -> Tile {
+  pub fn new(name: &'static str, glyph: char, fg: (u8, u8, u8), bg: (u8, u8, u8), tiletype: TileType) -> Tile {
     Tile { 
       name: name,
       glyph: glyph,
       fg: RGB::from_tup(fg),
       bg: RGB::from_tup(bg),
-      blocks: blocks,
       biome: "dungeon",
       scent: 0,
-      sound: 0
+      sound: 0,
+      tiletype: tiletype
     }
   }
 

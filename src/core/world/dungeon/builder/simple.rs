@@ -4,7 +4,7 @@ use self::rand::{thread_rng, Rng};
 use core::world::dungeon::builder::Buildable;
 use core::world::dungeon::builder::construct::{Corr, Rect};
 
-use core::world::dungeon::map::{Grid, Tile};
+use core::world::dungeon::map::{Grid, Tile, TileType};
 
 ///
 /// Simple dungeon builder
@@ -81,7 +81,7 @@ impl Simple {
         ' ',
         (255, 255, 255), 
         (0, 0, 0), 
-        false
+        TileType::Floor
       );
 
     }
@@ -99,7 +99,7 @@ impl Simple {
         ' ',
         (255, 255, 255), 
         (0, 0, 0), 
-        false
+        TileType::Floor
       );
 
     }
@@ -117,7 +117,7 @@ impl Simple {
           ' ',
           (255, 255, 255), 
           (0, 0, 0), 
-          false
+          TileType::Floor
         );
       }
     }

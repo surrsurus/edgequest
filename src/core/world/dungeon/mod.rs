@@ -12,7 +12,7 @@ mod builder;
 use self::builder::{Buildable, Fussy, Simple};
 
 pub mod map;
-use self::map::{Grid, Tile};
+use self::map::{Grid, Tile, TileType};
 
 use core::object::Entity;
 
@@ -43,7 +43,7 @@ impl Dungeon {
       ' ',
       (255, 255, 255), 
       (33, 33, 33), 
-      true
+      TileType::Wall
     );
 
     let floor = Tile::new(
@@ -51,7 +51,7 @@ impl Dungeon {
       ' ',
       (255, 255, 255), 
       (0, 0, 0), 
-      false
+      TileType::Floor
     );
 
     // Closure for generating drunkards walks
@@ -83,11 +83,10 @@ impl Dungeon {
     for x in 0..self.width {
       for y in 0..self.height {
         if bin_grid1[x][y] == 1 {
-          if grid[x][y].blocks {
-            grid[x][y].set_bg((60, 50, 50));
-          } else {
-            grid[x][y].set_bg((35, 20, 20));
-          } 
+          match grid[x][y].tiletype {
+            TileType::Wall => grid[x][y].set_bg((60, 50, 50)),
+            _ => grid[x][y].set_bg((35, 20, 20))
+          }
         }
       }
     }
@@ -99,11 +98,10 @@ impl Dungeon {
     for x in 0..self.width {
       for y in 0..self.height {
         if bin_grid2[x][y] == 1 {
-          if grid[x][y].blocks {
-            grid[x][y].set_bg((50, 50, 50));
-          } else {
-            grid[x][y].set_bg((20, 20, 20));
-          } 
+          match grid[x][y].tiletype {
+            TileType::Wall => grid[x][y].set_bg((50, 50, 50)),
+            _ => grid[x][y].set_bg((20, 20, 20))
+          }
         }
       }
     }
@@ -115,14 +113,22 @@ impl Dungeon {
     for x in 0..self.width {
       for y in 0..self.height {
         if bin_grid3[x][y] == 1 {
-          if grid[x][y].blocks {
-
-          } else {
-            grid[x][y].set_bg((0, 150, 150));
-          } 
+          match grid[x][y].tiletype {
+            TileType::Wall => {},
+            _ => grid[x][y].set_bg((0, 150, 150))
+          }
         }
       }
     }
+
+    let spos = Dungeon::get_valid_location(&grid);
+    grid[spos.0][spos.1] = Tile::new(
+      "Down Stair",
+      '>',
+      (255, 0, 0),
+      (0, 0, 0),
+      TileType::DownStair
+    );
 
     self.grid = grid;
 
@@ -160,7 +166,11 @@ impl Dungeon {
     loop {
       let x : usize = rng.gen_range(1, grid.len() - 2);
       let y : usize = rng.gen_range(1, grid[0].len() - 2);
-      if !grid[x][y].blocks { return (x, y) }
+
+      match grid[x][y].tiletype {
+        TileType::Floor => return (x, y),
+        _ => continue
+      }
     }
   }
 
@@ -169,8 +179,9 @@ impl Dungeon {
   ///
   pub fn is_valid(&self, x: usize, y: usize) -> bool {
     if x > 0 && x + 1 < self.width && y > 0 && y + 1 < self.height {
-      if !self.grid[x][y].blocks {
-        return true;
+      match self.grid[x][y].tiletype {
+        TileType::Floor | TileType::DownStair | TileType::UpStair => return true,
+        _ => {}
       }
     }
     return false;
@@ -185,7 +196,7 @@ impl Dungeon {
         ' ',
         (255, 255, 255), 
         (33, 33, 33), 
-        true));
+        TileType::Wall));
 
     return Dungeon { 
       width: map_dim.0,

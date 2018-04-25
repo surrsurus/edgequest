@@ -9,7 +9,7 @@ use core::world::World;
 
 use core::world::dungeon::Dungeon;
 
-use core::world::dungeon::map::Tile;
+use core::world::dungeon::map::{Tile, TileType};
 
 use core::object::{RGB, Pos, Entity};
 
@@ -43,7 +43,7 @@ impl Renderer {
             ' ',
             (255, 255, 255),
             (dungeon.grid[x][y].scent + 50, 0, dungeon.grid[x][y].scent + 25),
-            false
+            TileType::Debug
           ));
         }
       }

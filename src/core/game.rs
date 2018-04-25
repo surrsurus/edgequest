@@ -13,6 +13,10 @@ pub enum Actions {
   Move,
   // Player waited
   Wait,
+  // Player went down
+  DownStair,
+  // Player went up
+  UpStair,
   // Unknown action
   Unknown
 }
@@ -89,6 +93,8 @@ impl Game {
               self.state = State::Act(Actions::Move);
             },
             '.' => { self.state = State::Act(Actions::Wait) },
+            '>' => { self.state = State::Act(Actions::DownStair) },
+            '<' => { self.state = State::Act(Actions::UpStair) },
             _ => { self.state = State::Act(Actions::Unknown) }
             
           }
@@ -132,8 +138,13 @@ impl Game {
   ///
   pub fn update(&mut self) {
     match &self.state {
-      &State::Act(Actions::Move) => self.world.update(),
-      &State::Act(Actions::Wait) => self.world.update(),
+      &State::Act(Actions::Move) | &State::Act(Actions::Wait) => self.world.update(),
+      &State::Act(Actions::DownStair) => {
+        if self.world.can_go_down() {
+          self.world.go_down();
+        }
+      },
+      &State::Act(Actions::UpStair) => {}
       _ => ()
     }
   }

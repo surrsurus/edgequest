@@ -1,7 +1,7 @@
 
 pub mod dungeon;
 use self::dungeon::Dungeon;
-use self::dungeon::map::{Grid, Tile};
+use self::dungeon::map::{Grid, Tile, TileType};
 
 use core::object::{Creature, Fighter, Entity, RGB};
 use core::object::ai::SimpleAI;
@@ -107,6 +107,30 @@ impl World {
   pub fn get_bg_color_at(&self, x: usize, y: usize) -> RGB {
 
     self.cur_dungeon.grid[x][y].get_bg()
+
+  }
+
+  ///
+  /// Go downstairs
+  ///
+  pub fn can_go_down(&self) -> bool {
+    match self.cur_dungeon.grid[self.player.pos.x as usize][self.player.pos.y as usize].tiletype {
+      TileType::DownStair => return true,
+      _ => return false
+    }
+  }
+
+  pub fn go_down(&mut self) {
+
+    let d = World::create_test_dungeon((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize));
+    let g = d.grid.clone();
+    
+    self.cur_dungeon = d;
+    self.creatures = World::create_test_creatures(&g);
+
+    let start_loc = Dungeon::get_valid_location(&self.cur_dungeon.grid);
+    self.player.pos.x = start_loc.0 as isize;
+    self.player.pos.y = start_loc.1 as isize;
 
   }
 

@@ -1,5 +1,5 @@
 use core::world::dungeon::map::Grid;
-use core::world::dungeon::map::Tile;
+use core::world::dungeon::map::{Tile, TileType};
 
 use core::object::Fighter;
 use core::object::ai::AI;
@@ -47,11 +47,15 @@ impl AI for SimpleAI {
         _ => unreachable!("dice machine broke")
       }
 
-      if !map[x][y].blocks { break; } 
-      else if count > 100 {
-        x = me.pos.x as usize;
-        y = me.pos.y as usize;
-        break; 
+      match map[x][y].tiletype {
+        TileType::Floor => break,
+        _ => {
+          if count > 100 {
+            x = me.pos.x as usize;
+            y = me.pos.y as usize;
+            break; 
+          }
+        }
       }
     }
     
