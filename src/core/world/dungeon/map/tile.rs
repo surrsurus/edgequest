@@ -1,5 +1,8 @@
 use core::object::{Entity, RGB};
 
+pub const DARKEN_FAC : RGB = RGB(10, 10, 10);
+pub const YELLOW_FAC : RGB = RGB(25, 20, 10);
+
 ///
 /// Tiles have types
 ///
@@ -62,17 +65,20 @@ impl Tile {
   /// Darken a tile's fg and bg color
   ///
   pub fn darken(&mut self) -> Tile {
-    Tile {
-      name: self.name,
-      glyph: self.glyph,
-      fg: self.fg - RGB(10, 10, 10),
-      bg: self.bg - RGB(10, 10, 10),
-      biome: self.biome.clone(),
-      scent: self.scent,
-      sound: self.sound,
-      tiletype: self.tiletype.clone(),
-      seen: self.seen
-    }
+    let mut t = self.clone();
+    t.fg = self.fg - DARKEN_FAC;
+    t.bg = self.bg - DARKEN_FAC;
+    return t;
+  }
+
+  ///
+  /// Make a tile's fg and bg color more yellowish
+  ///
+  pub fn yellowish(&mut self) -> Tile {
+    let mut t = self.clone();
+    t.fg = self.fg + YELLOW_FAC;
+    t.bg = self.bg + YELLOW_FAC;
+    return t;
   }
 
 }

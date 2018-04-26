@@ -9,9 +9,10 @@ use core::world::World;
 
 use core::world::dungeon::Dungeon;
 
+use core::world::dungeon::map::tile;
 use core::world::dungeon::map::{Tile, TileType};
 
-use core::object::{RGB, Pos, Entity};
+use core::object::{Pos, Entity};
 
 use core::tcod::{Console, console};
 
@@ -72,7 +73,7 @@ impl Renderer {
         if self.fov {
           // And it's in the FOV
           if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
-            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].yellowish());
             world.cur_dungeon.grid[x][y].seen = true;
           }
           // And the tile has been seen...
@@ -124,9 +125,6 @@ impl Renderer {
   ///
   /// Draw creatures with "transparent" backgrounds
   ///
-  /// NOTE: Way too similar to draw_entity(). Plus, the whole bg thing seems weird.
-  /// Better way to do it?
-  ///
   pub fn draw_creature(&self, con: &mut Console, pos: Pos, ce: &Entity, world: &World) {
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
@@ -134,28 +132,15 @@ impl Renderer {
     // New pos with respect to camera
     let npos = pos + self.camera.pos;
 
-    if ce.get_glyph() == ' ' {
-      con.set_char_background(
-        npos.x as i32,
-        npos.y as i32,
-        ce.get_bg().to_tcod(),
-        console::BackgroundFlag::Set
-      );
-    } else {
-      let bg : RGB;
-      if ce.get_bg() == RGB(0, 0, 0) {
-        bg = world.get_bg_color_at(pos.x as usize, pos.y as usize);
-      } else {
-        bg = ce.get_bg()
-      }
-      con.put_char_ex(
-        npos.x as i32, 
-        npos.y as i32, 
-        ce.get_glyph(),
-        ce.get_fg().to_tcod(),
-        bg.to_tcod()
-      );
-    }
+    con.put_char_ex(
+      npos.x as i32, 
+      npos.y as i32, 
+      ce.get_glyph(),
+      ce.get_fg().to_tcod(),
+      // Backgrounds are just inherited from the world.
+      (world.get_bg_color_at(pos.x as usize, pos.y as usize) + tile::YELLOW_FAC).to_tcod()
+    );
+
   }
 
   ///

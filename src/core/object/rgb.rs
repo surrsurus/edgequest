@@ -40,7 +40,10 @@ impl Add<RGB> for RGB {
 
   #[inline]
   fn add(self, other: RGB) -> RGB {
-    return RGB(self.0 + other.0, self.1 + other.1, self.2 + other.2);
+    let r = { if (self.0 as isize) + (other.0 as isize) > 255 { 255 } else { self.0 + other.0 } };
+    let g = { if (self.1 as isize) + (other.1 as isize) > 255 { 255 } else { self.1 + other.1 } };
+    let b = { if (self.2 as isize) + (other.2 as isize) > 255 { 255 } else { self.2 + other.2 } };
+    return RGB(r, g, b);
   }
 
 }
