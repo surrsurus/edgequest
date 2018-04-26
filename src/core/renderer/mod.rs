@@ -65,56 +65,35 @@ impl Renderer {
 
     self.camera.move_to(world.player.pos);
 
-    // Draw seen tiles. Spaghetti, needs to change
+    // Draw seen tiles
     for x in 0..world.cur_dungeon.width {
       for y in 0..world.cur_dungeon.height {
+        // If fov is on...
         if self.fov {
-          if world.cur_dungeon.grid[x][y].seen {
-            match world.cur_dungeon.grid[x][y].tiletype {
-                TileType::Wall => {
-                  self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
-                    "Seen Wall",
-                    ' ',
-                    (0, 0, 0),
-                    (70, 70, 70),
-                    TileType::Unseen
-                  ));
-                }
-                _ => {
-                  self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
-                    "Seen Floor",
-                    ' ',
-                    (0, 0, 0),
-                    (40, 40, 40),
-                    TileType::Unseen
-                  ));
-                },
-            }
-             
-          }
-        }
-      }
-    }
-
-    // Draw tiles
-    for x in 0..world.cur_dungeon.width {
-      for y in 0..world.cur_dungeon.height {
-        if self.fov {
+          // And it's in the FOV
           if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
             self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
             world.cur_dungeon.grid[x][y].seen = true;
           }
-        } else {
+          // And the tile has been seen...
+          else if world.cur_dungeon.grid[x][y].seen {
+            // Draw certain tiles depending on their types
+            match world.cur_dungeon.grid[x][y].tiletype {
+              TileType::UpStair => {
+                self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+              },
+              TileType::DownStair => {
+                self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+              },
+              _ => {
+                self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].darken());
+              }
+            }
+          }
+        } 
+        // Debug just draw all tiles normally
+        else { 
           self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
-        }
-        match world.cur_dungeon.grid[x][y].tiletype {
-          TileType::UpStair => {
-            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
-          },
-          TileType::DownStair => {
-            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
-          },
-          _ => {}
         }
       }
     }
@@ -125,7 +104,9 @@ impl Renderer {
     }
 
     for c in &world.creatures {
+      // If fov is on...
       if self.fov {
+        // And its in the fov...
         if world.tcod_map.is_in_fov(c.fighter.pos.x as i32, c.fighter.pos.y as i32) && self.fov {
           self.draw_creature(con, c.fighter.pos, &c.fighter, world);
         }

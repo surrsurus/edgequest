@@ -1,3 +1,6 @@
+// Operator overloading
+use std::ops::{Add, Sub};
+
 use core::tcod::colors;
 
 ///
@@ -24,6 +27,37 @@ impl RGB {
   #[inline]
   pub fn to_tcod(&self) -> colors::Color {
     colors::Color::new(self.0, self.1, self.2)
+  }
+
+}
+
+/// 
+/// Allow for the addition of two `Pos` structs
+/// 
+impl Add<RGB> for RGB {
+
+  type Output = RGB;
+
+  #[inline]
+  fn add(self, other: RGB) -> RGB {
+    return RGB(self.0 + other.0, self.1 + other.1, self.2 + other.2);
+  }
+
+}
+
+/// 
+/// Allow for the addition of two `Pos` structs
+/// 
+impl Sub<RGB> for RGB {
+
+  type Output = RGB;
+
+  #[inline]
+  fn sub(self, other: RGB) -> RGB {
+    let r = { if (self.0 as isize) - (other.0 as isize) < 0 { 0 } else { self.0 - other.0 } };
+    let g = { if (self.1 as isize) - (other.1 as isize) < 0 { 0 } else { self.1 - other.1 } };
+    let b = { if (self.2 as isize) - (other.2 as isize) < 0 { 0 } else { self.2 - other.2 } };
+    return RGB(r, g, b);
   }
 
 }

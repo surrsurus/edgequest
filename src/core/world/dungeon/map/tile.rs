@@ -58,6 +58,23 @@ impl Tile {
     }
   }
 
+  ///
+  /// Darken a tile's fg and bg color
+  ///
+  pub fn darken(&mut self) -> Tile {
+    Tile {
+      name: self.name,
+      glyph: self.glyph,
+      fg: self.fg - RGB(10, 10, 10),
+      bg: self.bg - RGB(10, 10, 10),
+      biome: self.biome.clone(),
+      scent: self.scent,
+      sound: self.sound,
+      tiletype: self.tiletype.clone(),
+      seen: self.seen
+    }
+  }
+
 }
 
 impl Entity for Tile {
