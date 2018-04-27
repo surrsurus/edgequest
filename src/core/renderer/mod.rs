@@ -12,9 +12,12 @@ use core::world::dungeon::Dungeon;
 use core::world::dungeon::map::tile;
 use core::world::dungeon::map::{Tile, TileType};
 
-use core::object::{Pos, Entity};
+use core::object::{RGB, Pos, Entity};
 
 use core::tcod::{Console, console};
+
+extern crate rand;
+use self::rand::{thread_rng, Rng};
 
 ///
 /// Helper for rendering things to the screen
@@ -66,6 +69,8 @@ impl Renderer {
 
     self.camera.move_to(world.player.pos);
 
+    let mut rng = thread_rng();
+
     // Draw seen tiles
     for x in 0..world.cur_dungeon.width {
       for y in 0..world.cur_dungeon.height {
@@ -73,17 +78,45 @@ impl Renderer {
         if self.fov {
           // And it's in the FOV
           if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
-            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].yellowish());
+            match world.cur_dungeon.grid[x][y].tiletype {
+              TileType::Water => {
+
+                let mut t = world.cur_dungeon.grid[x][y].clone();
+                
+                match rng.gen_range(1, 11) as i32 {
+                  1 => {t = t.amplify_col(RGB(0, 0, 5));}
+                  2 => {t = t.amplify_col(RGB(0, 0, 10));}
+                  3 => {t = t.amplify_col(RGB(0, 0, 15));}
+                  4 => {t = t.amplify_col(RGB(0, 0, 20));}
+                  5 => {t = t.amplify_col(RGB(0, 2, 5));}
+                  6 => {t = t.amplify_col(RGB(0, 2, 10));}
+                  7 => {t = t.amplify_col(RGB(0, 2, 15));}
+                  8 => {t = t.amplify_col(RGB(0, 2, 20));}
+                  9 => {t = t.amplify_col(RGB(0, 2, 15));}
+                  10 => {t = t.amplify_col(RGB(0, 2, 10));}
+                  _ => unreachable!("whoopie looks like we made a fucky wucky")
+                }
+
+                self.draw_entity(con, Pos::new(x as isize, y as isize), &t);
+
+              },
+              TileType::UpStair | TileType::DownStair => {
+                let mut stair = world.cur_dungeon.grid[x][y].clone();
+                stair.set_bg(RGB::to_tup(world.get_bg_color_at(x as usize, y as usize)));
+                self.draw_entity(con, Pos::new(x as isize, y as isize), &stair.yellowish());
+              }
+              _ => {
+                self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].yellowish());
+              }
+            }
+            
             world.cur_dungeon.grid[x][y].seen = true;
           }
           // And the tile has been seen...
           else if world.cur_dungeon.grid[x][y].seen {
             // Draw certain tiles depending on their types
             match world.cur_dungeon.grid[x][y].tiletype {
-              TileType::UpStair => {
-                self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
-              },
-              TileType::DownStair => {
+              TileType::UpStair | TileType::DownStair => {
                 self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
               },
               _ => {
@@ -131,14 +164,18 @@ impl Renderer {
 
     // New pos with respect to camera
     let npos = pos + self.camera.pos;
-
+    
     con.put_char_ex(
       npos.x as i32, 
       npos.y as i32, 
       ce.get_glyph(),
       ce.get_fg().to_tcod(),
       // Backgrounds are just inherited from the world.
-      (world.get_bg_color_at(pos.x as usize, pos.y as usize) + tile::YELLOW_FAC).to_tcod()
+      if self.fov { 
+        (world.get_bg_color_at(pos.x as usize, pos.y as usize) + tile::YELLOW_FAC).to_tcod()
+      } else { 
+        (world.get_bg_color_at(pos.x as usize, pos.y as usize)).to_tcod()
+      }
     );
 
   }

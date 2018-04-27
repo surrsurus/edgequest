@@ -40,8 +40,8 @@ impl Dungeon {
 
     let wall = Tile::new(
       "Wall",
-      ' ',
-      (255, 255, 255), 
+      '#',
+      (40, 40, 40), 
       (33, 33, 33), 
       TileType::Wall
     );
@@ -107,7 +107,10 @@ impl Dungeon {
       for y in 0..self.height {
         if bin_grid1[x][y] == 1 {
           match grid[x][y].tiletype {
-            TileType::Wall => grid[x][y].set_bg((60, 50, 50)),
+            TileType::Wall => {
+               grid[x][y].set_fg((67, 57, 57));
+               grid[x][y].set_bg((60, 50, 50));
+            },
             _ => grid[x][y].set_bg((25, 20, 20))
           }
         }
@@ -122,7 +125,10 @@ impl Dungeon {
       for y in 0..self.height {
         if bin_grid2[x][y] == 1 {
           match grid[x][y].tiletype {
-            TileType::Wall => grid[x][y].set_bg((50, 50, 50)),
+            TileType::Wall => {
+               grid[x][y].set_fg((57, 57, 57));
+               grid[x][y].set_bg((50, 50, 50));
+            },
             _ => grid[x][y].set_bg((20, 20, 20))
           }
         }
@@ -137,7 +143,10 @@ impl Dungeon {
       for y in 0..self.height {
         if bin_grid3[x][y] == 1 {
           match grid[x][y].tiletype {
-            TileType::Wall => grid[x][y].set_bg((50, 50, 60)),
+            TileType::Wall => {
+              grid[x][y].set_fg((57, 57, 67));
+              grid[x][y].set_bg((50, 50, 60));
+            },
             _ => grid[x][y].set_bg((20, 20, 25))
           }
         }
@@ -213,8 +222,8 @@ impl Dungeon {
   pub fn new(map_dim: (usize, usize)) -> Dungeon {
     let g = Dungeon::generate_grid(map_dim.0, map_dim.1, Tile::new(
         "Wall",
-        ' ',
-        (255, 255, 255), 
+        '#',
+        (40, 40, 40), 
         (33, 33, 33), 
         TileType::Wall));
 

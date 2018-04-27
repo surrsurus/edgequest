@@ -10,4 +10,5 @@ pub use self::tile::DARKEN_FAC;
 pub use self::tile::YELLOW_FAC;
 pub use self::tile::Tile;
 pub use self::tile::TileType;
+pub use self::tile::TrapType;
 pub use self::tile::Biome;

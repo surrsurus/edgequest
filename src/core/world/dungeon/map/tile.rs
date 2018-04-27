@@ -1,7 +1,15 @@
 use core::object::{Entity, RGB};
 
 pub const DARKEN_FAC : RGB = RGB(10, 10, 10);
-pub const YELLOW_FAC : RGB = RGB(25, 20, 10);
+pub const YELLOW_FAC : RGB = RGB(27, 24, 22);
+
+///
+/// Traps have types
+///
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum TrapType {
+  MemoryLoss
+}
 
 ///
 /// Tiles have types
@@ -14,6 +22,7 @@ pub enum TileType {
   UpStair,
   Water,
   Unseen,
+  Trap(TrapType),
   Debug
 }
 
@@ -62,23 +71,37 @@ impl Tile {
   }
 
   ///
+  /// Modify a tile's fg and bg color
+  ///
+  pub fn amplify_col(&mut self, factor: RGB) -> Tile {
+    let mut t = self.clone();
+    t.fg = self.fg + factor;
+    t.bg = self.bg + factor;
+    return t;
+  }
+
+  ///
+  /// Modify a tile's fg and bg color
+  ///
+  pub fn reduce_col(&mut self, factor: RGB) -> Tile {
+    let mut t = self.clone();
+    t.fg = self.fg - factor;
+    t.bg = self.bg - factor;
+    return t;
+  }
+
+  ///
   /// Darken a tile's fg and bg color
   ///
   pub fn darken(&mut self) -> Tile {
-    let mut t = self.clone();
-    t.fg = self.fg - DARKEN_FAC;
-    t.bg = self.bg - DARKEN_FAC;
-    return t;
+    self.reduce_col(DARKEN_FAC)
   }
 
   ///
   /// Make a tile's fg and bg color more yellowish
   ///
   pub fn yellowish(&mut self) -> Tile {
-    let mut t = self.clone();
-    t.fg = self.fg + YELLOW_FAC;
-    t.bg = self.bg + YELLOW_FAC;
-    return t;
+    self.amplify_col(YELLOW_FAC)
   }
 
 }

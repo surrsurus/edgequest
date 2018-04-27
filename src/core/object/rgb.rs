@@ -21,6 +21,14 @@ impl RGB {
     RGB(rgb.0, rgb.1, rgb.2)
   }
 
+  ///
+  /// Get an RGB to a tuple
+  /// 
+  #[inline]
+  pub fn to_tup(rgb: RGB) -> (u8, u8, u8) {
+    (rgb.0, rgb.1, rgb.2)
+  }
+
   /// 
   /// Convert RGB to a tcod Color
   /// 

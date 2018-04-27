@@ -130,7 +130,7 @@ impl World {
           "Test",
           ' ',
           (0, 0, 0),
-          (50, 50, 0),
+          (0, 255, 0),
           TileType::Floor
         );
       }
