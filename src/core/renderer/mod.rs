@@ -10,7 +10,7 @@ use core::world::World;
 use core::world::dungeon::Dungeon;
 
 use core::world::dungeon::map::tile;
-use core::world::dungeon::map::{Tile, TileType};
+use core::world::dungeon::map::{Tile, TileType, SCENT_TYPES};
 
 use core::object::{RGB, Pos, Entity};
 
@@ -42,14 +42,18 @@ impl Renderer {
 
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
-        if dungeon.grid[x][y].scent > 0 {
-          self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
-            "Debug Scent",
-            ' ',
-            (255, 255, 255),
-            (dungeon.grid[x][y].scent + 50, 0, dungeon.grid[x][y].scent + 25),
-            TileType::Debug
-          ));
+        let mut color : (u8, u8, u8) = (dungeon.grid[x][y].scents[0].val + 50, dungeon.grid[x][y].scents[1].val + 25, dungeon.grid[x][y].scents[2].val + 50 );
+        for s in 0..SCENT_TYPES {
+          if dungeon.grid[x][y].scents[s].val > 0 {
+            self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
+              "Debug Scent",
+              ' ',
+              (255, 255, 255),
+              color,
+              TileType::Debug
+            ));
+            break;
+          }
         }
       }
     }
@@ -100,11 +104,6 @@ impl Renderer {
                 self.draw_entity(con, Pos::new(x as isize, y as isize), &t);
 
               },
-              TileType::UpStair | TileType::DownStair => {
-                let mut stair = world.cur_dungeon.grid[x][y].clone();
-                stair.set_bg(RGB::to_tup(world.get_bg_color_at(x as usize, y as usize)));
-                self.draw_entity(con, Pos::new(x as isize, y as isize), &stair.yellowish());
-              }
               _ => {
                 self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].yellowish());
               }
@@ -116,9 +115,6 @@ impl Renderer {
           else if world.cur_dungeon.grid[x][y].seen {
             // Draw certain tiles depending on their types
             match world.cur_dungeon.grid[x][y].tiletype {
-              TileType::UpStair | TileType::DownStair => {
-                self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
-              },
               _ => {
                 self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].darken());
               }
@@ -127,7 +123,11 @@ impl Renderer {
         } 
         // Debug just draw all tiles normally
         else { 
-          self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+         match world.cur_dungeon.grid[x][y].tiletype {
+            _ => {
+              self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+            }
+          }
         }
       }
     }
@@ -164,7 +164,7 @@ impl Renderer {
 
     // New pos with respect to camera
     let npos = pos + self.camera.pos;
-    
+
     con.put_char_ex(
       npos.x as i32, 
       npos.y as i32, 

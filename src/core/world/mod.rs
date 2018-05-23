@@ -1,7 +1,7 @@
 
 pub mod dungeon;
 use self::dungeon::Dungeon;
-use self::dungeon::map::{Grid, Tile, TileType};
+use self::dungeon::map::{Grid, Tile, TileType, ScentType, SCENT_TYPES};
 
 use core::object::{Creature, Fighter, Entity, RGB};
 use core::object::ai::{SimpleAI, TrackerAI};
@@ -52,6 +52,7 @@ impl World {
             (pos.0 as isize, pos.1 as isize)
           }, 
           (255, 0, 0), (0, 0, 0), 
+          ScentType::Insectoid,
           SimpleAI::new()
         )
       )
@@ -67,6 +68,7 @@ impl World {
             (pos.0 as isize, pos.1 as isize)
           },  
           (150, 150, 0), (0, 0, 0), 
+          ScentType::Insectoid,
           SimpleAI::new()
         )
       )
@@ -82,6 +84,7 @@ impl World {
             (pos.0 as isize, pos.1 as isize)
           },  
           (150, 0, 150), (0, 0, 0), 
+          ScentType::Mammalian,
           TrackerAI::new()
         )
       )
@@ -97,6 +100,7 @@ impl World {
             (pos.0 as isize, pos.1 as isize)
           },  
           (150, 150, 150), (0, 0, 0), 
+          ScentType::Mammalian,
           TrackerAI::new()
         )
       )
@@ -283,7 +287,7 @@ impl World {
     for nx in -1..2 {
       for ny in -1..2 {
         if self.is_valid((self.player.pos.x - nx) as usize, (self.player.pos.y - ny) as usize) {
-          self.cur_dungeon.grid[(self.player.pos.x - nx) as usize][(self.player.pos.y - ny) as usize].scent = SC_INC;
+          self.cur_dungeon.grid[(self.player.pos.x - nx) as usize][(self.player.pos.y - ny) as usize].scents[0].val = SC_INC;
         }
       }
     }
@@ -293,59 +297,69 @@ impl World {
       for nx in -1..2 {
         for ny in -1..2 {
           if self.is_valid((c.fighter.pos.x - nx) as usize, (c.fighter.pos.y - ny) as usize) {
-            self.cur_dungeon.grid[(c.fighter.pos.x - nx) as usize][(c.fighter.pos.y - ny) as usize].scent = SC_INC;
+            match c.scent_type {
+              ScentType::Insectoid => {
+                self.cur_dungeon.grid[(c.fighter.pos.x - nx) as usize][(c.fighter.pos.y - ny) as usize].scents[1].val = SC_INC;
+              },
+              ScentType::Mammalian => {
+                self.cur_dungeon.grid[(c.fighter.pos.x - nx) as usize][(c.fighter.pos.y - ny) as usize].scents[2].val = SC_INC;
+              },
+              _ => {unreachable!("Should never have a scent type that isn't defined here")}
+            }
           }
         }
       }
     }
 
-    // Create buffer
-    let buffer = self.cur_dungeon.grid.clone();
+    for s in 0..SCENT_TYPES {
+      // Create buffer
+      let buffer = self.cur_dungeon.grid.clone();
 
-    let filter = |tile: &Tile| -> f32 {
-      // So, interestingly, if a tile has no scent and is given 0.0 scent after the filter,
-      // it creates square scents that travel further, though for some reason a 0.1 value there creates
-      // very nice circular scents... I assume this is due to averages now being fuzzy in terms of accuracy?
-      if tile.scent == 0 { 0.1 } else { 1.0 }
-    };
+      let filter = |tile: &Tile| -> f32 {
+        // So, interestingly, if a tile has no scent and is given 0.0 scent after the filter,
+        // it creates square scents that travel further, though for some reason a 0.1 value there creates
+        // very nice circular scents... I assume this is due to averages now being fuzzy in terms of accuracy?
+        if tile.scents[s].val == 0 { 0.1 } else { 1.0 }
+      };
 
-    // Return an f32 value that is the average value of `Scent`s surrounding the desired position, with a slight decay factor  
-    // This is not a "true" average of all neighboring `Scent`s.
-    let avg_of_neighbors = |x: usize, y: usize| -> f32 {
-      // Add all tile values
-      (
-      buffer[x - 1][  y  ].scent as f32 +
-      buffer[x + 1][  y  ].scent as f32 +
-      buffer[  x  ][y - 1].scent as f32 +
-      buffer[  x  ][y + 1].scent as f32 +
-      buffer[x + 1][y + 1].scent as f32 +
-      buffer[x - 1][y - 1].scent as f32 +
-      buffer[x + 1][y - 1].scent as f32 +
-      buffer[x - 1][y + 1].scent as f32
-      ) / 
-      
-      // Divide by num tiles present, to get the average
-      // Add some value to reduce size of bloom 
-      (((
-      filter(&buffer[x - 1][  y  ]) +
-      filter(&buffer[x + 1][  y  ]) +
-      filter(&buffer[  x  ][y - 1]) +
-      filter(&buffer[  x  ][y + 1]) +
-      filter(&buffer[x + 1][y + 1]) +
-      filter(&buffer[x - 1][y - 1]) +
-      filter(&buffer[x + 1][y - 1]) +
-      filter(&buffer[x - 1][y + 1]
-      )) + SC_BLOOM_CUTOFF) 
-      
-      // Decay factor
-      * SC_DECAY)
-    };
+      // Return an f32 value that is the average value of `Scent`s surrounding the desired position, with a slight decay factor  
+      // This is not a "true" average of all neighboring `Scent`s.
+      let avg_of_neighbors = |x: usize, y: usize| -> f32 {
+        // Add all tile values
+        (
+        buffer[x - 1][  y  ].scents[s].val as f32 +
+        buffer[x + 1][  y  ].scents[s].val as f32 +
+        buffer[  x  ][y - 1].scents[s].val as f32 +
+        buffer[  x  ][y + 1].scents[s].val as f32 +
+        buffer[x + 1][y + 1].scents[s].val as f32 +
+        buffer[x - 1][y - 1].scents[s].val as f32 +
+        buffer[x + 1][y - 1].scents[s].val as f32 +
+        buffer[x - 1][y + 1].scents[s].val as f32
+        ) / 
+        
+        // Divide by num tiles present, to get the average
+        // Add some value to reduce size of bloom 
+        (((
+        filter(&buffer[x - 1][  y  ]) +
+        filter(&buffer[x + 1][  y  ]) +
+        filter(&buffer[  x  ][y - 1]) +
+        filter(&buffer[  x  ][y + 1]) +
+        filter(&buffer[x + 1][y + 1]) +
+        filter(&buffer[x - 1][y - 1]) +
+        filter(&buffer[x + 1][y - 1]) +
+        filter(&buffer[x - 1][y + 1]
+        )) + SC_BLOOM_CUTOFF) 
+        
+        // Decay factor
+        * SC_DECAY)
+      };
 
-    // Change values of map based on averages from the buffer
-    for x in 0..self.cur_dungeon.width {
-      for y in 0..self.cur_dungeon.height {
-        if self.is_valid(x, y) {
-          self.cur_dungeon.grid[x][y].scent = avg_of_neighbors(x, y) as u8;
+      // Change values of map based on averages from the buffer
+      for x in 0..self.cur_dungeon.width {
+        for y in 0..self.cur_dungeon.height {
+          if self.is_valid(x, y) {
+            self.cur_dungeon.grid[x][y].scents[s].val = avg_of_neighbors(x, y) as u8;
+          }
         }
       }
     }

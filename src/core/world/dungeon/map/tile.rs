@@ -35,6 +35,34 @@ pub enum Biome {
 }
 
 ///
+/// Scents
+/// 
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum ScentType {
+  Player,
+  Insectoid,
+  Mammalian
+}
+pub const SCENT_TYPES : usize = 3;
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub struct Scent {
+  pub val: u8,
+  pub scent_type: ScentType
+}
+
+impl Scent {
+
+  pub fn new(value: u8, scent_type: ScentType) -> Scent {
+    Scent {
+      val: value,
+      scent_type: scent_type
+    }
+  }
+
+}
+
+///
 /// Tile represents an environmental entity
 /// 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -44,7 +72,7 @@ pub struct Tile {
   fg: RGB,
   bg: RGB,
   pub biome: Biome,
-  pub scent: u8,
+  pub scents: Vec<Scent>,
   pub sound: u8, // Not in use (yet)
   pub tiletype: TileType,
   pub seen: bool
@@ -63,7 +91,7 @@ impl Tile {
       fg: RGB::from_tup(fg),
       bg: RGB::from_tup(bg),
       biome: Biome::Dungeon,
-      scent: 0,
+      scents: vec![Scent::new(0, ScentType::Player), Scent::new(0, ScentType::Insectoid), Scent::new(0, ScentType::Mammalian)],
       sound: 0,
       tiletype: tiletype,
       seen: false
