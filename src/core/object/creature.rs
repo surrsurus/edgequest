@@ -16,6 +16,7 @@ pub struct Creature {
 
 impl Creature {
 
+  #[inline]
   pub fn new<T: AI + 'static>(name: &'static str, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), scent_type: ScentType, ai: T) -> Creature {
     Creature {
       fighter: Fighter::new(name, glyph, pos, fg, bg),

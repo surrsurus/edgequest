@@ -1,6 +1,8 @@
 use core::object::{Entity, RGB};
 
+// Used to darken tiles that are out of sight
 pub const DARKEN_FAC : RGB = RGB(10, 10, 10);
+// Used to lighten tiles that are in the FoV
 pub const YELLOW_FAC : RGB = RGB(27, 24, 22);
 
 ///
@@ -43,6 +45,7 @@ pub enum ScentType {
   Insectoid,
   Mammalian
 }
+// This is mmmmmm not good
 pub const SCENT_TYPES : usize = 3;
 
 #[derive(Clone, PartialEq, Eq, Debug)]
@@ -53,6 +56,7 @@ pub struct Scent {
 
 impl Scent {
 
+  #[inline]
   pub fn new(value: u8, scent_type: ScentType) -> Scent {
     Scent {
       val: value,

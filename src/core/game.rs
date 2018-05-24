@@ -19,7 +19,7 @@ pub enum Actions {
   DownStair,
   // Player went up
   UpStair,
-  // Unknown action
+  // Unknown action (Player pressed unbound key)
   Unknown
 }
 
@@ -54,7 +54,8 @@ impl Game {
   pub fn process_keypress(&mut self, keypress: input::Key) {
 
     match keypress.code {
-
+      
+      // If the keycode isn't escape we continue checking for important keys
       input::KeyCode::Escape => panic!("Bye"),
       _ => { 
   
@@ -63,7 +64,8 @@ impl Game {
           let oldpos = self.world.player.pos.clone();
         
           match keypress.printable {
-
+            
+            // Movement keys are bound to vim-like controls (hjklyubn)
             'h' => { 
               self.world.player.move_cart(-1, 0);
               self.state = State::Act(Actions::Move);
@@ -96,17 +98,23 @@ impl Game {
               self.world.player.move_cart(1, 1);
               self.state = State::Act(Actions::Move);
             },
+            // "Regenerate" current level
             'w' => {
               self.world.test_traverse();
               self.state = State::Debug;
             },
+            // Create an empty level for testing
             'q' => {
               self.world.test_empty();
               self.state = State::Debug;
             },
+            // Wait
             '.' => { self.state = State::Act(Actions::Wait) },
+            // Go downstars (if possible)
             '>' => { self.state = State::Act(Actions::DownStair) },
+            // Go upstairs (if possible)
             '<' => { self.state = State::Act(Actions::UpStair) },
+            // Unbound key, so we just say we don't know what the player did
             _ => { self.state = State::Act(Actions::Unknown) }
             
           }
@@ -119,6 +127,7 @@ impl Game {
         } 
         
         /* 
+        // Prints keycode to console in case if you're trying to find a key that isn't intutive
         else {
           println!("{:?}", keypress.code);
         }
@@ -150,7 +159,10 @@ impl Game {
   ///
   pub fn update(&mut self) {
     match &self.state {
+      // Moving or waiting prompts a world update
       &State::Act(Actions::Move) | &State::Act(Actions::Wait) => self.world.update(),
+
+      // Trying to go up and downstairs prompts the respective response from world
       &State::Act(Actions::DownStair) => {
         if self.world.can_go_down() {
           self.world.go_down();
@@ -161,8 +173,11 @@ impl Game {
           self.world.go_up();
         }
       }
+      
+      // All other variants are dropped
       _ => ()
     }
+    // TODO ...Does this need to be here? :thinking:
     self.world.tcod_map.compute_fov(self.world.player.pos.x as i32, self.world.player.pos.y as i32, 20, true, FovAlgorithm::Shadow);
   }
 

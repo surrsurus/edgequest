@@ -45,16 +45,22 @@ use self::yaml_rust::YamlLoader;
 ///
 #[derive(Clone)]
 pub struct Config {
-  // i32 because of tcod
+
   pub screen_width: isize,
   pub screen_height: isize,
+
   pub map_width: isize,
   pub map_height: isize,
+
   pub fullscreen: bool,
+
   pub fontpath: String,
+
   pub fonttype: console::FontType,
   pub fontlayout: console::FontLayout,
-  pub renderer: console::Renderer,
+
+  pub renderer: console::Renderer
+
 }
 
 ///
@@ -122,7 +128,7 @@ pub fn load(path: &str) -> Config {
   // Return a Config struct
   return Config { 
 
-    // screen_width and screen_height can only be read as i64s so we use as i32
+    // screen_width and screen_height can only be read as i64s so we use as isize
     // to convert them down
     screen_width: cfg["screen_width"].as_i64().unwrap() as isize,
     screen_height: cfg["screen_height"].as_i64().unwrap() as isize,

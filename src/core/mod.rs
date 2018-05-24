@@ -52,6 +52,7 @@ pub fn play() {
 
     // Capture keypresses
     let keypress = root.wait_for_keypress(true);
+    // Capture debug keys
     if keypress.printable == 'r' {
       ren.sc_debug = !ren.sc_debug;
       ren.draw_all(&mut root, &mut game.world);
@@ -61,6 +62,7 @@ pub fn play() {
       game.update();
       ren.draw_all(&mut root, &mut game.world);
     }
+    // Capture game keys (Keys that change the state of the player)
     game.process_keypress(keypress);
 
     // Update game

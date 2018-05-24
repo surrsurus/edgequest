@@ -196,7 +196,7 @@ impl World {
       _ => return false
     }
   }
-
+  
   pub fn go_down(&mut self) {
     self.test_traverse();
   }
@@ -216,7 +216,7 @@ impl World {
   }
 
   ///
-  /// Temporary function for stair traversal. In the future floors will need to be saved.
+  /// Temporary function for stair traversal. In the future floors will need to be saved
   ///
   pub fn test_traverse(&mut self) {
     let d = World::create_test_dungeon((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize));
@@ -232,6 +232,9 @@ impl World {
     self.player.pos.y = start_loc.1 as isize;
   }
 
+  ///
+  /// Return a tcod map based on dungeon features (Essentially what walls you can walk and see through)
+  ///
   pub fn new_tcod_map(map_dim: (isize, isize), dungeon: &Dungeon) -> Map {
     let mut tm = Map::new(map_dim.0 as i32, map_dim.1 as i32);
 
@@ -258,6 +261,8 @@ impl World {
   /// 
   pub fn new(map_dim: (isize, isize)) -> World {
 
+    // Create a basic dungeon, tcod map from that dungeon, and a grid we can
+    // put test creatures on.
     let d = World::create_test_dungeon(map_dim);
     let g = d.grid.clone();
     let tm =  World::new_tcod_map(map_dim, &d);
@@ -292,7 +297,7 @@ impl World {
       }
     }
 
-    // Make creatures smell
+    // Make creatures smell based on their smell type
     for c in &self.creatures {
       for nx in -1..2 {
         for ny in -1..2 {

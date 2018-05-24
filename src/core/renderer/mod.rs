@@ -105,6 +105,7 @@ impl Renderer {
 
               },
               _ => {
+                // Draw a tile slightly more vibrant than it actually is 
                 self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].yellowish());
               }
             }
@@ -116,6 +117,7 @@ impl Renderer {
             // Draw certain tiles depending on their types
             match world.cur_dungeon.grid[x][y].tiletype {
               _ => {
+                // Draw a tile slightly darker than it actually is 
                 self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].darken());
               }
             }

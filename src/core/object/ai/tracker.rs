@@ -10,6 +10,7 @@ use core::object::ai::AI;
 pub struct TrackerAI;
 
 impl TrackerAI {
+  #[inline]
   pub fn new() -> TrackerAI {
     TrackerAI {}
   }
