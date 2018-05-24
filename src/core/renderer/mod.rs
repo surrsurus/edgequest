@@ -42,7 +42,7 @@ impl Renderer {
 
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
-        let mut color : (u8, u8, u8) = (dungeon.grid[x][y].scents[0].val + 50, dungeon.grid[x][y].scents[1].val + 25, dungeon.grid[x][y].scents[2].val + 50 );
+        let mut color : (u8, u8, u8) = (dungeon.grid[x][y].scents[0].val + 50 + dungeon.grid[x][y].scents[3].val, dungeon.grid[x][y].scents[1].val + 25 + dungeon.grid[x][y].scents[3].val, dungeon.grid[x][y].scents[2].val + 50 );
         for s in 0..SCENT_TYPES {
           if dungeon.grid[x][y].scents[s].val > 0 {
             self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(

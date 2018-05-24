@@ -40,13 +40,19 @@ pub enum Biome {
 /// Scents
 /// 
 #[derive(Clone, PartialEq, Eq, Debug)]
+pub enum MammalianScents {
+  Canine,
+  Feline
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub enum ScentType {
   Player,
   Insectoid,
-  Mammalian
+  Mammalian(MammalianScents)
 }
 // This is mmmmmm not good
-pub const SCENT_TYPES : usize = 3;
+pub const SCENT_TYPES : usize = 4;
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Scent {
@@ -95,7 +101,12 @@ impl Tile {
       fg: RGB::from_tup(fg),
       bg: RGB::from_tup(bg),
       biome: Biome::Dungeon,
-      scents: vec![Scent::new(0, ScentType::Player), Scent::new(0, ScentType::Insectoid), Scent::new(0, ScentType::Mammalian)],
+      scents: vec![
+        Scent::new(0, ScentType::Player), 
+        Scent::new(0, ScentType::Insectoid), 
+        Scent::new(0, ScentType::Mammalian(MammalianScents::Canine)), 
+        Scent::new(0, ScentType::Mammalian(MammalianScents::Feline))
+      ],
       sound: 0,
       tiletype: tiletype,
       seen: false

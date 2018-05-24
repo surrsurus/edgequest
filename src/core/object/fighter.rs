@@ -24,7 +24,7 @@ impl Fighter {
   /// `x` and `y` can be positive or negative.
   /// 
   /// * `x` - ammount to move in the x direction
-  /// * `y` - ammount to move in the x direction
+  /// * `y` - ammount to move in the y direction
   /// 
   #[inline]
   pub fn move_cart(&mut self, x: isize, y: isize) {

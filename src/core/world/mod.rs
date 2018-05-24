@@ -1,17 +1,17 @@
 
 pub mod dungeon;
 use self::dungeon::Dungeon;
-use self::dungeon::map::{Grid, Tile, TileType, ScentType, SCENT_TYPES};
+use self::dungeon::map::{Grid, Tile, TileType, MammalianScents, ScentType, SCENT_TYPES};
 
 use core::object::{Creature, Fighter, Entity, RGB};
-use core::object::ai::{SimpleAI, TrackerAI};
+use core::object::ai::{SimpleAI, TrackerAI, BlinkAI};
 
 use core::tcod::map::Map;
 
 ///
 /// What value the player sets the scent of nearby tiles to
 /// 
-const SC_INC : u8 = 150;
+const SC_INC : u8 = 100;
 
 ///
 /// Affects bloom distance. Higher values means less bloom
@@ -92,7 +92,7 @@ impl World {
             (pos.0 as isize, pos.1 as isize)
           },  
           (150, 0, 150), (0, 0, 0), 
-          ScentType::Mammalian,
+          ScentType::Mammalian(MammalianScents::Feline),
           TrackerAI::new()
         )
       )
@@ -101,15 +101,15 @@ impl World {
     creatures.push(
       Box::new(
         Creature::new(
-          "dog", 
+          "blink hound", 
           'd', 
           {
             let pos = Dungeon::get_valid_location(&g);
             (pos.0 as isize, pos.1 as isize)
           },  
           (150, 150, 150), (0, 0, 0), 
-          ScentType::Mammalian,
-          TrackerAI::new()
+          ScentType::Mammalian(MammalianScents::Canine),
+          BlinkAI::new()
         )
       )
     );
@@ -328,7 +328,8 @@ impl World {
       let cy = c.fighter.pos.y;
       let st = match c.scent_type {
         ScentType::Insectoid => 1,
-        ScentType::Mammalian => 2,
+        ScentType::Mammalian(MammalianScents::Feline) => 2,
+        ScentType::Mammalian(MammalianScents::Canine) => 3,
         _ => {unreachable!("Should never have a scent type that isn't defined here")}
       };
       cinf.push((cx, cy, st));

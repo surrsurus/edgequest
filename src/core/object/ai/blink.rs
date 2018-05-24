@@ -9,25 +9,22 @@ extern crate rand;
 use self::rand::{thread_rng, Rng};
 
 ///
-/// SimpleAI is literally just an AI that walks around randomly
-///
-/// NOTE: There is really no intention to keep this AI around... Maybe as a confused AI?
-/// Definitely will be replaced/refactored.
+/// BlinkAI makes monster teleport around the map periodically
 ///
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct SimpleAI {
+pub struct BlinkAI {
   properties: Vec<MovementTypes>
 }
 
-impl SimpleAI {
-  pub fn new() -> SimpleAI {
-    SimpleAI {
-      properties: vec![MovementTypes::Dumb]
+impl BlinkAI {
+  pub fn new() -> BlinkAI {
+    BlinkAI {
+      properties: vec![MovementTypes::Blink]
     }
   }
 }
 
-impl AI for SimpleAI {
+impl AI for BlinkAI {
   
   ///
   /// Walk around randomly
@@ -37,28 +34,44 @@ impl AI for SimpleAI {
     let mut rng = thread_rng();
     let mut dice : i32;
     
-    let mut x : usize;
-    let mut y : usize;
+    let mut x : isize;
+    let mut y : isize;
     let mut count : usize = 0;
     loop {
       count += 1;
-      x = me.pos.x as usize;
-      y = me.pos.y as usize;
-      dice = rng.gen_range(1, 5);
+      x = me.pos.x;
+      y = me.pos.y;
+      dice = rng.gen_range(1, 6);
       match dice {
         1 => x += 1,
         2 => x -= 1,
         3 => y += 1,
         4 => y -= 1,
+        5 => {
+          x += rng.gen_range(-8, 8);
+          y += rng.gen_range(-8, 8);
+          if x < 0 {
+            x = 0;
+          }
+          if y < 0 {
+            y = 0;
+          }
+          if y > map[0].len() as isize {
+            y = map[0].len() as isize;
+          }
+          if x > map.len() as isize {
+            x = map.len() as isize;
+          }
+        },
         _ => unreachable!("dice machine broke")
       }
 
-      match map[x][y].tiletype {
+      match map[x as usize][y as usize].tiletype {
         TileType::Floor => break,
         _ => {
           if count > 100 {
-            x = me.pos.x as usize;
-            y = me.pos.y as usize;
+            x = me.pos.x;
+            y = me.pos.y;
             break; 
           }
         }

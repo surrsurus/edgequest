@@ -3,6 +3,13 @@ use core::world::dungeon::map::Tile;
 
 use core::object::Fighter;
 
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum MovementTypes {
+  Dumb,
+  Track,
+  Blink
+}
+
 ///
 /// Represents basic actions AI can take in the game
 ///
