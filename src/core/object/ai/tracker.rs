@@ -7,6 +7,7 @@ use core::object::ai::AI;
 ///
 /// AI that tracks player
 ///
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct TrackerAI;
 
 impl TrackerAI {

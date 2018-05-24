@@ -13,6 +13,7 @@ use self::rand::{thread_rng, Rng};
 /// NOTE: There is really no intention to keep this AI around... Maybe as a confused AI?
 /// Definitely will be replaced/refactored.
 ///
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct SimpleAI;
 
 impl SimpleAI {

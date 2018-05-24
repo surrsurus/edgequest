@@ -8,7 +8,6 @@ use core::object::ai::{SimpleAI, TrackerAI};
 
 use core::tcod::map::Map;
 
-
 ///
 /// What value the player sets the scent of nearby tiles to
 /// 
@@ -25,6 +24,15 @@ const SC_BLOOM_CUTOFF : f32 = 0.05;
 /// Currently 255/256
 /// 
 const SC_DECAY : f32 = 0.99609375;
+
+///
+/// Diameter of scent around creatures, should be odd for best effect
+///
+const SC_DIAM : isize = 3;
+// Upper index for ranges
+const SC_DIAM_UPPER : isize = ((SC_DIAM / 2) + 1);
+// Lower index for ranges
+const SC_DIAM_LOWER : isize = -(SC_DIAM / 2);
 
 pub struct World {
   pub player: Fighter,
@@ -166,9 +174,11 @@ impl World {
   ///
   /// Check to see if a specific tile is valid, i.e. walkable and in the map bounds
   ///
-  pub fn is_valid(&self, x: usize, y: usize) -> bool {
-    if x > 0 && x + 1 < self.cur_dungeon.width && y > 0 && y + 1 < self.cur_dungeon.height {
-      match self.cur_dungeon.grid[x][y].tiletype {
+  pub fn is_valid(&self, x: isize, y: isize) -> bool {
+    let tx = x as usize;
+    let ty = y as usize;
+    if tx > 0 && tx + 1 < self.cur_dungeon.width && ty > 0 && ty + 1 < self.cur_dungeon.height {
+      match self.cur_dungeon.grid[tx][ty].tiletype {
         TileType::Floor | TileType::DownStair | TileType::UpStair | TileType::Water => return true,
         _ => {}
       }
@@ -191,7 +201,7 @@ impl World {
   /// Go downstairs
   ///
   pub fn can_go_down(&self) -> bool {
-    match self.cur_dungeon.grid[self.player.pos.x as usize][self.player.pos.y as usize].tiletype {
+    match self.get_tile_at(self.player.pos.x, self.player.pos.y).tiletype {
       TileType::DownStair => return true,
       _ => return false
     }
@@ -205,7 +215,7 @@ impl World {
   /// Go upstairs
   ///
   pub fn can_go_up(&self) -> bool {
-    match self.cur_dungeon.grid[self.player.pos.x as usize][self.player.pos.y as usize].tiletype {
+    match self.get_tile_at(self.player.pos.x, self.player.pos.y).tiletype {
       TileType::UpStair => return true,
       _ => return false
     }
@@ -283,39 +293,63 @@ impl World {
   
   }
 
+  // Get a mutable reference to a tile at a point on the current dungeon
+  pub fn get_mut_tile_at(&mut self, x: isize, y: isize) -> &mut Tile {
+    &mut self.cur_dungeon.grid[x as usize][y as usize]
+  }
+
+  // Get an immutable reference to a tile at a point on the current dungeon
+  pub fn get_tile_at(&self, x: isize, y: isize) -> &Tile {
+    &self.cur_dungeon.grid[x as usize][y as usize]
+  }
+
   ///
   /// Update the scent map
   ///
   fn update_scent(&mut self) {
 
     // Create initial bloom around player
-    for nx in -1..2 {
-      for ny in -1..2 {
-        if self.is_valid((self.player.pos.x - nx) as usize, (self.player.pos.y - ny) as usize) {
-          self.cur_dungeon.grid[(self.player.pos.x - nx) as usize][(self.player.pos.y - ny) as usize].scents[0].val = SC_INC;
+    let px = self.player.pos.x;
+    let py = self.player.pos.y;
+    for nx in SC_DIAM_LOWER..SC_DIAM_UPPER {
+      for ny in SC_DIAM_LOWER..SC_DIAM_UPPER {
+        if self.is_valid(px - nx, py - ny) {
+          self.get_mut_tile_at(px - nx, py - ny).scents[0].val = SC_INC;
         }
       }
     }
 
-    // Make creatures smell based on their smell type
+    // Save information about creatures
+    // We can't do a self.get_tile_at due to the fact we iterate over a &self
+    // but need a &mut self for that function.
+    let mut cinf = vec![];
     for c in &self.creatures {
-      for nx in -1..2 {
-        for ny in -1..2 {
-          if self.is_valid((c.fighter.pos.x - nx) as usize, (c.fighter.pos.y - ny) as usize) {
-            match c.scent_type {
-              ScentType::Insectoid => {
-                self.cur_dungeon.grid[(c.fighter.pos.x - nx) as usize][(c.fighter.pos.y - ny) as usize].scents[1].val = SC_INC;
-              },
-              ScentType::Mammalian => {
-                self.cur_dungeon.grid[(c.fighter.pos.x - nx) as usize][(c.fighter.pos.y - ny) as usize].scents[2].val = SC_INC;
-              },
-              _ => {unreachable!("Should never have a scent type that isn't defined here")}
-            }
+      let cx = c.fighter.pos.x;
+      let cy = c.fighter.pos.y;
+      let st = match c.scent_type {
+        ScentType::Insectoid => 1,
+        ScentType::Mammalian => 2,
+        _ => {unreachable!("Should never have a scent type that isn't defined here")}
+      };
+      cinf.push((cx, cy, st));
+    }
+
+    // For pair in creature information
+    for p in &cinf {
+      // Unpack
+      let cx = p.0;
+      let cy = p.1;
+      let st = p.2;
+      for nx in SC_DIAM_LOWER..SC_DIAM_UPPER {
+        for ny in SC_DIAM_LOWER..SC_DIAM_UPPER {
+          if self.is_valid(cx - nx, cy - ny) {
+            self.get_mut_tile_at(cx - nx, cy - ny).scents[st].val = SC_INC;
           }
         }
       }
     }
-
+    
+    // Create individual averages for each scent
     for s in 0..SCENT_TYPES {
       // Create buffer
       let buffer = self.cur_dungeon.grid.clone();
@@ -362,7 +396,7 @@ impl World {
       // Change values of map based on averages from the buffer
       for x in 0..self.cur_dungeon.width {
         for y in 0..self.cur_dungeon.height {
-          if self.is_valid(x, y) {
+          if self.is_valid(x as isize, y as isize) {
             self.cur_dungeon.grid[x][y].scents[s].val = avg_of_neighbors(x, y) as u8;
           }
         }
