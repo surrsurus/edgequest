@@ -352,7 +352,8 @@ impl World {
     
     // Create individual averages for each scent
 
-    // Create buffer
+    // Create buffer for scent updating, only create one
+    // because we never change it
     let buffer = self.cur_dungeon.grid.clone();
 
     for s in 0..SCENT_TYPES {
