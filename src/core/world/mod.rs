@@ -97,7 +97,7 @@ impl World {
         )
       )
     );
-
+    
     creatures.push(
       Box::new(
         Creature::new(
@@ -351,9 +351,11 @@ impl World {
     }
     
     // Create individual averages for each scent
+
+    // Create buffer
+    let buffer = self.cur_dungeon.grid.clone();
+
     for s in 0..SCENT_TYPES {
-      // Create buffer
-      let buffer = self.cur_dungeon.grid.clone();
 
       let filter = |tile: &Tile| -> f32 {
         // So, interestingly, if a tile has no scent and is given 0.0 scent after the filter,
