@@ -1,6 +1,6 @@
 //!
 //! Metapackage for renderer
-//! 
+//!
 
 pub mod camera;
 pub use self::camera::Camera;
@@ -12,20 +12,17 @@ use core::world::dungeon::Dungeon;
 use core::world::dungeon::map::tile;
 use core::world::dungeon::map::{Tile, TileType, ScentType};
 
-use core::object::{RGB, Pos, Entity};
-
 use core::tcod::{Console, console};
 
-extern crate rand;
-use self::rand::{thread_rng, Rng};
+use core::object::{Pos, Entity};
 
 ///
 /// Helper for rendering things to the screen
-/// 
+///
 /// Tracks the player and automatically scrolls the screen around to match where they go.
 /// This will never try to draw things outside of the given dimensions due to the way it handles
-/// determining whether something should be drawn or not. 
-/// 
+/// determining whether something should be drawn or not.
+///
 pub struct Renderer {
   // Camera object
   camera: Camera,
@@ -85,18 +82,16 @@ impl Renderer {
 
   ///
   /// Draw all.
-  /// 
+  ///
   /// You'll have to render this console to root (unless you passed root in)
   /// and always `flush()` the root console.
-  /// 
+  ///
   pub fn draw_all(&mut self, con: &mut Console, world: &mut World) {
 
     // Clear console
     con.clear();
 
     self.camera.move_to(world.player.fighter.pos);
-
-    let mut rng = thread_rng();
 
     // Draw seen tiles
     for x in 0..world.cur_dungeon.width {
@@ -106,33 +101,12 @@ impl Renderer {
           // And it's in the FOV
           if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
             match world.cur_dungeon.grid[x][y].tiletype {
-              TileType::Water => {
-
-                let mut t = world.cur_dungeon.grid[x][y].clone();
-                
-                match rng.gen_range(1, 11) as i32 {
-                  1 => {t = t.amplify_col(RGB(0, 0, 5));}
-                  2 => {t = t.amplify_col(RGB(0, 0, 10));}
-                  3 => {t = t.amplify_col(RGB(0, 0, 15));}
-                  4 => {t = t.amplify_col(RGB(0, 0, 20));}
-                  5 => {t = t.amplify_col(RGB(0, 2, 5));}
-                  6 => {t = t.amplify_col(RGB(0, 2, 10));}
-                  7 => {t = t.amplify_col(RGB(0, 2, 15));}
-                  8 => {t = t.amplify_col(RGB(0, 2, 20));}
-                  9 => {t = t.amplify_col(RGB(0, 2, 15));}
-                  10 => {t = t.amplify_col(RGB(0, 2, 10));}
-                  _ => unreachable!("whoopie looks like we made a fucky wucky")
-                }
-
-                self.draw_entity(con, Pos::new(x as isize, y as isize), &t);
-
-              },
               _ => {
-                // Draw a tile slightly more vibrant than it actually is 
+                // Draw a tile slightly more vibrant than it actually is
                 self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].yellowish());
               }
             }
-            
+
             world.cur_dungeon.grid[x][y].seen = true;
           }
           // And the tile has been seen...
@@ -140,14 +114,14 @@ impl Renderer {
             // Draw certain tiles depending on their types
             match world.cur_dungeon.grid[x][y].tiletype {
               _ => {
-                // Draw a tile slightly darker than it actually is 
+                // Draw a tile slightly darker than it actually is
                 self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].darken());
               }
             }
           }
-        } 
+        }
         // Debug just draw all tiles normally
-        else { 
+        else {
          match world.cur_dungeon.grid[x][y].tiletype {
             _ => {
               self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
@@ -195,14 +169,14 @@ impl Renderer {
     let npos = pos + self.camera.pos;
 
     con.put_char_ex(
-      npos.x as i32, 
-      npos.y as i32, 
+      npos.x as i32,
+      npos.y as i32,
       ce.get_glyph(),
       ce.get_fg().to_tcod(),
       // Backgrounds are just inherited from the world.
-      if self.fov { 
+      if self.fov {
         (world.get_bg_color_at(pos.x as usize, pos.y as usize) + tile::YELLOW_FAC).to_tcod()
-      } else { 
+      } else {
         (world.get_bg_color_at(pos.x as usize, pos.y as usize)).to_tcod()
       }
     );
@@ -211,12 +185,12 @@ impl Renderer {
 
   ///
   /// Put an `Entity` on the console
-  /// 
+  ///
   /// * `con` - Tcod `Console`
   /// * `entity` - `Entity`
-  /// 
+  ///
   pub fn draw_entity(&self, con: &mut Console, pos: Pos, ce: &Entity) {
-    
+
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
 
@@ -232,8 +206,8 @@ impl Renderer {
       );
     } else {
       con.put_char_ex(
-        pos.x as i32, 
-        pos.y as i32, 
+        pos.x as i32,
+        pos.y as i32,
         ce.get_glyph(),
         ce.get_fg().to_tcod(),
         ce.get_bg().to_tcod()
@@ -244,10 +218,10 @@ impl Renderer {
 
   ///
   /// Return a new `Renderer`
-  /// 
+  ///
   /// * `map` - `Pos` that holds the map dimensions
   /// * `screen` - `Pos` that holds the screen dimensions
-  /// 
+  ///
   #[inline]
   pub fn new(map: (isize, isize), screen: (isize, isize)) -> Renderer {
     Renderer { camera: Camera::new(map, screen), sc_debug: false, fov: true, so_debug: false }

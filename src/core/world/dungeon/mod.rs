@@ -18,9 +18,9 @@ use core::object::Entity;
 
 mod dungeon_tests;
 
-/// 
+///
 /// `Dungeon` struct to stitch together all builders and cellular automatons
-/// 
+///
 #[derive(Default)]
 pub struct Dungeon {
   pub width: usize,
@@ -32,7 +32,7 @@ impl Dungeon {
 
   ///
   /// Make the dungeon
-  /// 
+  ///
   pub fn build(&mut self) {
 
     // Apply simple builder first
@@ -41,16 +41,16 @@ impl Dungeon {
     let wall = Tile::new(
       "Wall",
       '#',
-      (40, 40, 40), 
-      (33, 33, 33), 
+      (40, 40, 40),
+      (33, 33, 33),
       TileType::Wall
     );
 
     let floor = Tile::new(
       "Floor",
       ' ',
-      (255, 255, 255), 
-      (20, 20, 20), 
+      (255, 255, 255),
+      (20, 20, 20),
       TileType::Floor
     );
 
@@ -58,9 +58,9 @@ impl Dungeon {
     let drunk = |chaos: f32, iter: u32, grid: &mut Grid<Tile> | -> Grid<Tile> {
       let d = DrunkardsWalk::new(chaos);
       d.generate(
-        grid, 
-        None, 
-        None, 
+        grid,
+        None,
+        None,
         Some(wall.clone()),
         floor.clone(),
         iter
@@ -163,7 +163,7 @@ impl Dungeon {
           match grid[x][y].tiletype {
             TileType::Wall | TileType::DownStair | TileType::UpStair => {},
             _ => {
-              grid[x][y].set_bg((0, 150, 150));
+              grid[x][y].set_bg((57, 144, 255));
               grid[x][y].tiletype = TileType::Water;
             }
           }
@@ -199,9 +199,9 @@ impl Dungeon {
 
   ///
   /// Get the player's starting location as a `Pos`
-  /// 
+  ///
   /// NOTE: Should be deprecated and removed once stairs show up
-  /// 
+  ///
   pub fn get_valid_location(grid: &Grid<Tile>) -> (usize, usize) {
     let mut rng = thread_rng();
     loop {
@@ -214,19 +214,19 @@ impl Dungeon {
       }
     }
   }
-  
-  /// 
+
+  ///
   /// Return a new `Dungeon`
-  /// 
+  ///
   pub fn new(map_dim: (usize, usize)) -> Dungeon {
     let g = Dungeon::generate_grid(map_dim.0, map_dim.1, Tile::new(
         "Wall",
         '#',
-        (40, 40, 40), 
-        (33, 33, 33), 
+        (40, 40, 40),
+        (33, 33, 33),
         TileType::Wall));
 
-    return Dungeon { 
+    return Dungeon {
       width: map_dim.0,
       height: map_dim.1,
       grid: g.clone(),
