@@ -10,7 +10,7 @@ use core::world::World;
 use core::world::dungeon::Dungeon;
 
 use core::world::dungeon::map::tile;
-use core::world::dungeon::map::{Tile, TileType, SCENT_TYPES};
+use core::world::dungeon::map::{Tile, TileType, ScentType};
 
 use core::object::{RGB, Pos, Entity};
 
@@ -44,7 +44,7 @@ impl Renderer {
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
         let mut color : (u8, u8, u8) = (dungeon.grid[x][y].scents[0].val + 50 + dungeon.grid[x][y].scents[3].val, dungeon.grid[x][y].scents[1].val + 25 + dungeon.grid[x][y].scents[3].val, dungeon.grid[x][y].scents[2].val + 50 );
-        for s in 0..SCENT_TYPES {
+        for s in 0..ScentType::Num as usize {
           if dungeon.grid[x][y].scents[s].val > 0 {
             self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
               "Debug Scent",

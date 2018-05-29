@@ -1,4 +1,5 @@
 use core::object::{Entity, RGB};
+use std::slice::Iter;
 
 // Used to darken tiles that are out of sight
 pub const DARKEN_FAC : RGB = RGB(10, 10, 10);
@@ -40,19 +41,25 @@ pub enum Biome {
 /// Scents
 /// 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub enum MammalianScents {
+pub enum ScentType {
+  Player = 0,
+  Insectoid,
   Canine,
-  Feline
+  Feline,
+  Num
 }
 
-#[derive(Clone, PartialEq, Eq, Debug)]
-pub enum ScentType {
-  Player,
-  Insectoid,
-  Mammalian(MammalianScents)
+impl ScentType {
+  pub fn iterator() -> Iter<'static, ScentType> {
+    static SCENT_TYPES: [ScentType;  ScentType::Num as usize] = [
+        ScentType::Player, 
+        ScentType::Insectoid, 
+        ScentType::Canine, 
+        ScentType::Feline
+      ];
+      SCENT_TYPES.into_iter()
+  }
 }
-// This is mmmmmm not good
-pub const SCENT_TYPES : usize = 4;
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Scent {
@@ -101,12 +108,14 @@ impl Tile {
       fg: RGB::from_tup(fg),
       bg: RGB::from_tup(bg),
       biome: Biome::Dungeon,
-      scents: vec![
-        Scent::new(0, ScentType::Player), 
-        Scent::new(0, ScentType::Insectoid), 
-        Scent::new(0, ScentType::Mammalian(MammalianScents::Feline)), 
-        Scent::new(0, ScentType::Mammalian(MammalianScents::Canine))
-      ],
+      // Create scents by iterating over ScentTypes
+      scents: {
+        let mut sv = vec![];
+        for s in ScentType::iterator() {
+          sv.push(Scent::new(0, s.clone()));
+        }
+        sv
+      },
       sound: 0,
       tiletype: tiletype,
       seen: false

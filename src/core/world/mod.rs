@@ -1,7 +1,7 @@
 
 pub mod dungeon;
 use self::dungeon::Dungeon;
-use self::dungeon::map::{Grid, Tile, TileType, MammalianScents, ScentType, SCENT_TYPES};
+use self::dungeon::map::{Grid, Tile, TileType, ScentType};
 
 use core::object::{Actions, Fighter, Creature, Entity, RGB};
 use core::object::ai::{SimpleAI, TrackerAI, BlinkAI};
@@ -100,7 +100,7 @@ impl World {
             (pos.0 as isize, pos.1 as isize)
           },  
           (150, 0, 150), (0, 0, 0), 
-          ScentType::Mammalian(MammalianScents::Feline),
+          ScentType::Feline,
           TrackerAI::new()
         )
       )
@@ -116,7 +116,7 @@ impl World {
             (pos.0 as isize, pos.1 as isize)
           },  
           (150, 150, 150), (0, 0, 0), 
-          ScentType::Mammalian(MammalianScents::Canine),
+          ScentType::Canine,
           BlinkAI::new()
         )
       )
@@ -372,7 +372,7 @@ impl World {
     // because we never change it
     let buffer = self.cur_dungeon.grid.clone();
 
-    for s in 0..SCENT_TYPES {
+    for s in 0..ScentType::Num as usize {
 
       let filter = |tile: &Tile| -> f32 {
         // So, interestingly, if a tile has no scent and is given 0.0 scent after the filter,
