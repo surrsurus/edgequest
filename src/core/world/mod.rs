@@ -8,21 +8,24 @@ use core::object::ai::{SimpleAI, TrackerAI, BlinkAI};
 
 use core::tcod::map::Map;
 
+extern crate rand;
+use self::rand::{thread_rng, Rng};
+
 ///
 /// What value the player sets the scent of nearby tiles to
-/// 
+///
 const SC_INC : u8 = 100;
 
 ///
 /// Affects bloom distance. Higher values means less bloom
-/// 
-const SC_BLOOM_CUTOFF : f32 = 0.05; 
+///
+const SC_BLOOM_CUTOFF : f32 = 0.05;
 
 ///
 /// Decay value applied to tiles inheriting scent from neighbors
-/// 
+///
 /// Currently 255/256
-/// 
+///
 const SC_DECAY : f32 = 0.99609375;
 
 ///
@@ -61,13 +64,13 @@ impl World {
     creatures.push(
       Box::new(
         Creature::new(
-          "ant", 
-          'a', 
+          "ant",
+          'a',
           {
             let pos = Dungeon::get_valid_location(&g);
             (pos.0 as isize, pos.1 as isize)
-          }, 
-          (255, 0, 0), (0, 0, 0), 
+          },
+          (255, 0, 0), (0, 0, 0),
           ScentType::Insectoid,
           SimpleAI::new()
         )
@@ -77,13 +80,13 @@ impl World {
     creatures.push(
       Box::new(
         Creature::new(
-          "bee", 
-          'b', 
+          "bee",
+          'b',
           {
             let pos = Dungeon::get_valid_location(&g);
             (pos.0 as isize, pos.1 as isize)
-          },  
-          (150, 150, 0), (0, 0, 0), 
+          },
+          (150, 150, 0), (0, 0, 0),
           ScentType::Insectoid,
           SimpleAI::new()
         )
@@ -93,29 +96,29 @@ impl World {
     creatures.push(
       Box::new(
         Creature::new(
-          "cat", 
-          'c', 
+          "cat",
+          'c',
           {
             let pos = Dungeon::get_valid_location(&g);
             (pos.0 as isize, pos.1 as isize)
-          },  
-          (150, 0, 150), (0, 0, 0), 
+          },
+          (150, 0, 150), (0, 0, 0),
           ScentType::Feline,
           TrackerAI::new()
         )
       )
     );
-    
+
     creatures.push(
       Box::new(
         Creature::new(
-          "blink hound", 
-          'd', 
+          "blink hound",
+          'd',
           {
             let pos = Dungeon::get_valid_location(&g);
             (pos.0 as isize, pos.1 as isize)
-          },  
-          (150, 150, 150), (0, 0, 0), 
+          },
+          (150, 150, 150), (0, 0, 0),
           ScentType::Canine,
           BlinkAI::new()
         )
@@ -143,7 +146,7 @@ impl World {
   /// Empty out the floor
   ///
   pub fn test_empty(&mut self) {
-    
+
     for x in 0..self.cur_dungeon.width {
       for y in 0..self.cur_dungeon.height {
         self.cur_dungeon.grid[x][y] = Tile::new(
@@ -158,7 +161,7 @@ impl World {
 
     let tm = World::new_tcod_map((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize), &self.cur_dungeon);
     self.tcod_map = tm;
-  
+
     self.creatures = Vec::new();
 
     self.player.fighter.pos.x = (self.cur_dungeon.width / 2) as isize;
@@ -167,14 +170,14 @@ impl World {
 
   ///
   /// Return a new player `Entity`
-  /// 
+  ///
   #[inline]
   fn fresh_player() -> Creature {
     Creature::new(
       "Player",
-      '@', 
-      (40, 25), 
-      (255, 255, 255), 
+      '@',
+      (40, 25),
+      (255, 255, 255),
       (0, 0, 0),
       ScentType::Player,
       SimpleAI::new()
@@ -216,7 +219,7 @@ impl World {
       _ => return false
     }
   }
-  
+
   pub fn go_down(&mut self) {
     self.test_traverse();
   }
@@ -242,7 +245,7 @@ impl World {
     let d = World::create_test_dungeon((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize));
     let g = d.grid.clone();
     let tm = World::new_tcod_map((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize), &d);
-    
+
     self.cur_dungeon = d;
     self.creatures = World::create_test_creatures(&g);
     self.tcod_map = tm;
@@ -276,9 +279,9 @@ impl World {
   }
 
 
-  /// 
+  ///
   /// Return a new `World`
-  /// 
+  ///
   pub fn new(map_dim: (isize, isize)) -> World {
 
     // Create a basic dungeon, tcod map from that dungeon, and a grid we can
@@ -288,19 +291,19 @@ impl World {
     let tm =  World::new_tcod_map(map_dim, &d);
 
     let mut w = World {
-      player: World::fresh_player(), 
+      player: World::fresh_player(),
       cur_dungeon: d,
       creatures: World::create_test_creatures(&g),
       dungeon_stack: Vec::new(),
       tcod_map: tm
     };
-      
+
     let start_loc = Dungeon::get_valid_location(&w.cur_dungeon.grid);
     w.player.fighter.pos.x = start_loc.0 as isize;
     w.player.fighter.pos.y = start_loc.1 as isize;
 
     return w;
-  
+
   }
 
   // Get a mutable reference to a tile at a point on the current dungeon
@@ -365,7 +368,7 @@ impl World {
         }
       }
     }
-    
+
     // Create individual averages for each scent
 
     // Create buffer for scent updating, only create one
@@ -381,7 +384,7 @@ impl World {
         if tile.scents[s].val == 0 { 0.1 } else { 1.0 }
       };
 
-      // Return an f32 value that is the average value of `Scent`s surrounding the desired position, with a slight decay factor  
+      // Return an f32 value that is the average value of `Scent`s surrounding the desired position, with a slight decay factor
       // This is not a "true" average of all neighboring `Scent`s.
       let avg_of_neighbors = |x: usize, y: usize| -> f32 {
         // Add all tile values
@@ -394,10 +397,10 @@ impl World {
         buffer[x - 1][y - 1].scents[s].val as f32 +
         buffer[x + 1][y - 1].scents[s].val as f32 +
         buffer[x - 1][y + 1].scents[s].val as f32
-        ) / 
-        
+        ) /
+
         // Divide by num tiles present, to get the average
-        // Add some value to reduce size of bloom 
+        // Add some value to reduce size of bloom
         (((
         filter(&buffer[x - 1][  y  ]) +
         filter(&buffer[x + 1][  y  ]) +
@@ -407,8 +410,8 @@ impl World {
         filter(&buffer[x - 1][y - 1]) +
         filter(&buffer[x + 1][y - 1]) +
         filter(&buffer[x - 1][y + 1]
-        )) + SC_BLOOM_CUTOFF) 
-        
+        )) + SC_BLOOM_CUTOFF)
+
         // Decay factor
         * SC_DECAY)
       };
@@ -488,14 +491,32 @@ impl World {
 
   }
 
+  fn update_water(&mut self) {
+    let mut rng = thread_rng();
+    let water_colors = vec![(51, 133, 255),
+                            (57, 144, 255),
+                            (54, 138, 255)];
+    for x in 0..self.cur_dungeon.width {
+      for y in 0..self.cur_dungeon.height {
+        match self.cur_dungeon.grid[x][y].tiletype {
+          TileType::Water => {
+            // Water tile should pick a new color from list of colors
+            self.cur_dungeon.grid[x][y].set_bg(water_colors[rng.gen_range(0, water_colors.len())]);
+          }
+          _ => {}
+        }
+      }
+    }
+  }
   ///
   /// Update the game world
-  /// 
+  ///
   pub fn update(&mut self) {
     self.update_scent();
     for c in &mut self.creatures {
       c.take_turn(&self.cur_dungeon.grid, &self.player)
     }
+    self.update_water();
     self.update_sound();
   }
 }
