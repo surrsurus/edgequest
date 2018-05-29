@@ -163,7 +163,7 @@ impl Dungeon {
           match grid[x][y].tiletype {
             TileType::Wall | TileType::DownStair | TileType::UpStair => {},
             _ => {
-              grid[x][y].set_bg((128, 179, 255));
+              grid[x][y].set_bg((57, 144, 255));
               grid[x][y].tiletype = TileType::Water;
             }
           }
