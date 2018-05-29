@@ -107,8 +107,10 @@ impl Renderer {
               }
             }
 
+            // Mark tile as seen if it's in the FoV
             world.cur_dungeon.grid[x][y].seen = true;
           }
+
           // And the tile has been seen...
           else if world.cur_dungeon.grid[x][y].seen {
             // Draw certain tiles depending on their types
@@ -120,6 +122,7 @@ impl Renderer {
             }
           }
         }
+
         // Debug just draw all tiles normally
         else {
          match world.cur_dungeon.grid[x][y].tiletype {
@@ -128,6 +131,7 @@ impl Renderer {
             }
           }
         }
+        
       }
     }
 

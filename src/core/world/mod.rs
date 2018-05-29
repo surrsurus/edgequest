@@ -37,13 +37,22 @@ const SC_DIAM_UPPER : isize = ((SC_DIAM / 2) + 1);
 // Lower index for ranges
 const SC_DIAM_LOWER : isize = -(SC_DIAM / 2);
 
+// Sound value, needs to be based on type of sound
 const SO_INC : u8 = 100;
 
+// Diameter of sound travel
 const SO_DIAM : isize = 15;
 // Upper index for ranges
 const SO_DIAM_UPPER : isize = ((SO_DIAM / 2) + 1);
 // Lower index for ranges
 const SO_DIAM_LOWER : isize = -(SO_DIAM / 2);
+
+// Water colors
+const WATER_COLORS : [(u8, u8, u8); 3] = [
+  (51, 133, 255),
+  (57, 144, 255),
+  (54, 138, 255)
+];
 
 pub struct World {
   pub player: Creature,
@@ -491,23 +500,26 @@ impl World {
 
   }
 
+  ///
+  /// Assign water tiles a new blue color
+  /// 
   fn update_water(&mut self) {
+    
     let mut rng = thread_rng();
-    let water_colors = vec![(51, 133, 255),
-                            (57, 144, 255),
-                            (54, 138, 255)];
     for x in 0..self.cur_dungeon.width {
       for y in 0..self.cur_dungeon.height {
         match self.cur_dungeon.grid[x][y].tiletype {
           TileType::Water => {
             // Water tile should pick a new color from list of colors
-            self.cur_dungeon.grid[x][y].set_bg(water_colors[rng.gen_range(0, water_colors.len())]);
+            self.cur_dungeon.grid[x][y].set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
           }
           _ => {}
         }
       }
     }
+
   }
+
   ///
   /// Update the game world
   ///
@@ -519,4 +531,5 @@ impl World {
     self.update_water();
     self.update_sound();
   }
+
 }
