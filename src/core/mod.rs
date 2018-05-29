@@ -57,6 +57,11 @@ pub fn play() {
       ren.sc_debug = !ren.sc_debug;
       ren.draw_all(&mut root, &mut game.world);
     }
+    if keypress.printable == 't' {
+      ren.so_debug = !ren.so_debug;
+      game.update();
+      ren.draw_all(&mut root, &mut game.world);
+    }
     if keypress.printable == 'f' {
       ren.fov = !ren.fov;
       game.update();

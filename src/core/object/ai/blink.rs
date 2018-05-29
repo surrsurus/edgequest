@@ -1,9 +1,8 @@
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, TileType};
 
-use core::object::Fighter;
+use core::object::{Actions, Creature, Fighter};
 use core::object::ai::AI;
-use core::object::ai::MovementTypes;
 
 extern crate rand;
 use self::rand::{thread_rng, Rng};
@@ -12,16 +11,35 @@ use self::rand::{thread_rng, Rng};
 /// BlinkAI makes monster teleport around the map periodically
 ///
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct BlinkAI {
-  properties: Vec<MovementTypes>
-}
+pub struct BlinkAI;
 
 impl BlinkAI {
-  pub fn new() -> BlinkAI {
-    BlinkAI {
-      properties: vec![MovementTypes::Blink]
+
+  pub fn blink(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Fighter) -> (isize, isize) {
+    let mut rng = thread_rng();
+    let mut x = me.pos.x;
+    let mut y = me.pos.y;
+    x += rng.gen_range(-8, 8);
+    y += rng.gen_range(-8, 8);
+    if x < 0 {
+      x = 0;
     }
+    if y < 0 {
+      y = 0;
+    }
+    if y >= (map[0].len() - 1) as isize {
+      y = (map[0].len() - 1) as isize;
+    }
+    if x >= (map.len() - 1) as isize {
+      x = (map.len() - 1) as isize;
+    }
+    return (x, y);
   }
+
+  pub fn new() -> BlinkAI {
+    BlinkAI {}
+  }
+
 }
 
 impl AI for BlinkAI {
@@ -29,18 +47,19 @@ impl AI for BlinkAI {
   ///
   /// Walk around randomly
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Fighter, me: &mut Fighter) {
+  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Fighter) -> Actions {
 
     let mut rng = thread_rng();
-    let mut dice : i32;
     
-    let mut x : isize;
-    let mut y : isize;
+    let mut x = me.pos.x;
+    let mut y = me.pos.y;
     let mut count : usize = 0;
+    let mut state = Actions::Move;
+
     loop {
       count += 1;
-      x = me.pos.x;
-      y = me.pos.y;
+
+      let dice : i32;
       dice = rng.gen_range(1, 6);
       match dice {
         1 => x += 1,
@@ -48,20 +67,10 @@ impl AI for BlinkAI {
         3 => y += 1,
         4 => y -= 1,
         5 => {
-          x += rng.gen_range(-8, 8);
-          y += rng.gen_range(-8, 8);
-          if x < 0 {
-            x = 0;
-          }
-          if y < 0 {
-            y = 0;
-          }
-          if y > map[0].len() as isize {
-            y = map[0].len() as isize;
-          }
-          if x > map.len() as isize {
-            x = map.len() as isize;
-          }
+          let bpos = self.blink(map, _player, me);
+          x = bpos.0;
+          y = bpos.1;
+          state = Actions::Blink;
         },
         _ => unreachable!("dice machine broke")
       }
@@ -80,6 +89,8 @@ impl AI for BlinkAI {
     
     me.pos.x = x as isize;
     me.pos.y = y as isize;
+
+    return state;
 
   }
 

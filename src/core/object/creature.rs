@@ -3,7 +3,7 @@ use core::object::ai::AI;
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, ScentType};
 
-use core::object::Fighter;
+use core::object::{Actions, Fighter};
 
 ///
 /// Creature holds a `Fighter` and an `AI`, basically a package that we can create monsters from
@@ -11,6 +11,7 @@ use core::object::Fighter;
 pub struct Creature {
   pub fighter: Fighter,
   pub scent_type: ScentType,
+  pub state: Actions,
   pub ai: Box<AI>
 }
 
@@ -21,12 +22,13 @@ impl Creature {
     Creature {
       fighter: Fighter::new(name, glyph, pos, fg, bg),
       scent_type: scent_type,
+      state: Actions::Unknown,
       ai: Box::new(ai)
     }
   }
 
-  pub fn take_turn(&mut self, map: &Grid<Tile>, player: &Fighter) {
-    self.ai.take_turn(map, player, &mut self.fighter);
+  pub fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature) {
+    self.state = self.ai.take_turn(map, player, &mut self.fighter);
   }
 
 }

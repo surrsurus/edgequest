@@ -30,7 +30,8 @@ pub struct Renderer {
   // Camera object
   camera: Camera,
   pub sc_debug: bool,
-  pub fov: bool
+  pub fov: bool,
+  pub so_debug: bool
 }
 
 impl Renderer {
@@ -61,6 +62,28 @@ impl Renderer {
   }
 
   ///
+  /// Render sound as blue cuz what other color would it be
+  ///
+  pub fn debug_render_sound_map(&mut self, con: &mut Console, dungeon: &Dungeon) {
+
+    for x in 0..dungeon.width {
+      for y in 0..dungeon.height {
+        let mut color : (u8, u8, u8) = (dungeon.grid[x][y].get_bg().0, dungeon.grid[x][y].get_bg().1, dungeon.grid[x][y].sound );
+        if dungeon.grid[x][y].sound > 0 {
+          self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
+            "Debug Sound",
+            ' ',
+            (255, 255, 255),
+            color,
+            TileType::Debug
+          ));
+        }
+      }
+    }
+
+  }
+
+  ///
   /// Draw all.
   /// 
   /// You'll have to render this console to root (unless you passed root in)
@@ -71,7 +94,7 @@ impl Renderer {
     // Clear console
     con.clear();
 
-    self.camera.move_to(world.player.pos);
+    self.camera.move_to(world.player.fighter.pos);
 
     let mut rng = thread_rng();
 
@@ -138,6 +161,10 @@ impl Renderer {
     if self.sc_debug {
       self.debug_render_scent_map(con, &world.cur_dungeon);
     }
+    if self.so_debug {
+      self.debug_render_sound_map(con, &world.cur_dungeon);
+    }
+
 
     for c in &world.creatures {
       // If fov is on...
@@ -153,7 +180,7 @@ impl Renderer {
 
     // Draw player. Player is always in the camera since
     // we move the camera over it.
-    self.draw_creature(con, world.player.pos, &world.player, world);
+    self.draw_creature(con, world.player.fighter.pos, &world.player.fighter, world);
 
   }
 
@@ -223,7 +250,7 @@ impl Renderer {
   /// 
   #[inline]
   pub fn new(map: (isize, isize), screen: (isize, isize)) -> Renderer {
-    Renderer { camera: Camera::new(map, screen), sc_debug: false, fov: true }
+    Renderer { camera: Camera::new(map, screen), sc_debug: false, fov: true, so_debug: false }
   }
 
 }

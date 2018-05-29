@@ -1,7 +1,7 @@
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, TileType};
 
-use core::object::Fighter;
+use core::object::{Actions, Creature, Fighter};
 use core::object::ai::AI;
 
 ///
@@ -20,21 +20,25 @@ impl TrackerAI {
 impl AI for TrackerAI {
   
   ///
-  /// Walk around randomly
+  /// Track player if near
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, player: &Fighter, me: &mut Fighter) {
+  fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature, me: &mut Fighter) -> Actions {
 
-    let distance = me.pos ^ player.pos;
+    let mut state = Actions::Wait;
+
+    let distance = me.pos ^ player.fighter.pos;
+    let mut x = me.pos.x;
+    let mut y = me.pos.y;
 
     if distance < 20.0 && distance > 2.00 {
-      let mut x = me.pos.x;
-      let mut y = me.pos.y;
-      
+
       // Move x
-      if x < player.pos.x {
+      if x < player.fighter.pos.x {
         x += 1;
-      } else if x > player.pos.x {
+        state = Actions::Move;
+      } else if x > player.fighter.pos.x {
         x -= 1;
+        state = Actions::Move;
       }
 
       // Check
@@ -44,10 +48,12 @@ impl AI for TrackerAI {
       }
 
       // Move y
-      if y < player.pos.y {
+      if y < player.fighter.pos.y {
         y += 1;
-      } else if y > player.pos.y {
+        state = Actions::Move;
+      } else if y > player.fighter.pos.y {
         y -= 1;
+        state = Actions::Move;
       }
 
       // Check
@@ -56,10 +62,12 @@ impl AI for TrackerAI {
         _ => {}
       }
 
-      me.pos.x = x;
-      me.pos.y = y;
-
     }
+    
+    me.pos.x = x as isize;
+    me.pos.y = y as isize;
+
+    return state;
 
   }
 

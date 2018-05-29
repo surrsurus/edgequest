@@ -83,7 +83,7 @@ pub struct Tile {
   bg: RGB,
   pub biome: Biome,
   pub scents: Vec<Scent>,
-  pub sound: u8, // Not in use (yet)
+  pub sound: u8,
   pub tiletype: TileType,
   pub seen: bool
 }
@@ -104,8 +104,8 @@ impl Tile {
       scents: vec![
         Scent::new(0, ScentType::Player), 
         Scent::new(0, ScentType::Insectoid), 
-        Scent::new(0, ScentType::Mammalian(MammalianScents::Canine)), 
-        Scent::new(0, ScentType::Mammalian(MammalianScents::Feline))
+        Scent::new(0, ScentType::Mammalian(MammalianScents::Feline)), 
+        Scent::new(0, ScentType::Mammalian(MammalianScents::Canine))
       ],
       sound: 0,
       tiletype: tiletype,

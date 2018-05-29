@@ -1,9 +1,8 @@
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, TileType};
 
-use core::object::Fighter;
+use core::object::{Actions, Creature, Fighter};
 use core::object::ai::AI;
-use core::object::ai::MovementTypes;
 
 extern crate rand;
 use self::rand::{thread_rng, Rng};
@@ -15,15 +14,11 @@ use self::rand::{thread_rng, Rng};
 /// Definitely will be replaced/refactored.
 ///
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct SimpleAI {
-  properties: Vec<MovementTypes>
-}
+pub struct SimpleAI;
 
 impl SimpleAI {
   pub fn new() -> SimpleAI {
-    SimpleAI {
-      properties: vec![MovementTypes::Dumb]
-    }
+    SimpleAI {}
   }
 }
 
@@ -32,10 +27,11 @@ impl AI for SimpleAI {
   ///
   /// Walk around randomly
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Fighter, me: &mut Fighter) {
+  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Fighter) -> Actions {
 
     let mut rng = thread_rng();
     let mut dice : i32;
+    let mut state = Actions::Move;
     
     let mut x : usize;
     let mut y : usize;
@@ -59,6 +55,7 @@ impl AI for SimpleAI {
           if count > 100 {
             x = me.pos.x as usize;
             y = me.pos.y as usize;
+            state = Actions::Wait;
             break; 
           }
         }
@@ -67,6 +64,8 @@ impl AI for SimpleAI {
     
     me.pos.x = x as isize;
     me.pos.y = y as isize;
+
+    return state;
 
   }
 

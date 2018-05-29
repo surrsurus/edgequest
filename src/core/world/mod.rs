@@ -3,7 +3,7 @@ pub mod dungeon;
 use self::dungeon::Dungeon;
 use self::dungeon::map::{Grid, Tile, TileType, MammalianScents, ScentType, SCENT_TYPES};
 
-use core::object::{Creature, Fighter, Entity, RGB};
+use core::object::{Actions, Fighter, Creature, Entity, RGB};
 use core::object::ai::{SimpleAI, TrackerAI, BlinkAI};
 
 use core::tcod::map::Map;
@@ -34,8 +34,16 @@ const SC_DIAM_UPPER : isize = ((SC_DIAM / 2) + 1);
 // Lower index for ranges
 const SC_DIAM_LOWER : isize = -(SC_DIAM / 2);
 
+const SO_INC : u8 = 100;
+
+const SO_DIAM : isize = 15;
+// Upper index for ranges
+const SO_DIAM_UPPER : isize = ((SO_DIAM / 2) + 1);
+// Lower index for ranges
+const SO_DIAM_LOWER : isize = -(SO_DIAM / 2);
+
 pub struct World {
-  pub player: Fighter,
+  pub player: Creature,
   pub cur_dungeon: Dungeon,
   pub creatures: Vec<Box<Creature>>,
   pub dungeon_stack: Vec<Dungeon>,
@@ -142,7 +150,7 @@ impl World {
           "Test",
           ' ',
           (0, 0, 0),
-          (0, 255, 0),
+          (0, 0, 0),
           TileType::Floor
         );
       }
@@ -153,21 +161,23 @@ impl World {
   
     self.creatures = Vec::new();
 
-    self.player.pos.x = (self.cur_dungeon.width / 2) as isize;
-    self.player.pos.y = (self.cur_dungeon.height / 2) as isize;
+    self.player.fighter.pos.x = (self.cur_dungeon.width / 2) as isize;
+    self.player.fighter.pos.y = (self.cur_dungeon.height / 2) as isize;
   }
 
   ///
   /// Return a new player `Entity`
   /// 
   #[inline]
-  fn fresh_player() -> Fighter {
-    Fighter::new(
+  fn fresh_player() -> Creature {
+    Creature::new(
       "Player",
       '@', 
       (40, 25), 
       (255, 255, 255), 
-      (0, 0, 0)
+      (0, 0, 0),
+      ScentType::Player,
+      SimpleAI::new()
     )
   }
 
@@ -177,7 +187,7 @@ impl World {
   pub fn is_valid(&self, x: isize, y: isize) -> bool {
     let tx = x as usize;
     let ty = y as usize;
-    if tx > 0 && tx + 1 < self.cur_dungeon.width && ty > 0 && ty + 1 < self.cur_dungeon.height {
+    if tx > 0 && tx < self.cur_dungeon.width - 1 && ty > 0 && ty < self.cur_dungeon.height - 1 {
       match self.cur_dungeon.grid[tx][ty].tiletype {
         TileType::Floor | TileType::DownStair | TileType::UpStair | TileType::Water => return true,
         _ => {}
@@ -201,7 +211,7 @@ impl World {
   /// Go downstairs
   ///
   pub fn can_go_down(&self) -> bool {
-    match self.get_tile_at(self.player.pos.x, self.player.pos.y).tiletype {
+    match self.get_tile_at(self.player.fighter.pos.x, self.player.fighter.pos.y).tiletype {
       TileType::DownStair => return true,
       _ => return false
     }
@@ -215,7 +225,7 @@ impl World {
   /// Go upstairs
   ///
   pub fn can_go_up(&self) -> bool {
-    match self.get_tile_at(self.player.pos.x, self.player.pos.y).tiletype {
+    match self.get_tile_at(self.player.fighter.pos.x, self.player.fighter.pos.y).tiletype {
       TileType::UpStair => return true,
       _ => return false
     }
@@ -238,8 +248,8 @@ impl World {
     self.tcod_map = tm;
 
     let start_loc = Dungeon::get_valid_location(&self.cur_dungeon.grid);
-    self.player.pos.x = start_loc.0 as isize;
-    self.player.pos.y = start_loc.1 as isize;
+    self.player.fighter.pos.x = start_loc.0 as isize;
+    self.player.fighter.pos.y = start_loc.1 as isize;
   }
 
   ///
@@ -286,8 +296,8 @@ impl World {
     };
       
     let start_loc = Dungeon::get_valid_location(&w.cur_dungeon.grid);
-    w.player.pos.x = start_loc.0 as isize;
-    w.player.pos.y = start_loc.1 as isize;
+    w.player.fighter.pos.x = start_loc.0 as isize;
+    w.player.fighter.pos.y = start_loc.1 as isize;
 
     return w;
   
@@ -309,12 +319,19 @@ impl World {
   fn update_scent(&mut self) {
 
     // Create initial bloom around player
-    let px = self.player.pos.x;
-    let py = self.player.pos.y;
+    let px = self.player.fighter.pos.x;
+    let py = self.player.fighter.pos.y;
     for nx in SC_DIAM_LOWER..SC_DIAM_UPPER {
       for ny in SC_DIAM_LOWER..SC_DIAM_UPPER {
         if self.is_valid(px - nx, py - ny) {
-          self.get_mut_tile_at(px - nx, py - ny).scents[0].val = SC_INC;
+          for s in &mut self.get_mut_tile_at(px - nx, py - ny).scents {
+            match s.scent_type {
+              ScentType::Player => {
+                s.val = SC_INC
+              }
+              _ => {}
+            }
+          }
         }
       }
     }
@@ -326,12 +343,7 @@ impl World {
     for c in &self.creatures {
       let cx = c.fighter.pos.x;
       let cy = c.fighter.pos.y;
-      let st = match c.scent_type {
-        ScentType::Insectoid => 1,
-        ScentType::Mammalian(MammalianScents::Feline) => 2,
-        ScentType::Mammalian(MammalianScents::Canine) => 3,
-        _ => {unreachable!("Should never have a scent type that isn't defined here")}
-      };
+      let st = c.scent_type.clone();
       cinf.push((cx, cy, st));
     }
 
@@ -340,11 +352,15 @@ impl World {
       // Unpack
       let cx = p.0;
       let cy = p.1;
-      let st = p.2;
+      let st = &p.2;
       for nx in SC_DIAM_LOWER..SC_DIAM_UPPER {
         for ny in SC_DIAM_LOWER..SC_DIAM_UPPER {
           if self.is_valid(cx - nx, cy - ny) {
-            self.get_mut_tile_at(cx - nx, cy - ny).scents[st].val = SC_INC;
+            for s in &mut self.get_mut_tile_at(cx - nx, cy - ny).scents {
+              if &s.scent_type == st {
+                s.val = SC_INC
+              }
+            }
           }
         }
       }
@@ -409,6 +425,69 @@ impl World {
 
   }
 
+  fn update_sound(&mut self) {
+
+    for x in 0..self.cur_dungeon.width {
+      for y in 0..self.cur_dungeon.height {
+        self.cur_dungeon.grid[x][y].sound = 0;
+      }
+    }
+
+    let dist = |obj: &Fighter, x: isize, y: isize| -> isize {
+      (((obj.pos.x - x).pow(2) + (obj.pos.y - y).pow(2)) as f32).sqrt().floor() as isize
+    };
+
+    // Create initial bloom around player
+    match &self.player.state {
+        &Actions::Move => {
+          let px = self.player.fighter.pos.x;
+          let py = self.player.fighter.pos.y;
+          for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
+            for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
+              if self.is_valid(px - nx, py - ny) {
+                self.get_mut_tile_at(px - nx, py - ny).sound = SO_INC - ((dist(&self.player.fighter, px - nx, py - ny)) * (SO_DIAM / 2)) as u8;
+              }
+            }
+          }
+        },
+        _ => {},
+    }
+
+    // Save information about creatures
+    // We can't do a self.get_tile_at due to the fact we iterate over a &self
+    // but need a &mut self for that function.
+    let mut cinf = vec![];
+    for c in &self.creatures {
+      let cx = c.fighter.pos.x;
+      let cy = c.fighter.pos.y;
+      let f = c.fighter.clone();
+      let s = c.state.clone();
+      cinf.push((cx, cy, f, s));
+    }
+
+    // For pair in creature information
+    for p in &cinf {
+      // Unpack
+      let s = &p.3;
+      match s {
+        &Actions::Move => {
+          let cx = p.0;
+          let cy = p.1;
+          let f = &p.2;
+          for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
+            for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
+              if self.is_valid(cx - nx, cy - ny) {
+                self.get_mut_tile_at(cx - nx, cy - ny).sound = SO_INC - ((dist(&f, cx - nx, cy - ny)) * (SO_DIAM / 2)) as u8;
+              }
+            }
+          }
+        },
+        _ => {}
+      }
+    }
+
+  }
+
   ///
   /// Update the game world
   /// 
@@ -417,5 +496,6 @@ impl World {
     for c in &mut self.creatures {
       c.take_turn(&self.cur_dungeon.grid, &self.player)
     }
+    self.update_sound();
   }
 }

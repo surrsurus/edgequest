@@ -3,25 +3,11 @@ use core::world::World;
 
 use core::tcod::input;
 
+use core::object::actions::Actions;
+
 use core::tcod::map::FovAlgorithm;
 
 // use core::renderer::Screen;
-
-///
-/// Enum representing possible actions the player can take
-///
-pub enum Actions {
-  // Player moved
-  Move,
-  // Player waited
-  Wait,
-  // Player went down
-  DownStair,
-  // Player went up
-  UpStair,
-  // Unknown action (Player pressed unbound key)
-  Unknown
-}
 
 ///
 /// Enum representing the state of the game
@@ -61,42 +47,50 @@ impl Game {
   
         if keypress.printable != ' ' {
 
-          let oldpos = self.world.player.pos.clone();
+          let oldpos = self.world.player.fighter.pos.clone();
         
           match keypress.printable {
             
             // Movement keys are bound to vim-like controls (hjklyubn)
             'h' => { 
-              self.world.player.move_cart(-1, 0);
+              self.world.player.fighter.move_cart(-1, 0);
               self.state = State::Act(Actions::Move);
+              self.world.player.state = Actions::Move;
             },
             'j' => { 
-              self.world.player.move_cart(0, 1);
+              self.world.player.fighter.move_cart(0, 1);
               self.state = State::Act(Actions::Move);
+              self.world.player.state = Actions::Move;
             },
             'k' => {
-              self.world.player.move_cart(0, -1);
+              self.world.player.fighter.move_cart(0, -1);
               self.state = State::Act(Actions::Move);
+              self.world.player.state = Actions::Move;
             },
             'l' => {
-              self.world.player.move_cart(1, 0);
+              self.world.player.fighter.move_cart(1, 0);
               self.state = State::Act(Actions::Move);  
+              self.world.player.state = Actions::Move;
             },
             'y' => {
-              self.world.player.move_cart(-1, -1);
+              self.world.player.fighter.move_cart(-1, -1);
               self.state = State::Act(Actions::Move);
+              self.world.player.state = Actions::Move;
             },
             'u' => {
-              self.world.player.move_cart(1, -1);
+              self.world.player.fighter.move_cart(1, -1);
               self.state = State::Act(Actions::Move);
+              self.world.player.state = Actions::Move;
             },
             'b' => {
-              self.world.player.move_cart(-1, 1);
+              self.world.player.fighter.move_cart(-1, 1);
               self.state = State::Act(Actions::Move);
+              self.world.player.state = Actions::Move;
             },
             'n' => { 
-              self.world.player.move_cart(1, 1);
+              self.world.player.fighter.move_cart(1, 1);
               self.state = State::Act(Actions::Move);
+              self.world.player.state = Actions::Move;
             },
             // "Regenerate" current level
             'w' => {
@@ -109,7 +103,10 @@ impl Game {
               self.state = State::Debug;
             },
             // Wait
-            '.' => { self.state = State::Act(Actions::Wait) },
+            '.' => { 
+              self.state = State::Act(Actions::Wait);
+              self.world.player.state = Actions::Wait;
+            },
             // Go downstars (if possible)
             '>' => { self.state = State::Act(Actions::DownStair) },
             // Go upstairs (if possible)
@@ -119,9 +116,10 @@ impl Game {
             
           }
 
-          if !self.world.is_valid(self.world.player.pos.x, self.world.player.pos.y) {
-            self.world.player.pos = oldpos;
+          if !self.world.is_valid(self.world.player.fighter.pos.x, self.world.player.fighter.pos.y) {
+            self.world.player.fighter.pos = oldpos;
             self.state = State::Act(Actions::Unknown);
+            self.world.player.state = Actions::Unknown;
           }
 
         } 
@@ -178,7 +176,7 @@ impl Game {
       _ => ()
     }
     // TODO ...Does this need to be here? :thinking:
-    self.world.tcod_map.compute_fov(self.world.player.pos.x as i32, self.world.player.pos.y as i32, 20, true, FovAlgorithm::Shadow);
+    self.world.tcod_map.compute_fov(self.world.player.fighter.pos.x as i32, self.world.player.fighter.pos.y as i32, 20, true, FovAlgorithm::Shadow);
   }
 
 }

@@ -3,6 +3,9 @@
 //! 
 pub mod ai;
 
+pub mod actions;
+pub use self::actions::Actions;
+
 pub mod creature;
 pub use self::creature::Creature;
 
