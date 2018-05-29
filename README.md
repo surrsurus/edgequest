@@ -16,6 +16,8 @@ $ set PATH=%PATH%;C:\Program Files (x86)\Rust\bin;C:\MinGW\bin
 $ cargo run
 ```
 
+You might also need to change the default renderer in `config/cfg.yml` to `SDL`. That variable is at the bottom of the file.
+
 OSX:
 
 ```
