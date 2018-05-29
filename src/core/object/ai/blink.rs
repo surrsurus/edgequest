@@ -15,24 +15,12 @@ pub struct BlinkAI;
 
 impl BlinkAI {
 
-  pub fn blink(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Fighter) -> (isize, isize) {
+  pub fn blink(&mut self, me: &mut Fighter) -> (isize, isize) {
     let mut rng = thread_rng();
     let mut x = me.pos.x;
     let mut y = me.pos.y;
     x += rng.gen_range(-8, 8);
     y += rng.gen_range(-8, 8);
-    if x < 0 {
-      x = 0;
-    }
-    if y < 0 {
-      y = 0;
-    }
-    if y >= (map[0].len() - 1) as isize {
-      y = (map[0].len() - 1) as isize;
-    }
-    if x >= (map.len() - 1) as isize {
-      x = (map.len() - 1) as isize;
-    }
     return (x, y);
   }
 
@@ -67,7 +55,7 @@ impl AI for BlinkAI {
         3 => y += 1,
         4 => y -= 1,
         5 => {
-          let bpos = self.blink(map, _player, me);
+          let bpos = self.blink(me);
           x = bpos.0;
           y = bpos.1;
           state = Actions::Blink;
@@ -75,8 +63,22 @@ impl AI for BlinkAI {
         _ => unreachable!("dice machine broke")
       }
 
+      // Check bounds
+      if x < 0 {
+        x = 0;
+      }
+      if y < 0 {
+        y = 0;
+      }
+      if y >= (map[0].len() - 1) as isize {
+        y = (map[0].len() - 1) as isize;
+      }
+      if x >= (map.len() - 1) as isize {
+        x = (map.len() - 1) as isize;
+      }
+
       match map[x as usize][y as usize].tiletype {
-        TileType::Floor => break,
+        TileType::Floor | TileType::Water | TileType::UpStair | TileType::DownStair => break,
         _ => {
           if count > 100 {
             x = me.pos.x;
