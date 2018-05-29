@@ -9,7 +9,7 @@ use core::object::ai::{SimpleAI, TrackerAI, BlinkAI};
 use core::tcod::map::Map;
 
 extern crate rand;
-use self::rand::{thread_rng, Rng};
+use self::rand::Rng;
 
 ///
 /// What value the player sets the scent of nearby tiles to
@@ -504,8 +504,7 @@ impl World {
   /// Assign water tiles a new blue color
   /// 
   fn update_water(&mut self) {
-    
-    let mut rng = thread_rng();
+
     for x in 0..self.cur_dungeon.width {
       for y in 0..self.cur_dungeon.height {
         match self.cur_dungeon.grid[x][y].tiletype {
