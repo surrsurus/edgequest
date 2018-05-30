@@ -261,6 +261,9 @@ impl World {
     let start_loc = Dungeon::get_valid_location(&self.cur_dungeon.grid);
     self.player.fighter.pos.x = start_loc.0 as isize;
     self.player.fighter.pos.y = start_loc.1 as isize;
+
+    self.update_water();
+
   }
 
   ///
