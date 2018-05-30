@@ -51,6 +51,8 @@ pub struct Config {
   pub map_width: isize,
   pub map_height: isize,
 
+  pub console_height: isize,
+
   pub fullscreen: bool,
 
   pub fontpath: String,
@@ -134,6 +136,8 @@ pub fn load(path: &str) -> Config {
 
     map_width: cfg["map_width"].as_i64().unwrap() as isize,
     map_height: cfg["map_height"].as_i64().unwrap() as isize,
+
+    console_height: cfg["console_height"].as_i64().unwrap() as isize,
 
     // Font path should be a String so it doesnt have a lifetime
     fontpath: cfg["fontpath"].as_str().unwrap().to_string(),

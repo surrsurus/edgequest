@@ -45,3 +45,11 @@ pub fn map_dimensions() -> (isize, isize) {
   return (cfg.map_width, cfg.map_height);
 
 }
+
+///
+/// Get console height
+///
+pub fn console_height() -> isize {
+  let cfg = config::load("config/cfg.yml");
+  return cfg.console_height;
+}

@@ -9,11 +9,14 @@ screen_height: 50
 map_width: 100
 map_height: 70
 
+# Height of console
+console_height: 5
+
 # Fullscreen mode
 fullscreen: false
 
 # Path to desired font
-fontpath: "fonts/terminal10x16_gs_tc.png"
+fontpath: "fonts/terminal8x14_gs_ro.png"
 
 # Font type. Default: Default
 # Options:
@@ -26,7 +29,7 @@ fonttype: "Greyscale"
 # * Tcod
 # * AsciiInRow
 # * AsciiInCol
-fontlayout: "Tcod"
+fontlayout: "AsciiInRow"
 
 
 # Desired renderer. Default: SDL

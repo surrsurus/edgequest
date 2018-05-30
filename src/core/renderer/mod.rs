@@ -31,6 +31,7 @@ pub struct Renderer {
   // Camera object
   camera: Camera,
   screen: Pos,
+  console_height: isize,
   pub sc_debug: bool,
   pub fov: bool,
   pub so_debug: bool
@@ -200,6 +201,20 @@ impl Renderer {
     self.draw_log(con);
 
     //
+    // Draw UI
+    //
+
+    for x in 0..self.screen.x {
+      con.put_char_ex(
+        x as i32,
+        (self.screen.y - self.console_height - 1) as i32,
+        '-',
+        RGB(255, 255, 255).to_tcod(),
+        RGB(0, 0, 0).to_tcod()
+      );
+    }
+
+    //
     // Flush changes to root
     //
 
@@ -297,9 +312,12 @@ impl Renderer {
   /// * `screen` - `Pos` that holds the screen dimensions
   ///
   #[inline]
-  pub fn new(map: (isize, isize), screen: (isize, isize)) -> Renderer {
+  pub fn new(map: (isize, isize), screen: (isize, isize), console_height: isize) -> Renderer {
     Renderer { 
-      camera: Camera::new(map, screen), 
+      // Camera takes a modified screen value that compensates for the console_height
+      // This way the render still knows that that area is "reserved" for the console
+      camera: Camera::new(map, (screen.0, screen.1 - console_height - 1)), 
+      console_height: console_height,
       screen: Pos::from_tup(screen),
       sc_debug: false, fov: true, so_debug: false 
     }
