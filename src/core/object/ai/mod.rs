@@ -15,5 +15,8 @@ pub use self::simple::SimpleAI;
 pub mod blink;
 pub use self::blink::BlinkAI;
 
+pub mod talker;
+pub use self::talker::TalkerAI;
+
 pub mod tracker;
 pub use self::tracker::TrackerAI;

@@ -4,7 +4,7 @@ use self::rand::Rng;
 use core::tcod::map::Map;
 
 use core::object::{Actions, Fighter, Creature, Entity, RGB};
-use core::object::ai::{SimpleAI, TrackerAI, BlinkAI};
+use core::object::ai::{SimpleAI, TrackerAI, BlinkAI, TalkerAI};
 
 pub mod dungeon;
 use self::dungeon::Dungeon;
@@ -129,6 +129,22 @@ impl World {
           (150, 150, 150), (0, 0, 0),
           ScentType::Canine,
           BlinkAI::new()
+        )
+      )
+    );
+
+    creatures.push(
+      Box::new(
+        Creature::new(
+          "Kurt",
+          '@',
+          {
+            let pos = Dungeon::get_valid_location(&g);
+            (pos.0 as isize, pos.1 as isize)
+          },
+          (200, 200, 200), (0, 0, 0),
+          ScentType::Canine,
+          TalkerAI::new()
         )
       )
     );

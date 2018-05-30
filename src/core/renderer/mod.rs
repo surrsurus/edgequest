@@ -321,7 +321,7 @@ impl Renderer {
   pub fn draw_log(&self, con: &mut console::Root) {
 
     // Mutable reference to the mutex
-    let mut log = GlobalLog.lock().unwrap();
+    let log = GlobalLog.lock().unwrap();
 
     // Iterage over the latest range
     for i in log.get_latest_range(5) {
@@ -334,7 +334,7 @@ impl Renderer {
     }
 
     // Test mutability
-    log.push(("Update", RGB(255, 255, 255)));
+    // log.push(("Update", RGB(255, 255, 255)));
 
   }
 

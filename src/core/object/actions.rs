@@ -14,6 +14,8 @@ pub enum Actions {
   UpStair,
   // Creature blinked (teleported randomly)
   Blink,
+  // Creature Talked
+  Talk,
   // Unknown action (Creature did something weird)
   Unknown
 }
