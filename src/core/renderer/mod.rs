@@ -2,19 +2,23 @@
 //! Metapackage for renderer
 //!
 
-pub mod camera;
-pub use self::camera::Camera;
+// `Console` is needed as Console is a trait that console::Root extends
+use core::tcod::{Console, console};
+
+use core::GlobalLog;
 
 use core::world::World;
 
 use core::world::dungeon::Dungeon;
-
+// Used to expliclty reference constants
 use core::world::dungeon::map::tile;
 use core::world::dungeon::map::{Tile, TileType, ScentType};
 
-use core::tcod::{Console, console};
+use core::object::{Pos, Entity, RGB};
 
-use core::object::{Pos, Entity};
+// Use camera privately
+mod camera;
+use self::camera::Camera;
 
 ///
 /// Helper for rendering things to the screen
@@ -26,6 +30,7 @@ use core::object::{Pos, Entity};
 pub struct Renderer {
   // Camera object
   camera: Camera,
+  screen: Pos,
   pub sc_debug: bool,
   pub fov: bool,
   pub so_debug: bool
@@ -34,13 +39,19 @@ pub struct Renderer {
 impl Renderer {
 
   ///
-  /// Render scent as a fine, purple mist, just like real life
+  /// Render for each monster as a visible colored entity
   ///
-  pub fn debug_render_scent_map(&mut self, con: &mut Console, dungeon: &Dungeon) {
+  pub fn debug_render_scent_map(&mut self, con: &mut console::Root, dungeon: &Dungeon) {
 
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
-        let mut color : (u8, u8, u8) = (dungeon.grid[x][y].scents[0].val + 50 + dungeon.grid[x][y].scents[3].val, dungeon.grid[x][y].scents[1].val + 25 + dungeon.grid[x][y].scents[3].val, dungeon.grid[x][y].scents[2].val + 50 );
+        // Pretty much just random, Player is red, bugs are green, cats are yellow and dogs are blue
+        let mut color : (u8, u8, u8) = (
+          dungeon.grid[x][y].scents[0].val + 50 + dungeon.grid[x][y].scents[3].val, 
+          dungeon.grid[x][y].scents[1].val + 25 + dungeon.grid[x][y].scents[3].val, 
+          dungeon.grid[x][y].scents[2].val + 50 
+        );
+        // Iterate over scents, context of what scent it is isn't necessary
         for s in 0..ScentType::Num as usize {
           if dungeon.grid[x][y].scents[s].val > 0 {
             self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
@@ -59,13 +70,18 @@ impl Renderer {
   }
 
   ///
-  /// Render sound as blue cuz what other color would it be
+  /// Render sound as a transparent blue entity
   ///
-  pub fn debug_render_sound_map(&mut self, con: &mut Console, dungeon: &Dungeon) {
+  pub fn debug_render_sound_map(&mut self, con: &mut console::Root, dungeon: &Dungeon) {
 
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
-        let mut color : (u8, u8, u8) = (dungeon.grid[x][y].get_bg().0, dungeon.grid[x][y].get_bg().1, dungeon.grid[x][y].sound );
+        // Color is weighted towards blue
+        let mut color : (u8, u8, u8) = (
+          dungeon.grid[x][y].get_bg().0, 
+          dungeon.grid[x][y].get_bg().1, 
+          dungeon.grid[x][y].sound 
+        );
         if dungeon.grid[x][y].sound > 0 {
           self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Sound",
@@ -83,22 +99,28 @@ impl Renderer {
   ///
   /// Draw all.
   ///
-  /// You'll have to render this console to root (unless you passed root in)
-  /// and always `flush()` the root console.
-  ///
-  pub fn draw_all(&mut self, con: &mut Console, world: &mut World) {
+  pub fn draw_all(&mut self, con: &mut console::Root, world: &mut World) {
+    
+    //
+    // Console prep
+    //
 
     // Clear console
     con.clear();
 
+    // Move camera to player's position
     self.camera.move_to(world.player.fighter.pos);
+
+    //
+    // Draw tiles
+    //
 
     // Draw seen tiles
     for x in 0..world.cur_dungeon.width {
       for y in 0..world.cur_dungeon.height {
         // If fov is on...
         if self.fov {
-          // And it's in the FOV
+          // And it's in the FoV
           if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
             match world.cur_dungeon.grid[x][y].tiletype {
               _ => {
@@ -109,6 +131,7 @@ impl Renderer {
 
             // Mark tile as seen if it's in the FoV
             world.cur_dungeon.grid[x][y].seen = true;
+
           }
 
           // And the tile has been seen...
@@ -121,9 +144,10 @@ impl Renderer {
               }
             }
           }
+
         }
 
-        // Debug just draw all tiles normally
+        // [Debug] Otherwise just draw all tiles normally
         else {
          match world.cur_dungeon.grid[x][y].tiletype {
             _ => {
@@ -135,14 +159,23 @@ impl Renderer {
       }
     }
 
-    // Debug
+    //
+    // Debug options
+    //
+
+    // Debug scent
     if self.sc_debug {
       self.debug_render_scent_map(con, &world.cur_dungeon);
     }
+
+    // Debug sound
     if self.so_debug {
       self.debug_render_sound_map(con, &world.cur_dungeon);
     }
 
+    //
+    // Draw creatures
+    //
 
     for c in &world.creatures {
       // If fov is on...
@@ -160,18 +193,30 @@ impl Renderer {
     // we move the camera over it.
     self.draw_creature(con, world.player.fighter.pos, &world.player.fighter, world);
 
+    //
+    // Draw log
+    //
+
+    self.draw_log(con);
+
+    //
+    // Flush changes to root
+    //
+
+    con.flush();
+
   }
 
   ///
   /// Draw creatures with "transparent" backgrounds
   ///
-  pub fn draw_creature(&self, con: &mut Console, pos: Pos, ce: &Entity, world: &World) {
+  pub fn draw_creature(&self, con: &mut console::Root, pos: Pos, ce: &Entity, world: &World) {
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
 
     // New pos with respect to camera
     let npos = pos + self.camera.pos;
-
+  
     con.put_char_ex(
       npos.x as i32,
       npos.y as i32,
@@ -193,7 +238,7 @@ impl Renderer {
   /// * `con` - Tcod `Console`
   /// * `entity` - `Entity`
   ///
-  pub fn draw_entity(&self, con: &mut Console, pos: Pos, ce: &Entity) {
+  pub fn draw_entity(&self, con: &mut console::Root, pos: Pos, ce: &Entity) {
 
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
@@ -221,6 +266,31 @@ impl Renderer {
   }
 
   ///
+  /// Draw the log
+  ///
+  /// Currently still testing
+  ///
+  pub fn draw_log(&self, con: &mut console::Root) {
+
+    // Mutable reference to the mutex
+    let mut log = GlobalLog.lock().unwrap();
+
+    // Iterage over the latest range
+    for i in log.get_latest_range(5) {
+      // Draw to screen
+      let y = self.screen.y - ((log.data.len() as isize) - i as isize);
+      let color = log.data[i].1;
+      let s = log.data[i].0;
+      con.set_default_foreground(color.to_tcod());
+      con.print_ex(0, y as i32, console::BackgroundFlag::Set, console::TextAlignment::Left, s);
+    }
+
+    // Test mutability
+    log.push(("Update", RGB(255, 255, 255)));
+
+  }
+
+  ///
   /// Return a new `Renderer`
   ///
   /// * `map` - `Pos` that holds the map dimensions
@@ -228,7 +298,11 @@ impl Renderer {
   ///
   #[inline]
   pub fn new(map: (isize, isize), screen: (isize, isize)) -> Renderer {
-    Renderer { camera: Camera::new(map, screen), sc_debug: false, fov: true, so_debug: false }
+    Renderer { 
+      camera: Camera::new(map, screen), 
+      screen: Pos::from_tup(screen),
+      sc_debug: false, fov: true, so_debug: false 
+    }
   }
 
 }

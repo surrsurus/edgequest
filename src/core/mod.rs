@@ -9,9 +9,6 @@ use self::tcod::Console;
 // core::world
 pub mod world;
 
-// core::init
-pub mod init;
-
 // core::object
 pub mod object;
 
@@ -19,9 +16,18 @@ pub mod object;
 pub mod renderer;
 use self::renderer::Renderer;
 
-// core::game
-pub mod game;
+// core::log
+pub mod log;
+use self::log::GlobalLog;
+
+// Use game privately
+// Game is pretty much the most top level thing besides core
+mod game;
 use self::game::Game;
+
+// Use init here privately
+// After all, what game function requires that something in the initalizer be ran?
+mod init;
 
 ///
 /// Play the game.
@@ -46,10 +52,7 @@ pub fn play() {
 
     // Draw what the camera sees
     ren.draw_all(&mut root, &mut game.world);
-
-    // Flush all draws to root
-    root.flush();
-
+    
     // Capture keypresses
     let keypress = root.wait_for_keypress(true);
     // Capture debug keys

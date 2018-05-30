@@ -1,11 +1,14 @@
+//!
+//! Control the game loop, state, and input
+//!
+
+use core::tcod::input;
+use core::tcod::map::FovAlgorithm;
 
 use core::world::World;
 
-use core::tcod::input;
-
+// Game state depends on what actions the player can do
 use core::object::actions::Actions;
-
-use core::tcod::map::FovAlgorithm;
 
 // use core::renderer::Screen;
 

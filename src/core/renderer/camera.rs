@@ -21,7 +21,7 @@ impl Camera {
   pub fn is_in_camera(&self, pos: Pos) -> bool {
     // New pos to compare things to without totally cluttering the function
     let npos = pos + self.pos;
-    if npos.x >= 0 && npos.x < self.screen.x && npos.y >= 0 && npos.y < self.screen.y { true } else { false }
+    if npos.x >= 0 && npos.x < self.screen.x && npos.y >= 0 && npos.y < self.screen.y - 5 { true } else { false }
   }
 
   ///
@@ -38,7 +38,7 @@ impl Camera {
     if new_pos.x < 0 { new_pos.x = 0; }
     if new_pos.y < 0 { new_pos.y = 0; }
     if new_pos.x > self.map.x - self.screen.x - 1 { new_pos.x = self.map.x - self.screen.x - 1; }
-    if new_pos.y > self.map.y - self.screen.y - 1 { new_pos.y = self.map.y - self.screen.y - 1; }
+    if new_pos.y > self.map.y - self.screen.y - 6 { new_pos.y = self.map.y - self.screen.y - 6; }
 
     self.pos = -new_pos;
 

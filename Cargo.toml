@@ -5,6 +5,7 @@ authors = ["surrsurus"]
 
 [dependencies]
 tcod = "0.12"
+lazy_static = "1.0.1"
 yaml-rust = "0.3"
 rand = "0.3"
 fuss = { git = "https://github.com/surrsurus/fuss.git" }
