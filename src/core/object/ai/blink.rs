@@ -1,11 +1,11 @@
+extern crate rand;
+use self::rand::{thread_rng, Rng};
+
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, TileType};
 
 use core::object::{Actions, Creature, Fighter};
 use core::object::ai::AI;
-
-extern crate rand;
-use self::rand::{thread_rng, Rng};
 
 ///
 /// BlinkAI makes monster teleport around the map periodically

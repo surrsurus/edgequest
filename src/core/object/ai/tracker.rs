@@ -1,8 +1,8 @@
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, TileType};
 
-use core::object::{Actions, Creature, Fighter};
 use core::object::ai::AI;
+use core::object::{Actions, Creature, Fighter};
 
 ///
 /// AI that tracks player

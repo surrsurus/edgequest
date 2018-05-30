@@ -1,5 +1,6 @@
-use core::object::{Entity, RGB};
 use std::slice::Iter;
+
+use core::object::{Entity, RGB};
 
 // Used to darken tiles that are out of sight
 pub const DARKEN_FAC : RGB = RGB(10, 10, 10);
@@ -49,6 +50,7 @@ pub enum ScentType {
   Num
 }
 
+// Implement an iterator for ScentType to get the variants out in order
 impl ScentType {
   pub fn iterator() -> Iter<'static, ScentType> {
     static SCENT_TYPES: [ScentType;  ScentType::Num as usize] = [

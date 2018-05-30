@@ -5,16 +5,18 @@
 extern crate rand;
 use self::rand::{thread_rng, Rng};
 
-mod automata;
-use self::automata::{Automaton, DrunkardsWalk};
-
-mod builder;
-use self::builder::{Buildable, Fussy, Simple};
+use core::object::Entity;
 
 pub mod map;
 use self::map::{Grid, Tile, TileType};
 
-use core::object::Entity;
+// Privately use automata
+mod automata;
+use self::automata::{Automaton, DrunkardsWalk};
+
+// Privately use builders
+mod builder;
+use self::builder::{Buildable, Fussy, Simple};
 
 mod dungeon_tests;
 

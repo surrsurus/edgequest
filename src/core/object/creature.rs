@@ -1,8 +1,7 @@
-use core::object::ai::AI;
-
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, ScentType};
 
+use core::object::ai::AI;
 use core::object::{Actions, Fighter};
 
 ///

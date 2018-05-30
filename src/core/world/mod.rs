@@ -1,15 +1,14 @@
+extern crate rand;
+use self::rand::Rng;
 
-pub mod dungeon;
-use self::dungeon::Dungeon;
-use self::dungeon::map::{Grid, Tile, TileType, ScentType};
+use core::tcod::map::Map;
 
 use core::object::{Actions, Fighter, Creature, Entity, RGB};
 use core::object::ai::{SimpleAI, TrackerAI, BlinkAI};
 
-use core::tcod::map::Map;
-
-extern crate rand;
-use self::rand::Rng;
+pub mod dungeon;
+use self::dungeon::Dungeon;
+use self::dungeon::map::{Grid, Tile, TileType, ScentType};
 
 ///
 /// What value the player sets the scent of nearby tiles to

@@ -1,19 +1,19 @@
+//!
+//! Enum representing possible actions creatures can take
+//!
 
-///
-/// Enum representing possible actions the player can take
-///
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Actions {
-  // Player moved
+  // Creature moved
   Move,
-  // Player waited
+  // Creature waited
   Wait,
-  // Player went down
+  // Creature went down
   DownStair,
-  // Player went up
+  // Creature went up
   UpStair,
-  //
+  // Creature blinked (teleported randomly)
   Blink,
-  // Unknown action (Player pressed unbound key)
+  // Unknown action (Creature did something weird)
   Unknown
 }

@@ -2,7 +2,6 @@ extern crate rand;
 use self::rand::{thread_rng, Rng};
 
 use core::world::dungeon::automata::Automaton;
-
 use core::world::dungeon::map::{Grid, Tile};
 
 ///

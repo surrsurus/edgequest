@@ -2,7 +2,6 @@ extern crate fuss;
 use self::fuss::Simplex;
 
 use core::world::dungeon::builder::Buildable;
-
 use core::world::dungeon::map::Grid;
 
 ///
