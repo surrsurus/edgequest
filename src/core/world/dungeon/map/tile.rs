@@ -1,6 +1,7 @@
 use std::slice::Iter;
 
-use core::object::{Entity, RGB};
+use core::object::Entity;
+use core::renderer::RGB;
 
 // Used to darken tiles that are out of sight
 pub const DARKEN_FAC : RGB = RGB(10, 10, 10);

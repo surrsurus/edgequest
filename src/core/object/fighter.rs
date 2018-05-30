@@ -1,4 +1,5 @@
-use core::object::{Entity, Pos, RGB};
+use core::object::{Entity, Pos};
+use core::renderer::RGB;
 
 ///
 /// A Fighter is something that can fight, but also be rendered to the screen

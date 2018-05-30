@@ -18,7 +18,4 @@ pub use self::fighter::Fighter;
 pub mod pos;
 pub use self::pos::Pos;
 
-pub mod rgb;
-pub use self::rgb::RGB;
-
 mod object_tests;

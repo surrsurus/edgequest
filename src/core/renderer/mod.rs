@@ -16,11 +16,14 @@ use core::world::dungeon::Dungeon;
 use core::world::dungeon::map::tile;
 use core::world::dungeon::map::{Tile, TileType, ScentType};
 
-use core::object::{Pos, Entity, RGB};
+use core::object::{Pos, Entity};
 
 // Use camera privately
 mod camera;
 use self::camera::Camera;
+
+pub mod rgb;
+pub use self::rgb::RGB;
 
 ///
 /// Helper for rendering things to the screen

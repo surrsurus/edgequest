@@ -7,7 +7,7 @@
 use std::sync::Mutex;
 use std::ops::Range;
 
-use core::object::RGB;
+use core::renderer::RGB;
 
 // A log just wraps some data pretty much
 pub struct Log {

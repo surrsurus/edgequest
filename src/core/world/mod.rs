@@ -3,8 +3,9 @@ use self::rand::Rng;
 
 use core::tcod::map::Map;
 
-use core::object::{Actions, Fighter, Creature, Entity, RGB};
+use core::object::{Actions, Fighter, Creature, Entity};
 use core::object::ai::{SimpleAI, TrackerAI, BlinkAI, TalkerAI};
+use core::renderer::RGB;
 
 pub mod dungeon;
 use self::dungeon::Dungeon;

@@ -1,4 +1,4 @@
-use core::object::RGB;
+use core::renderer::RGB;
 
 /// 
 /// Holds a position and a character.
