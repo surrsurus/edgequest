@@ -235,6 +235,18 @@ impl Renderer {
       RGB(0, 0, 0).to_tcod()
     );
 
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      0,
+      "Edgequest"
+    );
+
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      1,
+      "This is where we live"
+    );
+
     //
     // Flush changes to root
     //
@@ -318,7 +330,7 @@ impl Renderer {
       let color = log.data[i].1;
       let s = log.data[i].0;
       con.set_default_foreground(color.to_tcod());
-      con.print_ex(0, y as i32, console::BackgroundFlag::Set, console::TextAlignment::Left, s);
+      con.print(0, y as i32, s);
     }
 
     // Test mutability
