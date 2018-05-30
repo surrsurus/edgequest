@@ -39,7 +39,7 @@ impl Camera {
     // Boundary checks
     if new_pos.x < 0 { new_pos.x = 0; }
     if new_pos.y < 0 { new_pos.y = 0; }
-    if new_pos.x > self.map.x - self.screen.x - 1 { new_pos.x = self.map.x - self.screen.x - 1; }
+    if new_pos.x > self.map.x - self.screen.x { new_pos.x = self.map.x - self.screen.x; }
     if new_pos.y > self.map.y - self.screen.y { new_pos.y = self.map.y - self.screen.y; }
 
     self.pos = -new_pos;

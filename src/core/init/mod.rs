@@ -53,3 +53,11 @@ pub fn console_height() -> isize {
   let cfg = config::load("config/cfg.yml");
   return cfg.console_height;
 }
+
+///
+/// Get panel width
+///
+pub fn panel_width() -> isize {
+  let cfg = config::load("config/cfg.yml");
+  return cfg.panel_width;
+}

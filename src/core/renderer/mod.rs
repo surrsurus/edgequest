@@ -2,6 +2,8 @@
 //! Metapackage for renderer
 //!
 
+use std::char;
+
 // `Console` is needed as Console is a trait that console::Root extends
 use core::tcod::{Console, console};
 
@@ -32,6 +34,7 @@ pub struct Renderer {
   camera: Camera,
   screen: Pos,
   console_height: isize,
+  panel_width: isize,
   pub sc_debug: bool,
   pub fov: bool,
   pub so_debug: bool
@@ -214,6 +217,24 @@ impl Renderer {
       );
     }
 
+    for y in 0..(self.screen.y - self.console_height - 1) {
+      con.put_char_ex(
+        (self.screen.x - self.panel_width - 1) as i32,
+        y as i32,
+        '|',
+        RGB(255, 255, 255).to_tcod(),
+        RGB(0, 0, 0).to_tcod()
+      );
+    }
+
+    con.put_char_ex(
+      (self.screen.x - self.panel_width - 1) as i32,
+      (self.screen.y - self.console_height - 1) as i32,
+      char::from_u32(193).unwrap(),
+      RGB(255, 255, 255).to_tcod(),
+      RGB(0, 0, 0).to_tcod()
+    );
+
     //
     // Flush changes to root
     //
@@ -312,12 +333,12 @@ impl Renderer {
   /// * `screen` - `Pos` that holds the screen dimensions
   ///
   #[inline]
-  pub fn new(map: (isize, isize), screen: (isize, isize), console_height: isize) -> Renderer {
+  pub fn new(map: (isize, isize), screen: (isize, isize), console_height: isize, panel_width: isize) -> Renderer {
     Renderer { 
       // Camera takes a modified screen value that compensates for the console_height
       // This way the render still knows that that area is "reserved" for the console
-      camera: Camera::new(map, (screen.0, screen.1 - console_height - 1)), 
-      console_height: console_height,
+      camera: Camera::new(map, (screen.0 - panel_width - 1, screen.1 - console_height - 1)), 
+      console_height: console_height, panel_width: panel_width,
       screen: Pos::from_tup(screen),
       sc_debug: false, fov: true, so_debug: false 
     }
