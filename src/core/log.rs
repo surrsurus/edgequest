@@ -18,18 +18,16 @@ impl Log {
 
   // New log. Filler data
   pub fn new() -> Log {
-    Log { data: vec![
-      ("mmmm", RGB(255, 255, 0)), 
-      ("gotta", RGB(255, 0, 255)), 
-      ("love", RGB(0, 255, 255)), 
-      ("that", RGB(0, 255, 0)), 
-      ("rust", RGB(255, 255, 255))
-    ] }
+    Log { data: vec![] }
   }
 
   // Get a range of the last n items added to the log
   pub fn get_latest_range(&self, n: usize) -> Range<usize> {
-    (self.data.len()-n)..self.data.len()
+    if n > self.data.len() {
+      return 0..self.data.len()
+    } else {
+      (self.data.len()-n)..self.data.len()
+    }
   }
 
   // Push new data onto the log stack

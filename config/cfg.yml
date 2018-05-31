@@ -2,7 +2,7 @@
 # on what each of these do
 
 # Dimensions of screen in characters
-screen_width: 105
+screen_width: 115
 screen_height: 50
 
 # Dimensions of map in characters
@@ -10,7 +10,7 @@ map_width: 100
 map_height: 70
 
 # Height of console
-console_height: 5
+console_height: 10
 
 # Width of right panel
 panel_width: 25

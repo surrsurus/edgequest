@@ -42,12 +42,14 @@ impl AI for TalkerAI {
       let dice : i32 = rng.gen_range(1, 15);;
       match dice {
         1...10 => (),
-        11 => log.push(("This is where we live", me.get_fg())),
-        12 => log.push(("This is where we get work done", me.get_fg())),
-        13 => log.push(("Don't touch the arrow keys", me.get_fg())),
-        14 => log.push(("Talk to the TAs", me.get_fg())),
+        11 => log.push(("'This is where we live'", me.get_fg())),
+        12 => log.push(("'This is where we get work done'", me.get_fg())),
+        13 => log.push(("'Don't touch the arrow keys'", me.get_fg())),
+        14 => log.push(("'Talk to the TAs'", me.get_fg())),
         _ => unreachable!("dice machine broke")
       }
+
+      drop(log);
       
       state = Actions::Talk;
 

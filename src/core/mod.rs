@@ -15,6 +15,7 @@ pub mod object;
 // core::renderer
 pub mod renderer;
 use self::renderer::Renderer;
+use self::renderer::RGB;
 
 // core::log
 pub mod log;
@@ -47,6 +48,14 @@ pub fn play() {
     init::console_height(),
     init::panel_width()
   );
+
+  let mut log = GlobalLog.lock().unwrap();
+  log.push(("Welcome to Edgequest", RGB(255, 0, 255)));
+  log.push(("Move with vim keys", RGB(255, 255, 255)));
+  log.push(("esc to quit, w to regenerate", RGB(255, 255, 255)));
+  log.push(("r to toggle scent, t to toggle sound", RGB(255, 255, 255)));
+  log.push(("f to toggle FoV", RGB(255, 255, 255)));
+  drop(log);
 
   // Get a new game
   let mut game = Game::new(map_dim);

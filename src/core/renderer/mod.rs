@@ -238,6 +238,8 @@ impl Renderer {
       RGB(0, 0, 0).to_tcod()
     );
 
+    con.set_default_foreground(RGB(255, 255, 255).to_tcod());
+
     con.print(
       (self.screen.x - self.panel_width + 1) as i32,
       0,
@@ -327,7 +329,7 @@ impl Renderer {
     let log = GlobalLog.lock().unwrap();
 
     // Iterage over the latest range
-    for i in log.get_latest_range(5) {
+    for i in log.get_latest_range(self.console_height as usize) {
       // Draw to screen
       let y = self.screen.y - ((log.data.len() as isize) - i as isize);
       let color = log.data[i].1;
@@ -338,6 +340,8 @@ impl Renderer {
 
     // Test mutability
     // log.push(("Update", RGB(255, 255, 255)));
+
+    drop(log);
 
   }
 

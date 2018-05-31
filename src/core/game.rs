@@ -5,6 +5,8 @@
 use core::tcod::input;
 use core::tcod::map::FovAlgorithm;
 
+use core::log::GlobalLog;
+
 use core::world::World;
 
 // Game state depends on what actions the player can do
