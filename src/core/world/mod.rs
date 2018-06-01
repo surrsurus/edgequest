@@ -1,7 +1,7 @@
 extern crate rand;
 use self::rand::Rng;
 
-use core::tcod::map::Map;
+use core::tcod::map::{Map, FovAlgorithm};
 
 use core::object::{Actions, Fighter, Creature, Entity};
 use core::object::ai::{SimpleAI, TrackerAI, BlinkAI, TalkerAI};
@@ -329,6 +329,7 @@ impl World {
     let start_loc = Dungeon::get_valid_location(&w.cur_dungeon.grid);
     w.player.fighter.pos.x = start_loc.0 as isize;
     w.player.fighter.pos.y = start_loc.1 as isize;
+    w.update_fov();
 
     return w;
 
@@ -538,10 +539,15 @@ impl World {
 
   }
 
+  pub fn update_fov(&mut self) {
+    self.tcod_map.compute_fov(self.player.fighter.pos.x as i32, self.player.fighter.pos.y as i32, 20, true, FovAlgorithm::Shadow);
+  }
+
   ///
   /// Update the game world
   ///
   pub fn update(&mut self) {
+    self.update_fov();
     self.update_scent();
     for c in &mut self.creatures {
       c.take_turn(&self.cur_dungeon.grid, &self.player)

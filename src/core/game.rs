@@ -3,9 +3,6 @@
 //!
 
 use core::tcod::input;
-use core::tcod::map::FovAlgorithm;
-
-use core::log::GlobalLog;
 
 use core::world::World;
 
@@ -40,7 +37,7 @@ pub struct Game {
 impl Game {
 
   ///
-  /// Capture keyboard input from tcod
+  /// Capture keyboard input from tcod and update player state
   /// 
   pub fn process_keypress(&mut self, keypress: input::Key) {
 
@@ -59,42 +56,34 @@ impl Game {
             // Movement keys are bound to vim-like controls (hjklyubn)
             'h' => { 
               self.world.player.fighter.move_cart(-1, 0);
-              self.state = State::Act(Actions::Move);
               self.world.player.state = Actions::Move;
             },
             'j' => { 
               self.world.player.fighter.move_cart(0, 1);
-              self.state = State::Act(Actions::Move);
               self.world.player.state = Actions::Move;
             },
             'k' => {
               self.world.player.fighter.move_cart(0, -1);
-              self.state = State::Act(Actions::Move);
               self.world.player.state = Actions::Move;
             },
             'l' => {
               self.world.player.fighter.move_cart(1, 0);
-              self.state = State::Act(Actions::Move);  
               self.world.player.state = Actions::Move;
             },
             'y' => {
               self.world.player.fighter.move_cart(-1, -1);
-              self.state = State::Act(Actions::Move);
               self.world.player.state = Actions::Move;
             },
             'u' => {
               self.world.player.fighter.move_cart(1, -1);
-              self.state = State::Act(Actions::Move);
               self.world.player.state = Actions::Move;
             },
             'b' => {
               self.world.player.fighter.move_cart(-1, 1);
-              self.state = State::Act(Actions::Move);
               self.world.player.state = Actions::Move;
             },
             'n' => { 
               self.world.player.fighter.move_cart(1, 1);
-              self.state = State::Act(Actions::Move);
               self.world.player.state = Actions::Move;
             },
             // "Regenerate" current level
@@ -109,15 +98,14 @@ impl Game {
             },
             // Wait
             '.' => { 
-              self.state = State::Act(Actions::Wait);
               self.world.player.state = Actions::Wait;
             },
             // Go downstars (if possible)
-            '>' => { self.state = State::Act(Actions::DownStair) },
+            '>' => { self.world.player.state = Actions::DownStair },
             // Go upstairs (if possible)
-            '<' => { self.state = State::Act(Actions::UpStair) },
+            '<' => { self.world.player.state = Actions::UpStair },
             // Unbound key, so we just say we don't know what the player did
-            _ => { self.state = State::Act(Actions::Unknown) }
+            _ => { self.world.player.state = Actions::Unknown }
             
           }
 
@@ -158,9 +146,15 @@ impl Game {
   }
 
   ///
-  /// Update the game depending on the state
+  /// Update the game state, then update depending on the new state
   ///
   pub fn update(&mut self) {
+
+    match self.state {
+      State::Debug => (),
+      _ => self.state = State::Act(self.world.player.state.clone())
+    }
+
     match &self.state {
       // Moving or waiting prompts a world update
       &State::Act(Actions::Move) | &State::Act(Actions::Wait) => self.world.update(),
@@ -180,8 +174,7 @@ impl Game {
       // All other variants are dropped
       _ => ()
     }
-    // TODO ...Does this need to be here? :thinking:
-    self.world.tcod_map.compute_fov(self.world.player.fighter.pos.x as i32, self.world.player.fighter.pos.y as i32, 20, true, FovAlgorithm::Shadow);
+    
   }
 
 }
