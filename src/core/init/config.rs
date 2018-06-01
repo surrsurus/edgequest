@@ -2,16 +2,13 @@
 //! A module for loading a YAML config file.
 //! 
 
-// Use to parse YAML
-extern crate yaml_rust;
-use self::yaml_rust::YamlLoader;
+// Serde
+extern crate serde;
+extern crate serde_yaml;
 
 // Use to read files
 use std::fs::File;
 use std::io::prelude::*;
-
-// Use this for three enums that are used in the Config struct
-use core::tcod::console;
 
 ///
 /// A struct to hold data gathered from a config.yml file. You should not need to create your own,
@@ -40,7 +37,7 @@ use core::tcod::console;
 /// * `ro` - AsciiInRow
 /// * `as` - AsciiInCol
 ///
-#[derive(Clone)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Config {
 
   pub screen_width: isize,
@@ -56,10 +53,10 @@ pub struct Config {
 
   pub fontpath: String,
 
-  pub fonttype: console::FontType,
-  pub fontlayout: console::FontLayout,
+  pub fonttype: String,
+  pub fontlayout: String,
 
-  pub renderer: console::Renderer
+  pub renderer: String
 
 }
 
@@ -73,6 +70,8 @@ pub enum Error {
   BadRenderer
 }
 
+///
+/// NOTE: Pretty sure this whole thing is deprecated. Needs to change
 ///
 /// Load configuration data from a path. returns a `Config` struct.
 /// 
@@ -107,64 +106,13 @@ pub enum Error {
 ///  
 pub fn load(path: &str) -> Result<Config, Error> {
 
-  // Q: Why not use SerDe for this?
-  // A: Tcod enums dont derive serialize/deserialize
-
   // Load file to String
   let mut file = File::open(path).expect("Unable to open");
   let mut contents = String::new();
   file.read_to_string(&mut contents).expect("Problem reading file");
 
-  // ... But we actually need a &str. Wish YamlLoader had
-  // a load_from_reader.
-  let cfgs = YamlLoader::load_from_str(&contents).unwrap();
-  // Apparently YamlLoader has this weird quirk where it doesn't do
-  // what you think it would do.
-  let cfg = &cfgs[0];
+  let ds_cfg: Config = serde_yaml::from_str(&contents).unwrap();
 
-  // Return a Config struct
-  return Ok(Config { 
-
-    // screen_width and screen_height can only be read as i64s so we use as isize
-    // to convert them down
-    screen_width: cfg["screen_width"].as_i64().unwrap() as isize,
-    screen_height: cfg["screen_height"].as_i64().unwrap() as isize,
-
-    map_width: cfg["map_width"].as_i64().unwrap() as isize,
-    map_height: cfg["map_height"].as_i64().unwrap() as isize,
-
-    console_height: cfg["console_height"].as_i64().unwrap() as isize,
-    panel_width: cfg["panel_width"].as_i64().unwrap() as isize,
-
-    // Font path should be a String so it doesnt have a lifetime
-    fontpath: cfg["fontpath"].as_str().unwrap().to_string(),
-
-    // Fullscreen mode
-    fullscreen: cfg["fullscreen"].as_bool().unwrap(),
-
-    // Match fonttype based on the FontType enum
-    fonttype: match cfg["fonttype"].as_str().unwrap() {
-      "Default" => console::FontType::Default,
-      "Greyscale" => console::FontType::Greyscale,
-      _ => return Err(Error::BadFontType)
-    },
-
-    // Match fontlayout based on the FontLayout enum
-    fontlayout: match cfg["fontlayout"].as_str().unwrap() {
-      "Tcod" => console::FontLayout::Tcod,
-      "AsciiInRow" => console::FontLayout::AsciiInRow,
-      "AsciiInCol" => console::FontLayout::AsciiInCol,
-      _ => return Err(Error::BadFontLayout)
-    },
-
-    // Match renderer based on the Renderer enum
-    renderer: match cfg["renderer"].as_str().unwrap() {
-      "SDL" => console::Renderer::SDL,
-      "GLSL" => console::Renderer::GLSL,
-      "OpenGL" => console::Renderer::OpenGL,
-      _ => return Err(Error::BadRenderer)
-    }
-
-  });
+  return Ok(ds_cfg);
 
 }

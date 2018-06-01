@@ -4,10 +4,17 @@ version = "0.1.0"
 authors = ["surrsurus"]
 
 [dependencies]
+
+# Main library used
 tcod = "0.12"
+
+# Macro for global logging
 lazy_static = "1.0.1"
-yaml-rust = "0.3"
+
+# RNG
 rand = "0.3"
+
+# Custom noise generator
 fuss = { git = "https://github.com/surrsurus/fuss.git" }
 
 # The core APIs, including the Serialize and Deserialize traits. Always

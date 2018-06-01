@@ -9,6 +9,10 @@ pub mod core;
 #[macro_use]
 extern crate lazy_static;
 
+// For our config
+#[macro_use]
+extern crate serde_derive;
+
 // Defer to game to start playing.
 fn main() {
   core::play();

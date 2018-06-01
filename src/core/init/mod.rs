@@ -24,14 +24,39 @@ pub fn root() -> console::Root {
 
   match config::load("config/cfg.yml") {
     Ok(cfg) => {
+      
+      // Match fonttype based on the FontType enum
+      let fonttype = match cfg.fonttype.as_str() {
+        "Default" => console::FontType::Default,
+        "Greyscale" => console::FontType::Greyscale,
+        _ => panic!("Bad font type: {}", cfg.fonttype)
+      };
+
+      // Match fontlayout based on the FontLayout enum
+      let fontlayout = match cfg.fontlayout.as_str() {
+        "Tcod" => console::FontLayout::Tcod,
+        "AsciiInRow" => console::FontLayout::AsciiInRow,
+        "AsciiInCol" => console::FontLayout::AsciiInCol,
+        _ => panic!("Bad font type: {}", cfg.fontlayout)
+      };
+
+      // Match renderer based on the Renderer enum
+      let renderer = match cfg.renderer.as_str() {
+        "SDL" => console::Renderer::SDL,
+        "GLSL" => console::Renderer::GLSL,
+        "OpenGL" => console::Renderer::OpenGL,
+        _ => panic!("Bad font type: {}", cfg.renderer)
+      };
+
       return console::Root::initializer()
         .size(cfg.screen_width as i32, cfg.screen_height as i32)
         .title("EQ")
         .fullscreen(cfg.fullscreen)
-        .font(cfg.fontpath, cfg.fontlayout)
-        .font_type(cfg.fonttype)
-        .renderer(cfg.renderer)
+        .font(cfg.fontpath, fontlayout)
+        .font_type(fonttype)
+        .renderer(renderer)
         .init();
+
     },
     Err(e) => panic!("Error parsing config.yml! {:?}", e)
   }
