@@ -15,5 +15,6 @@ extern crate serde_derive;
 
 // Defer to game to start playing.
 fn main() {
-  core::play();
+  let mut e = core::Engine::new();
+  e.play();
 }
