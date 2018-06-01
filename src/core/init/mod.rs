@@ -47,9 +47,10 @@ pub fn root() -> console::Root {
     _ => panic!("Bad font type: {}", cfg.renderer)
   };
 
+  // Return a Root console
   return console::Root::initializer()
     .size(cfg.screen_width as i32, cfg.screen_height as i32)
-    .title("EQ")
+    .title("edgequest")
     .fullscreen(cfg.fullscreen)
     .font(cfg.fontpath, fontlayout)
     .font_type(fonttype)

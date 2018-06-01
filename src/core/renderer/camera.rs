@@ -1,5 +1,17 @@
+//!
+//! Select specific parts of the screen to be rendered
+//!
+
 use core::object::Pos;
 
+///
+/// `Camera` struct. A camera simply holds a position (Where it is looking),
+/// and holds information about the map size and screen size (Held as `Pos`s)
+///
+/// Note that the map size can be less than the screen size and this will still work fine,
+/// Although the `Camera` likes to place emphasis on the bottom right corner of the screen,
+/// as that is where the boundary often extends beyond and special care must be taken.
+///
 pub struct Camera {
   // Position that the camera is panned to on the map
   // Must be within map bounds, or camera will just go to the region,
@@ -17,7 +29,7 @@ pub struct Camera {
 impl Camera {
 
   ///
-  /// Check if a `Pos` is in the camera
+  /// Check if a `Pos` is in the camera. Used to determine if something should be rendered or not.
   /// 
   #[inline]
   pub fn is_in_camera(&self, pos: Pos) -> bool {
@@ -27,13 +39,17 @@ impl Camera {
   }
 
   ///
-  /// Move camera over a position on the map
+  /// Move camera over a position on the map. Used to center on the player or points of interest.
   /// 
   /// The camera will prevent itself from going OOB.
   /// 
   pub fn move_to(&mut self, pos: Pos) {
-    
+
+    // Copy position
     let mut new_pos = pos.clone();
+
+    // We want to be somewhere in the middle of the map, but judge based on the max
+    // bounds of the screen. This is what pushes the camera to the bottom right of the screen
     new_pos -= (self.screen.x / 2, (self.screen.y) / 2);
 
     // Boundary checks
@@ -42,6 +58,7 @@ impl Camera {
     if new_pos.x > self.map.x - self.screen.x { new_pos.x = self.map.x - self.screen.x; }
     if new_pos.y > self.map.y - self.screen.y { new_pos.y = self.map.y - self.screen.y; }
 
+    // Some cool math gets us a good position to be at
     self.pos = -new_pos;
 
   }

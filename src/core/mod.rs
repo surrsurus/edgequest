@@ -49,6 +49,7 @@ pub fn play() {
     init::panel_width()
   );
 
+  // Some starting messages, will be removed in later versions
   let mut log = GlobalLog.lock().unwrap();
   log.push(("Welcome to Edgequest", RGB(255, 0, 255)));
   log.push(("Move with vim keys", RGB(255, 255, 255)));
@@ -67,9 +68,11 @@ pub fn play() {
     // Draw what the camera sees
     ren.draw_all(&mut root, &mut game.world);
     
-    // Capture keypresses
+    // Capture some keypresses to trigger debugging options
+    // NOTE: We *might* be able to put these in `Game`? I want to
+    // consolidate this core and `Game` sometime. After all, `Game`
+    // IS a singleton. Why not just have it all over here?
     let keypress = root.wait_for_keypress(true);
-    // Capture debug keys
     if keypress.printable == 'r' {
       ren.sc_debug = !ren.sc_debug;
       ren.draw_all(&mut root, &mut game.world);

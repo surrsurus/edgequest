@@ -1,5 +1,5 @@
 //! 
-//! A module for loading a YAML config file.
+//! A module for loading a YAML config file with serde.
 //! 
 
 // Serde
@@ -40,60 +40,44 @@ use std::io::prelude::*;
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Config {
 
+  // Size of physical screen
   pub screen_width: isize,
   pub screen_height: isize,
 
+  // Size of default dungeon maps
   pub map_width: isize,
   pub map_height: isize,
 
+  // Size of the console at the bottom of the screen
   pub console_height: isize,
+  
+  // Size of the panel on the right of the screen
   pub panel_width: isize,
 
+  // Toggles fullscreen
   pub fullscreen: bool,
 
+  // Determines relative path to the font to be used
   pub fontpath: String,
 
+  // Determines type of font
   pub fonttype: String,
+
+  // Determines layout of font
   pub fontlayout: String,
 
+  // Determines renderer to be used
   pub renderer: String
 
 }
 
 ///
-/// NOTE: Pretty sure this whole thing is deprecated. Needs to change
+/// Load configuration data from a path. 
+/// Deserializes data from the file to a `Config` struct with serde.
 ///
-/// Load configuration data from a path. returns a `Config` struct.
+/// Serde typically will fail on its own if there is any malformed data,
+/// but in instance of specific strings it should be up to `init` to verify them
 /// 
-/// This function expects to be passed in a valid YAML file that has YAML for each attribute
-/// in `Config`.
-///
-/// * `path` - Path to desired YAML file.
-/// 
-/// # What data should be in your configuration file
-/// 
-/// * `screen_width` - screen_width of the window in characters.
-/// * `screen_height` - screen_height of the window in characters.
-/// * `fullscreen` - Determines whether or not game will start in fullscreen mode.
-/// * `fontpath` - Path to desired font to use.
-/// * `fonttype` - Type of font, either Default or Greyscale.
-/// * `fontlayout` - Layout of font. Either Tcod, AsciiInRow, or AsciiInCol.
-/// * `renderer` - Desired renderer to use. Either SDL, GLSL, or OpenGL.
-/// 
-/// # Panics
-/// 
-/// This function will panic if:
-/// 
-/// * The path is invalid
-/// * The file is invalid
-/// * The file is not a YAML file
-/// * The file is missing YAML for any attribute of `Config`
-/// * The YAML for each attribute is not the correct type
-/// * The YAML for fonttype, fontlayout, or renderer are not in their tcod enums
-/// 
-/// This is definitely a very touchy function but it is important that there are no errors
-/// with the configuration file because initializing the root console depends heavily on it.
-///  
 pub fn load(path: &str) -> Config {
 
   // Load file to String
@@ -101,6 +85,7 @@ pub fn load(path: &str) -> Config {
   let mut contents = String::new();
   file.read_to_string(&mut contents).expect("Problem reading file");
 
+  // Deserialize content to Config
   let ds_cfg: Config = serde_yaml::from_str(&contents).unwrap();
 
   return ds_cfg;

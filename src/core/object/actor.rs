@@ -1,10 +1,13 @@
+//!
+//! An `Actor` is an object that is renderable to the screen and is responsible for moving itself
+//!
+
 use core::object::{Entity, Pos};
+
 use core::renderer::RGB;
 
 ///
-/// A Actor is something that can fight, but also be rendered to the screen
-///
-/// NOTE: From that description, I think something might have to change...
+/// Actor struct. Holds necessary properties that extend from `Entity`
 ///
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Actor {
@@ -18,7 +21,7 @@ pub struct Actor {
 impl Actor {
 
   /// 
-  /// Move the `Entity` by `x` in the x direction and `y` in
+  /// Move the `Actor` by `x` in the x direction and `y` in
   /// the y direction.
   /// 
   /// This does not overwrite the positon, only add to it.
@@ -33,7 +36,7 @@ impl Actor {
   }
 
   /// 
-  /// Move the `Entity` by adding a new `Pos` to it
+  /// Move the `Actor` by adding a new `Pos` to it
   /// 
   /// This does not overwrite the positon, only add to it.
   /// If values in `Pos` are negative, 
@@ -48,7 +51,7 @@ impl Actor {
   }
 
   ///
-  /// Return a new `Entity`
+  /// Return a new `Actor`
   ///
   #[inline]
   pub fn new(name: &'static str, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8)) -> Actor {
@@ -61,6 +64,9 @@ impl Actor {
     }
   }
 
+  ///
+  /// Directly override position
+  ///
   #[inline]
   pub fn set_pos(&mut self, pos: Pos) {
     self.pos = pos
@@ -68,6 +74,9 @@ impl Actor {
 
 }
 
+///
+/// Implement the `Entity` trait for `Actor`, mostly just getters and setters
+///
 impl Entity for Actor {
 
   #[inline]

@@ -1,3 +1,7 @@
+//!
+//! A `Pos` is an xy coordinate that can do some fancy math on itself
+//!
+
 // Operator overloading
 use std::ops::{Add, AddAssign, BitXor, Neg, Sub, SubAssign};
 

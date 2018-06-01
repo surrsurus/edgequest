@@ -109,6 +109,7 @@ impl Game {
             
           }
 
+          // Make sure player doesn't do anything dumb
           if !self.world.is_valid(self.world.player.actor.pos.x, self.world.player.actor.pos.y) {
             self.world.player.actor.pos = oldpos;
             self.state = State::Act(Actions::Unknown);

@@ -1,3 +1,15 @@
+//!
+//! An entity is something that can be rendered to the screen, that is:
+//!
+//! * Has a glyph (Character the `Entity` shows up as on the screen)
+//! * Has a name (Allows us to log specific things about the `Entity`)
+//! * Has a `Pos` (Allows us to know where on the map an `Entity` is)
+//! * Has `RGB` foreground and backgrounds (Allows us to make it pretty)
+//!
+//! The entity trait simply allows us to define some getters and setters that should
+//! be uniform across all `Entity`s.
+//!
+
 use core::renderer::RGB;
 
 /// 

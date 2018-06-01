@@ -1,6 +1,8 @@
 //!
 //! Global, mutable log.
 //!
+//! NOTE: Probably needs to change to just BE a Vec, much like `Grid<T>`
+//!
 
 #![allow(non_upper_case_globals)] 
 
