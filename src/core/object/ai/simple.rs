@@ -5,7 +5,7 @@ use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, TileType};
 
 use core::object::ai::AI;
-use core::object::{Actions, Creature, Actor};
+use core::object::{Actions, Creature, Actor, Stats};
 
 ///
 /// SimpleAI is literally just an AI that walks around randomly
@@ -27,7 +27,7 @@ impl AI for SimpleAI {
   ///
   /// Walk around randomly
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Actor) -> Actions {
+  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
 
     let mut rng = thread_rng();
     let mut dice : i32;

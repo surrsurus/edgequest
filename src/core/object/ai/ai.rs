@@ -1,7 +1,7 @@
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::Tile;
 
-use core::object::{Actions, Creature, Actor};
+use core::object::{Actions, Creature, Actor, Stats};
 
 ///
 /// Represents basic actions AI can take in the game
@@ -14,6 +14,6 @@ pub trait AI {
   /// NOTE: I feel like this is going to have to change, maybe it'll take a vec of
   /// creatures instead? Definitely going to change in the future. Might even need a tcod map?
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature, me: &mut Actor) -> Actions;
+  fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature, me: &mut Actor, stats: &mut Stats) -> Actions;
 
 }

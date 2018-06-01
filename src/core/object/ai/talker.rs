@@ -7,7 +7,7 @@ use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::Tile;
 
 use core::object::ai::AI;
-use core::object::{Actions, Creature, Actor, Entity};
+use core::object::{Actions, Creature, Actor, Entity, Stats};
 
 ///
 /// AI that tracks player
@@ -27,7 +27,7 @@ impl AI for TalkerAI {
   ///
   /// Track player if near
   ///
-  fn take_turn(&mut self, _map: &Grid<Tile>, player: &Creature, me: &mut Actor) -> Actions {
+  fn take_turn(&mut self, _map: &Grid<Tile>, player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
 
     let mut state = Actions::Wait;
 

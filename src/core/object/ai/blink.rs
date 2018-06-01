@@ -4,7 +4,7 @@ use self::rand::{thread_rng, Rng};
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, TileType};
 
-use core::object::{Actions, Creature, Actor};
+use core::object::{Actions, Creature, Actor, Stats};
 use core::object::ai::AI;
 
 ///
@@ -35,7 +35,7 @@ impl AI for BlinkAI {
   ///
   /// Walk around randomly
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Actor) -> Actions {
+  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
 
     let mut rng = thread_rng();
     

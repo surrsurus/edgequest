@@ -17,6 +17,7 @@ pub struct Creature {
 impl Creature {
 
   #[inline]
+  // NOTE: Will need to change so that a stats is passed in instead of a scent_type
   pub fn new<T: AI + 'static>(name: &'static str, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), scent_type: ScentType, ai: T) -> Creature {
     Creature {
       actor: Actor::new(name, glyph, pos, fg, bg),
@@ -27,7 +28,7 @@ impl Creature {
   }
 
   pub fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature) {
-    self.state = self.ai.take_turn(map, player, &mut self.actor);
+    self.state = self.ai.take_turn(map, player, &mut self.actor, &mut self.stats);
   }
 
 }
