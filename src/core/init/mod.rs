@@ -22,16 +22,19 @@ mod init_tests;
 /// 
 pub fn root() -> console::Root {
 
-  let cfg = config::load("config/cfg.yml");
-
-  return console::Root::initializer()
-    .size(cfg.screen_width as i32, cfg.screen_height as i32)
-    .title("EQ")
-    .fullscreen(cfg.fullscreen)
-    .font(cfg.fontpath, cfg.fontlayout)
-    .font_type(cfg.fonttype)
-    .renderer(cfg.renderer)
-    .init();
+  match config::load("config/cfg.yml") {
+    Ok(cfg) => {
+      return console::Root::initializer()
+        .size(cfg.screen_width as i32, cfg.screen_height as i32)
+        .title("EQ")
+        .fullscreen(cfg.fullscreen)
+        .font(cfg.fontpath, cfg.fontlayout)
+        .font_type(cfg.fonttype)
+        .renderer(cfg.renderer)
+        .init();
+    },
+    Err(e) => panic!("Error parsing config.yml! {:?}", e)
+  }
 
 }
 
@@ -40,9 +43,10 @@ pub fn root() -> console::Root {
 /// 
 pub fn map_dimensions() -> (isize, isize) {
   
-  let cfg = config::load("config/cfg.yml");
-
-  return (cfg.map_width, cfg.map_height);
+  match config::load("config/cfg.yml") {
+    Ok(cfg) => return (cfg.map_width, cfg.map_height),
+    Err(e) => panic!("Error parsing config.yml! {:?}", e)
+  }
 
 }
 
@@ -50,14 +54,22 @@ pub fn map_dimensions() -> (isize, isize) {
 /// Get console height
 ///
 pub fn console_height() -> isize {
-  let cfg = config::load("config/cfg.yml");
-  return cfg.console_height;
+
+  match config::load("config/cfg.yml") {
+    Ok(cfg) => return cfg.console_height,
+    Err(e) => panic!("Error parsing config.yml! {:?}", e)
+  }
+  
 }
 
 ///
 /// Get panel width
 ///
 pub fn panel_width() -> isize {
-  let cfg = config::load("config/cfg.yml");
-  return cfg.panel_width;
+
+  match config::load("config/cfg.yml") {
+    Ok(cfg) => return cfg.panel_width,
+    Err(e) => panic!("Error parsing config.yml! {:?}", e)
+  }
+  
 }

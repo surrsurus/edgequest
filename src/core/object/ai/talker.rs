@@ -33,7 +33,7 @@ impl AI for TalkerAI {
 
     let distance = me.pos ^ player.fighter.pos;
 
-    if distance < 20.0 && distance > 2.00 {
+    if distance < 20.0 {
 
       // Mutable reference to the mutex
       let mut log = GlobalLog.lock().unwrap();

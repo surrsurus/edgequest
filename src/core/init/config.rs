@@ -68,13 +68,12 @@ pub struct Config {
 ///
 /// Hold possible return errors from `load()`
 ///
-/// NOTE: We want to use this in a future version of `load()`
-///
-// enum ConfigError {
-//   BadFontType,
-//   BadFontLayout,
-//   BadRenderer
-// }
+#[derive(Debug)]
+pub enum Error {
+  BadFontType,
+  BadFontLayout,
+  BadRenderer
+}
 
 ///
 /// Load configuration data from a path. returns a `Config` struct.
@@ -110,7 +109,7 @@ pub struct Config {
 ///  
 /// NOTE: *Definitely* want to make sure this returns a Result<Config, ConfigError>
 ///
-pub fn load(path: &str) -> Config {
+pub fn load(path: &str) -> Result<Config, Error> {
 
   // Q: Why not use SerDe for this?
   // A: Tcod enums dont derive serialize/deserialize
@@ -128,7 +127,7 @@ pub fn load(path: &str) -> Config {
   let cfg = &cfgs[0];
 
   // Return a Config struct
-  return Config { 
+  return Ok(Config { 
 
     // screen_width and screen_height can only be read as i64s so we use as isize
     // to convert them down
@@ -151,7 +150,7 @@ pub fn load(path: &str) -> Config {
     fonttype: match cfg["fonttype"].as_str().unwrap() {
       "Default" => console::FontType::Default,
       "Greyscale" => console::FontType::Greyscale,
-      _ => panic!("Wrong FontType in yaml file!")
+      _ => return Err(Error::BadFontType)
     },
 
     // Match fontlayout based on the FontLayout enum
@@ -159,7 +158,7 @@ pub fn load(path: &str) -> Config {
       "Tcod" => console::FontLayout::Tcod,
       "AsciiInRow" => console::FontLayout::AsciiInRow,
       "AsciiInCol" => console::FontLayout::AsciiInCol,
-      _ => panic!("Wrong FontLayout in yaml file!")
+      _ => return Err(Error::BadFontLayout)
     },
 
     // Match renderer based on the Renderer enum
@@ -167,9 +166,9 @@ pub fn load(path: &str) -> Config {
       "SDL" => console::Renderer::SDL,
       "GLSL" => console::Renderer::GLSL,
       "OpenGL" => console::Renderer::OpenGL,
-      _ => panic!("Wrong Renderer in yaml file!")
+      _ => return Err(Error::BadRenderer)
     }
 
-  }
+  });
 
 }
