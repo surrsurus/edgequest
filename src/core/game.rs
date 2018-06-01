@@ -49,41 +49,41 @@ impl Game {
   
         if keypress.printable != ' ' {
 
-          let oldpos = self.world.player.fighter.pos.clone();
+          let oldpos = self.world.player.actor.pos.clone();
         
           match keypress.printable {
             
             // Movement keys are bound to vim-like controls (hjklyubn)
             'h' => { 
-              self.world.player.fighter.move_cart(-1, 0);
+              self.world.player.actor.move_cart(-1, 0);
               self.world.player.state = Actions::Move;
             },
             'j' => { 
-              self.world.player.fighter.move_cart(0, 1);
+              self.world.player.actor.move_cart(0, 1);
               self.world.player.state = Actions::Move;
             },
             'k' => {
-              self.world.player.fighter.move_cart(0, -1);
+              self.world.player.actor.move_cart(0, -1);
               self.world.player.state = Actions::Move;
             },
             'l' => {
-              self.world.player.fighter.move_cart(1, 0);
+              self.world.player.actor.move_cart(1, 0);
               self.world.player.state = Actions::Move;
             },
             'y' => {
-              self.world.player.fighter.move_cart(-1, -1);
+              self.world.player.actor.move_cart(-1, -1);
               self.world.player.state = Actions::Move;
             },
             'u' => {
-              self.world.player.fighter.move_cart(1, -1);
+              self.world.player.actor.move_cart(1, -1);
               self.world.player.state = Actions::Move;
             },
             'b' => {
-              self.world.player.fighter.move_cart(-1, 1);
+              self.world.player.actor.move_cart(-1, 1);
               self.world.player.state = Actions::Move;
             },
             'n' => { 
-              self.world.player.fighter.move_cart(1, 1);
+              self.world.player.actor.move_cart(1, 1);
               self.world.player.state = Actions::Move;
             },
             // "Regenerate" current level
@@ -109,8 +109,8 @@ impl Game {
             
           }
 
-          if !self.world.is_valid(self.world.player.fighter.pos.x, self.world.player.fighter.pos.y) {
-            self.world.player.fighter.pos = oldpos;
+          if !self.world.is_valid(self.world.player.actor.pos.x, self.world.player.actor.pos.y) {
+            self.world.player.actor.pos = oldpos;
             self.state = State::Act(Actions::Unknown);
             self.world.player.state = Actions::Unknown;
           }

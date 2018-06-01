@@ -189,8 +189,8 @@ impl World {
 
     self.creatures = Vec::new();
 
-    self.player.fighter.pos.x = (self.cur_dungeon.width / 2) as isize;
-    self.player.fighter.pos.y = (self.cur_dungeon.height / 2) as isize;
+    self.player.actor.pos.x = (self.cur_dungeon.width / 2) as isize;
+    self.player.actor.pos.y = (self.cur_dungeon.height / 2) as isize;
   }
 
   ///
@@ -239,7 +239,7 @@ impl World {
   /// Go downstairs
   ///
   pub fn can_go_down(&self) -> bool {
-    match self.get_tile_at(self.player.fighter.pos.x, self.player.fighter.pos.y).tiletype {
+    match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
       TileType::DownStair => return true,
       _ => return false
     }
@@ -253,7 +253,7 @@ impl World {
   /// Go upstairs
   ///
   pub fn can_go_up(&self) -> bool {
-    match self.get_tile_at(self.player.fighter.pos.x, self.player.fighter.pos.y).tiletype {
+    match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
       TileType::UpStair => return true,
       _ => return false
     }
@@ -276,8 +276,8 @@ impl World {
     self.tcod_map = tm;
 
     let start_loc = Dungeon::get_valid_location(&self.cur_dungeon.grid);
-    self.player.fighter.pos.x = start_loc.0 as isize;
-    self.player.fighter.pos.y = start_loc.1 as isize;
+    self.player.actor.pos.x = start_loc.0 as isize;
+    self.player.actor.pos.y = start_loc.1 as isize;
 
     self.update_water();
 
@@ -327,8 +327,8 @@ impl World {
     };
 
     let start_loc = Dungeon::get_valid_location(&w.cur_dungeon.grid);
-    w.player.fighter.pos.x = start_loc.0 as isize;
-    w.player.fighter.pos.y = start_loc.1 as isize;
+    w.player.actor.pos.x = start_loc.0 as isize;
+    w.player.actor.pos.y = start_loc.1 as isize;
     w.update_fov();
 
     return w;
@@ -351,8 +351,8 @@ impl World {
   fn update_scent(&mut self) {
 
     // Create initial bloom around player
-    let px = self.player.fighter.pos.x;
-    let py = self.player.fighter.pos.y;
+    let px = self.player.actor.pos.x;
+    let py = self.player.actor.pos.y;
     for nx in SC_DIAM_LOWER..SC_DIAM_UPPER {
       for ny in SC_DIAM_LOWER..SC_DIAM_UPPER {
         if self.is_valid(px - nx, py - ny) {
@@ -373,9 +373,9 @@ impl World {
     // but need a &mut self for that function.
     let mut cinf = vec![];
     for c in &self.creatures {
-      let cx = c.fighter.pos.x;
-      let cy = c.fighter.pos.y;
-      let st = c.scent_type.clone();
+      let cx = c.actor.pos.x;
+      let cy = c.actor.pos.y;
+      let st = c.stats.scent_type.clone();
       cinf.push((cx, cy, st));
     }
 
@@ -472,12 +472,12 @@ impl World {
     // Create initial bloom around player
     match &self.player.state {
         &Actions::Move => {
-          let px = self.player.fighter.pos.x;
-          let py = self.player.fighter.pos.y;
+          let px = self.player.actor.pos.x;
+          let py = self.player.actor.pos.y;
           for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
             for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
               if self.is_valid(px - nx, py - ny) {
-                self.get_mut_tile_at(px - nx, py - ny).sound = SO_INC - ((dist(&self.player.fighter, px - nx, py - ny)) * (SO_DIAM / 2)) as u8;
+                self.get_mut_tile_at(px - nx, py - ny).sound = SO_INC - ((dist(&self.player.actor, px - nx, py - ny)) * (SO_DIAM / 2)) as u8;
               }
             }
           }
@@ -490,9 +490,9 @@ impl World {
     // but need a &mut self for that function.
     let mut cinf = vec![];
     for c in &self.creatures {
-      let cx = c.fighter.pos.x;
-      let cy = c.fighter.pos.y;
-      let f = c.fighter.clone();
+      let cx = c.actor.pos.x;
+      let cy = c.actor.pos.y;
+      let f = c.actor.clone();
       let s = c.state.clone();
       cinf.push((cx, cy, f, s));
     }
@@ -540,7 +540,7 @@ impl World {
   }
 
   pub fn update_fov(&mut self) {
-    self.tcod_map.compute_fov(self.player.fighter.pos.x as i32, self.player.fighter.pos.y as i32, 20, true, FovAlgorithm::Shadow);
+    self.tcod_map.compute_fov(self.player.actor.pos.x as i32, self.player.actor.pos.y as i32, 20, true, FovAlgorithm::Shadow);
   }
 
   ///

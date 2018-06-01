@@ -116,7 +116,7 @@ impl Renderer {
     con.clear();
 
     // Move camera to player's position
-    self.camera.move_to(world.player.fighter.pos);
+    self.camera.move_to(world.player.actor.pos);
 
     //
     // Draw tiles
@@ -188,17 +188,17 @@ impl Renderer {
       // If fov is on...
       if self.fov {
         // And its in the fov...
-        if world.tcod_map.is_in_fov(c.fighter.pos.x as i32, c.fighter.pos.y as i32) && self.fov {
-          self.draw_creature(con, c.fighter.pos, &c.fighter, world);
+        if world.tcod_map.is_in_fov(c.actor.pos.x as i32, c.actor.pos.y as i32) && self.fov {
+          self.draw_creature(con, c.actor.pos, &c.actor, world);
         }
       } else {
-        self.draw_creature(con, c.fighter.pos, &c.fighter, world);
+        self.draw_creature(con, c.actor.pos, &c.actor, world);
       }
     }
 
     // Draw player. Player is always in the camera since
     // we move the camera over it.
-    self.draw_creature(con, world.player.fighter.pos, &world.player.fighter, world);
+    self.draw_creature(con, world.player.actor.pos, &world.player.actor, world);
 
     //
     // Draw log

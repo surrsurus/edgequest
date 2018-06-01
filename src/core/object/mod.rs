@@ -15,6 +15,9 @@ pub use self::entity::Entity;
 pub mod actor;
 pub use self::actor::Actor;
 
+pub mod stats;
+pub use self::stats::Stats;
+
 pub mod pos;
 pub use self::pos::Pos;
 

@@ -31,7 +31,7 @@ impl AI for TalkerAI {
 
     let mut state = Actions::Wait;
 
-    let distance = me.pos ^ player.fighter.pos;
+    let distance = me.pos ^ player.actor.pos;
 
     if distance < 20.0 {
 

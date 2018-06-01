@@ -26,17 +26,17 @@ impl AI for TrackerAI {
 
     let mut state = Actions::Wait;
 
-    let distance = me.pos ^ player.fighter.pos;
+    let distance = me.pos ^ player.actor.pos;
     let mut x = me.pos.x;
     let mut y = me.pos.y;
 
     if distance < 20.0 && distance > 2.00 {
 
       // Move x
-      if x < player.fighter.pos.x {
+      if x < player.actor.pos.x {
         x += 1;
         state = Actions::Move;
-      } else if x > player.fighter.pos.x {
+      } else if x > player.actor.pos.x {
         x -= 1;
         state = Actions::Move;
       }
@@ -48,10 +48,10 @@ impl AI for TrackerAI {
       }
 
       // Move y
-      if y < player.fighter.pos.y {
+      if y < player.actor.pos.y {
         y += 1;
         state = Actions::Move;
-      } else if y > player.fighter.pos.y {
+      } else if y > player.actor.pos.y {
         y -= 1;
         state = Actions::Move;
       }
