@@ -12,8 +12,8 @@ pub use self::creature::Creature;
 pub mod entity;
 pub use self::entity::Entity;
 
-pub mod fighter;
-pub use self::fighter::Fighter;
+pub mod actor;
+pub use self::actor::Actor;
 
 pub mod pos;
 pub use self::pos::Pos;

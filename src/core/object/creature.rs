@@ -2,13 +2,13 @@ use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, ScentType};
 
 use core::object::ai::AI;
-use core::object::{Actions, Fighter};
+use core::object::{Actions, Actor};
 
 ///
-/// Creature holds a `Fighter` and an `AI`, basically a package that we can create monsters from
+/// Creature holds a `Actor` and an `AI`, basically a package that we can create monsters from
 ///
 pub struct Creature {
-  pub fighter: Fighter,
+  pub fighter: Actor,
   pub scent_type: ScentType,
   pub state: Actions,
   pub ai: Box<AI>
@@ -19,7 +19,7 @@ impl Creature {
   #[inline]
   pub fn new<T: AI + 'static>(name: &'static str, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), scent_type: ScentType, ai: T) -> Creature {
     Creature {
-      fighter: Fighter::new(name, glyph, pos, fg, bg),
+      fighter: Actor::new(name, glyph, pos, fg, bg),
       scent_type: scent_type,
       state: Actions::Unknown,
       ai: Box::new(ai)

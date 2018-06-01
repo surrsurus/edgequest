@@ -2,7 +2,7 @@ use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, TileType};
 
 use core::object::ai::AI;
-use core::object::{Actions, Creature, Fighter};
+use core::object::{Actions, Creature, Actor};
 
 ///
 /// AI that tracks player
@@ -22,7 +22,7 @@ impl AI for TrackerAI {
   ///
   /// Track player if near
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature, me: &mut Fighter) -> Actions {
+  fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature, me: &mut Actor) -> Actions {
 
     let mut state = Actions::Wait;
 

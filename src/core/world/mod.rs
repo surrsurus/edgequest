@@ -3,7 +3,7 @@ use self::rand::Rng;
 
 use core::tcod::map::{Map, FovAlgorithm};
 
-use core::object::{Actions, Fighter, Creature, Entity};
+use core::object::{Actions, Actor, Creature, Entity};
 use core::object::ai::{SimpleAI, TrackerAI, BlinkAI, TalkerAI};
 use core::renderer::RGB;
 
@@ -465,7 +465,7 @@ impl World {
       }
     }
 
-    let dist = |obj: &Fighter, x: isize, y: isize| -> isize {
+    let dist = |obj: &Actor, x: isize, y: isize| -> isize {
       (((obj.pos.x - x).pow(2) + (obj.pos.y - y).pow(2)) as f32).sqrt().floor() as isize
     };
 

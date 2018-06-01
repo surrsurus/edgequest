@@ -4,7 +4,7 @@ use self::rand::{thread_rng, Rng};
 use core::world::dungeon::map::Grid;
 use core::world::dungeon::map::{Tile, TileType};
 
-use core::object::{Actions, Creature, Fighter};
+use core::object::{Actions, Creature, Actor};
 use core::object::ai::AI;
 
 ///
@@ -15,7 +15,7 @@ pub struct BlinkAI;
 
 impl BlinkAI {
 
-  pub fn blink(&mut self, me: &mut Fighter) -> (isize, isize) {
+  pub fn blink(&mut self, me: &mut Actor) -> (isize, isize) {
     let mut rng = thread_rng();
     let mut x = me.pos.x;
     let mut y = me.pos.y;
@@ -35,7 +35,7 @@ impl AI for BlinkAI {
   ///
   /// Walk around randomly
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Fighter) -> Actions {
+  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Actor) -> Actions {
 
     let mut rng = thread_rng();
     
