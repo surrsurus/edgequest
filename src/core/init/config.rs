@@ -61,16 +61,6 @@ pub struct Config {
 }
 
 ///
-/// Hold possible return errors from `load()`
-///
-#[derive(Debug)]
-pub enum Error {
-  BadFontType,
-  BadFontLayout,
-  BadRenderer
-}
-
-///
 /// NOTE: Pretty sure this whole thing is deprecated. Needs to change
 ///
 /// Load configuration data from a path. returns a `Config` struct.
@@ -104,7 +94,7 @@ pub enum Error {
 /// This is definitely a very touchy function but it is important that there are no errors
 /// with the configuration file because initializing the root console depends heavily on it.
 ///  
-pub fn load(path: &str) -> Result<Config, Error> {
+pub fn load(path: &str) -> Config {
 
   // Load file to String
   let mut file = File::open(path).expect("Unable to open");
@@ -113,6 +103,6 @@ pub fn load(path: &str) -> Result<Config, Error> {
 
   let ds_cfg: Config = serde_yaml::from_str(&contents).unwrap();
 
-  return Ok(ds_cfg);
+  return ds_cfg;
 
 }

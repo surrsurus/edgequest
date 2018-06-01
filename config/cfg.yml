@@ -34,7 +34,6 @@ fonttype: "Greyscale"
 # * AsciiInCol
 fontlayout: "AsciiInRow"
 
-
 # Desired renderer. Default: SDL
 # Options:
 # * SDL

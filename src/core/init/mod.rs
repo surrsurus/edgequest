@@ -22,44 +22,39 @@ mod init_tests;
 /// 
 pub fn root() -> console::Root {
 
-  match config::load("config/cfg.yml") {
-    Ok(cfg) => {
-      
-      // Match fonttype based on the FontType enum
-      let fonttype = match cfg.fonttype.as_str() {
-        "Default" => console::FontType::Default,
-        "Greyscale" => console::FontType::Greyscale,
-        _ => panic!("Bad font type: {}", cfg.fonttype)
-      };
+  let cfg = config::load("config/cfg.yml");
 
-      // Match fontlayout based on the FontLayout enum
-      let fontlayout = match cfg.fontlayout.as_str() {
-        "Tcod" => console::FontLayout::Tcod,
-        "AsciiInRow" => console::FontLayout::AsciiInRow,
-        "AsciiInCol" => console::FontLayout::AsciiInCol,
-        _ => panic!("Bad font type: {}", cfg.fontlayout)
-      };
+  // Match fonttype based on the FontType enum
+  let fonttype = match cfg.fonttype.as_str() {
+    "Default" => console::FontType::Default,
+    "Greyscale" => console::FontType::Greyscale,
+    _ => panic!("Bad font type: {}", cfg.fonttype)
+  };
 
-      // Match renderer based on the Renderer enum
-      let renderer = match cfg.renderer.as_str() {
-        "SDL" => console::Renderer::SDL,
-        "GLSL" => console::Renderer::GLSL,
-        "OpenGL" => console::Renderer::OpenGL,
-        _ => panic!("Bad font type: {}", cfg.renderer)
-      };
+  // Match fontlayout based on the FontLayout enum
+  let fontlayout = match cfg.fontlayout.as_str() {
+    "Tcod" => console::FontLayout::Tcod,
+    "AsciiInRow" => console::FontLayout::AsciiInRow,
+    "AsciiInCol" => console::FontLayout::AsciiInCol,
+    _ => panic!("Bad font type: {}", cfg.fontlayout)
+  };
 
-      return console::Root::initializer()
-        .size(cfg.screen_width as i32, cfg.screen_height as i32)
-        .title("EQ")
-        .fullscreen(cfg.fullscreen)
-        .font(cfg.fontpath, fontlayout)
-        .font_type(fonttype)
-        .renderer(renderer)
-        .init();
+  // Match renderer based on the Renderer enum
+  let renderer = match cfg.renderer.as_str() {
+    "SDL" => console::Renderer::SDL,
+    "GLSL" => console::Renderer::GLSL,
+    "OpenGL" => console::Renderer::OpenGL,
+    _ => panic!("Bad font type: {}", cfg.renderer)
+  };
 
-    },
-    Err(e) => panic!("Error parsing config.yml! {:?}", e)
-  }
+  return console::Root::initializer()
+    .size(cfg.screen_width as i32, cfg.screen_height as i32)
+    .title("EQ")
+    .fullscreen(cfg.fullscreen)
+    .font(cfg.fontpath, fontlayout)
+    .font_type(fonttype)
+    .renderer(renderer)
+    .init();
 
 }
 
@@ -67,34 +62,22 @@ pub fn root() -> console::Root {
 /// Get map dimensions as a `Pos`
 /// 
 pub fn map_dimensions() -> (isize, isize) {
-  
-  match config::load("config/cfg.yml") {
-    Ok(cfg) => return (cfg.map_width, cfg.map_height),
-    Err(e) => panic!("Error parsing config.yml! {:?}", e)
-  }
-
+  let cfg = config::load("config/cfg.yml");
+  return (cfg.map_width, cfg.map_height);
 }
 
 ///
 /// Get console height
 ///
 pub fn console_height() -> isize {
-
-  match config::load("config/cfg.yml") {
-    Ok(cfg) => return cfg.console_height,
-    Err(e) => panic!("Error parsing config.yml! {:?}", e)
-  }
-  
+  let cfg = config::load("config/cfg.yml");
+  return cfg.console_height;
 }
 
 ///
 /// Get panel width
 ///
 pub fn panel_width() -> isize {
-
-  match config::load("config/cfg.yml") {
-    Ok(cfg) => return cfg.panel_width,
-    Err(e) => panic!("Error parsing config.yml! {:?}", e)
-  }
-  
+  let cfg = config::load("config/cfg.yml");
+  return cfg.panel_width;
 }
