@@ -9,3 +9,15 @@ lazy_static = "1.0.1"
 yaml-rust = "0.3"
 rand = "0.3"
 fuss = { git = "https://github.com/surrsurus/fuss.git" }
+
+# The core APIs, including the Serialize and Deserialize traits. Always
+# required when using Serde.
+serde = "1.0"
+
+# Support for #[derive(Serialize, Deserialize)]. Required if you want Serde
+# to work for structs and enums defined in your crate.
+serde_derive = "1.0"
+
+# Each data format lives in its own crate; the sample code below uses YAML
+# but you may be using a different one.
+serde_yaml = "0.7"

@@ -1,8 +1,6 @@
 //! 
 //! A module for loading a YAML config file.
 //! 
-//! NOTE: Probably will be deprecated in favor of using serde
-//! 
 
 // Use to parse YAML
 extern crate yaml_rust;
@@ -107,8 +105,6 @@ pub enum Error {
 /// This is definitely a very touchy function but it is important that there are no errors
 /// with the configuration file because initializing the root console depends heavily on it.
 ///  
-/// NOTE: *Definitely* want to make sure this returns a Result<Config, ConfigError>
-///
 pub fn load(path: &str) -> Result<Config, Error> {
 
   // Q: Why not use SerDe for this?
