@@ -279,6 +279,7 @@ impl World {
     self.player.actor.pos.x = start_loc.0 as isize;
     self.player.actor.pos.y = start_loc.1 as isize;
 
+    self.update_fov();
     self.update_water();
 
   }

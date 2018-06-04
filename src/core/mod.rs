@@ -45,10 +45,10 @@ pub enum State {
 /// Engine struct. Holds a world, state, and renderer
 /// 
 pub struct Engine {
-  pub world: World,
-  pub state: State,
-  pub ren: Renderer,
-  pub root: console::Root
+  world: World,
+  state: State,
+  ren: Renderer,
+  root: console::Root,
 }
 
 impl Engine {
@@ -56,7 +56,7 @@ impl Engine {
   ///
   /// Capture keyboard input from tcod and update player state
   /// 
-  pub fn process_keypress(&mut self, keypress: input::Key) {
+  fn process_keypress(&mut self, keypress: input::Key) {
 
     match keypress.code {
       
@@ -67,8 +67,12 @@ impl Engine {
         if keypress.printable != ' ' {
 
           let oldpos = self.world.player.actor.pos.clone();
+
+          // Wipe the state
+          self.state = State::New;
         
           match keypress.printable {
+
             
             // Movement keys are bound to vim-like controls (hjklyubn)
             'h' => { 
@@ -106,12 +110,12 @@ impl Engine {
             // "Regenerate" current level
             'w' => {
               self.world.test_traverse();
-              self.state = State::Debug;
+              self.state = State::Act(Actions::Unknown);
             },
             // Create an empty level for testing
             'q' => {
               self.world.test_empty();
-              self.state = State::Debug;
+              self.state = State::Act(Actions::Unknown);
             },
             // Wait
             '.' => { 
@@ -127,15 +131,14 @@ impl Engine {
 
             // Toggle scent
             'r' => {
-              self.ren.sc_debug = !self.ren.sc_debug;
+              self.ren.show_scent = !self.ren.show_scent;
               self.ren.draw_all(&mut self.root, &mut self.world);
               self.state = State::Debug;
             },
 
             // Toggle sound
             't' => {
-              self.ren.so_debug = !self.ren.so_debug;
-              self.update();
+              self.ren.show_sound = !self.ren.show_sound;
               self.ren.draw_all(&mut self.root, &mut self.world);
               self.state = State::Debug;
             },
@@ -143,8 +146,8 @@ impl Engine {
             // Toggle FoV
             'f' => {
               self.ren.fov = !self.ren.fov;
-              self.update();
               self.ren.draw_all(&mut self.root, &mut self.world);
+              self.state = State::Debug;
             },
 
             _ => { self.world.player.state = Actions::Unknown }
@@ -154,8 +157,17 @@ impl Engine {
           // Make sure player doesn't do anything dumb
           if !self.world.is_valid(self.world.player.actor.pos.x, self.world.player.actor.pos.y) {
             self.world.player.actor.pos = oldpos;
-            self.state = State::Act(Actions::Unknown);
             self.world.player.state = Actions::Unknown;
+          }
+
+          // If state is Debug, don't override
+          match self.state {
+            State::Debug => (),
+            _ => {
+              match self.world.player.state {
+                _ => { self.state = State::Act(self.world.player.state.clone()) }
+              }
+            }
           }
 
         } 
@@ -184,6 +196,7 @@ impl Engine {
     // Get map height
     let map_dim = init::map_dimensions();
 
+    // Get root console
     let root = init::root();
 
     Engine {
@@ -195,9 +208,7 @@ impl Engine {
         init::console_height(),
         init::panel_width()
       ),
-      // Get root console
       root: root,
-
     }
     
   }
@@ -205,12 +216,7 @@ impl Engine {
   ///
   /// Update the game state, then update depending on the new state
   ///
-  pub fn update(&mut self) {
-
-    match self.state {
-      State::Debug => (),
-      _ => self.state = State::Act(self.world.player.state.clone())
-    }
+  fn update(&mut self) {
 
     match &self.state {
       // Moving or waiting prompts a world update

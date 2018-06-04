@@ -38,9 +38,9 @@ pub struct Renderer {
   screen: Pos,
   console_height: isize,
   panel_width: isize,
-  pub sc_debug: bool,
+  pub show_scent: bool,
   pub fov: bool,
-  pub so_debug: bool
+  pub show_sound: bool
 }
 
 impl Renderer {
@@ -171,12 +171,12 @@ impl Renderer {
     //
 
     // Debug scent
-    if self.sc_debug {
+    if self.show_scent {
       self.debug_render_scent_map(con, &world.cur_dungeon);
     }
 
     // Debug sound
-    if self.so_debug {
+    if self.show_sound {
       self.debug_render_sound_map(con, &world.cur_dungeon);
     }
 
@@ -359,7 +359,7 @@ impl Renderer {
       camera: Camera::new(map, (screen.0 - panel_width - 1, screen.1 - console_height - 1)), 
       console_height: console_height, panel_width: panel_width,
       screen: Pos::from_tup(screen),
-      sc_debug: false, fov: true, so_debug: false 
+      show_scent: false, fov: true, show_sound: false 
     }
   }
 
