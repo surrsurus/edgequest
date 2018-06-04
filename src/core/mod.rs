@@ -49,6 +49,10 @@ pub struct Engine {
   state: State,
   ren: Renderer,
   root: console::Root,
+
+  // Debug
+  noclip: bool
+
 }
 
 impl Engine {
@@ -150,23 +154,35 @@ impl Engine {
               self.state = State::Debug;
             },
 
+            // Toggle noclip
+            'z' => {
+              self.noclip = !self.noclip;
+              self.state = State::Debug;
+            },
+
+
             _ => { self.world.player.state = Actions::Unknown }
             
-          }
-
-          // Make sure player doesn't do anything dumb
-          if !self.world.is_valid(self.world.player.actor.pos.x, self.world.player.actor.pos.y) {
-            self.world.player.actor.pos = oldpos;
-            self.world.player.state = Actions::Unknown;
           }
 
           // If state is Debug, don't override
           match self.state {
             State::Debug => (),
             _ => {
+              // Set game state to player state
+              self.state = State::Act(self.world.player.state.clone());
+
               match self.world.player.state {
-                _ => { self.state = State::Act(self.world.player.state.clone()) }
+                Actions::Move => {
+                  // Make sure player doesn't do anything dumb
+                  if !self.world.is_valid(self.world.player.actor.pos.x, self.world.player.actor.pos.y) && !self.noclip {
+                    self.world.player.actor.pos = oldpos;
+                    self.world.player.state = Actions::Unknown;
+                  }
+                }
+                _ => ()
               }
+
             }
           }
 
@@ -209,6 +225,9 @@ impl Engine {
         init::panel_width()
       ),
       root: root,
+
+      // Debug 
+      noclip: false
     }
     
   }
@@ -251,7 +270,7 @@ impl Engine {
     log.push(("Move with vim keys", RGB(255, 255, 255)));
     log.push(("esc to quit, w to regenerate", RGB(255, 255, 255)));
     log.push(("r to toggle scent, t to toggle sound", RGB(255, 255, 255)));
-    log.push(("f to toggle FoV", RGB(255, 255, 255)));
+    log.push(("f to toggle FoV, z to toggle noclip", RGB(255, 255, 255)));
     drop(log);
 
     // Initial update
