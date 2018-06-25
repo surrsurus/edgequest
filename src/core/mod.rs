@@ -237,17 +237,17 @@ impl Engine {
   ///
   fn update(&mut self) {
 
-    match &self.state {
+    match self.state {
       // Moving or waiting prompts a world update
-      &State::Act(Actions::Move) | &State::Act(Actions::Wait) => self.world.update(),
+      State::Act(Actions::Move) | State::Act(Actions::Wait) => self.world.update(),
 
       // Trying to go up and downstairs prompts the respective response from world
-      &State::Act(Actions::DownStair) => {
+      State::Act(Actions::DownStair) => {
         if self.world.can_go_down() {
           self.world.go_down();
         }
       },
-      &State::Act(Actions::UpStair) => {
+      State::Act(Actions::UpStair) => {
         if self.world.can_go_up() {
           self.world.go_up();
         }
