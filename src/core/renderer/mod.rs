@@ -26,7 +26,7 @@ pub mod rgb;
 pub use self::rgb::RGB;
 
 ///
-/// Helper for rendering things to the screen
+/// The renderer
 ///
 /// Tracks the player and automatically scrolls the screen around to match where they go.
 /// This will never try to draw things outside of the given dimensions due to the way it handles
@@ -129,12 +129,8 @@ impl Renderer {
         if self.fov {
           // And it's in the FoV
           if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
-            match world.cur_dungeon.grid[x][y].tiletype {
-              _ => {
-                // Draw a tile slightly more vibrant than it actually is
-                self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].yellowish());
-              }
-            }
+            // Draw a tile slightly more vibrant than it actually is to emulate torchlight
+            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].yellowish());
 
             // Mark tile as seen if it's in the FoV
             world.cur_dungeon.grid[x][y].seen = true;
@@ -143,24 +139,15 @@ impl Renderer {
 
           // And the tile has been seen...
           else if world.cur_dungeon.grid[x][y].seen {
-            // Draw certain tiles depending on their types
-            match world.cur_dungeon.grid[x][y].tiletype {
-              _ => {
-                // Draw a tile slightly darker than it actually is
-                self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].darken());
-              }
-            }
+            // Draw a tile, but darker
+            self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y].darken());
           }
 
         }
 
         // [Debug] Otherwise just draw all tiles normally
         else {
-         match world.cur_dungeon.grid[x][y].tiletype {
-            _ => {
-              self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
-            }
-          }
+          self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
         }
         
       }
@@ -238,18 +225,52 @@ impl Renderer {
       RGB(0, 0, 0).to_tcod()
     );
 
+    // Tile player is on
+    let tile = &world.cur_dungeon.grid[world.player.actor.pos.x as usize][world.player.actor.pos.y as usize];
+
     con.set_default_foreground(RGB(255, 255, 255).to_tcod());
 
     con.print(
       (self.screen.x - self.panel_width + 1) as i32,
-      0,
+      1,
       "Edgequest"
     );
 
     con.print(
       (self.screen.x - self.panel_width + 1) as i32,
-      1,
+      2,
       "This is where we live"
+    );
+
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      4,
+      format!("{}: {}", "Biome", tile.biome)
+    );
+
+    let mut npscent = 0;
+    for s in &tile.scents {
+      if &s.scent_type != &ScentType::Player { 
+        npscent += s.val;
+      }
+    }
+
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      5,
+      format!("{}: {}", "Non-player Scent", npscent)
+    );
+
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      6,
+      format!("{}: {}", "Sound", tile.sound)
+    );
+
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      7,
+      format!("{}: {}", "Tile", tile.get_name())
     );
 
     //
@@ -299,29 +320,20 @@ impl Renderer {
     // New pos with respect to camera
     let pos = pos + self.camera.pos;
 
-    if ce.get_glyph() == ' ' {
-      con.set_char_background(
-        pos.x as i32,
-        pos.y as i32,
-        ce.get_bg().to_tcod(),
-        console::BackgroundFlag::Set
-      );
-    } else {
-      con.put_char_ex(
-        pos.x as i32,
-        pos.y as i32,
-        ce.get_glyph(),
-        ce.get_fg().to_tcod(),
-        ce.get_bg().to_tcod()
-      );
-    }
+    con.put_char_ex(
+      pos.x as i32,
+      pos.y as i32,
+      ce.get_glyph(),
+      ce.get_fg().to_tcod(),
+      ce.get_bg().to_tcod()
+    );
 
   }
 
   ///
   /// Draw the log
   ///
-  /// Currently still testing
+  /// We need to directly manipulate the GlobalLog object so here we use the mutex lock
   ///
   pub fn draw_log(&self, con: &mut console::Root) {
 

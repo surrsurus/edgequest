@@ -8,7 +8,7 @@ use core::world::dungeon::map::{Grid, Tile};
 /// Struct to hold the implementation details for the Drunkards' Walk cellular automaton
 /// 
 /// * `chaos` - Chaos chance from [0.0, 1.0]. Represents the chance that the automaton changes it's direction. 
-/// 1.0 represents total chaos, 0.0 represents total order. 
+/// 1.0 represents total chaos, 0.0 represents total order. Going over 1.0 causes a panic
 /// 
 #[derive(Clone, PartialEq, Debug, Default)]
 pub struct DrunkardsWalk {
@@ -81,7 +81,7 @@ impl Automaton for DrunkardsWalk {
         2 => x -= 1,
         3 => y += 1,
         4 => y -= 1,
-        _ => unreachable!("dice machine broke")
+        _ => unreachable!("DrunkardsWalk - Unreachable dice state reached in movement")
       }
 
       // Check bounds, leave a gap though between the border.

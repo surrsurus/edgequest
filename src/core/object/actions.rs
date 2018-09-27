@@ -14,6 +14,8 @@ pub enum Actions {
   Move,
   // Creature waited
   Wait,
+  // NOTE: So right now the only creature that can "go down" or "go up" is the player
+  // but now I'm thinking about monsters that decide to traverse the floors at their discretion...
   // Creature went down
   DownStair,
   // Creature went up
@@ -22,6 +24,8 @@ pub enum Actions {
   Blink,
   // Creature Talked
   Talk,
+  // Creature died
+  Die,
   // Unknown action (Creature did something weird)
   Unknown
 }

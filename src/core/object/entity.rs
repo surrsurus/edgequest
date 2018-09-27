@@ -8,6 +8,9 @@
 //!
 //! The entity trait simply allows us to define some getters and setters that should
 //! be uniform across all `Entity`s.
+//! 
+//! Entities should fundamentally exist divorced from whatever rendering library we use in order to keep everything
+//! the way it is with as minimal hassle as possible if a different renderer is chosen
 //!
 
 use core::renderer::RGB;

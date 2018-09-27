@@ -26,7 +26,14 @@ impl Creature {
   ///
   /// Create a new `Creature`
   ///
-  /// NOTE: Needs to be cleaned up, maybe just pure `Actor`s, `Stats` and `AI`s are all that is needed.
+  /// NOTE: This doesn't even scratch the surface of what `Creature`s should be. Here's some ideas I was considering:
+  /// 
+  /// Mood - How the monster is feeling
+  /// Personalities - Helps determine specfic actions based off creature state and mood
+  /// Inventory - What the creature is holding
+  /// Illnesses - What afflictions the creature has (affects mood)
+  /// 
+  /// What I'm basically proposing is to first turn the game into a nature simulator first, and a game second
   ///
   #[inline]
   pub fn new<T: AI + 'static>(name: &'static str, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), scent_type: ScentType, ai: T) -> Creature {

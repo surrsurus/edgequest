@@ -15,7 +15,6 @@ use std::ops::{Add, AddAssign, BitXor, Neg, Sub, SubAssign};
 /// 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub struct Pos {
-  // i32 because of tcod
   pub x: isize,
   pub y: isize,
 }

@@ -4,7 +4,7 @@ use self::rand::{thread_rng, Rng};
 use core::world::dungeon::builder::Buildable;
 use core::world::dungeon::builder::construct::{Corr, Rect};
 
-use core::world::dungeon::map::{Grid, Tile, TileType};
+use core::world::dungeon::map::{Grid, Tile, TileType, FloorType};
 
 ///
 /// Simple dungeon builder
@@ -12,15 +12,18 @@ use core::world::dungeon::map::{Grid, Tile, TileType};
 /// This builder places a number of small rooms (respective to map size)
 /// all connected by corridors.
 /// 
-#[derive(Clone, PartialEq, Eq, Debug, Default)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Simple {
 
   pub grid: Grid<Tile>,
   pub w: usize,
   pub h: usize,
 
-  // Privatre vector to hold rooms
+  // Private vector to hold rooms
   rooms: Vec<Rect>,
+  
+  // Private vector to hold floor type
+  floor: Tile
 
 }
 
@@ -76,13 +79,7 @@ impl Simple {
         mover.0 -= 1;
       } 
 
-      self.grid[mover.0 as usize][mover.1 as usize] = Tile::new(
-        "Floor",
-        ' ',
-        (255, 255, 255), 
-        (0, 0, 0), 
-        TileType::Floor
-      );
+      self.grid[mover.0 as usize][mover.1 as usize] = self.floor.clone();
 
     }
 
@@ -94,13 +91,7 @@ impl Simple {
         mover.1 -= 1;
       } 
 
-      self.grid[mover.0][mover.1] = Tile::new(
-        "Floor",
-        ' ',
-        (255, 255, 255), 
-        (0, 0, 0), 
-        TileType::Floor
-      );
+      self.grid[mover.0][mover.1] = self.floor.clone();
 
     }
 
@@ -112,13 +103,7 @@ impl Simple {
   fn build_rect(&mut self, r: &Rect) {
     for w in 0..r.w {
       for l in 0..r.l {
-        self.grid[(w + r.x)][(l + r.y)] = Tile::new(
-          "Floor",
-          ' ',
-          (255, 255, 255), 
-          (0, 0, 0), 
-          TileType::Floor
-        );
+        self.grid[(w + r.x)][(l + r.y)] = self.floor.clone();
       }
     }
   }
@@ -168,7 +153,9 @@ impl Simple {
       grid: grid.clone(), 
       rooms: Vec::<Rect>::new(), 
       w: grid.len(), 
-      h: grid[0].len() 
+      h: grid[0].len(),
+      // Floor type. Doesn't need to be changed right now, after all this is the 'simple' dungeon builder
+      floor: Tile::new("Floor", ' ', (7, 7, 7),  (0, 0, 0), TileType::Floor(FloorType::Normal))
     };
     
     return s;

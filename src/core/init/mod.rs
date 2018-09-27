@@ -2,8 +2,6 @@
 //! Initialize tcod elements.
 //! 
 //! Depends on the `config` module.
-//!
-//! NOTE: Maybe change this so we're only loading config once?
 //! 
 
 // We need tcod::Console to keep our consoles in scope
@@ -11,8 +9,21 @@
 use core::tcod::{Console, console};
 
 pub mod config;
+use self::config::Config;
 
 mod init_tests;
+
+// So for a while each function here loaded the config on it's own. And I thought to myself, "hm, is it possible for this
+// to only be loaded once?"
+//
+// Well then I remembered the log system.
+//
+// What this does is essentially just creates a private static reference a single time to a config struct loaded from `config`
+// on runtime thanks to lazy_static. I can then just reference elements of the config object via this and not have to redundantly
+// load the file
+lazy_static! {
+  static ref CFG : Config = config::load("config/cfg.yml");
+}
 
 ///
 /// Initialize the root console.
@@ -22,37 +33,38 @@ mod init_tests;
 /// 
 pub fn root() -> console::Root {
 
-  let cfg = config::load("config/cfg.yml");
-
   // Match fonttype based on the FontType enum
-  let fonttype = match cfg.fonttype.as_str() {
+  let fonttype = match CFG.fonttype.as_str() {
     "Default" => console::FontType::Default,
     "Greyscale" => console::FontType::Greyscale,
-    _ => panic!("Bad font type: {}", cfg.fonttype)
+    _ => panic!("Bad font type: {}", CFG.fonttype)
   };
 
   // Match fontlayout based on the FontLayout enum
-  let fontlayout = match cfg.fontlayout.as_str() {
+  let fontlayout = match CFG.fontlayout.as_str() {
     "Tcod" => console::FontLayout::Tcod,
     "AsciiInRow" => console::FontLayout::AsciiInRow,
     "AsciiInCol" => console::FontLayout::AsciiInCol,
-    _ => panic!("Bad font type: {}", cfg.fontlayout)
+    _ => panic!("Bad font type: {}", CFG.fontlayout)
   };
 
   // Match renderer based on the Renderer enum
-  let renderer = match cfg.renderer.as_str() {
+  let renderer = match CFG.renderer.as_str() {
     "SDL" => console::Renderer::SDL,
     "GLSL" => console::Renderer::GLSL,
     "OpenGL" => console::Renderer::OpenGL,
-    _ => panic!("Bad font type: {}", cfg.renderer)
+    _ => panic!("Bad font type: {}", CFG.renderer)
   };
 
   // Return a Root console
   return console::Root::initializer()
-    .size(cfg.screen_width as i32, cfg.screen_height as i32)
+    .size(CFG.screen_width as i32, CFG.screen_height as i32)
     .title("edgequest")
-    .fullscreen(cfg.fullscreen)
-    .font(cfg.fontpath, fontlayout)
+    .fullscreen(CFG.fullscreen)
+    // Not sure why this one needs to be cloned,
+    // probably because font completely passes the reference to the console itself
+    // and we need to preserve the static ref otherwise it's pointless
+    .font(CFG.fontpath.clone(), fontlayout)
     .font_type(fonttype)
     .renderer(renderer)
     .init();
@@ -63,22 +75,19 @@ pub fn root() -> console::Root {
 /// Get map dimensions as a `Pos`
 /// 
 pub fn map_dimensions() -> (isize, isize) {
-  let cfg = config::load("config/cfg.yml");
-  return (cfg.map_width, cfg.map_height);
+  return (CFG.map_width, CFG.map_height);
 }
 
 ///
 /// Get console height
 ///
 pub fn console_height() -> isize {
-  let cfg = config::load("config/cfg.yml");
-  return cfg.console_height;
+  return CFG.console_height;
 }
 
 ///
 /// Get panel width
 ///
 pub fn panel_width() -> isize {
-  let cfg = config::load("config/cfg.yml");
-  return cfg.panel_width;
+  return CFG.panel_width;
 }
