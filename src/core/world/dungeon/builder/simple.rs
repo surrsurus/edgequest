@@ -144,7 +144,7 @@ impl Simple {
 
 
   /// 
-  /// Return a new `Dungeon`
+  /// Return a new `Simple`
   /// 
   pub fn new(grid: Grid<Tile>) -> Simple {
 
