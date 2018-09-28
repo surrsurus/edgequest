@@ -1,10 +1,12 @@
 extern crate rand;
-use self::rand::{thread_rng, Rng};
+use self::rand::Rng;
+
+use core::renderer::RGB;
 
 use core::world::dungeon::builder::Buildable;
 use core::world::dungeon::builder::construct::{Corr, Rect};
 
-use core::world::dungeon::map::{Grid, Tile, TileType, FloorType};
+use core::world::dungeon::map::{Grid, tile, Tile};
 
 ///
 /// Simple dungeon builder
@@ -37,7 +39,7 @@ impl Simple {
     // Clear rooms
     self.rooms = Vec::<Rect>::new();
 
-    let mut rng = thread_rng();
+    let mut rng = rand::thread_rng();
 
     // Number of rooms correspond to map size
     let n = (self.w + self.h) / 10;
@@ -155,7 +157,7 @@ impl Simple {
       w: grid.len(), 
       h: grid[0].len(),
       // Floor type. Doesn't need to be changed right now, after all this is the 'simple' dungeon builder
-      floor: Tile::new("Floor", ' ', (7, 7, 7),  (0, 0, 0), TileType::Floor(FloorType::Normal))
+      floor: Tile::new("Floor", ' ', RGB(7, 7, 7),  RGB(0, 0, 0), tile::Type::Floor(tile::Floor::Normal))
     };
     
     return s;

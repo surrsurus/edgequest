@@ -1,11 +1,10 @@
 extern crate rand;
-use self::rand::{thread_rng, Rng};
+use self::rand::Rng;
 
-use core::world::dungeon::map::Grid;
-use core::world::dungeon::map::{Tile, walkable};
+use core::world::dungeon::map::{self, tile, Tile};
 
-use core::object::ai::{AI, RANDOM_TRIES};
-use core::object::{Actions, Creature, Actor, Stats};
+use core::creature::ai::{AI, RANDOM_TRIES};
+use core::creature::{Actions, Creature, Actor, Stats};
 
 ///
 /// SmellerAI is an AI that follows insect smells
@@ -26,7 +25,7 @@ impl AI for SmellerAI {
   ///
   /// Walk around randomly until it picks up a scent
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
+  fn take_turn(&mut self, map: &map::Grid<Tile>, _player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
 
     let mut state = Actions::Wait;
     
@@ -71,7 +70,7 @@ impl AI for SmellerAI {
       }
 
       // Check
-      if !walkable(&map[x][y]) {
+      if !tile::walkable(&map[x][y]) {
         x = tx as usize;
         state = Actions::Move;
       }
@@ -84,7 +83,7 @@ impl AI for SmellerAI {
       }
 
       // Check
-      if !walkable(&map[x][y]) {
+      if !tile::walkable(&map[x][y]) {
         y = ty as usize;
         state = Actions::Move;
       }
@@ -97,7 +96,7 @@ impl AI for SmellerAI {
       // Otherwise behave like a simple ai and walk around randomly
       loop {
 
-        let mut rng = thread_rng();
+        let mut rng = rand::thread_rng();
         let dice : usize;
         state = Actions::Move;
         
@@ -120,7 +119,7 @@ impl AI for SmellerAI {
         // Since the only thing this thing can do is move, there is no need to match the dice again to determine state
         
         // If we find a good tile, great, otherwise keep trying until we get tired of it
-        if walkable(&map[x][y]) {
+        if tile::walkable(&map[x][y]) {
           break;
         } else if count > RANDOM_TRIES {
           x = me.pos.x as usize;

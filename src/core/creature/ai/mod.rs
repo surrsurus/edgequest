@@ -18,14 +18,17 @@ pub const RANDOM_TRIES : usize = 10;
 // NOTE: Probably going to get rid of this at some point
 pub const TALK_DISTANCE: f32 = 20.0;
 
+pub mod blink;
+pub use self::blink::BlinkAI;
+
+pub mod player;
+pub use self::player::PlayerAI;
+
 pub mod simple;
 pub use self::simple::SimpleAI;
 
 pub mod smeller;
 pub use self::smeller::SmellerAI;
-
-pub mod blink;
-pub use self::blink::BlinkAI;
 
 pub mod talker;
 pub use self::talker::TalkerAI;

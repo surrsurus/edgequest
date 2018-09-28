@@ -5,11 +5,21 @@
 //! such that each part is easily passed in and also easily replacable
 //!
 
-use core::world::dungeon::map::Grid;
-use core::world::dungeon::map::{Tile, ScentType};
+pub mod ai;
 
-use core::object::ai::AI;
-use core::object::{Actions, Actor, Stats};
+pub mod actions;
+pub use self::actions::Actions;
+
+pub mod actor;
+pub use self::actor::Actor;
+
+pub mod stats;
+pub use self::stats::Stats;
+
+mod object_tests;
+
+use core::renderer::RGB;
+use core::world::dungeon::map::{self, Pos, tile, Tile};
 
 ///
 /// Creature holds a `Actor` and an `AI`, basically a package that we can create monsters from
@@ -18,7 +28,7 @@ pub struct Creature {
   pub actor: Actor,
   pub stats: Stats,
   pub state: Actions,
-  pub ai: Box<AI>
+  pub ai: Box<ai::AI>
 }
 
 impl Creature {
@@ -36,7 +46,7 @@ impl Creature {
   /// What I'm basically proposing is to first turn the game into a nature simulator first, and a game second
   ///
   #[inline]
-  pub fn new<T: AI + 'static>(name: &'static str, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8), scent_type: ScentType, ai: T) -> Creature {
+  pub fn new<T: ai::AI + 'static>(name: &'static str, glyph: char, pos: Pos, fg: RGB, bg: RGB, scent_type: tile::Scent, ai: T) -> Creature {
     Creature {
       actor: Actor::new(name, glyph, pos, fg, bg),
       stats: Stats::new(scent_type),
@@ -50,7 +60,7 @@ impl Creature {
   ///
   /// Essentially allows us to not need to include `AI` when we need to `take_turn()`
   ///
-  pub fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature) {
+  pub fn take_turn(&mut self, map: &map::Grid<Tile>, player: &Creature) {
     self.state = self.ai.take_turn(map, player, &mut self.actor, &mut self.stats);
   }
 

@@ -1,8 +1,8 @@
 extern crate rand;
-use self::rand::{thread_rng, Rng};
+use self::rand::Rng;
 
 use core::world::dungeon::automata::Automaton;
-use core::world::dungeon::map::{Grid, Tile};
+use core::world::dungeon::map::{self, Tile};
 
 ///
 /// Struct to hold the implementation details for the Drunkards' Walk cellular automaton
@@ -31,10 +31,10 @@ impl Automaton for DrunkardsWalk {
 
   type Output = Tile;
 
-  fn generate(&self, grid: &mut Grid<Tile>, sx: Option<usize>, sy: Option<usize>, find: Option<Tile>, replace: Tile, iterations: u32) -> Grid<Tile> {
+  fn generate(&self, grid: &mut map::Grid<Tile>, sx: Option<usize>, sy: Option<usize>, find: Option<Tile>, replace: Tile, iterations: u32) -> map::Grid<Tile> {
 
     // Start our RNG
-    let mut rng = thread_rng();
+    let mut rng = rand::thread_rng();
 
     // Get our starting x and y
 

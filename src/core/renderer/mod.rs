@@ -13,15 +13,16 @@ use core::world::World;
 
 use core::world::dungeon::Dungeon;
 // Used to expliclty reference constants
-use core::world::dungeon::map::tile;
-use core::world::dungeon::map::{Tile, TileType, ScentType};
+use core::world::dungeon::map::{tile, Pos, Tile};
 
-use core::object::{Pos, Entity};
+mod entity;
+pub use self::entity::Entity;
 
 // Use camera privately
 mod camera;
 use self::camera::Camera;
 
+// Use RGB publicly
 pub mod rgb;
 pub use self::rgb::RGB;
 
@@ -53,20 +54,20 @@ impl Renderer {
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
         // Pretty much just random, Player is red, bugs are green, cats are yellow and dogs are blue
-        let mut color : (u8, u8, u8) = (
+        let mut color = RGB(
           dungeon.grid[x][y].scents[0].val + 50 + dungeon.grid[x][y].scents[3].val, 
           dungeon.grid[x][y].scents[1].val + 25 + dungeon.grid[x][y].scents[3].val, 
           dungeon.grid[x][y].scents[2].val + 50 
         );
         // Iterate over scents, context of what scent it is isn't necessary
-        for s in 0..ScentType::Num as usize {
+        for s in 0..tile::Scent::Num as usize {
           if dungeon.grid[x][y].scents[s].val > 0 {
             self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
               "Debug Scent",
               ' ',
-              (255, 255, 255),
+              RGB(255, 255, 255),
               color,
-              TileType::Debug
+              tile::Type::Debug
             ));
             break;
           }
@@ -84,18 +85,18 @@ impl Renderer {
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
         // Color is weighted towards blue
-        let mut color : (u8, u8, u8) = (
+        let mut color = RGB(
           dungeon.grid[x][y].get_bg().0, 
           dungeon.grid[x][y].get_bg().1, 
-          dungeon.grid[x][y].sound 
+          dungeon.grid[x][y].sound as u8
         );
         if dungeon.grid[x][y].sound > 0 {
           self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Sound",
             ' ',
-            (255, 255, 255),
+            RGB(255, 255, 255),
             color,
-            TileType::Debug
+            tile::Type::Debug
           ));
         }
       }
@@ -250,7 +251,7 @@ impl Renderer {
 
     let mut npscent = 0;
     for s in &tile.scents {
-      if &s.scent_type != &ScentType::Player { 
+      if &s.scent_type != &tile::Scent::Player { 
         npscent += s.val;
       }
     }
@@ -364,13 +365,16 @@ impl Renderer {
   /// * `screen` - `Pos` that holds the screen dimensions
   ///
   #[inline]
-  pub fn new(map: (isize, isize), screen: (isize, isize), console_height: isize, panel_width: isize) -> Renderer {
+  pub fn new(map: Pos, screen: Pos, console_height: isize, panel_width: isize) -> Renderer {
     Renderer { 
       // Camera takes a modified screen value that compensates for the console_height
       // This way the render still knows that that area is "reserved" for the console
-      camera: Camera::new(map, (screen.0 - panel_width - 1, screen.1 - console_height - 1)), 
+      camera: Camera::new(
+        map, 
+        Pos::new(screen.x - panel_width - 1, screen.y - console_height - 1)
+      ), 
       console_height: console_height, panel_width: panel_width,
-      screen: Pos::from_tup(screen),
+      screen: screen,
       show_scent: false, fov: true, show_sound: false 
     }
   }

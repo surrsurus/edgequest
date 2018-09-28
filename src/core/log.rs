@@ -10,6 +10,7 @@
 #![allow(non_upper_case_globals)]
 
 use std::ops::Range;
+
 ///
 /// How to use it
 ///
@@ -89,6 +90,7 @@ lazy_static! {
 }
 
 // This macro automates the log mutex process. This whole thing is pretty crazy
+// Oviously if any panics occur here then the mutex becomes poisoned
 #[macro_export]
 macro_rules! log {
   ($msg:expr) => {{
@@ -97,6 +99,7 @@ macro_rules! log {
     // Lock the mutex
     let mut log = GlobalLog.lock().unwrap();
     // Push the message
+    // Highly implies a correct expression for the push arguments are being supplied
     log.push($msg);
     // Drop the reference
     drop(log);

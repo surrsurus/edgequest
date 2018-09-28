@@ -40,7 +40,7 @@ impl RGB {
 }
 
 /// 
-/// Allow for the addition of two `Pos` structs
+/// Allow for the addition of two `RGB` structs
 /// 
 impl Add<RGB> for RGB {
 
@@ -57,7 +57,7 @@ impl Add<RGB> for RGB {
 }
 
 /// 
-/// Allow for the addition of two `Pos` structs
+/// Allow for the addition of two `RGB` structs
 /// 
 impl Sub<RGB> for RGB {
 

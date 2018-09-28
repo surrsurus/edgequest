@@ -1,11 +1,10 @@
 extern crate rand;
-use self::rand::{thread_rng, Rng};
+use self::rand::Rng;
 
-use core::world::dungeon::map::Grid;
-use core::world::dungeon::map::{Tile, walkable};
+use core::world::dungeon::map::{self, Pos, tile, Tile};
 
-use core::object::ai::{AI, RANDOM_TRIES};
-use core::object::{Actions, Creature, Actor, Stats};
+use core::creature::ai::{AI, RANDOM_TRIES};
+use core::creature::{Actions, Creature, Actor, Stats};
 
 ///
 /// BlinkAI makes monster teleport around the map periodically
@@ -18,13 +17,13 @@ impl BlinkAI {
   ///
   /// Get a random tile nearby
   /// 
-  pub fn blink(&mut self, me: &mut Actor) -> (isize, isize) {
-    let mut rng = thread_rng();
+  pub fn blink(&mut self, me: &mut Actor) -> Pos {
+    let mut rng = rand::thread_rng();
     let mut x = me.pos.x;
     let mut y = me.pos.y;
     x += rng.gen_range(-8, 8);
     y += rng.gen_range(-8, 8);
-    return (x, y);
+    return Pos::new(x, y);
   }
 
   ///
@@ -41,9 +40,9 @@ impl AI for BlinkAI {
   ///
   /// Walk around randomly, and occasionally blink
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, _player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
+  fn take_turn(&mut self, map: &map::Grid<Tile>, _player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
 
-    let mut rng = thread_rng();
+    let mut rng = rand::thread_rng();
     
     let mut x = me.pos.x;
     let mut y = me.pos.y;
@@ -69,8 +68,8 @@ impl AI for BlinkAI {
         // Blink
         5 => {
           let bpos = self.blink(me);
-          x = bpos.0;
-          y = bpos.1;
+          x = bpos.x;
+          y = bpos.y;
           state = Actions::Blink;
         },
         // If the rng breaks something is very wrong
@@ -92,9 +91,9 @@ impl AI for BlinkAI {
         x = (map.len() - 1) as isize;
       }
 
-      if walkable(&map[x as usize][y as usize]) {
+      if tile::walkable(&map[x as usize][y as usize]) {
         break;
-      // If we make a lot of attempts and still can't find a walkable tile, just stop
+      // If we make a lot of attempts and still can't find a tile::walkable tile, just stop
       } else if count > RANDOM_TRIES {
         x = me.pos.x;
         y = me.pos.y;

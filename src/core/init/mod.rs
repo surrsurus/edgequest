@@ -72,7 +72,7 @@ pub fn root() -> console::Root {
 }
 
 ///
-/// Get map dimensions as a `Pos`
+/// Get map dimensions as a tuple
 /// 
 pub fn map_dimensions() -> (isize, isize) {
   return (CFG.map_width, CFG.map_height);

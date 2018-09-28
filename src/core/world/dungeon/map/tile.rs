@@ -1,7 +1,6 @@
 use std::slice::Iter;
 
-use core::object::Entity;
-use core::renderer::RGB;
+use core::renderer::{Entity, RGB};
 
 use std::fmt;
 
@@ -14,16 +13,16 @@ pub const YELLOW_FAC : RGB = RGB(27, 24, 22);
 /// Tiles have types
 ///
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub enum TileType {
-  Wall(WallType),
-  Floor(FloorType),
+pub enum Type {
+  Wall(Wall),
+  Floor(Floor),
+  Stair(Stair),
   TallGrass,
-  DownStair,
-  UpStair,
+  Vine,
   Water,
   Unseen,
   // There are many different types of traps, so include them all
-  Trap(TrapType),
+  Trap(Trap),
   Debug
 }
 
@@ -31,7 +30,7 @@ pub enum TileType {
 /// Floors have types
 ///
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub enum FloorType {
+pub enum Floor {
   Normal,
   Crystal
 }
@@ -40,7 +39,7 @@ pub enum FloorType {
 /// Walls have types
 /// 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub enum WallType {
+pub enum Wall {
   Normal,
   Crystal,
   Hard
@@ -50,10 +49,54 @@ pub enum WallType {
 /// Traps have types
 ///
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub enum TrapType {
+pub enum Trap {
   // NOTE: The only trap I can think about implementing right now, which just causes the player to lose all their
   // map information. Kind of just a tech demo, but it's not implemented right now
   MemoryLoss
+}
+
+///
+/// Stairs have types
+/// 
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum Stair {
+  DownStair(DownStair),
+  UpStair(UpStair)
+}
+
+///
+/// Up/Down stairs have types
+/// 
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum DownStair {
+  Normal
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum UpStair {
+  Normal
+}
+
+///
+/// Properties
+/// 
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum Props {
+  Visibility(Visibility),
+  Traversability(Traversability)
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum Visibility {
+  Opaque,
+  Transparent
+}
+
+#[derive(Clone, PartialEq, Eq, Debug)]
+pub enum Traversability {
+  Walkable,
+  Blocking
 }
 
 ///
@@ -69,7 +112,7 @@ pub enum TrapType {
 // Does the tile block vision?
 pub fn opaque(t: &Tile) -> bool {
   match t.tiletype {
-    TileType::Wall(_) | TileType::TallGrass => true,
+    Type::Wall(_) | Type::TallGrass => true,
     _ => false
   }
 }
@@ -77,7 +120,7 @@ pub fn opaque(t: &Tile) -> bool {
 // Is it okay to spawn stuff on this tile / replace it?
 pub fn spawnable(t: &Tile) -> bool {
   match t.tiletype {
-    TileType::Floor(_) | TileType::Water => true,
+    Type::Floor(_) | Type::Water | Type::TallGrass | Type::Vine => true,
     _ => false
   }
 }
@@ -85,7 +128,7 @@ pub fn spawnable(t: &Tile) -> bool {
 // Is the tile able to be walked on?
 pub fn walkable(t: &Tile) -> bool {
   match t.tiletype {
-    TileType::Floor(_) | TileType::Water | TileType::UpStair | TileType::DownStair | TileType::Trap(_) | TileType::TallGrass => true,
+    Type::Floor(_) | Type::Water | Type::Stair(_) | Type::Trap(_) | Type::TallGrass | Type::Vine => true,
     _ => false
   }
 }
@@ -98,9 +141,9 @@ pub fn generic_floor() -> Tile {
   Tile::new(
     "Generic Floor",
     ' ',
-    (0, 0, 0),
-    (0, 0, 0),
-    TileType::Floor(FloorType::Normal)
+    RGB(0, 0, 0),
+    RGB(0, 0, 0),
+    Type::Floor(Floor::Normal)
   )
 }
 
@@ -108,9 +151,9 @@ pub fn generic_wall() -> Tile {
   Tile::new(
     "Generic Wall",
     ' ',
-    (0, 0, 0),
-    (0, 0, 0),
-    TileType::Wall(WallType::Normal)
+    RGB(0, 0, 0),
+    RGB(0, 0, 0),
+    Type::Wall(Wall::Normal)
   )
 }
 
@@ -143,7 +186,7 @@ impl fmt::Display for Biome {
 /// Scents
 /// 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub enum ScentType {
+pub enum Scent {
   Player = 0,
   Insectoid,
   Canine,
@@ -152,42 +195,42 @@ pub enum ScentType {
 }
 
 // Implement ability to turn the enum into a string
-impl fmt::Display for ScentType {
+impl fmt::Display for Scent {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match *self {
-      ScentType::Player => write!(f, "Player"),
-      ScentType::Insectoid => write!(f, "Insectoid"),
-      ScentType::Canine => write!(f, "Canine"),
-      ScentType::Feline => write!(f, "Feline"),
-      ScentType::Num => write!(f, "Num - Something wrong must have happened"),
+      Scent::Player => write!(f, "Player"),
+      Scent::Insectoid => write!(f, "Insectoid"),
+      Scent::Canine => write!(f, "Canine"),
+      Scent::Feline => write!(f, "Feline"),
+      Scent::Num => write!(f, "Num - Something wrong must have happened"),
     }
   }
 }
 
-// Implement an iterator for ScentType to get the variants out in order
-impl ScentType {
-  pub fn iterator() -> Iter<'static, ScentType> {
-    static SCENT_TYPES: [ScentType;  ScentType::Num as usize] = [
-        ScentType::Player, 
-        ScentType::Insectoid, 
-        ScentType::Canine, 
-        ScentType::Feline
+// Implement an iterator for Scent to get the variants out in order
+impl Scent {
+  pub fn iterator() -> Iter<'static, Scent> {
+    static SCENT_TYPES: [Scent;  Scent::Num as usize] = [
+        Scent::Player, 
+        Scent::Insectoid, 
+        Scent::Canine, 
+        Scent::Feline
       ];
       SCENT_TYPES.into_iter()
   }
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Scent {
+pub struct _Scent {
   pub val: u8,
-  pub scent_type: ScentType
+  pub scent_type: Scent
 }
 
-impl Scent {
+impl _Scent {
 
   #[inline]
-  pub fn new(value: u8, scent_type: ScentType) -> Scent {
-    Scent {
+  pub fn new(value: u8, scent_type: Scent) -> _Scent {
+    _Scent {
       val: value,
       scent_type: scent_type
     }
@@ -205,9 +248,9 @@ pub struct Tile {
   fg: RGB,
   bg: RGB,
   pub biome: Biome,
-  pub scents: Vec<Scent>,
+  pub scents: Vec<_Scent>,
   pub sound: u8,
-  pub tiletype: TileType,
+  pub tiletype: Type,
   pub seen: bool
 }
 
@@ -217,18 +260,18 @@ impl Tile {
   /// Return a new `Tile`
   /// 
   #[inline]
-  pub fn new(name: &'static str, glyph: char, fg: (u8, u8, u8), bg: (u8, u8, u8), tiletype: TileType) -> Tile {
+  pub fn new(name: &'static str, glyph: char, fg: RGB, bg: RGB, tiletype: Type) -> Tile {
     Tile { 
       name: name,
       glyph: glyph,
-      fg: RGB::from_tup(fg),
-      bg: RGB::from_tup(bg),
+      fg: fg,
+      bg: bg,
       biome: Biome::Dungeon,
       // Create scents by iterating over ScentTypes
       scents: {
         let mut sv = vec![];
-        for s in ScentType::iterator() {
-          sv.push(Scent::new(0, s.clone()));
+        for s in Scent::iterator() {
+          sv.push(_Scent::new(0, s.clone()));
         }
         sv
       },

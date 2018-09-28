@@ -13,7 +13,7 @@
 //! the way it is with as minimal hassle as possible if a different renderer is chosen
 //!
 
-use core::renderer::RGB;
+pub use core::renderer::RGB;
 
 /// 
 /// Holds a position and a character.

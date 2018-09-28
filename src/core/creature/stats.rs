@@ -7,18 +7,18 @@
 //! combat system, and as of right now this is pretty much just a lot of fluff for a scent holder
 //!
 
-use core::world::dungeon::map::ScentType;
+use core::world::dungeon::map::tile;
 
 #[derive(Clone, Debug)]
 pub struct Stats {
   pub attack: isize,
   pub defense: isize,
   pub speed: isize,
-  pub scent_type: ScentType
+  pub scent_type: tile::Scent
 }
 
 impl Stats {
-  pub fn new(scent_type: ScentType) -> Stats {
+  pub fn new(scent_type: tile::Scent) -> Stats {
     Stats {
       attack: 0,
       defense: 0,

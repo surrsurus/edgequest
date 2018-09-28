@@ -1,12 +1,14 @@
 extern crate rand;
-use self::rand::{thread_rng, Rng};
+use self::rand::Rng;
 
 use std::io::prelude::*;
-use std::fs::{self};
+use std::fs;
 
 use core::world::dungeon::builder::Buildable;
 
-use core::world::dungeon::map::{FloorType, Grid, Tile, TileType, WallType};
+use core::world::dungeon::map::{self, tile, Tile};
+
+use core::renderer::RGB;
 
 ///
 /// Simple dungeon builder
@@ -16,7 +18,7 @@ use core::world::dungeon::map::{FloorType, Grid, Tile, TileType, WallType};
 ///
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Structure {
-  grid: Grid<Tile>,
+  grid: map::Grid<Tile>,
   w: usize,
   h: usize,
 }
@@ -46,16 +48,16 @@ impl Structure {
     file.read_to_string(&mut s).unwrap();
 
     // Turn string to 2d array of tiles
-    let mut strct : Grid<Tile> = vec![];
+    let mut strct : map::Grid<Tile> = vec![];
     let mut line : Vec<Tile> = vec![];
 
     for c in s.chars() {
       if c != '\n' {
         let tile = {
           match c {
-            '#' => Tile::new("Wall", ' ', (40, 40, 40), (33, 33, 33), TileType::Wall(WallType::Normal)),
-            '.' => Tile::new("Floor", ' ', (27, 27, 27), (20, 20, 20), TileType::Floor(FloorType::Normal)),
-            '"' => Tile::new("Tall Grass", '"', (76, 74, 75), (20, 20, 20), TileType::TallGrass),
+            '#' => Tile::new("Wall", ' ', RGB(40, 40, 40), RGB(33, 33, 33), tile::Type::Wall(tile::Wall::Normal)),
+            '.' => Tile::new("Floor", ' ', RGB(27, 27, 27), RGB(20, 20, 20), tile::Type::Floor(tile::Floor::Normal)),
+            '"' => Tile::new("Tall Grass", '"', RGB(76, 74, 75), RGB(20, 20, 20), tile::Type::TallGrass),
             _ => panic!("Unknown character: {}", c)
           }
         };
@@ -91,7 +93,7 @@ impl Structure {
   ///
   /// Return a new `Simple`
   ///
-  pub fn new(grid: Grid<Tile>) -> Structure {
+  pub fn new(grid: map::Grid<Tile>) -> Structure {
 
     // Make a new dungeon with our fresh grid of size `w` by `h`
     let s = Structure {
@@ -109,7 +111,7 @@ impl Buildable for Structure {
 
   type Output = Tile;
 
-  fn build(&mut self) -> Grid<Tile> {
+  fn build(&mut self) -> map::Grid<Tile> {
     self.add_rand_struct();
     return self.grid.clone();
   }

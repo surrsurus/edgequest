@@ -1,7 +1,6 @@
-use core::world::dungeon::map::Grid;
-use core::world::dungeon::map::Tile;
+use core::world::dungeon::map::{self, Tile};
 
-use core::object::{Actions, Creature, Actor, Stats};
+use core::creature::{Actions, Creature, Actor, Stats};
 
 ///
 /// Represents basic actions AI can take in the game
@@ -19,6 +18,6 @@ pub trait AI {
   /// (for monster infighting, fight-flight) and maybe even some sort of "mood" though that would be a part of the `Creature`. I am
   /// completely considering adding randomized personalities to monsters to create even more combinations of behavior.
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature, me: &mut Actor, stats: &mut Stats) -> Actions;
+  fn take_turn(&mut self, map: &map::Grid<Tile>, player: &Creature, me: &mut Actor, stats: &mut Stats) -> Actions;
 
 }

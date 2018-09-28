@@ -33,6 +33,7 @@ use self::log::GlobalLog;
 pub mod world;
 // Import world directly so we can make instances of it
 use core::world::World;
+use core::world::dungeon::map::Pos;
 
 // Game objects
 //
@@ -41,10 +42,10 @@ use core::world::World;
 // and `Action`s, and AI patterns that help drive monster descicion making.
 //
 // Object is public so that docs are generated for it
-pub mod object;
+pub mod creature;
 // While normally this module most likely should not have access to objects, we need to see `Action`s as the player's
 // choices changes the state of the game
-use core::object::actions::Actions;
+use core::creature::actions::Actions;
 
 // Renderer
 //
@@ -245,6 +246,7 @@ impl Engine {
                   if !self.world.is_valid_pos(self.world.player.actor.pos.x, self.world.player.actor.pos.y) && !self.noclip {
                     self.world.player.actor.pos = oldpos;
                     self.world.player.state = Actions::Unknown;
+                  // Otherwise if the position is valid check to see if there's stuff on the tile
                   } else {
                     self.world.check_trap();
                   }
@@ -279,17 +281,18 @@ impl Engine {
   pub fn new() -> Engine {
 
     // Get map height
-    let map_dim = init::map_dimensions();
+    let map_dim = Pos::from_tup(init::map_dimensions());
 
     // Get root console
     let root = init::root();
 
     Engine {
+
       world: World::new(map_dim),
       state: State::New,
       ren: Renderer::new(
         map_dim, 
-        (root.width() as isize, root.height() as isize), 
+        Pos::new(root.width() as isize, root.height() as isize), 
         init::console_height(),
         init::panel_width()
       ),
@@ -297,6 +300,7 @@ impl Engine {
 
       // Debug 
       noclip: false
+
     }
     
   }
@@ -307,7 +311,8 @@ impl Engine {
   fn update(&mut self) {
 
     match self.state {
-      // Moving or waiting prompts a world update
+
+      // Player moving or waiting prompts a world update
       State::Act(Actions::Move) | State::Act(Actions::Wait) => self.world.update(),
 
       // Trying to go up and downstairs prompts the respective response from world
@@ -320,7 +325,7 @@ impl Engine {
       }
       
       // All other variants are dropped
-      _ => ()
+      _ => {}
 
     }
     
@@ -362,7 +367,16 @@ impl Engine {
     self.root.flush();
 
     // Wait for keypress
-    let _keypress = self.root.wait_for_keypress(true);
+    let keypress = self.root.wait_for_keypress(true);
+
+    // Escape on title should quit the game
+    match keypress.code {
+      
+      // If the keycode isn't escape we continue checking for important keys
+      input::KeyCode::Escape => panic!("Bye"),
+      _ => {}
+
+    }
 
   }
 
@@ -392,11 +406,14 @@ impl Engine {
       
       // Capture game keys (Keys that change the state of the player)
       // This is what gives it the turn based nature, i.e. waits for player input before
-      // doing anything
+      // doing anything. Process keypress also updates the engine state.
+      //
+      // We save input to keypress because directly sending the root back into the engine 
+      // causes it to be mutably borrowed more than once
       let keypress = self.root.wait_for_keypress(true);
       self.process_keypress(keypress);
 
-      // Update game
+      // Update engine based on state
       self.update();
 
     } 

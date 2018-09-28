@@ -2,7 +2,7 @@
 //! Select specific parts of the screen to be rendered
 //!
 
-use core::object::Pos;
+use core::renderer::Pos;
 
 ///
 /// `Camera` struct. A camera simply holds a position (Where it is looking),
@@ -70,8 +70,8 @@ impl Camera {
   /// * `screen` - `Pos` that holds the screen dimensions
   /// 
   #[inline]
-  pub fn new(map: (isize, isize), screen: (isize, isize)) -> Camera {
-    Camera { pos: Pos::origin(), map: Pos::from_tup(map), screen: Pos::from_tup(screen)}
+  pub fn new(map: Pos, screen: Pos) -> Camera {
+    Camera { pos: Pos::origin(), map: map, screen: screen}
   }
 
 }

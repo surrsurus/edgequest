@@ -1,8 +1,7 @@
-use core::world::dungeon::map::Grid;
-use core::world::dungeon::map::{Tile, walkable};
+use core::world::dungeon::map::{self, tile, Tile};
 
-use core::object::ai::AI;
-use core::object::{Actions, Creature, Actor, Stats};
+use core::creature::ai::AI;
+use core::creature::{Actions, Creature, Actor, Stats};
 
 ///
 /// AI that tracks player
@@ -22,7 +21,7 @@ impl AI for TrackerAI {
   ///
   /// Track player and follow if near
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
+  fn take_turn(&mut self, map: &map::Grid<Tile>, player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
 
     let mut state = Actions::Wait;
 
@@ -43,7 +42,7 @@ impl AI for TrackerAI {
       }
 
       // Check
-      if !walkable(&map[x as usize][y as usize]) {
+      if !tile::walkable(&map[x as usize][y as usize]) {
         x = me.pos.x;
       }
 
@@ -57,7 +56,7 @@ impl AI for TrackerAI {
       }
 
       // Check
-      if !walkable(&map[x as usize][y as usize]) {
+      if !tile::walkable(&map[x as usize][y as usize]) {
         y = me.pos.y
       }
 

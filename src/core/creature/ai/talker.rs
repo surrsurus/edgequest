@@ -1,13 +1,14 @@
 extern crate rand;
-use self::rand::{thread_rng, Rng};
+use self::rand::Rng;
 
 use core::log;
 
-use core::world::dungeon::map::Grid;
-use core::world::dungeon::map::Tile;
+use core::world::dungeon::map::{self, Tile};
 
-use core::object::ai::{AI, TALK_DISTANCE};
-use core::object::{Actions, Creature, Actor, Entity, Stats};
+use core::renderer::Entity;
+
+use core::creature::ai::{AI, TALK_DISTANCE};
+use core::creature::{Actions, Creature, Actor, Stats};
 
 ///
 /// AI that talks to the player
@@ -27,7 +28,7 @@ impl AI for TalkerAI {
   ///
   /// Talk to player if near
   ///
-  fn take_turn(&mut self, _map: &Grid<Tile>, player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
+  fn take_turn(&mut self, _map: &map::Grid<Tile>, player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
 
     let mut state = Actions::Wait;
 
@@ -36,7 +37,7 @@ impl AI for TalkerAI {
 
     if distance < TALK_DISTANCE {
 
-      let mut rng = thread_rng();
+      let mut rng = rand::thread_rng();
       let dice : i32 = rng.gen_range(1, 15);
 
       // Match dice for voiceline
