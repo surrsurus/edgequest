@@ -22,7 +22,6 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install sdl; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install gcc g++ make libsdl1.2-dev; fi
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then set PATH=%PATH%;C:\Program Files (x86)\Rust\bin;C:\MinGW\bin; fi
 
 script:
   - cargo build --verbose --all
