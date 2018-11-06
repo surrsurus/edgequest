@@ -2,13 +2,13 @@ extern crate fuss;
 use self::fuss::Simplex;
 
 use core::world::dungeon::builder::Buildable;
-use core::world::dungeon::map::Grid;
+use core::world::dungeon::map;
 
 ///
 /// Builder for generating noise maps
 /// 
 pub struct Fussy {
-  pub grid: Grid<u8>,
+  pub grid: map::Grid<u8>,
   pub w: usize,
   pub h: usize,
   pub noise: Simplex,
@@ -35,7 +35,7 @@ impl Fussy {
   ///
   /// Return a new `Fussy`
   /// 
-  pub fn new(grid: Grid<u8>, threshold: f32) -> Fussy {
+  pub fn new(grid: map::Grid<u8>, threshold: f32) -> Fussy {
 
     // Make a new dungeon with our fresh grid of size `w` by `h`
     let f = Fussy { 
@@ -56,7 +56,7 @@ impl Buildable for Fussy {
   
   type Output = u8;
 
-  fn build(&mut self) -> Grid<u8> {
+  fn build(&mut self) -> map::Grid<u8> {
     self.add_noise();
     return self.grid.clone();
   }

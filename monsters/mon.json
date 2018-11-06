@@ -1,0 +1,82 @@
+{
+  "ant": {
+    "name": "ant",
+    "glyph": "a",
+    "fg": [
+      255,
+      0,
+      0
+    ],
+    "bg": [
+      0,
+      0,
+      0
+    ],
+    "scent": "insectoid",
+    "ai": "simple"
+  },
+  "bee": {
+    "name": "bee",
+    "glyph": "b",
+    "fg": [
+      150,
+      150,
+      0
+    ],
+    "bg": [
+      0,
+      0,
+      0
+    ],
+    "scent": "insectoid",
+    "ai": "simple"
+  },
+  "cat": {
+    "name": "cat",
+    "glyph": "c",
+    "fg": [
+      150,
+      0,
+      150
+    ],
+    "bg": [
+      0,
+      0,
+      0
+    ],
+    "scent": "feline",
+    "ai": "tracker"
+  },
+  "dog": {
+    "name": "blink hound",
+    "glyph": "d",
+    "fg": [
+      150,
+      150,
+      150
+    ],
+    "bg": [
+      0,
+      0,
+      0
+    ],
+    "scent": "canine",
+    "ai": "blink"
+  },
+  "kurt": {
+    "name": "Kurt",
+    "glyph": "j",
+    "fg": [
+      200,
+      200,
+      200
+    ],
+    "bg": [
+      0,
+      0,
+      0
+    ],
+    "scent": "canine",
+    "ai": "talk"
+  }
+}

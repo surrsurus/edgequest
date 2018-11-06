@@ -1,8 +1,7 @@
-use core::world::dungeon::map::Grid;
-use core::world::dungeon::map::{Tile, TileType};
+use core::world::dungeon::map::{self, tile, Tile};
 
-use core::object::ai::AI;
-use core::object::{Actions, Creature, Actor, Stats};
+use core::creature::ai::AI;
+use core::creature::{Actions, Creature, Actor, Stats};
 
 ///
 /// AI that tracks player
@@ -20,12 +19,13 @@ impl TrackerAI {
 impl AI for TrackerAI {
   
   ///
-  /// Track player if near
+  /// Track player and follow if near
   ///
-  fn take_turn(&mut self, map: &Grid<Tile>, player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
+  fn take_turn(&mut self, map: &map::Grid<Tile>, player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
 
     let mut state = Actions::Wait;
 
+    // ^ is overridden to be the distance formula, this isn't xor
     let distance = me.pos ^ player.actor.pos;
     let mut x = me.pos.x;
     let mut y = me.pos.y;
@@ -42,9 +42,8 @@ impl AI for TrackerAI {
       }
 
       // Check
-      match map[x as usize][y as usize].tiletype {
-        TileType::Wall => x = me.pos.x,
-        _ => {}
+      if !tile::walkable(&map[x as usize][y as usize]) {
+        x = me.pos.x;
       }
 
       // Move y
@@ -57,9 +56,8 @@ impl AI for TrackerAI {
       }
 
       // Check
-      match map[x as usize][y as usize].tiletype {
-        TileType::Wall => y = me.pos.y,
-        _ => {}
+      if !tile::walkable(&map[x as usize][y as usize]) {
+        y = me.pos.y
       }
 
     }

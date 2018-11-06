@@ -2,9 +2,8 @@
 //! An `Actor` is an object that is renderable to the screen and is responsible for moving itself
 //!
 
-use core::object::{Entity, Pos};
-
-use core::renderer::RGB;
+use core::world::dungeon::map::Pos;
+use core::renderer::{Entity, RGB};
 
 ///
 /// Actor struct. Holds necessary properties that extend from `Entity`
@@ -54,13 +53,13 @@ impl Actor {
   /// Return a new `Actor`
   ///
   #[inline]
-  pub fn new(name: &'static str, glyph: char, pos: (isize, isize), fg: (u8, u8, u8), bg: (u8, u8, u8)) -> Actor {
+  pub fn new(name: &'static str, glyph: char, pos: Pos, fg: RGB, bg: RGB) -> Actor {
     Actor {
       name: name,
       glyph: glyph, 
-      pos: Pos::from_tup(pos), 
-      fg: RGB::from_tup(fg), 
-      bg: RGB::from_tup(bg)
+      pos: pos, 
+      fg: fg, 
+      bg: bg
     }
   }
 
@@ -100,13 +99,13 @@ impl Entity for Actor {
   }
 
   #[inline]
-  fn set_bg(&mut self, bg: (u8, u8, u8)) {
-    self.bg = RGB::from_tup(bg);
+  fn set_bg(&mut self, bg: RGB) {
+    self.bg = bg;
   }
 
   #[inline]
-  fn set_fg(&mut self, fg: (u8, u8, u8)) {
-    self.fg = RGB::from_tup(fg);
+  fn set_fg(&mut self, fg: RGB) {
+    self.fg = fg;
   }
 
   #[inline]

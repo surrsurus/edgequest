@@ -3,12 +3,12 @@
 //!
 
 extern crate rand;
-use self::rand::{thread_rng, Rng};
+use self::rand::Rng;
 
-use core::object::Entity;
+use core::renderer::{Entity, RGB};
 
 pub mod map;
-use self::map::{Grid, Tile, TileType};
+use self::map::{tile, Pos, Tile};
 
 // Privately use automata
 mod automata;
@@ -16,48 +16,101 @@ use self::automata::{Automaton, DrunkardsWalk};
 
 // Privately use builders
 mod builder;
-use self::builder::{Buildable, Fussy, Simple};
+use self::builder::{Buildable, Fussy, Simple, Structure};
 
 mod dungeon_tests;
+
+const GRASS_COLORS : [RGB; 3] = [
+  RGB(76, 74, 75),
+  RGB(76, 79, 75),
+  RGB(80, 74, 75)
+];
+
+const VINE_GLYPHS : [char; 5] = [
+  '/', '|', '\\', '-', '~'
+];
+
 
 ///
 /// `Dungeon` struct to stitch together all builders and cellular automatons
 ///
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Dungeon {
   pub width: usize,
   pub height: usize,
-  pub grid: Grid<Tile>,
+  pub grid: map::Grid<Tile>,
 }
 
 impl Dungeon {
+
+
+  ///
+  /// Add a tile to the gird and preserve the existing BG color of the spot
+  /// 
+  fn add_tile(&mut self, g: &mut map::Grid<Tile>, t: &mut Tile, pos: Pos) {
+    // Get the background color of the tile that the new one will be going on top of
+    let bg_col = g[pos.x as usize][pos.y as usize].get_bg();
+    t.set_bg(bg_col);
+    // Replace grid tile with tile
+    g[pos.x as usize][pos.y as usize] = t.clone();
+  }
 
   ///
   /// Make the dungeon
   ///
   pub fn build(&mut self) {
 
-    // Apply simple builder first
-    let mut grid = Simple::new(self.grid.clone()).build();
+    // The purpose of this function is to create some basic grid object, 
+    // and completely fill it out into a dungeon.
 
+    // Currently, it only builds on specific type of dungeon, and in the future,
+    // there should be some construct to generate types of dungeons.
+
+    // 'Types' here refers to dungeons with different themes, that have different terrain features -
+    // think of branches in DCSS. Coupled with this, the Dungeon struct should hold onto this type and
+    // the world should be able to access it to generate items and monsters in the type/biome combinations
+    // that will appear
+
+    // We start with a basic grid object. We will pass references of this object into various functions to carve out a dungeon.
+    let mut grid : map::Grid<Tile>;
+
+    // Fill the map with walls first
+    grid = Dungeon::generate_grid(self.width, self.height, Tile::new(
+      "Wall",
+      ' ',
+      RGB(40, 40, 40),
+      RGB(33, 33, 33),
+      tile::Type::Wall(tile::Wall::Normal))
+    );
+
+    // Apply simple builder. This creates a simple corridor/room dungeon based off the simple builder
+    // Note how the grid is being consumed to replace itself here, but we don't want this later on.
+    grid = Simple::new(grid).build();
+
+    // Create several reusable constructs for walls and floors. Since passing these directly into functions
+    // will cause the references to be lost, clone them first, since Tile derives Clone.
     let wall = Tile::new(
       "Wall",
-      '#',
-      (40, 40, 40),
-      (33, 33, 33),
-      TileType::Wall
+      ' ',
+      RGB(40, 40, 40),
+      RGB(33, 33, 33),
+      tile::Type::Wall(tile::Wall::Normal)
     );
 
     let floor = Tile::new(
       "Floor",
       ' ',
-      (255, 255, 255),
-      (20, 20, 20),
-      TileType::Floor
+      RGB(27, 27, 27),
+      RGB(20, 20, 20),
+      tile::Type::Floor(tile::Floor::Normal)
     );
 
-    // Closure for generating drunkards walks
-    let drunk = |chaos: f32, iter: u32, grid: &mut Grid<Tile> | -> Grid<Tile> {
+    // Closure for generating drunkards walks. Basically just makes the process of adding these
+    // easy. And since we don't use it anywhere else, it doesn't really make sense to turn it into a function,
+    // though it may be in the future.
+    
+    // This is geared towards eating walls and replacing them with floors, so mainly just to flesh out the dungeon.
+    let drunk = |chaos: f32, iter: u32, grid: &mut map::Grid<Tile> | -> map::Grid<Tile> {
       let d = DrunkardsWalk::new(chaos);
       d.generate(
         grid,
@@ -69,93 +122,104 @@ impl Dungeon {
       )
     };
 
-    // Total randomness
+    // Make three passes of this basic walk to carve caves.
+
+    // Total randomness - Really centralized areas that are mostly opened since it walks over itself a lot
     grid = drunk(1.0, 1000, &mut grid);
 
-    // Semi random
+    // Semi random - A mixture of the previous and next option
     grid = drunk(0.5, 1000, &mut grid);
 
-    // Mostly orderly
+    // Mostly orderly - Long corridors that occassionally deviate
     grid = drunk(0.25, 1000, &mut grid);
 
-    // Add Stairs
-    //
-    // So I know that get_valid_location() should be deprecated since we started adding stairs
-    // but we're just gonna have to live with it for now
-    //
-    let spos1 = Dungeon::get_valid_location(&grid);
-    grid[spos1.0][spos1.1] = Tile::new(
-      "Down Stair",
-      '>',
-      (255, 255, 255),
-      (0, 0, 0),
-      TileType::DownStair
-    );
+    // Add structures
+    grid = Structure::new(grid).build();
 
-    let spos2 = Dungeon::get_valid_location(&grid);
-    grid[spos2.0][spos2.1] = Tile::new(
-      "Up Stair",
-      '<',
-      (255, 255, 255),
-      (0, 0, 0),
-      TileType::UpStair
-    );
+    // Biome generation
 
-    // Apply noise
+    // Mostly just a proof of concept. Biomes are generated by comparing noise maps to the grid then flipping biomes
+
+    // Apply noise for Cave biome
     let mut f1 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.2);
     let bin_grid1 = f1.build();
 
+    // Iterate over the grid
     for x in 0..self.width {
       for y in 0..self.height {
+        // Positions of 1 mean that the noise passes the threshold
         if bin_grid1[x][y] == 1 {
+          // First flip the biome
+          grid[x][y].biome = tile::Biome::Cave;
+          // Then recolor based on tile type
           match grid[x][y].tiletype {
-            TileType::Wall => {
-               grid[x][y].set_fg((67, 57, 57));
-               grid[x][y].set_bg((60, 50, 50));
+            tile::Type::Wall(_) => {
+               grid[x][y].set_fg(RGB(67, 57, 57));
+               grid[x][y].set_bg(RGB(60, 50, 50));
             },
-            _ => grid[x][y].set_bg((25, 20, 20))
+            tile::Type::Stair(_) | tile::Type::TallGrass => {
+              grid[x][y].set_bg(RGB(25, 20, 20));
+            },
+            _ => {
+              grid[x][y].set_fg(RGB(32, 27, 27));
+              grid[x][y].set_bg(RGB(25, 20, 20));
+            }
           }
         }
       }
     }
 
-    // Apply noise 2
+    // Apply noise for Crypt biome
     let mut f2 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.2);
     let bin_grid2 = f2.build();
 
     for x in 0..self.width {
       for y in 0..self.height {
         if bin_grid2[x][y] == 1 {
+          grid[x][y].biome = tile::Biome::Crypt;
           match grid[x][y].tiletype {
-            TileType::Wall => {
-               grid[x][y].set_fg((57, 57, 57));
-               grid[x][y].set_bg((50, 50, 50));
+            tile::Type::Wall(_) => {
+               grid[x][y].set_fg(RGB(57, 57, 57));
+               grid[x][y].set_bg(RGB(50, 50, 50));
             },
-            _ => grid[x][y].set_bg((20, 20, 20))
+            tile::Type::Stair(_) | tile::Type::TallGrass => {
+              grid[x][y].set_bg(RGB(20, 20, 20));
+            }
+            _ => {
+              grid[x][y].set_fg(RGB(27, 27, 27));
+              grid[x][y].set_bg(RGB(20, 20, 20));
+            }
           }
         }
       }
     }
 
-    // Apply noise 3
+    // Apply noise for Sunken biome
     let mut f3 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.4);
     let bin_grid3 = f3.build();
 
     for x in 0..self.width {
       for y in 0..self.height {
         if bin_grid3[x][y] == 1 {
+          grid[x][y].biome = tile::Biome::Sunken;
           match grid[x][y].tiletype {
-            TileType::Wall => {
-              grid[x][y].set_fg((57, 57, 67));
-              grid[x][y].set_bg((50, 50, 60));
+            tile::Type::Wall(_) => {
+              grid[x][y].set_fg(RGB(57, 57, 67));
+              grid[x][y].set_bg(RGB(50, 50, 60));
             },
-            _ => grid[x][y].set_bg((20, 20, 25))
+            tile::Type::Stair(_) | tile::Type::TallGrass => {
+              grid[x][y].set_bg(RGB(20, 20, 25));
+            }
+            _ => {
+              grid[x][y].set_fg(RGB(27, 27, 32));
+              grid[x][y].set_bg(RGB(20, 20, 25));
+            }
           }
         }
       }
     }
 
-    // Apply noise 4
+    // Apply noise for water
     let mut f4 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.4);
     let bin_grid4 = f4.build();
 
@@ -163,23 +227,206 @@ impl Dungeon {
       for y in 0..self.height {
         if bin_grid4[x][y] == 1 {
           match grid[x][y].tiletype {
-            TileType::Wall | TileType::DownStair | TileType::UpStair => {},
+            tile::Type::Wall(_) | tile::Type::Stair(_) => {},
             _ => {
-              grid[x][y].set_bg((57, 144, 255));
-              grid[x][y].tiletype = TileType::Water;
+              grid[x][y].set_bg(RGB(57, 144, 255));
+              grid[x][y].tiletype = tile::Type::Water;
             }
           }
         }
       }
     }
 
+    // Apply noise for crystal biome
+    let mut f5 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.67);
+    let bin_grid5 = f5.build();
+
+    for x in 0..self.width {
+      for y in 0..self.height {
+        if bin_grid5[x][y] == 1 {
+          match grid[x][y].tiletype {
+            tile::Type::Floor(_) => {
+              grid[x][y] = Tile::new(
+                "Crystaline Floor", 
+                ' ', 
+                RGB(0, 0, 0), 
+                RGB(183, 141, 212), 
+                tile::Type::Floor(tile::Floor::Crystal)
+              );
+            },
+            tile::Type::Wall(_) => {
+              grid[x][y] = Tile::new(
+                "Crystaline Wall", 
+                ' ', 
+                RGB(0, 0, 0), 
+                RGB(216, 197, 244), 
+                tile::Type::Wall(tile::Wall::Crystal)
+              );
+            }
+            _ => {}
+          }
+        }
+      }
+    }
+
+    // Apply noise for tall grass
+    let mut f6 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.5);
+    let bin_grid6 = f6.build();
+
+    for x in 0..self.width {
+      for y in 0..self.height {
+        if bin_grid6[x][y] == 1 {
+          match grid[x][y].tiletype {
+            tile::Type::Floor(_) => {
+              grid[x][y] = Tile::new(
+                "Tall Grass", 
+                '"', 
+                *rand::thread_rng().choose(&GRASS_COLORS).unwrap(), 
+                grid[x][y].get_bg(), 
+                tile::Type::TallGrass
+              );
+            },
+            _ => {}
+          }
+        }
+      }
+    }
+
+    // Apply noise for vines
+    let mut f7 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.55);
+    let bin_grid7 = f7.build();
+
+    for x in 0..self.width {
+      for y in 0..self.height {
+        if bin_grid7[x][y] == 1 {
+          match grid[x][y].tiletype {
+            tile::Type::Floor(_) => {
+              grid[x][y] = Tile::new(
+                "Vine", 
+                *rand::thread_rng().choose(&VINE_GLYPHS).unwrap(), 
+                *rand::thread_rng().choose(&GRASS_COLORS).unwrap(), 
+                grid[x][y].get_bg(), 
+                tile::Type::Vine
+              );
+            },
+            _ => {}
+          }
+        }
+      }
+    }
+
+    // Add pretty details last.
+
+    // Add some hard walls
+    for x in 0..self.width {
+      for y in 0..self.height {
+        // Basically just select 30% of walls to be 'hard walls' which are no different from normal walls
+        if grid[x][y].tiletype == tile::Type::Wall(tile::Wall::Normal) {
+          let mut rng = rand::thread_rng();
+          let chance = rng.gen_range(1, 100);
+          if chance > 70 {
+            grid[x][y].glyph = '#';
+            grid[x][y].tiletype = tile::Type::Wall(tile::Wall::Hard);
+          }
+        }
+      }
+    }
+
+    // Add floor features
+    for x in 0..self.width {
+      for y in 0..self.height {
+        if grid[x][y].tiletype == tile::Type::Floor(tile::Floor::Normal) {
+          let mut rng = rand::thread_rng();
+          let feature_chance = rng.gen_range(1, 100);
+
+          // Create basic rock features
+          if feature_chance > 90 {
+            let feature = rng.gen_range(1, 5);
+            match feature {
+              1 => grid[x][y].glyph = ',',
+              2 => grid[x][y].glyph = '.',
+              3 => grid[x][y].glyph = '%',
+              4 => grid[x][y].glyph = '*',
+              _ => {}
+            };
+
+            // Add foliage in specific biomes
+            match grid[x][y].biome {
+              tile::Biome::Cave => {
+                let foliage_chance = rng.gen_range(1, 100);
+                match foliage_chance {
+                  1...5 => grid[x][y].set_fg(RGB(76, 74, 45)),
+                  6...10 => grid[x][y].set_fg(RGB(35, 30, 30)),
+                  11...15 => grid[x][y].set_fg(RGB(76, 74, 45)),
+                  16...20 => grid[x][y].set_fg(RGB(76, 74, 45)),
+                  _ => {}
+                };
+              }
+              _ => {}
+            };
+            
+          }
+        }
+      }
+    }
+
+    // Add Stairs
+
+    // So I know that get_valid_location() should be deprecated since we started adding stairs
+    // but we're just gonna have to live with it for now
+    
+    // Downstair location
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Down Stair",
+        '>',
+        RGB(255, 255, 255),
+        RGB(0, 0, 0),
+        tile::Type::Stair(tile::Stair::DownStair(tile::DownStair::Normal))
+      ),
+      loc
+    );
+
+    // Stair location
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Up Stair",
+        '<',
+        RGB(255, 255, 255),
+        RGB(0, 0, 0),
+        tile::Type::Stair(tile::Stair::UpStair(tile::UpStair::Normal))
+      ),
+      loc
+    );
+
+    // Add a trap
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Memory Loss Trap", 
+        '^', 
+        RGB(255, 255, 0), 
+        RGB(0, 0, 0), 
+        tile::Type::Trap(tile::Trap::MemoryLoss)
+      ),
+      loc
+    );
+
+    // Spent 300 million years wondering why the map was all walls until I realized this CRUCIAL piece of code
+    // suddenly vanished.
+    // Don't delete.
     self.grid = grid;
 
   }
 
-  fn generate_grid<T : Clone>(w: usize, h: usize, init: T) -> Grid<T> {
+  fn generate_grid<T : Clone>(w: usize, h: usize, init: T) -> map::Grid<T> {
     // Make grid
-    let mut grid = Grid::<T>::new();
+    let mut grid = map::Grid::<T>::new();
 
     // Fill it with Vecs
     for _x in 0..w {
@@ -199,39 +446,37 @@ impl Dungeon {
 
   }
 
+  pub fn get_bounds_pos(&self) -> Pos {
+    Pos::from_usize(self.width, self.height)
+  }
+
   ///
-  /// Get the player's starting location as a `Pos`
+  /// Get the player's starting location as a tuple
   ///
   /// NOTE: Should be deprecated and removed once stairs show up
   ///
-  pub fn get_valid_location(grid: &Grid<Tile>) -> (usize, usize) {
-    let mut rng = thread_rng();
+  pub fn get_valid_location(grid: &map::Grid<Tile>) -> Pos {
     loop {
+      let mut rng = rand::thread_rng();
       let x : usize = rng.gen_range(1, grid.len() - 2);
       let y : usize = rng.gen_range(1, grid[0].len() - 2);
 
-      match grid[x][y].tiletype {
-        TileType::Floor => return (x, y),
-        _ => continue
+      if tile::spawnable(&grid[x][y]) {
+        return Pos::from_usize(x, y);
       }
+
     }
   }
 
   ///
-  /// Return a new `Dungeon`
+  /// Return a new `Dungeon` that consists of pure walls
   ///
-  pub fn new(map_dim: (usize, usize)) -> Dungeon {
-    let g = Dungeon::generate_grid(map_dim.0, map_dim.1, Tile::new(
-        "Wall",
-        '#',
-        (40, 40, 40),
-        (33, 33, 33),
-        TileType::Wall));
+  pub fn new(map_dim: Pos) -> Dungeon {
 
     return Dungeon {
-      width: map_dim.0,
-      height: map_dim.1,
-      grid: g.clone(),
+      width: map_dim.x as usize,
+      height: map_dim.y as usize,
+      grid: map::Grid::new()
     };
 
   }

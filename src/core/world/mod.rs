@@ -1,15 +1,23 @@
-extern crate rand;
-use self::rand::Rng;
+// extern crate serde_json;
+// JSON Parsing and Construction
+// https://github.com/serde-rs/json
+// use self::serde_json::Value;
+// use self::serde_json::map;
+
+// Use to read files
+// use std::fs::File;
+// use std::io::prelude::*;
 
 use core::tcod::map::{Map, FovAlgorithm};
 
-use core::object::{Actions, Actor, Creature, Entity};
-use core::object::ai::{SimpleAI, TrackerAI, BlinkAI, TalkerAI};
-use core::renderer::RGB;
+use core::creature::{ai, Actions, Actor, Creature};
+
+use core::renderer::{Entity, RGB};
+
+use core::log;
 
 pub mod dungeon;
-use self::dungeon::Dungeon;
-use self::dungeon::map::{Grid, Tile, TileType, ScentType};
+use self::dungeon::{Dungeon, map::{self, Pos, tile, Tile}};
 
 ///
 /// What value the player sets the scent of nearby tiles to
@@ -47,20 +55,15 @@ const SO_DIAM_UPPER : isize = ((SO_DIAM / 2) + 1);
 // Lower index for ranges
 const SO_DIAM_LOWER : isize = -(SO_DIAM / 2);
 
-// Water colors
-const WATER_COLORS : [(u8, u8, u8); 3] = [
-  (51, 133, 255),
-  (57, 144, 255),
-  (54, 138, 255)
-];
-
 pub struct World {
   pub player: Creature,
   pub cur_dungeon: Dungeon,
+  // Creatures need to be boxed because they hold a trait object, which has an undefined size.
+  // Whenever you create a creature, just slap it into Box::new() and it works
   pub creatures: Vec<Box<Creature>>,
   pub dungeon_stack: Vec<Dungeon>,
+  // http://tomassedovic.github.io/tcod-rs/tcod/map/struct.Map.html
   pub tcod_map: Map
-  // Need to add http://tomassedovic.github.io/tcod-rs/tcod/map/struct.Map.html
 }
 
 impl World {
@@ -68,20 +71,19 @@ impl World {
   ///
   /// Create a set of creatures for testing
   ///
-  fn create_test_creatures(g: &Grid<Tile>) -> Vec<Box<Creature>> {
+  fn create_test_creatures(g: &map::Grid<Tile>) -> Vec<Box<Creature>> {
+    
     let mut creatures = Vec::<Box<Creature>>::new();
+
     creatures.push(
       Box::new(
         Creature::new(
           "ant",
           'a',
-          {
-            let pos = Dungeon::get_valid_location(&g);
-            (pos.0 as isize, pos.1 as isize)
-          },
-          (255, 0, 0), (0, 0, 0),
-          ScentType::Insectoid,
-          SimpleAI::new()
+          Dungeon::get_valid_location(g),
+          RGB(150, 0, 0), RGB(0, 0, 0),
+          tile::Scent::Insectoid,
+          ai::SimpleAI::new()
         )
       )
     );
@@ -91,13 +93,10 @@ impl World {
         Creature::new(
           "bee",
           'b',
-          {
-            let pos = Dungeon::get_valid_location(&g);
-            (pos.0 as isize, pos.1 as isize)
-          },
-          (150, 150, 0), (0, 0, 0),
-          ScentType::Insectoid,
-          SimpleAI::new()
+          Dungeon::get_valid_location(g),
+          RGB(150, 150, 0), RGB(0, 0, 0),
+          tile::Scent::Insectoid,
+          ai::SimpleAI::new()
         )
       )
     );
@@ -107,13 +106,10 @@ impl World {
         Creature::new(
           "cat",
           'c',
-          {
-            let pos = Dungeon::get_valid_location(&g);
-            (pos.0 as isize, pos.1 as isize)
-          },
-          (150, 0, 150), (0, 0, 0),
-          ScentType::Feline,
-          TrackerAI::new()
+          Dungeon::get_valid_location(g),
+          RGB(150, 0, 150), RGB(0, 0, 0),
+          tile::Scent::Feline,
+          ai::TrackerAI::new()
         )
       )
     );
@@ -123,13 +119,10 @@ impl World {
         Creature::new(
           "blink hound",
           'd',
-          {
-            let pos = Dungeon::get_valid_location(&g);
-            (pos.0 as isize, pos.1 as isize)
-          },
-          (150, 150, 150), (0, 0, 0),
-          ScentType::Canine,
-          BlinkAI::new()
+          Dungeon::get_valid_location(g),
+          RGB(150, 150, 150), RGB(0, 0, 0),
+          tile::Scent::Canine,
+          ai::BlinkAI::new()
         )
       )
     );
@@ -139,13 +132,23 @@ impl World {
         Creature::new(
           "Kurt",
           '@',
-          {
-            let pos = Dungeon::get_valid_location(&g);
-            (pos.0 as isize, pos.1 as isize)
-          },
-          (200, 200, 200), (0, 0, 0),
-          ScentType::Canine,
-          TalkerAI::new()
+          Dungeon::get_valid_location(g),
+          RGB(200, 200, 200), RGB(0, 0, 0),
+          tile::Scent::Canine,
+          ai::TalkerAI::new()
+        )
+      )
+    );
+
+    creatures.push(
+      Box::new(
+        Creature::new(
+          "Echidna",
+          'e',
+          Dungeon::get_valid_location(g),
+          RGB(50, 50, 200), RGB(0, 0, 0),
+          tile::Scent::Canine,
+          ai::SmellerAI::new()
         )
       )
     );
@@ -157,14 +160,30 @@ impl World {
   ///
   /// Create a basic dungeon for testing
   ///
-  fn create_test_dungeon(map_dim: (isize, isize)) -> Dungeon {
+  fn create_test_dungeon(map_dim: Pos) -> Dungeon {
 
-    let mut d = Dungeon::new((map_dim.0 as usize, map_dim.1 as usize));
+    let mut d = Dungeon::new(map_dim);
 
+    // Build is a void method so we do it separately
     d.build();
 
     return d;
 
+  }
+
+  ///
+  /// Return a new player `Entity`
+  ///
+  #[inline]
+  fn new_player() -> Creature {
+    Creature::new(
+      "Player",
+      '@',
+      Pos::new(40, 25),
+      RGB(255, 255, 255), RGB(0, 0, 0),
+      tile::Scent::Player,
+      ai::PlayerAI::new()
+    )
   }
 
   ///
@@ -174,131 +193,141 @@ impl World {
 
     for x in 0..self.cur_dungeon.width {
       for y in 0..self.cur_dungeon.height {
-        self.cur_dungeon.grid[x][y] = Tile::new(
-          "Test",
-          ' ',
-          (0, 0, 0),
-          (0, 0, 0),
-          TileType::Floor
-        );
+        self.cur_dungeon.grid[x][y] = tile::generic_floor();
       }
     }
 
-    let tm = World::new_tcod_map((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize), &self.cur_dungeon);
+    let tm = World::new_tcod_map(self.cur_dungeon.get_bounds_pos(), &self.cur_dungeon);
     self.tcod_map = tm;
 
     self.creatures = Vec::new();
 
     self.player.actor.pos.x = (self.cur_dungeon.width / 2) as isize;
     self.player.actor.pos.y = (self.cur_dungeon.height / 2) as isize;
+    
   }
 
   ///
-  /// Return a new player `Entity`
+  /// Check to see if a specific position is valid, i.e. tile::walkable and in the map bounds
   ///
-  #[inline]
-  fn fresh_player() -> Creature {
-    Creature::new(
-      "Player",
-      '@',
-      (40, 25),
-      (255, 255, 255),
-      (0, 0, 0),
-      ScentType::Player,
-      SimpleAI::new()
-    )
-  }
+  pub fn is_valid_pos(&self, x: isize, y: isize) -> bool {
 
-  ///
-  /// Check to see if a specific tile is valid, i.e. walkable and in the map bounds
-  ///
-  pub fn is_valid(&self, x: isize, y: isize) -> bool {
     let tx = x as usize;
     let ty = y as usize;
-    if tx > 0 && tx < self.cur_dungeon.width - 1 && ty > 0 && ty < self.cur_dungeon.height - 1 {
-      match self.cur_dungeon.grid[tx][ty].tiletype {
-        TileType::Floor | TileType::DownStair | TileType::UpStair | TileType::Water => return true,
-        _ => {}
-      }
+
+    if tx > 0 && tx < self.cur_dungeon.width - 1 && ty > 0 && ty < self.cur_dungeon.height - 1 && tile::walkable(&self.cur_dungeon.grid[tx][ty]) {
+      return true;
+    } else {
+      return false;
     }
-    return false;
+
+  }
+
+  ///
+  /// Check to see if a tile is a trap
+  /// 
+  /// Should only be called after checking tile validity to avoid OOB errors
+  /// 
+  pub fn check_trap(&mut self) {
+
+    match &self.cur_dungeon.grid[self.player.actor.pos.x as usize][self.player.actor.pos.y as usize].tiletype.clone() {
+
+      // We only care about traps, and this matches every trap
+      tile::Type::Trap(trap) => {
+        
+        log!(("You step on a trap!", RGB(255, 0, 0)));
+
+        // Match the type of trap
+        match trap {
+
+          // Memory loss causes all tiles to become unseen, effectively losing all mapping progress
+          tile::Trap::MemoryLoss => {
+            
+            for tile in self.cur_dungeon.grid.iter_mut().flatten() {
+              tile.seen = false;
+            }
+            
+            log!(("You lose your memory", RGB(255, 255, 0)));
+          },
+
+        }
+
+      },
+      _ => {}
+    }
+
   }
 
   ///
   /// Return the bg color of a tile at a point
   ///
-  /// NOTE: Clearly does not give a fuck if you go oob, probably should change
+  /// NOTE: Clearly does not give a fuck if you go OOB, probably should change
+  /// Interestingly, it's only used by the renderer and that can't display stuff out of bounds (thanks, camera)
+  /// so maybe it's not important to have needless code?
   ///
-  pub fn get_bg_color_at(&self, x: usize, y: usize) -> RGB {
+  pub fn get_bg_color_at(&self, pos: Pos) -> RGB {
 
-    self.cur_dungeon.grid[x][y].get_bg()
+    self.cur_dungeon.grid[pos.x as usize][pos.y as usize].get_bg()
 
   }
 
   ///
-  /// Go downstairs
+  /// Go downstairs if possible
   ///
-  pub fn can_go_down(&self) -> bool {
-    match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
-      TileType::DownStair => return true,
-      _ => return false
-    }
-  }
-
   pub fn go_down(&mut self) {
-    self.test_traverse();
-  }
 
-  ///
-  /// Go upstairs
-  ///
-  pub fn can_go_up(&self) -> bool {
     match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
-      TileType::UpStair => return true,
-      _ => return false
+      tile::Type::Stair(tile::Stair::DownStair(_)) => self.test_traverse(),
+      _ => log!(("You can't go down here", RGB(150, 150, 150)))
     }
+
   }
 
+  ///
+  /// Go upstairs if possible
+  ///
   pub fn go_up(&mut self) {
-    self.test_traverse();
+
+    match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
+      tile::Type::Stair(tile::Stair::UpStair(_)) => self.test_traverse(),
+      _ => log!(("You can't go up here", RGB(150, 150, 150)))
+    }
+
   }
 
   ///
   /// Temporary function for stair traversal. In the future floors will need to be saved
   ///
   pub fn test_traverse(&mut self) {
-    let d = World::create_test_dungeon((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize));
+    let d = World::create_test_dungeon(self.cur_dungeon.get_bounds_pos());
     let g = d.grid.clone();
-    let tm = World::new_tcod_map((self.cur_dungeon.width as isize, self.cur_dungeon.height as isize), &d);
+    let tm = World::new_tcod_map(self.cur_dungeon.get_bounds_pos(), &d);
 
     self.cur_dungeon = d;
     self.creatures = World::create_test_creatures(&g);
     self.tcod_map = tm;
 
     let start_loc = Dungeon::get_valid_location(&self.cur_dungeon.grid);
-    self.player.actor.pos.x = start_loc.0 as isize;
-    self.player.actor.pos.y = start_loc.1 as isize;
+    self.player.actor.pos.x = start_loc.x;
+    self.player.actor.pos.y = start_loc.y;
 
     self.update_fov();
-    self.update_water();
 
   }
 
   ///
   /// Return a tcod map based on dungeon features (Essentially what walls you can walk and see through)
   ///
-  pub fn new_tcod_map(map_dim: (isize, isize), dungeon: &Dungeon) -> Map {
-    let mut tm = Map::new(map_dim.0 as i32, map_dim.1 as i32);
+  pub fn new_tcod_map(map_dim: Pos, dungeon: &Dungeon) -> Map {
+    let mut tm = Map::new(map_dim.x as i32, map_dim.y as i32);
 
+    // Fill the map in based on what blocks are tile::opaque
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
-        match dungeon.grid[x][y].tiletype {
-          TileType::Wall => {
-            tm.set(x as i32, y as i32, false, false);
-          },
-          _ => {
-            tm.set(x as i32, y as i32, true, true);
-          }
+        if tile::opaque(&dungeon.grid[x][y]) {
+          tm.set(x as i32, y as i32, false, false);
+        } else {
+          tm.set(x as i32, y as i32, true, true);
         }
       }
     }
@@ -311,7 +340,7 @@ impl World {
   ///
   /// Return a new `World`
   ///
-  pub fn new(map_dim: (isize, isize)) -> World {
+  pub fn new(map_dim: Pos) -> World {
 
     // Create a basic dungeon, tcod map from that dungeon, and a grid we can
     // put test creatures on.
@@ -320,7 +349,7 @@ impl World {
     let tm =  World::new_tcod_map(map_dim, &d);
 
     let mut w = World {
-      player: World::fresh_player(),
+      player: World::new_player(),
       cur_dungeon: d,
       creatures: World::create_test_creatures(&g),
       dungeon_stack: Vec::new(),
@@ -328,8 +357,8 @@ impl World {
     };
 
     let start_loc = Dungeon::get_valid_location(&w.cur_dungeon.grid);
-    w.player.actor.pos.x = start_loc.0 as isize;
-    w.player.actor.pos.y = start_loc.1 as isize;
+    w.player.actor.pos.x = start_loc.x;
+    w.player.actor.pos.y = start_loc.y;
     w.update_fov();
 
     return w;
@@ -356,10 +385,10 @@ impl World {
     let py = self.player.actor.pos.y;
     for nx in SC_DIAM_LOWER..SC_DIAM_UPPER {
       for ny in SC_DIAM_LOWER..SC_DIAM_UPPER {
-        if self.is_valid(px - nx, py - ny) {
+        if self.is_valid_pos(px - nx, py - ny) {
           for s in &mut self.get_mut_tile_at(px - nx, py - ny).scents {
             match s.scent_type {
-              ScentType::Player => {
+              tile::Scent::Player => {
                 s.val = SC_INC
               }
               _ => {}
@@ -388,7 +417,7 @@ impl World {
       let st = &p.2;
       for nx in SC_DIAM_LOWER..SC_DIAM_UPPER {
         for ny in SC_DIAM_LOWER..SC_DIAM_UPPER {
-          if self.is_valid(cx - nx, cy - ny) {
+          if self.is_valid_pos(cx - nx, cy - ny) {
             for s in &mut self.get_mut_tile_at(cx - nx, cy - ny).scents {
               if &s.scent_type == st {
                 s.val = SC_INC
@@ -405,7 +434,7 @@ impl World {
     // because we never change it
     let buffer = self.cur_dungeon.grid.clone();
 
-    for s in 0..ScentType::Num as usize {
+    for s in 0..tile::Scent::Num as usize {
 
       let filter = |tile: &Tile| -> f32 {
         // So, interestingly, if a tile has no scent and is given 0.0 scent after the filter,
@@ -449,7 +478,7 @@ impl World {
       // Change values of map based on averages from the buffer
       for x in 0..self.cur_dungeon.width {
         for y in 0..self.cur_dungeon.height {
-          if self.is_valid(x as isize, y as isize) {
+          if self.is_valid_pos(x as isize, y as isize) {
             self.cur_dungeon.grid[x][y].scents[s].val = avg_of_neighbors(x, y) as u8;
           }
         }
@@ -458,12 +487,14 @@ impl World {
 
   }
 
+  ///
+  /// Update the sound map
+  /// 
   fn update_sound(&mut self) {
 
-    for x in 0..self.cur_dungeon.width {
-      for y in 0..self.cur_dungeon.height {
-        self.cur_dungeon.grid[x][y].sound = 0;
-      }
+    // Remove all sound
+    for tile in self.cur_dungeon.grid.iter_mut().flatten() {
+      tile.sound = 0;
     }
 
     let dist = |obj: &Actor, x: isize, y: isize| -> isize {
@@ -477,7 +508,7 @@ impl World {
           let py = self.player.actor.pos.y;
           for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
             for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
-              if self.is_valid(px - nx, py - ny) {
+              if self.is_valid_pos(px - nx, py - ny) {
                 self.get_mut_tile_at(px - nx, py - ny).sound = SO_INC - ((dist(&self.player.actor, px - nx, py - ny)) * (SO_DIAM / 2)) as u8;
               }
             }
@@ -501,20 +532,29 @@ impl World {
     // For pair in creature information
     for p in &cinf {
       // Unpack
+      let cx = p.0;
+      let cy = p.1;
+      let f = &p.2;
       let s = &p.3;
       match s {
         &Actions::Move => {
-          let cx = p.0;
-          let cy = p.1;
-          let f = &p.2;
           for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
             for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
-              if self.is_valid(cx - nx, cy - ny) {
+              if self.is_valid_pos(cx - nx, cy - ny) {
                 self.get_mut_tile_at(cx - nx, cy - ny).sound = SO_INC - ((dist(&f, cx - nx, cy - ny)) * (SO_DIAM / 2)) as u8;
               }
             }
           }
         },
+        &Actions::Talk => {
+          for nx in SO_DIAM_LOWER-2..SO_DIAM_UPPER+2 {
+            for ny in SO_DIAM_LOWER-2..SO_DIAM_UPPER+2 {
+              if self.is_valid_pos(cx - nx, cy - ny) {
+                self.get_mut_tile_at(cx - nx, cy - ny).sound = SO_INC - ((dist(&f, cx - nx, cy - ny)) * (SO_DIAM / 2)) as u8;
+              }
+            }
+          }
+        }
         _ => {}
       }
     }
@@ -522,24 +562,8 @@ impl World {
   }
 
   ///
-  /// Assign water tiles a new blue color
+  /// Update the fov map from the player's perspective
   /// 
-  fn update_water(&mut self) {
-
-    for x in 0..self.cur_dungeon.width {
-      for y in 0..self.cur_dungeon.height {
-        match self.cur_dungeon.grid[x][y].tiletype {
-          TileType::Water => {
-            // Water tile should pick a new color from list of colors
-            self.cur_dungeon.grid[x][y].set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
-          }
-          _ => {}
-        }
-      }
-    }
-
-  }
-
   pub fn update_fov(&mut self) {
     self.tcod_map.compute_fov(self.player.actor.pos.x as i32, self.player.actor.pos.y as i32, 20, true, FovAlgorithm::Shadow);
   }
@@ -553,7 +577,6 @@ impl World {
     for c in &mut self.creatures {
       c.take_turn(&self.cur_dungeon.grid, &self.player)
     }
-    self.update_water();
     self.update_sound();
   }
 

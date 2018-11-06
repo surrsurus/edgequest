@@ -1,12 +1,26 @@
+//!
+//! Hold colors as a tuple
+//! 
+
 // Operator overloading
 use std::ops::{Add, Sub};
 
+// Tcod colors for conversion
 use core::tcod::colors;
 
 ///
-/// Wrap tcod::Color with a struct to keep tcod integration with the renderer
+/// One would think that the RGB 'type' we use here is divorced from the actual tcod library, however
+/// this construct serves more as a wrapper or converter for tcod colors, because they are pretty ass.
 /// 
-/// Also allows us to be able to clone and compare, where tcod colors cannot for some reason
+/// Tcod colors cannot be cloned, cannot be compared, and other basic functions a normal human being
+/// would assume would be availible are simply not. I assume this is not the doings of the rust
+/// maintainers, but the original author of libtcod combined with whatever necessary evils and/or evil rituals
+/// that must have taken place in order to get tcod-rs working.
+/// 
+/// While this is specifically intended for tcod, it can be entirely used without ever needing
+/// to see tcod as it still holds all of the data on it's own.
+/// 
+/// Naturally since RGB colors don't exceed values of 255, the RGB struct holds 3 u8 values.
 /// 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub struct RGB(pub u8, pub u8, pub u8);
@@ -22,7 +36,7 @@ impl RGB {
   }
 
   ///
-  /// Get an RGB to a tuple
+  /// Turn an RGB into a tuple
   /// 
   #[inline]
   pub fn to_tup(rgb: RGB) -> (u8, u8, u8) {
@@ -30,7 +44,7 @@ impl RGB {
   }
 
   /// 
-  /// Convert RGB to a tcod Color
+  /// Convert an RGB into a tcod Color
   /// 
   #[inline]
   pub fn to_tcod(&self) -> colors::Color {
@@ -40,7 +54,7 @@ impl RGB {
 }
 
 /// 
-/// Allow for the addition of two `Pos` structs
+/// Allow for the addition of two `RGB` structs
 /// 
 impl Add<RGB> for RGB {
 
@@ -57,7 +71,7 @@ impl Add<RGB> for RGB {
 }
 
 /// 
-/// Allow for the addition of two `Pos` structs
+/// Allow for the addition of two `RGB` structs
 /// 
 impl Sub<RGB> for RGB {
 
