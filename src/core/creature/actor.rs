@@ -99,13 +99,13 @@ impl Entity for Actor {
   }
 
   #[inline]
-  fn set_bg(&mut self, bg: (u8, u8, u8)) {
-    self.bg = RGB::from_tup(bg);
+  fn set_bg(&mut self, bg: RGB) {
+    self.bg = bg;
   }
 
   #[inline]
-  fn set_fg(&mut self, fg: (u8, u8, u8)) {
-    self.fg = RGB::from_tup(fg);
+  fn set_fg(&mut self, fg: RGB) {
+    self.fg = fg;
   }
 
   #[inline]

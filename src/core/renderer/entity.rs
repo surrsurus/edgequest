@@ -10,7 +10,8 @@
 //! be uniform across all `Entity`s.
 //! 
 //! Entities should fundamentally exist divorced from whatever rendering library we use in order to keep everything
-//! the way it is with as minimal hassle as possible if a different renderer is chosen
+//! the way it is with as minimal hassle as possible if a different renderer is chosen. However they are heavily
+//! intertwined with the renderer and thus a bridge between game constructs and the screen.
 //!
 
 pub use core::renderer::RGB;
@@ -33,10 +34,10 @@ pub trait Entity {
   fn get_name(&self) -> &'static str;
 
   #[inline]
-  fn set_bg(&mut self, bg: (u8, u8, u8));
+  fn set_bg(&mut self, bg: RGB);
 
   #[inline]
-  fn set_fg(&mut self, fg: (u8, u8, u8));
+  fn set_fg(&mut self, fg: RGB);
 
   #[inline]
   fn set_glyph(&mut self, glyph: char);

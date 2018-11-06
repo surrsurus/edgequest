@@ -50,7 +50,7 @@ impl Dungeon {
   fn add_tile(&mut self, g: &mut map::Grid<Tile>, t: &mut Tile, pos: Pos) {
     // Get the background color of the tile that the new one will be going on top of
     let bg_col = g[pos.x as usize][pos.y as usize].get_bg();
-    t.set_bg((bg_col.0, bg_col.1, bg_col.2));
+    t.set_bg(bg_col);
     // Replace grid tile with tile
     g[pos.x as usize][pos.y as usize] = t.clone();
   }
@@ -154,15 +154,15 @@ impl Dungeon {
           // Then recolor based on tile type
           match grid[x][y].tiletype {
             tile::Type::Wall(_) => {
-               grid[x][y].set_fg((67, 57, 57));
-               grid[x][y].set_bg((60, 50, 50));
+               grid[x][y].set_fg(RGB(67, 57, 57));
+               grid[x][y].set_bg(RGB(60, 50, 50));
             },
             tile::Type::Stair(_) | tile::Type::TallGrass => {
-              grid[x][y].set_bg((25, 20, 20));
+              grid[x][y].set_bg(RGB(25, 20, 20));
             },
             _ => {
-              grid[x][y].set_fg((32, 27, 27));
-              grid[x][y].set_bg((25, 20, 20));
+              grid[x][y].set_fg(RGB(32, 27, 27));
+              grid[x][y].set_bg(RGB(25, 20, 20));
             }
           }
         }
@@ -179,15 +179,15 @@ impl Dungeon {
           grid[x][y].biome = tile::Biome::Crypt;
           match grid[x][y].tiletype {
             tile::Type::Wall(_) => {
-               grid[x][y].set_fg((57, 57, 57));
-               grid[x][y].set_bg((50, 50, 50));
+               grid[x][y].set_fg(RGB(57, 57, 57));
+               grid[x][y].set_bg(RGB(50, 50, 50));
             },
             tile::Type::Stair(_) | tile::Type::TallGrass => {
-              grid[x][y].set_bg((20, 20, 20));
+              grid[x][y].set_bg(RGB(20, 20, 20));
             }
             _ => {
-              grid[x][y].set_fg((27, 27, 27));
-              grid[x][y].set_bg((20, 20, 20));
+              grid[x][y].set_fg(RGB(27, 27, 27));
+              grid[x][y].set_bg(RGB(20, 20, 20));
             }
           }
         }
@@ -204,15 +204,15 @@ impl Dungeon {
           grid[x][y].biome = tile::Biome::Sunken;
           match grid[x][y].tiletype {
             tile::Type::Wall(_) => {
-              grid[x][y].set_fg((57, 57, 67));
-              grid[x][y].set_bg((50, 50, 60));
+              grid[x][y].set_fg(RGB(57, 57, 67));
+              grid[x][y].set_bg(RGB(50, 50, 60));
             },
             tile::Type::Stair(_) | tile::Type::TallGrass => {
-              grid[x][y].set_bg((20, 20, 25));
+              grid[x][y].set_bg(RGB(20, 20, 25));
             }
             _ => {
-              grid[x][y].set_fg((27, 27, 32));
-              grid[x][y].set_bg((20, 20, 25));
+              grid[x][y].set_fg(RGB(27, 27, 32));
+              grid[x][y].set_bg(RGB(20, 20, 25));
             }
           }
         }
@@ -229,7 +229,7 @@ impl Dungeon {
           match grid[x][y].tiletype {
             tile::Type::Wall(_) | tile::Type::Stair(_) => {},
             _ => {
-              grid[x][y].set_bg((57, 144, 255));
+              grid[x][y].set_bg(RGB(57, 144, 255));
               grid[x][y].tiletype = tile::Type::Water;
             }
           }
@@ -355,10 +355,10 @@ impl Dungeon {
               tile::Biome::Cave => {
                 let foliage_chance = rng.gen_range(1, 100);
                 match foliage_chance {
-                  1...5 => grid[x][y].set_fg((76, 74, 45)),
-                  6...10 => grid[x][y].set_fg((35, 30, 30)),
-                  11...15 => grid[x][y].set_fg((76, 74, 45)),
-                  16...20 => grid[x][y].set_fg((76, 74, 45)),
+                  1...5 => grid[x][y].set_fg(RGB(76, 74, 45)),
+                  6...10 => grid[x][y].set_fg(RGB(35, 30, 30)),
+                  11...15 => grid[x][y].set_fg(RGB(76, 74, 45)),
+                  16...20 => grid[x][y].set_fg(RGB(76, 74, 45)),
                   _ => {}
                 };
               }

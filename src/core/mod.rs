@@ -136,7 +136,6 @@ impl Engine {
           // Begin to pattern match the char corresponding to the key pressed
           match keypress.printable {
 
-            
             // Movement keys are bound to vim-like controls (hjklyubn)
             'h' => { 
               self.world.player.actor.move_cart(-1, 0);
@@ -220,6 +219,12 @@ impl Engine {
               self.state = State::Debug;
             },
 
+            // Tcod test
+            'c' => {
+              self.ren.tcod_test(&mut self.root);
+              self.state = State::Debug;
+            },
+
             // Unbound key, so we just say we don't know what the player did
             _ => { self.world.player.state = Actions::Unknown }
             
@@ -289,13 +294,16 @@ impl Engine {
     Engine {
 
       world: World::new(map_dim),
+
       state: State::New,
+
       ren: Renderer::new(
         map_dim, 
         Pos::new(root.width() as isize, root.height() as isize), 
         init::console_height(),
         init::panel_width()
       ),
+      
       root: root,
 
       // Debug 
@@ -389,11 +397,11 @@ impl Engine {
     self.title_screen();
 
     // Some starting messages, will be removed in later versions (hopefully)
-    log!(("Welcome to Edgequest", RGB(255, 0, 255)));
-    log!(("Move with vim keys", RGB(255, 255, 255)));
-    log!(("esc to quit, w to regenerate", RGB(255, 255, 255)));
+    log!(("Welcome to Edgequest",                 RGB(255,   0, 255)));
+    log!(("Move with vim keys",                   RGB(255, 255, 255)));
+    log!(("esc to quit, w to regenerate",         RGB(255, 255, 255)));
     log!(("r to toggle scent, t to toggle sound", RGB(255, 255, 255)));
-    log!(("f to toggle FoV, z to toggle noclip", RGB(255, 255, 255)));
+    log!(("f to toggle FoV, z to toggle noclip",  RGB(255, 255, 255)));
 
     // Initial update
     self.update();

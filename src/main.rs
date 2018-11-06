@@ -10,8 +10,6 @@
 //! uses the haskell-esque pattern matching to drive the descision making.
 //! 
 
-#![feature(iterator_flatten)]
-
 // Local imports for all game files
 //
 // We set as public so docs are generated for them

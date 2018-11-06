@@ -74,6 +74,9 @@ pub fn root() -> console::Root {
 ///
 /// Get map dimensions as a tuple
 /// 
+/// We return this as a tuple and not a Pos because ideally the init should purely only rely on
+/// the filesystem loading and tcod for initializing the console
+/// 
 pub fn map_dimensions() -> (isize, isize) {
   return (CFG.map_width, CFG.map_height);
 }

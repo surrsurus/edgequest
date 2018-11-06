@@ -11,6 +11,9 @@ use core::renderer::Pos;
 /// Note that the map size can be less than the screen size and this will still work fine,
 /// Although the `Camera` likes to place emphasis on the bottom right corner of the screen,
 /// as that is where the boundary often extends beyond and special care must be taken.
+/// 
+/// Theoretically, the camera does not need tcod to function, and should work for any terminal or tile based
+/// renderer.
 ///
 pub struct Camera {
   // Position that the camera is panned to on the map
@@ -50,7 +53,7 @@ impl Camera {
 
     // We want to be somewhere in the middle of the map, but judge based on the max
     // bounds of the screen. This is what pushes the camera to the bottom right of the screen
-    new_pos -= (self.screen.x / 2, (self.screen.y) / 2);
+    new_pos -= Pos::new(self.screen.x / 2, (self.screen.y) / 2);
 
     // Boundary checks
     if new_pos.x < 0 { new_pos.x = 0; }

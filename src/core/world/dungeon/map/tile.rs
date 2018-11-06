@@ -4,11 +4,6 @@ use core::renderer::{Entity, RGB};
 
 use std::fmt;
 
-// Used to darken tiles that are out of sight
-pub const DARKEN_FAC : RGB = RGB(10, 10, 10);
-// Used to lighten tiles that are in the FoV
-pub const YELLOW_FAC : RGB = RGB(27, 24, 22);
-
 ///
 /// Tiles have types
 ///
@@ -21,7 +16,6 @@ pub enum Type {
   Vine,
   Water,
   Unseen,
-  // There are many different types of traps, so include them all
   Trap(Trap),
   Debug
 }
@@ -245,8 +239,8 @@ impl _Scent {
 pub struct Tile {
   name: &'static str,
   pub glyph: char,
-  fg: RGB,
-  bg: RGB,
+  pub fg: RGB,
+  pub bg: RGB,
   pub biome: Biome,
   pub scents: Vec<_Scent>,
   pub sound: u8,
@@ -281,40 +275,6 @@ impl Tile {
     }
   }
 
-  ///
-  /// Modify a tile's fg and bg color
-  ///
-  pub fn amplify_col(&mut self, factor: RGB) -> Tile {
-    let mut t = self.clone();
-    t.fg = self.fg + factor;
-    t.bg = self.bg + factor;
-    return t;
-  }
-
-  ///
-  /// Modify a tile's fg and bg color
-  ///
-  pub fn reduce_col(&mut self, factor: RGB) -> Tile {
-    let mut t = self.clone();
-    t.fg = self.fg - factor;
-    t.bg = self.bg - factor;
-    return t;
-  }
-
-  ///
-  /// Darken a tile's fg and bg color
-  ///
-  pub fn darken(&mut self) -> Tile {
-    self.reduce_col(DARKEN_FAC)
-  }
-
-  ///
-  /// Make a tile's fg and bg color more yellowish
-  ///
-  pub fn yellowish(&mut self) -> Tile {
-    self.amplify_col(YELLOW_FAC)
-  }
-
 }
 
 impl Entity for Tile {
@@ -340,13 +300,13 @@ impl Entity for Tile {
   }
 
   #[inline]
-  fn set_bg(&mut self, bg: (u8, u8, u8)) {
-    self.bg = RGB::from_tup(bg);
+  fn set_bg(&mut self, bg: RGB) {
+    self.bg = bg;
   }
 
   #[inline]
-  fn set_fg(&mut self, fg: (u8, u8, u8)) {
-    self.fg = RGB::from_tup(fg);
+  fn set_fg(&mut self, fg: RGB) {
+    self.fg = fg;
   }
 
   #[inline]

@@ -9,8 +9,6 @@
 // What can I say, I think `GlobalLog` is prettier than GLOBALLLOG
 #![allow(non_upper_case_globals)]
 
-use std::ops::Range;
-
 ///
 /// How to use it
 ///
@@ -65,14 +63,17 @@ impl Log {
 
   ///
   /// Get a range of the last n items added to the log
+  /// 
+  /// The intention of this is that the range is the interated over, and then used as indexes
+  /// to read the log data
   ///
-  pub fn get_latest_range(&self, n: usize) -> Range<usize> {
+  pub fn get_latest_range(&self, n: usize) -> &[(&'static str, RGB)] {
     // Basically if there are n items in the log, but we want to get > n items, we
     // should make sure rust doesn't have some sort of underflow error
     if n > self.data.len() {
-      return 0..self.data.len();
+      return &self.data[0..self.data.len()];
     } else {
-      (self.data.len() - n)..self.data.len()
+      return &self.data[(self.data.len() - n)..self.data.len()];
     }
   }
 

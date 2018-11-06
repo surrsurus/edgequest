@@ -8,9 +8,6 @@
 // use std::fs::File;
 // use std::io::prelude::*;
 
-extern crate rand;
-use self::rand::Rng;
-
 use core::tcod::map::{Map, FovAlgorithm};
 
 use core::creature::{ai, Actions, Actor, Creature};
@@ -20,8 +17,7 @@ use core::renderer::{Entity, RGB};
 use core::log;
 
 pub mod dungeon;
-use self::dungeon::Dungeon;
-use self::dungeon::map::{self, Pos, tile, Tile};
+use self::dungeon::{Dungeon, map::{self, Pos, tile, Tile}};
 
 ///
 /// What value the player sets the scent of nearby tiles to
@@ -58,13 +54,6 @@ const SO_DIAM : isize = 15;
 const SO_DIAM_UPPER : isize = ((SO_DIAM / 2) + 1);
 // Lower index for ranges
 const SO_DIAM_LOWER : isize = -(SO_DIAM / 2);
-
-// Water colors
-const WATER_COLORS : [(u8, u8, u8); 3] = [
-  (51, 133, 200),
-  (57, 144, 200),
-  (54, 138, 200)
-];
 
 pub struct World {
   pub player: Creature,
@@ -186,7 +175,7 @@ impl World {
   /// Return a new player `Entity`
   ///
   #[inline]
-  fn fresh_player() -> Creature {
+  fn new_player() -> Creature {
     Creature::new(
       "Player",
       '@',
@@ -276,9 +265,9 @@ impl World {
   /// Interestingly, it's only used by the renderer and that can't display stuff out of bounds (thanks, camera)
   /// so maybe it's not important to have needless code?
   ///
-  pub fn get_bg_color_at(&self, x: usize, y: usize) -> RGB {
+  pub fn get_bg_color_at(&self, pos: Pos) -> RGB {
 
-    self.cur_dungeon.grid[x][y].get_bg()
+    self.cur_dungeon.grid[pos.x as usize][pos.y as usize].get_bg()
 
   }
 
@@ -289,7 +278,7 @@ impl World {
 
     match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
       tile::Type::Stair(tile::Stair::DownStair(_)) => self.test_traverse(),
-      _ => {}
+      _ => log!(("You can't go down here", RGB(150, 150, 150)))
     }
 
   }
@@ -301,7 +290,7 @@ impl World {
 
     match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
       tile::Type::Stair(tile::Stair::UpStair(_)) => self.test_traverse(),
-      _ => {}
+      _ => log!(("You can't go up here", RGB(150, 150, 150)))
     }
 
   }
@@ -323,7 +312,6 @@ impl World {
     self.player.actor.pos.y = start_loc.y;
 
     self.update_fov();
-    self.update_water();
 
   }
 
@@ -361,7 +349,7 @@ impl World {
     let tm =  World::new_tcod_map(map_dim, &d);
 
     let mut w = World {
-      player: World::fresh_player(),
+      player: World::new_player(),
       cur_dungeon: d,
       creatures: World::create_test_creatures(&g),
       dungeon_stack: Vec::new(),
@@ -372,7 +360,6 @@ impl World {
     w.player.actor.pos.x = start_loc.x;
     w.player.actor.pos.y = start_loc.y;
     w.update_fov();
-    w.update_water();
 
     return w;
 
@@ -575,23 +562,6 @@ impl World {
   }
 
   ///
-  /// Assign water tiles a new blue color
-  /// 
-  fn update_water(&mut self) {
-
-    for tile in self.cur_dungeon.grid.iter_mut().flatten() {
-      match tile.tiletype {
-        // Water tile should pick a new color from list of colors
-        tile::Type::Water => {
-          tile.set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
-        }
-        _ => {}
-      }
-    }
-
-  }
-
-  ///
   /// Update the fov map from the player's perspective
   /// 
   pub fn update_fov(&mut self) {
@@ -607,7 +577,6 @@ impl World {
     for c in &mut self.creatures {
       c.take_turn(&self.cur_dungeon.grid, &self.player)
     }
-    self.update_water();
     self.update_sound();
   }
 
