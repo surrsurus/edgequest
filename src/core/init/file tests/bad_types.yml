@@ -1,0 +1,36 @@
+# Example of wrong types
+
+# Dimensions of screen in characters
+screen_width: "80"
+screen_height: "50"
+
+# Dimensions of map in characters
+map_width: "160"
+map_height: "100"
+
+# Fullscreen mode
+fullscreen: "false"
+
+# Path to desired font
+fontpath: 2
+
+# Font type. Default: Default
+# Options:
+# * Default
+# * Greyscale
+fonttype: 3
+
+# Font layout. Default: Tcod
+# Options:
+# * Tcod
+# * AsciiInRow
+# * AsciiInCol
+fontlayout: 4
+
+
+# Desired renderer. Default: SDL
+# Options:
+# * SDL
+# * GLSL
+# * OpenGL
+renderer: 5
