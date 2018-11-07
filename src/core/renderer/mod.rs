@@ -409,7 +409,7 @@ impl Renderer {
     // Enumerate over the last few messages
     for (i, pair) in log.get_latest_range(self.console_height as usize).iter().enumerate() {
       // Y value of text is determined by the index
-      let y = self.screen.y - ((log.data.len() as isize) - i as isize);
+      let y = self.screen.y - ((log.get_latest_range(self.console_height as usize).len() as isize) - i as isize);
       // Color and string is determined by the content of the slice at that index
       let color = pair.1;
       let s = pair.0;
