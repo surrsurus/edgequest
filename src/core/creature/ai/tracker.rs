@@ -69,4 +69,11 @@ impl AI for TrackerAI {
 
   }
 
+  ///
+  /// Allow Box<AI> cloning
+  ///
+  fn box_clone(&self) -> Box<AI> {
+    Box::new((*self).clone())
+  }
+
 }

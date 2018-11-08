@@ -43,6 +43,16 @@ pub struct Dungeon {
 
 impl Dungeon {
 
+  #[inline]
+  pub fn width(&self) -> usize {
+    self.grid.len()
+  }
+
+  #[inline]
+  pub fn height(&self) -> usize {
+    self.grid[0].len()
+  }
+
 
   ///
   /// Add a tile to the gird and preserve the existing BG color of the spot

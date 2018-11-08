@@ -44,6 +44,11 @@ impl AI for SimpleAI {
       y = me.pos.y as usize;
       dice = rng.gen_range(1, 5);
 
+      if x == 0 || y == 0 {
+        x += 1;
+        y += 1;
+      }
+
       // Match dice for movement
       match dice {
         1 => x += 1,
@@ -72,6 +77,13 @@ impl AI for SimpleAI {
 
     return state;
 
+  }
+
+  ///
+  /// Allow Box<AI> cloning
+  ///
+  fn box_clone(&self) -> Box<AI> {
+    Box::new((*self).clone())
   }
 
 }

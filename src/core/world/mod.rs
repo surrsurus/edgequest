@@ -55,13 +55,32 @@ const SO_DIAM_UPPER : isize = ((SO_DIAM / 2) + 1);
 // Lower index for ranges
 const SO_DIAM_LOWER : isize = -(SO_DIAM / 2);
 
-pub struct World {
-  pub player: Creature,
-  pub cur_dungeon: Dungeon,
+///
+/// Represent a floor in the dungeon
+///
+#[derive(Default, Clone)]
+pub struct Floor {
+  pub dun: Dungeon,
   // Creatures need to be boxed because they hold a trait object, which has an undefined size.
   // Whenever you create a creature, just slap it into Box::new() and it works
-  pub creatures: Vec<Box<Creature>>,
-  pub dungeon_stack: Vec<Dungeon>,
+  pub creatures: Vec<Box<Creature>>
+}
+
+impl Floor {
+  pub fn new(dun: Dungeon, creatures: Vec<Box<Creature>>) -> Floor {
+    Floor {
+      dun: dun,
+      creatures: creatures
+    }
+  }
+
+}
+
+pub struct World {
+  pub player: Creature,
+  pub floor: Floor,
+  pub floor_stack: Vec<Floor>,
+  pub floor_num: usize,
   // http://tomassedovic.github.io/tcod-rs/tcod/map/struct.Map.html
   pub tcod_map: Map
 }
@@ -186,24 +205,25 @@ impl World {
     )
   }
 
+
   ///
   /// Empty out the floor
   ///
   pub fn test_empty(&mut self) {
 
-    for x in 0..self.cur_dungeon.width {
-      for y in 0..self.cur_dungeon.height {
-        self.cur_dungeon.grid[x][y] = tile::generic_floor();
+    for x in 0..self.floor.dun.width {
+      for y in 0..self.floor.dun.height {
+        self.floor.dun.grid[x][y] = tile::generic_floor();
       }
     }
 
-    let tm = World::new_tcod_map(self.cur_dungeon.get_bounds_pos(), &self.cur_dungeon);
+    let tm = World::new_tcod_map(self.floor.dun.get_bounds_pos(), &self.floor.dun);
     self.tcod_map = tm;
 
-    self.creatures = Vec::new();
+    self.floor.creatures = Vec::new();
 
-    self.player.actor.pos.x = (self.cur_dungeon.width / 2) as isize;
-    self.player.actor.pos.y = (self.cur_dungeon.height / 2) as isize;
+    self.player.actor.pos.x = (self.floor.dun.width / 2) as isize;
+    self.player.actor.pos.y = (self.floor.dun.height / 2) as isize;
     
   }
 
@@ -215,7 +235,7 @@ impl World {
     let tx = x as usize;
     let ty = y as usize;
 
-    if tx > 0 && tx < self.cur_dungeon.width - 1 && ty > 0 && ty < self.cur_dungeon.height - 1 && tile::walkable(&self.cur_dungeon.grid[tx][ty]) {
+    if tx > 0 && tx < self.floor.dun.width - 1 && ty > 0 && ty < self.floor.dun.height - 1 && tile::walkable(&self.floor.dun.grid[tx][ty]) {
       return true;
     } else {
       return false;
@@ -230,7 +250,7 @@ impl World {
   /// 
   pub fn check_trap(&mut self) {
 
-    match &self.cur_dungeon.grid[self.player.actor.pos.x as usize][self.player.actor.pos.y as usize].tiletype.clone() {
+    match &self.floor.dun.grid[self.player.actor.pos.x as usize][self.player.actor.pos.y as usize].tiletype.clone() {
 
       // We only care about traps, and this matches every trap
       tile::Type::Trap(trap) => {
@@ -243,7 +263,7 @@ impl World {
           // Memory loss causes all tiles to become unseen, effectively losing all mapping progress
           tile::Trap::MemoryLoss => {
             
-            for tile in self.cur_dungeon.grid.iter_mut().flatten() {
+            for tile in self.floor.dun.grid.iter_mut().flatten() {
               tile.seen = false;
             }
             
@@ -267,7 +287,7 @@ impl World {
   ///
   pub fn get_bg_color_at(&self, pos: Pos) -> RGB {
 
-    self.cur_dungeon.grid[pos.x as usize][pos.y as usize].get_bg()
+    self.floor.dun.grid[pos.x as usize][pos.y as usize].get_bg()
 
   }
 
@@ -277,7 +297,13 @@ impl World {
   pub fn go_down(&mut self) {
 
     match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
-      tile::Type::Stair(tile::Stair::DownStair(_)) => self.test_traverse(),
+      tile::Type::Stair(tile::Stair::DownStair(_)) => {
+        if self.floor_num <= self.floor_stack.len() {
+          self.floor_stack[self.floor_num] = self.floor.clone();
+        }
+        self.floor_num += 1;
+        self.test_traverse();
+      },
       _ => log!(("You can't go down here", RGB(150, 150, 150)))
     }
 
@@ -289,7 +315,15 @@ impl World {
   pub fn go_up(&mut self) {
 
     match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
-      tile::Type::Stair(tile::Stair::UpStair(_)) => self.test_traverse(),
+      tile::Type::Stair(tile::Stair::UpStair(_)) => {
+        if self.floor_num != 0 {
+          self.floor_stack[self.floor_num] = self.floor.clone();
+          self.floor_num -= 1;
+          self.test_traverse();
+        } else {
+          log!(("You are not allowed to turn back now...", RGB(100, 50, 25)));
+        }
+      },
       _ => log!(("You can't go up here", RGB(150, 150, 150)))
     }
 
@@ -299,15 +333,23 @@ impl World {
   /// Temporary function for stair traversal. In the future floors will need to be saved
   ///
   pub fn test_traverse(&mut self) {
-    let d = World::create_test_dungeon(self.cur_dungeon.get_bounds_pos());
-    let g = d.grid.clone();
-    let tm = World::new_tcod_map(self.cur_dungeon.get_bounds_pos(), &d);
 
-    self.cur_dungeon = d;
-    self.creatures = World::create_test_creatures(&g);
-    self.tcod_map = tm;
+    let f;
+    if self.floor_num > self.floor_stack.len() - 1 {
+      let d = World::create_test_dungeon(self.floor.dun.get_bounds_pos());
+      let g = d.grid.clone();
+      let c = World::create_test_creatures(&g);
+      f = Floor::new(d, c);
+      self.floor_stack.push(f.clone());
+    } else {
+      f = self.floor_stack[self.floor_num].clone();
+    }
 
-    let start_loc = Dungeon::get_valid_location(&self.cur_dungeon.grid);
+    self.floor = f;
+
+    self.tcod_map = World::new_tcod_map(self.floor.dun.get_bounds_pos(), &self.floor.dun);
+
+    let start_loc = Dungeon::get_valid_location(&self.floor.dun.grid);
     self.player.actor.pos.x = start_loc.x;
     self.player.actor.pos.y = start_loc.y;
 
@@ -348,15 +390,20 @@ impl World {
     let g = d.grid.clone();
     let tm =  World::new_tcod_map(map_dim, &d);
 
+    let floor = Floor::new(d, World::create_test_creatures(&g));
+
+    let mut floor_stack = Vec::new();
+    floor_stack.push(floor.clone());
+
     let mut w = World {
       player: World::new_player(),
-      cur_dungeon: d,
-      creatures: World::create_test_creatures(&g),
-      dungeon_stack: Vec::new(),
+      floor: floor,
+      floor_stack: floor_stack,
+      floor_num: 0,
       tcod_map: tm
     };
 
-    let start_loc = Dungeon::get_valid_location(&w.cur_dungeon.grid);
+    let start_loc = Dungeon::get_valid_location(&w.floor.dun.grid);
     w.player.actor.pos.x = start_loc.x;
     w.player.actor.pos.y = start_loc.y;
     w.update_fov();
@@ -367,12 +414,12 @@ impl World {
 
   // Get a mutable reference to a tile at a point on the current dungeon
   pub fn get_mut_tile_at(&mut self, x: isize, y: isize) -> &mut Tile {
-    &mut self.cur_dungeon.grid[x as usize][y as usize]
+    &mut self.floor.dun.grid[x as usize][y as usize]
   }
 
   // Get an immutable reference to a tile at a point on the current dungeon
   pub fn get_tile_at(&self, x: isize, y: isize) -> &Tile {
-    &self.cur_dungeon.grid[x as usize][y as usize]
+    &self.floor.dun.grid[x as usize][y as usize]
   }
 
   ///
@@ -402,7 +449,7 @@ impl World {
     // We can't do a self.get_tile_at due to the fact we iterate over a &self
     // but need a &mut self for that function.
     let mut cinf = vec![];
-    for c in &self.creatures {
+    for c in &self.floor.creatures {
       let cx = c.actor.pos.x;
       let cy = c.actor.pos.y;
       let st = c.stats.scent_type.clone();
@@ -432,7 +479,7 @@ impl World {
 
     // Create buffer for scent updating, only create one
     // because we never change it
-    let buffer = self.cur_dungeon.grid.clone();
+    let buffer = self.floor.dun.grid.clone();
 
     for s in 0..tile::Scent::Num as usize {
 
@@ -476,10 +523,10 @@ impl World {
       };
 
       // Change values of map based on averages from the buffer
-      for x in 0..self.cur_dungeon.width {
-        for y in 0..self.cur_dungeon.height {
+      for x in 0..self.floor.dun.width {
+        for y in 0..self.floor.dun.height {
           if self.is_valid_pos(x as isize, y as isize) {
-            self.cur_dungeon.grid[x][y].scents[s].val = avg_of_neighbors(x, y) as u8;
+            self.floor.dun.grid[x][y].scents[s].val = avg_of_neighbors(x, y) as u8;
           }
         }
       }
@@ -493,7 +540,7 @@ impl World {
   fn update_sound(&mut self) {
 
     // Remove all sound
-    for tile in self.cur_dungeon.grid.iter_mut().flatten() {
+    for tile in self.floor.dun.grid.iter_mut().flatten() {
       tile.sound = 0;
     }
 
@@ -521,7 +568,7 @@ impl World {
     // We can't do a self.get_tile_at due to the fact we iterate over a &self
     // but need a &mut self for that function.
     let mut cinf = vec![];
-    for c in &self.creatures {
+    for c in &self.floor.creatures {
       let cx = c.actor.pos.x;
       let cy = c.actor.pos.y;
       let f = c.actor.clone();
@@ -574,10 +621,11 @@ impl World {
   pub fn update(&mut self) {
     self.update_fov();
     self.update_scent();
-    for c in &mut self.creatures {
-      c.take_turn(&self.cur_dungeon.grid, &self.player)
+    for c in &mut self.floor.creatures {
+      c.take_turn(&self.floor.dun.grid, &self.player)
     }
     self.update_sound();
+    // self.debug_show_mem();
   }
 
 }

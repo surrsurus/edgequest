@@ -1,13 +1,1 @@
 # Todo List
-
-# General
-- Documentation
-- Simplify and refactor
-
-# Module Specific
-
-## Dungeon
-- Structure generator lacks several important features being
-  1. The ability to rotate structures
-  2. Ability to preserve tiles the structure will be placed on, aka 'holes' in the structure tilemap
-- Dungeon generation is rather lacking in variety. See https://www.rockpapershotgun.com/2015/07/28/how-do-roguelikes-generate-levels/ and https://www.reddit.com/r/roguelikedev/comments/6df0aw/my_implementation_of_a_bunch_of_dungeon_algorithms/ for ideas

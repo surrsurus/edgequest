@@ -139,4 +139,11 @@ impl AI for SmellerAI {
 
   }
 
+  ///
+  /// Allow Box<AI> cloning
+  ///
+  fn box_clone(&self) -> Box<AI> {
+    Box::new((*self).clone())
+  }
+
 }
