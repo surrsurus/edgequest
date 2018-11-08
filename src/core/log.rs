@@ -90,8 +90,8 @@ lazy_static! {
   pub static ref GlobalLog: Mutex<Log> = Mutex::new(Log::new());
 }
 
-// This macro automates the log mutex process. This whole thing is pretty crazy
-// Oviously if any panics occur here then the mutex becomes poisoned
+/// This macro automates the log mutex process. This whole thing is pretty crazy
+/// Oviously if any panics occur here then the mutex becomes poisoned
 #[macro_export]
 macro_rules! log {
   ($msg:expr) => {{

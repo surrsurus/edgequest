@@ -144,8 +144,8 @@ impl Renderer {
       for y in 0..dungeon.height {
         // Color is weighted towards blue
         let mut color = RGB(
-          dungeon.grid[x][y].get_bg().0, 
-          dungeon.grid[x][y].get_bg().1, 
+          dungeon.grid[x][y].get_bg().r(), 
+          dungeon.grid[x][y].get_bg().g(), 
           dungeon.grid[x][y].sound as u8
         );
         if dungeon.grid[x][y].sound > 0 {
@@ -182,40 +182,40 @@ impl Renderer {
     //
 
     // Draw seen tiles
-    for x in 0..world.cur_dungeon.width {
-      for y in 0..world.cur_dungeon.height {
+    for x in 0..world.floor.dun.width {
+      for y in 0..world.floor.dun.height {
         // If fov is on...
         if self.fov {
           // And it's in the FoV
           if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
 
             // Update tile if possible
-            match &world.cur_dungeon.grid[x][y].tiletype {
+            match &world.floor.dun.grid[x][y].tiletype {
               tile::Type::Water => {
-                &world.cur_dungeon.grid[x][y].set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
+                &world.floor.dun.grid[x][y].set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
               },
               _ => {}
             }
 
             // Draw a tile slightly more vibrant than it actually is to emulate torchlight
-            self.draw_entity(con, Pos::from_usize(x, y), &yellowish(&world.cur_dungeon.grid[x][y]));
+            self.draw_entity(con, Pos::from_usize(x, y), &yellowish(&world.floor.dun.grid[x][y]));
 
             // Mark tile as seen if it's in the FoV
-            world.cur_dungeon.grid[x][y].seen = true;
+            world.floor.dun.grid[x][y].seen = true;
 
           }
 
           // And the tile has been seen...
-          else if world.cur_dungeon.grid[x][y].seen {
+          else if world.floor.dun.grid[x][y].seen {
             // Draw a tile, but darker
-            self.draw_entity(con, Pos::from_usize(x, y), &darken(&world.cur_dungeon.grid[x][y]));
+            self.draw_entity(con, Pos::from_usize(x, y), &darken(&world.floor.dun.grid[x][y]));
           }
 
         }
 
         // [Debug] Otherwise just draw all tiles normally
         else {
-          self.draw_entity(con, Pos::new(x as isize, y as isize), &world.cur_dungeon.grid[x][y]);
+          self.draw_entity(con, Pos::new(x as isize, y as isize), &world.floor.dun.grid[x][y]);
         }
         
       }
@@ -227,19 +227,19 @@ impl Renderer {
 
     // Debug scent
     if self.show_scent {
-      self.debug_render_scent_map(con, &world.cur_dungeon);
+      self.debug_render_scent_map(con, &world.floor.dun);
     }
 
     // Debug sound
     if self.show_sound {
-      self.debug_render_sound_map(con, &world.cur_dungeon);
+      self.debug_render_sound_map(con, &world.floor.dun);
     }
 
     //
     // Draw creatures
     //
 
-    for c in &world.creatures {
+    for c in &world.floor.creatures {
       // If fov is on...
       if self.fov {
         // And its in the fov...
@@ -295,7 +295,7 @@ impl Renderer {
     );
 
     // Tile player is on
-    let tile = &world.cur_dungeon.grid[world.player.actor.pos.x as usize][world.player.actor.pos.y as usize];
+    let tile = &world.floor.dun.grid[world.player.actor.pos.x as usize][world.player.actor.pos.y as usize];
 
     con.set_default_foreground(RGB(255, 255, 255).to_tcod());
 
@@ -340,6 +340,12 @@ impl Renderer {
       (self.screen.x - self.panel_width + 1) as i32,
       7,
       format!("{}: {}", "Tile", tile.get_name())
+    );
+
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      8,
+      format!("{}: {}", "Floor", world.floor_num)
     );
 
     //

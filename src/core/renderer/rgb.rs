@@ -23,7 +23,7 @@ use core::tcod::colors;
 /// Naturally since RGB colors don't exceed values of 255, the RGB struct holds 3 u8 values.
 /// 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
-pub struct RGB(pub u8, pub u8, pub u8);
+pub struct RGB (pub u8, pub u8, pub u8);
 
 impl RGB {
 
@@ -40,7 +40,7 @@ impl RGB {
   /// 
   #[inline]
   pub fn to_tup(rgb: RGB) -> (u8, u8, u8) {
-    (rgb.0, rgb.1, rgb.2)
+    (rgb.r(), rgb.g(), rgb.b())
   }
 
   /// 
@@ -48,7 +48,22 @@ impl RGB {
   /// 
   #[inline]
   pub fn to_tcod(&self) -> colors::Color {
-    colors::Color::new(self.0, self.1, self.2)
+    colors::Color::new(self.r(), self.g(), self.b())
+  }
+
+  #[inline]
+  pub fn r(&self) -> u8 {
+    self.0
+  }
+
+  #[inline]
+  pub fn g(&self) -> u8 {
+    self.1
+  }
+
+  #[inline]
+  pub fn b(&self) -> u8 {
+    self.2
   }
 
 }
@@ -62,9 +77,9 @@ impl Add<RGB> for RGB {
 
   #[inline]
   fn add(self, other: RGB) -> RGB {
-    let r = { if (self.0 as isize) + (other.0 as isize) > 255 { 255 } else { self.0 + other.0 } };
-    let g = { if (self.1 as isize) + (other.1 as isize) > 255 { 255 } else { self.1 + other.1 } };
-    let b = { if (self.2 as isize) + (other.2 as isize) > 255 { 255 } else { self.2 + other.2 } };
+    let r = { if (self.r() as isize) + (other.0 as isize) > 255 { 255 } else { self.r() + other.0 } };
+    let g = { if (self.g() as isize) + (other.1 as isize) > 255 { 255 } else { self.g() + other.1 } };
+    let b = { if (self.b() as isize) + (other.2 as isize) > 255 { 255 } else { self.b() + other.2 } };
     return RGB(r, g, b);
   }
 
@@ -79,9 +94,9 @@ impl Sub<RGB> for RGB {
 
   #[inline]
   fn sub(self, other: RGB) -> RGB {
-    let r = { if (self.0 as isize) - (other.0 as isize) < 0 { 0 } else { self.0 - other.0 } };
-    let g = { if (self.1 as isize) - (other.1 as isize) < 0 { 0 } else { self.1 - other.1 } };
-    let b = { if (self.2 as isize) - (other.2 as isize) < 0 { 0 } else { self.2 - other.2 } };
+    let r = { if (self.r() as isize) - (other.0 as isize) < 0 { 0 } else { self.r() - other.0 } };
+    let g = { if (self.g() as isize) - (other.1 as isize) < 0 { 0 } else { self.g() - other.1 } };
+    let b = { if (self.b() as isize) - (other.2 as isize) < 0 { 0 } else { self.b() - other.2 } };
     return RGB(r, g, b);
   }
 

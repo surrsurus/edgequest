@@ -18,6 +18,8 @@ Edgequest is a roguelike for all major platforms (pretty sure this can run on an
     - Foliage: Gotta make it look nice
     - Filters: Generation happens in filters, each of which add or subtract features from the landscape, meaning that at some point dungeon generation can be completely modular, or at least configured with some sort of file. All above features are actually filters.
 
+And most importantly, no unsafe code.
+
 ## Requirements
 
 - Rust Nightly (Make sure it's up to date!)

@@ -58,4 +58,31 @@ pub trait AI {
   ///
   fn take_turn(&mut self, map: &map::Grid<Tile>, player: &Creature, me: &mut Actor, stats: &mut Stats) -> Actions;
 
+  ///
+  /// Determine if the AI has gone out of bounds with respect to the given map
+  ///
+  fn is_oob(&mut self, x: isize, y: isize, map: &map::Grid<Tile>) -> bool { 
+    if x < 0 || y < 0 || y >= (map[0].len() - 1) as isize || x >= (map.len() - 1) as isize {
+      return true;
+    }
+    return false;
+  }
+
+  ///
+  /// Allow boxed trait objects to be cloned
+  /// 
+  fn box_clone(&self) -> Box<AI>;
+
+}
+
+///
+/// Allow cloning of boxed trait objects via box_clone()
+///
+/// https://users.rust-lang.org/t/solved-is-it-possible-to-clone-a-boxed-trait-object/1714
+/// 
+/// The downside is that all things that impl AI need to have a very similar box clone, but that's not an issue
+impl Clone for Box<AI> {
+  fn clone(&self) -> Box<AI> {
+    self.box_clone()
+  }
 }

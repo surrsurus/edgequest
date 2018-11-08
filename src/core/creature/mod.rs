@@ -24,10 +24,13 @@ use core::world::dungeon::map::{self, Pos, tile, Tile};
 ///
 /// Creature holds a `Actor` and an `AI`, basically a package that we can create monsters from
 ///
+#[derive(Clone)]
 pub struct Creature {
   pub actor: Actor,
   pub stats: Stats,
   pub state: Actions,
+  // Q: Wait, an AI trait object is clonable?
+  // A: A *Boxed* AI trait object is clonable.
   pub ai: Box<ai::AI>
 }
 
