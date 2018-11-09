@@ -51,3 +51,8 @@ OSX:
 $ brew install pkg-config sdl
 $ cargo run
 ```
+
+#### Note for Mojave Users
+
+This will not work if you have an xcode version above 9 installed. For some reason, sdl just flat out doesn't render but the game still technically works.
+
