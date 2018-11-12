@@ -29,6 +29,20 @@ pub struct Simple {
 
 }
 
+// Make Simple Indexable
+impl std::ops::Index<usize> for Simple {
+  type Output = [Tile];
+  fn index(&self, idx: usize) -> &Self::Output {
+    &self.grid[idx]
+  }
+}
+
+impl std::ops::IndexMut<usize> for Simple {
+  fn index_mut(&mut self, idx: usize) -> &mut [Tile] {
+    &mut self.grid[idx]
+  }
+}
+
 impl Simple {
 
   ///
@@ -81,7 +95,7 @@ impl Simple {
         mover.0 -= 1;
       } 
 
-      self.grid[mover.0 as usize][mover.1 as usize] = self.floor.clone();
+      self[mover.0 as usize][mover.1 as usize] = self.floor.clone();
 
     }
 
@@ -93,7 +107,7 @@ impl Simple {
         mover.1 -= 1;
       } 
 
-      self.grid[mover.0][mover.1] = self.floor.clone();
+      self[mover.0][mover.1] = self.floor.clone();
 
     }
 
@@ -105,7 +119,7 @@ impl Simple {
   fn build_rect(&mut self, r: &Rect) {
     for w in 0..r.w {
       for l in 0..r.l {
-        self.grid[(w + r.x)][(l + r.y)] = self.floor.clone();
+        self[(w + r.x)][(l + r.y)] = self.floor.clone();
       }
     }
   }

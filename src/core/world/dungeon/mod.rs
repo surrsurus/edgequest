@@ -41,6 +41,22 @@ pub struct Dungeon {
   pub grid: map::Grid<Tile>,
 }
 
+// Make Dungeon Indexable
+// The trick here is that you can do dungeon[][] since it will return a vector
+// that is in of itself, indexable
+impl std::ops::Index<usize> for Dungeon {
+  type Output = [Tile];
+  fn index(&self, idx: usize) -> &Self::Output {
+    &self.grid[idx]
+  }
+}
+
+impl std::ops::IndexMut<usize> for Dungeon {
+  fn index_mut(&mut self, idx: usize) -> &mut [Tile] {
+    &mut self.grid[idx]
+  }
+}
+
 impl Dungeon {
 
   #[inline]

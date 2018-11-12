@@ -213,7 +213,7 @@ impl World {
 
     for x in 0..self.floor.dun.width {
       for y in 0..self.floor.dun.height {
-        self.floor.dun.grid[x][y] = tile::generic_floor();
+        self.floor.dun[x][y] = tile::generic_floor();
       }
     }
 
@@ -235,7 +235,7 @@ impl World {
     let tx = x as usize;
     let ty = y as usize;
 
-    if tx > 0 && tx < self.floor.dun.width - 1 && ty > 0 && ty < self.floor.dun.height - 1 && tile::walkable(&self.floor.dun.grid[tx][ty]) {
+    if tx > 0 && tx < self.floor.dun.width - 1 && ty > 0 && ty < self.floor.dun.height - 1 && tile::walkable(&self.floor.dun[tx][ty]) {
       return true;
     } else {
       return false;
@@ -250,7 +250,7 @@ impl World {
   /// 
   pub fn check_trap(&mut self) {
 
-    match &self.floor.dun.grid[self.player.actor.pos.x as usize][self.player.actor.pos.y as usize].tiletype.clone() {
+    match &self.floor.dun[self.player.actor.pos.x as usize][self.player.actor.pos.y as usize].tiletype.clone() {
 
       // We only care about traps, and this matches every trap
       tile::Type::Trap(trap) => {
@@ -287,7 +287,7 @@ impl World {
   ///
   pub fn get_bg_color_at(&self, pos: Pos) -> RGB {
 
-    self.floor.dun.grid[pos.x as usize][pos.y as usize].get_bg()
+    self.floor.dun[pos.x as usize][pos.y as usize].get_bg()
 
   }
 
@@ -366,7 +366,7 @@ impl World {
     // Fill the map in based on what blocks are tile::opaque
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
-        if tile::opaque(&dungeon.grid[x][y]) {
+        if tile::opaque(&dungeon[x][y]) {
           tm.set(x as i32, y as i32, false, false);
         } else {
           tm.set(x as i32, y as i32, true, true);
@@ -414,12 +414,12 @@ impl World {
 
   // Get a mutable reference to a tile at a point on the current dungeon
   pub fn get_mut_tile_at(&mut self, x: isize, y: isize) -> &mut Tile {
-    &mut self.floor.dun.grid[x as usize][y as usize]
+    &mut self.floor.dun[x as usize][y as usize]
   }
 
   // Get an immutable reference to a tile at a point on the current dungeon
   pub fn get_tile_at(&self, x: isize, y: isize) -> &Tile {
-    &self.floor.dun.grid[x as usize][y as usize]
+    &self.floor.dun[x as usize][y as usize]
   }
 
   ///
@@ -526,7 +526,7 @@ impl World {
       for x in 0..self.floor.dun.width {
         for y in 0..self.floor.dun.height {
           if self.is_valid_pos(x as isize, y as isize) {
-            self.floor.dun.grid[x][y].scents[s].val = avg_of_neighbors(x, y) as u8;
+            self.floor.dun[x][y].scents[s].val = avg_of_neighbors(x, y) as u8;
           }
         }
       }
