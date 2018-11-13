@@ -295,7 +295,7 @@ impl Renderer {
     );
 
     // Tile player is on
-    let tile = &world.floor.dun[world.player.actor.pos.x as usize][world.player.actor.pos.y as usize];
+    let tile = &world.floor.dun[world.player.actor.pos];
 
     con.set_default_foreground(RGB(255, 255, 255).to_tcod());
 

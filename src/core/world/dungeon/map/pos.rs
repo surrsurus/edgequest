@@ -46,6 +46,14 @@ impl Pos {
   }
 
   ///
+  /// Return a new `Pos` from a tuple of usizes
+  /// 
+  #[inline]
+  pub fn from_usize_tup(pos: (usize, usize)) -> Pos {
+   Pos { x: pos.0 as isize, y: pos.1 as isize }
+  }
+
+  ///
   /// Return a `Pos` at the origin (0, 0)
   /// 
   #[inline]

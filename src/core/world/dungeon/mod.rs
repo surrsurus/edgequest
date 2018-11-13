@@ -61,6 +61,19 @@ impl std::ops::IndexMut<usize> for Dungeon {
   }
 }
 
+impl std::ops::Index<map::Pos> for Dungeon {
+  type Output = Tile;
+  fn index(&self, idx: map::Pos) -> &Self::Output {
+    &self.grid[idx.x as usize][idx.y as usize]
+  }
+}
+
+impl std::ops::IndexMut<map::Pos> for Dungeon {
+  fn index_mut(&mut self, idx: map::Pos) -> &mut Tile {
+    &mut self.grid[idx.x as usize][idx.y as usize]
+  }
+}
+
 impl Dungeon {
 
   #[inline]

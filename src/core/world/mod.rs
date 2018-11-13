@@ -250,7 +250,7 @@ impl World {
   /// 
   pub fn check_trap(&mut self) {
 
-    match &self.floor.dun[self.player.actor.pos.x as usize][self.player.actor.pos.y as usize].tiletype.clone() {
+    match &self.floor.dun[self.player.actor.pos].tiletype.clone() {
 
       // We only care about traps, and this matches every trap
       tile::Type::Trap(trap) => {
@@ -287,7 +287,7 @@ impl World {
   ///
   pub fn get_bg_color_at(&self, pos: Pos) -> RGB {
 
-    self.floor.dun[pos.x as usize][pos.y as usize].get_bg()
+    self.floor.dun[pos].get_bg()
 
   }
 
