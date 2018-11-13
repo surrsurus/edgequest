@@ -31,7 +31,7 @@ impl Automaton for DrunkardsWalk {
 
   type Output = Tile;
 
-  fn generate(&self, grid: &mut map::Grid<Tile>, sx: Option<usize>, sy: Option<usize>, find: Option<Tile>, replace: Tile, iterations: u32) -> map::Grid<Tile> {
+  fn apply(&self, grid: &mut map::Grid<Tile>, sx: Option<usize>, sy: Option<usize>, find: Option<Tile>, replace: Tile, iterations: u32) {
 
     // Start our RNG
     let mut rng = rand::thread_rng();
@@ -104,9 +104,6 @@ impl Automaton for DrunkardsWalk {
       }
 
     }
-
-    // Return a clone of the grid
-    return grid.clone();
 
   }
 

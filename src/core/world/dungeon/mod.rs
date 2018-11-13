@@ -12,7 +12,7 @@ use self::map::{tile, Pos, Tile};
 
 // Privately use filter
 mod filter;
-use self::filter::Filter;
+// use self::filter::Filter;
 
 // Privately use automata
 mod automata;
@@ -140,9 +140,9 @@ impl Dungeon {
     // though it may be in the future.
     
     // This is geared towards eating walls and replacing them with floors, so mainly just to flesh out the dungeon.
-    let drunk = |chaos: f32, iter: u32, grid: &mut map::Grid<Tile> | -> map::Grid<Tile> {
+    let drunk = |chaos: f32, iter: u32, grid: &mut map::Grid<Tile> | {
       let d = DrunkardsWalk::new(chaos);
-      d.generate(
+      d.apply(
         grid,
         None,
         None,
@@ -155,13 +155,13 @@ impl Dungeon {
     // Make three passes of this basic walk to carve caves.
 
     // Total randomness - Really centralized areas that are mostly opened since it walks over itself a lot
-    grid = drunk(1.0, 1000, &mut grid);
+    drunk(1.0, 1000, &mut grid);
 
     // Semi random - A mixture of the previous and next option
-    grid = drunk(0.5, 1000, &mut grid);
+    drunk(0.5, 1000, &mut grid);
 
     // Mostly orderly - Long corridors that occassionally deviate
-    grid = drunk(0.25, 1000, &mut grid);
+    drunk(0.25, 1000, &mut grid);
 
     // Add structures
     grid = Structure::new(grid).build();

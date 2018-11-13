@@ -33,6 +33,6 @@ pub trait Automaton {
   /// It is implied that you should initialize each builder with it's `new()` method
   /// then call this function
   /// 
-  fn generate(&self, grid: &mut map::Grid<Self::Output>, x: Option<usize>, y: Option<usize>, find: Option<Self::Output>, replace: Self::Output, iterations: u32) -> map::Grid<Self::Output>;
+  fn apply(&self, grid: &mut map::Grid<Self::Output>, x: Option<usize>, y: Option<usize>, find: Option<Self::Output>, replace: Self::Output, iterations: u32);
 
 }
