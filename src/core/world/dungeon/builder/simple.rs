@@ -6,7 +6,7 @@ use core::renderer::RGB;
 use core::world::dungeon::builder::Buildable;
 use core::world::dungeon::builder::construct::{Corr, Rect};
 
-use core::world::dungeon::map::{Grid, tile, Tile};
+use core::world::dungeon::map::{Grid, Pos, tile, Tile};
 
 ///
 /// Simple dungeon builder
@@ -43,6 +43,19 @@ impl std::ops::IndexMut<usize> for Simple {
   }
 }
 
+impl std::ops::Index<Pos> for Simple {
+  type Output = Tile;
+  fn index(&self, idx: Pos) -> &Self::Output {
+    &self.grid[idx]
+  }
+}
+
+impl std::ops::IndexMut<Pos> for Simple {
+  fn index_mut(&mut self, idx: Pos) -> &mut Tile {
+    &mut self.grid[idx]
+  }
+}
+
 impl Simple {
 
   ///
@@ -60,13 +73,13 @@ impl Simple {
 
     for _ in 0..n {
 
-      let x: usize = rng.gen_range(1, self.w - 2);
-      let y: usize = rng.gen_range(1, self.h - 2);
-      let l: usize = rng.gen_range(5, 20);
-      let w: usize = rng.gen_range(5, 20);
+      let x: isize = rng.gen_range(1, self.w as isize - 2);
+      let y: isize = rng.gen_range(1, self.h as isize - 2);
+      let l: isize = rng.gen_range(5, 20);
+      let w: isize = rng.gen_range(5, 20);
 
       // Check bounds
-      if w + x >= self.w || l + y >= self.h {
+      if w + x >= self.w as isize|| l + y >= self.h as isize {
         continue;
       } else {
         let r = Rect::new(x, y, l, w);
@@ -85,29 +98,29 @@ impl Simple {
   /// 
   fn build_corr(&mut self, c: &Corr) {
 
-    let mut mover = (c.start.0, c.start.1);
+    let mut mover = c.start;
 
-    while mover.0 != c.end.0 {
+    while mover.x != c.end.x {
 
-      if mover.0 < c.end.0 {
-        mover.0 += 1;
-      } else if mover.0 > c.end.0 {
-        mover.0 -= 1;
+      if mover.x < c.end.x {
+        mover.x += 1;
+      } else if mover.x > c.end.x {
+        mover.x -= 1;
       } 
 
-      self[mover.0 as usize][mover.1 as usize] = self.floor.clone();
+      self[mover] = self.floor.clone();
 
     }
 
-    while mover.1 != c.end.1 {
+    while mover.y != c.end.y {
 
-      if mover.1 < c.end.1 {
-        mover.1 += 1;
-      } else if mover.1 > c.end.1 {
-        mover.1 -= 1;
+      if mover.y < c.end.y {
+        mover.y += 1;
+      } else if mover.y > c.end.y {
+        mover.y -= 1;
       } 
 
-      self[mover.0][mover.1] = self.floor.clone();
+      self[mover] = self.floor.clone();
 
     }
 
@@ -119,7 +132,7 @@ impl Simple {
   fn build_rect(&mut self, r: &Rect) {
     for w in 0..r.w {
       for l in 0..r.l {
-        self[(w + r.x)][(l + r.y)] = self.floor.clone();
+        self[(w + r.x) as usize][(l + r.y) as usize] = self.floor.clone();
       }
     }
   }
@@ -136,8 +149,8 @@ impl Simple {
 
     for r in 0..self.rooms.len() - 1 {
 
-      let c1 : (usize, usize);
-      let c2 : (usize, usize);
+      let c1 : Pos;
+      let c2 : Pos;
 
       // Wrap around
       if r == self.rooms.len() - 1 {

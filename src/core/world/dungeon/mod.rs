@@ -64,13 +64,13 @@ impl std::ops::IndexMut<usize> for Dungeon {
 impl std::ops::Index<map::Pos> for Dungeon {
   type Output = Tile;
   fn index(&self, idx: map::Pos) -> &Self::Output {
-    &self.grid[idx.x as usize][idx.y as usize]
+    &self.grid[idx]
   }
 }
 
 impl std::ops::IndexMut<map::Pos> for Dungeon {
   fn index_mut(&mut self, idx: map::Pos) -> &mut Tile {
-    &mut self.grid[idx.x as usize][idx.y as usize]
+    &mut self.grid[idx]
   }
 }
 
@@ -92,10 +92,10 @@ impl Dungeon {
   /// 
   fn add_tile(&mut self, g: &mut map::Grid<Tile>, t: &mut Tile, pos: Pos) {
     // Get the background color of the tile that the new one will be going on top of
-    let bg_col = g[pos.x as usize][pos.y as usize].get_bg();
+    let bg_col = g[pos].get_bg();
     t.set_bg(bg_col);
     // Replace grid tile with tile
-    g[pos.x as usize][pos.y as usize] = t.clone();
+    g[pos] = t.clone();
   }
 
   ///
