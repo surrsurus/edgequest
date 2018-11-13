@@ -10,6 +10,10 @@ use core::renderer::{Entity, RGB};
 pub mod map;
 use self::map::{tile, Pos, Tile};
 
+// Privately use filter
+mod filter;
+use self::filter::Filter;
+
 // Privately use automata
 mod automata;
 use self::automata::{Automaton, DrunkardsWalk};
