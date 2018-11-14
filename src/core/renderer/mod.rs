@@ -174,9 +174,6 @@ impl Renderer {
     // Clear console
     con.clear();
 
-    // Move camera to player's position
-    self.camera.move_to(world.player.actor.pos);
-
     //
     // Draw world
     //
@@ -391,9 +388,14 @@ impl Renderer {
 
     // Draw the world in three steps:
     //
-    //  1. Tiles
-    //  2. Debug information (I want to move this out... if its not here this fn doesn't need to be &mut self)
-    //  3. Creatures
+    //  1. Place camera on player
+    //  2. Draw tiles
+    //  3. Draw debug information (I want to move this out... if its not here this fn doesn't need to be &mut self)
+    //  (Drawing items should go here)
+    //  4. Draw creatures
+
+    // Move camera to player's position
+    self.camera.move_to(world.player.actor.pos);
 
     //
     // Draw tiles

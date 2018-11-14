@@ -459,6 +459,20 @@ impl Dungeon {
       loc
     );
 
+    // Or two
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Shaft", 
+        '^', 
+        RGB(200, 50, 20), 
+        RGB(0, 0, 0), 
+        tile::Type::Trap(tile::Trap::Shaft)
+      ),
+      loc
+    );
+
     // Spent 300 million years wondering why the map was all walls until I realized this CRUCIAL piece of code
     // suddenly vanished.
     // Don't delete.
