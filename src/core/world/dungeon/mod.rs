@@ -158,7 +158,6 @@ impl Dungeon {
       d.apply(
         grid,
         None,
-        None,
         Some(wall.clone()),
         floor.clone(),
         iter
