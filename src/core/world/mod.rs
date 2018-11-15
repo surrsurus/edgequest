@@ -252,7 +252,7 @@ impl World {
   /// Should only be called after checking tile validity to avoid OOB errors
   /// 
   pub fn check_trap(&mut self) {
-
+    
     match &self.floor.dun[self.player.actor.pos].tiletype.clone() {
 
       // We only care about traps, and this matches every trap
@@ -265,22 +265,47 @@ impl World {
 
           // Memory loss causes all tiles to become unseen, effectively losing all mapping progress
           tile::Trap::MemoryLoss => {
+
+            log!(("You lose your memory", RGB(255, 255, 0)));
             
             for tile in self.floor.dun.grid.iter_mut().flatten() {
               tile.seen = false;
             }
-            
-            log!(("You lose your memory", RGB(255, 255, 0)));
+
           },
 
-          // Fall down a floor
+          // Fall down a floor or three
           tile::Trap::Shaft => {
+
+            log!(("You fall down a shaft!", RGB(200, 50, 20)));
             
             for _floors in 0..rand::thread_rng().gen_range(1, 4) {
               self.go_down();
             }
-            
-            log!(("You fall down a shaft!", RGB(200, 50, 20)));
+
+          },
+
+          // Turn creature a new color
+          tile::Trap::PaintBomb => {
+
+            let mut r = rand::thread_rng();
+
+            let col = RGB(r.gen_range(1, 255), r.gen_range(1, 255), r.gen_range(1, 255));
+
+            log!(("It's a paint bomb!", RGB(100, 100, 100)));
+
+            log!(("You look different!", col));
+
+            self.player.actor.set_fg(col);
+
+          }
+
+          // Move randomly on map
+          tile::Trap::Teleport => {
+
+            log!(("It's a teleporter!", RGB(50, 127, 200)));
+
+            self.player.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
 
           }
 
@@ -438,9 +463,7 @@ impl World {
       tcod_map: tm
     };
 
-    let start_loc = Dungeon::get_valid_location(&w.floor.dun.grid);
-    w.player.actor.pos.x = start_loc.x;
-    w.player.actor.pos.y = start_loc.y;
+    w.player.actor.pos = Dungeon::get_valid_location(&w.floor.dun.grid);
     w.update_fov();
 
     return w;

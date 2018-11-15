@@ -473,6 +473,33 @@ impl Dungeon {
       loc
     );
 
+    // Anotha one
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Paint bomb", 
+        '^', 
+        RGB(50, 200, 20), 
+        RGB(0, 0, 0), 
+        tile::Type::Trap(tile::Trap::PaintBomb)
+      ),
+      loc
+    );
+
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Teleport Trap", 
+        '^', 
+        RGB(50, 127, 200), 
+        RGB(0, 0, 0), 
+        tile::Type::Trap(tile::Trap::Teleport)
+      ),
+      loc
+    );
+
     // Spent 300 million years wondering why the map was all walls until I realized this CRUCIAL piece of code
     // suddenly vanished.
     // Don't delete.

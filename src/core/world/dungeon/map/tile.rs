@@ -45,7 +45,9 @@ pub enum Wall {
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Trap {
   MemoryLoss,
-  Shaft
+  Shaft,
+  PaintBomb,
+  Teleport
 }
 
 ///
