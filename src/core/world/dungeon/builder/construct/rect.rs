@@ -1,3 +1,5 @@
+use core::world::dungeon::map::Pos;
+
 ///
 /// Rectangle struct to represent rooms for `Dungeon`
 /// 
@@ -14,10 +16,10 @@
 /// 
 #[derive(Copy, Clone, PartialEq, Eq, Debug, Default)]
 pub struct Rect {
-  pub x: usize,
-  pub y: usize,
-  pub l: usize,
-  pub w: usize,
+  pub x: isize,
+  pub y: isize,
+  pub l: isize,
+  pub w: isize,
 }
 
 impl Rect {
@@ -26,9 +28,11 @@ impl Rect {
   /// Find the center of the `Rect` and return it's position
   /// 
   #[inline]
-  pub fn center(&self) -> (usize, usize) {
-    ((self.w / 2) + self.x, 
-     (self.l / 2) + self.y)
+  pub fn center(&self) -> Pos {
+    Pos::from_tup((
+      (self.w / 2) + self.x, 
+      (self.l / 2) + self.y
+    ))
   }
 
   ///
@@ -45,7 +49,7 @@ impl Rect {
   /// ```
   /// 
   #[inline]
-  pub fn new(x: usize, y: usize, l: usize, w: usize) -> Rect {
+  pub fn new(x: isize, y: isize, l: isize, w: isize) -> Rect {
     Rect { x: x, y: y, l: l, w: w }
   }
   

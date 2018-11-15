@@ -8,6 +8,9 @@
 // use std::fs::File;
 // use std::io::prelude::*;
 
+extern crate rand;
+use self::rand::Rng;
+
 use core::tcod::map::{Map, FovAlgorithm};
 
 use core::creature::{ai, Actions, Actor, Creature};
@@ -249,8 +252,8 @@ impl World {
   /// Should only be called after checking tile validity to avoid OOB errors
   /// 
   pub fn check_trap(&mut self) {
-
-    match &self.floor.dun[self.player.actor.pos.x as usize][self.player.actor.pos.y as usize].tiletype.clone() {
+    
+    match &self.floor.dun[self.player.actor.pos].tiletype.clone() {
 
       // We only care about traps, and this matches every trap
       tile::Type::Trap(trap) => {
@@ -262,13 +265,49 @@ impl World {
 
           // Memory loss causes all tiles to become unseen, effectively losing all mapping progress
           tile::Trap::MemoryLoss => {
+
+            log!(("You lose your memory", RGB(255, 255, 0)));
             
             for tile in self.floor.dun.grid.iter_mut().flatten() {
               tile.seen = false;
             }
-            
-            log!(("You lose your memory", RGB(255, 255, 0)));
+
           },
+
+          // Fall down a floor or three
+          tile::Trap::Shaft => {
+
+            log!(("You fall down a shaft!", RGB(200, 50, 20)));
+            
+            for _floors in 0..rand::thread_rng().gen_range(1, 4) {
+              self.go_down();
+            }
+
+          },
+
+          // Turn creature a new color
+          tile::Trap::PaintBomb => {
+
+            let mut r = rand::thread_rng();
+
+            let col = RGB(r.gen_range(1, 255), r.gen_range(1, 255), r.gen_range(1, 255));
+
+            log!(("It's a paint bomb!", RGB(100, 100, 100)));
+
+            log!(("You look different!", col));
+
+            self.player.actor.set_fg(col);
+
+          }
+
+          // Move randomly on map
+          tile::Trap::Teleport => {
+
+            log!(("It's a teleporter!", RGB(50, 127, 200)));
+
+            self.player.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
+
+          }
 
         }
 
@@ -287,7 +326,7 @@ impl World {
   ///
   pub fn get_bg_color_at(&self, pos: Pos) -> RGB {
 
-    self.floor.dun[pos.x as usize][pos.y as usize].get_bg()
+    self.floor.dun[pos].get_bg()
 
   }
 
@@ -296,30 +335,38 @@ impl World {
   ///
   pub fn go_down(&mut self) {
 
-    match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
-      tile::Type::Stair(tile::Stair::DownStair(_)) => {
-        if self.floor_num <= self.floor_stack.len() {
-          self.floor_stack[self.floor_num] = self.floor.clone();
-        }
-        self.floor_num += 1;
-        self.test_traverse();
-      },
-      _ => log!(("You can't go down here", RGB(150, 150, 150)))
+    if self.floor_num <= self.floor_stack.len() {
+      self.floor_stack[self.floor_num] = self.floor.clone();
     }
+    self.floor_num += 1;
+    self.test_traverse();
 
   }
 
   ///
-  /// Go upstairs if possible
+  /// Save the current floor and go up one floor
   ///
   pub fn go_up(&mut self) {
+    
+    // Be sure we aren't going to mess something up
+    assert!(self.floor_num != 0);
+
+    self.floor_stack[self.floor_num] = self.floor.clone();
+    self.floor_num -= 1;
+    self.test_traverse();
+
+  }
+  
+  ///
+  /// See if the player is able to go up on the current tile and draw some stuff to the log
+  /// 
+  pub fn player_go_up(&mut self) {
 
     match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
       tile::Type::Stair(tile::Stair::UpStair(_)) => {
         if self.floor_num != 0 {
-          self.floor_stack[self.floor_num] = self.floor.clone();
-          self.floor_num -= 1;
-          self.test_traverse();
+          self.go_up();
+          log!(("You bravely venture forth...", RGB(255, 255, 200)));
         } else {
           log!(("You are not allowed to turn back now...", RGB(100, 50, 25)));
         }
@@ -327,6 +374,19 @@ impl World {
       _ => log!(("You can't go up here", RGB(150, 150, 150)))
     }
 
+  }
+
+  ///
+  /// See if the player is able to go down on the current tile and draw some stuff to the log
+  /// 
+  pub fn player_go_down(&mut self) {
+    match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
+      tile::Type::Stair(tile::Stair::DownStair(_)) => {
+        self.go_down();
+        log!(("You bravely venture forth...", RGB(255, 255, 200)));
+      },
+      _ => log!(("You can't go down here", RGB(150, 150, 150)))
+    }
   }
 
   ///
@@ -403,9 +463,7 @@ impl World {
       tcod_map: tm
     };
 
-    let start_loc = Dungeon::get_valid_location(&w.floor.dun.grid);
-    w.player.actor.pos.x = start_loc.x;
-    w.player.actor.pos.y = start_loc.y;
+    w.player.actor.pos = Dungeon::get_valid_location(&w.floor.dun.grid);
     w.update_fov();
 
     return w;

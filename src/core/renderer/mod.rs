@@ -174,86 +174,11 @@ impl Renderer {
     // Clear console
     con.clear();
 
-    // Move camera to player's position
-    self.camera.move_to(world.player.actor.pos);
-
     //
-    // Draw tiles
+    // Draw world
     //
 
-    // Draw seen tiles
-    for x in 0..world.floor.dun.width {
-      for y in 0..world.floor.dun.height {
-        // If fov is on...
-        if self.fov {
-          // And it's in the FoV
-          if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
-
-            // Update tile if possible
-            match &world.floor.dun[x][y].tiletype {
-              tile::Type::Water => {
-                &world.floor.dun[x][y].set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
-              },
-              _ => {}
-            }
-
-            // Draw a tile slightly more vibrant than it actually is to emulate torchlight
-            self.draw_entity(con, Pos::from_usize(x, y), &yellowish(&world.floor.dun[x][y]));
-
-            // Mark tile as seen if it's in the FoV
-            world.floor.dun[x][y].seen = true;
-
-          }
-
-          // And the tile has been seen...
-          else if world.floor.dun[x][y].seen {
-            // Draw a tile, but darker
-            self.draw_entity(con, Pos::from_usize(x, y), &darken(&world.floor.dun[x][y]));
-          }
-
-        }
-
-        // [Debug] Otherwise just draw all tiles normally
-        else {
-          self.draw_entity(con, Pos::new(x as isize, y as isize), &world.floor.dun[x][y]);
-        }
-        
-      }
-    }
-
-    //
-    // Debug options
-    //
-
-    // Debug scent
-    if self.show_scent {
-      self.debug_render_scent_map(con, &world.floor.dun);
-    }
-
-    // Debug sound
-    if self.show_sound {
-      self.debug_render_sound_map(con, &world.floor.dun);
-    }
-
-    //
-    // Draw creatures
-    //
-
-    for c in &world.floor.creatures {
-      // If fov is on...
-      if self.fov {
-        // And its in the fov...
-        if world.tcod_map.is_in_fov(c.actor.pos.x as i32, c.actor.pos.y as i32) && self.fov {
-          self.draw_creature(con, c.actor.pos, &c.actor, world);
-        }
-      } else {
-        self.draw_creature(con, c.actor.pos, &c.actor, world);
-      }
-    }
-
-    // Draw player. Player is always in the camera since
-    // we move the camera over it.
-    self.draw_creature(con, world.player.actor.pos, &world.player.actor, world);
+    self.draw_world(con, world);
 
     //
     // Draw log
@@ -264,89 +189,9 @@ impl Renderer {
     //
     // Draw UI
     //
+    
+    self.draw_ui(con, world);
 
-    for x in 0..self.screen.x {
-      con.put_char_ex(
-        x as i32,
-        (self.screen.y - self.console_height - 1) as i32,
-        '-',
-        RGB(255, 255, 255).to_tcod(),
-        RGB(0, 0, 0).to_tcod()
-      );
-    }
-
-    for y in 0..(self.screen.y - self.console_height - 1) {
-      con.put_char_ex(
-        (self.screen.x - self.panel_width - 1) as i32,
-        y as i32,
-        '|',
-        RGB(255, 255, 255).to_tcod(),
-        RGB(0, 0, 0).to_tcod()
-      );
-    }
-
-    con.put_char_ex(
-      (self.screen.x - self.panel_width - 1) as i32,
-      (self.screen.y - self.console_height - 1) as i32,
-      // hyperthonk
-      char::from_u32(193).unwrap(),
-      RGB(255, 255, 255).to_tcod(),
-      RGB(0, 0, 0).to_tcod()
-    );
-
-    // Tile player is on
-    let tile = &world.floor.dun[world.player.actor.pos.x as usize][world.player.actor.pos.y as usize];
-
-    con.set_default_foreground(RGB(255, 255, 255).to_tcod());
-
-    con.print(
-      (self.screen.x - self.panel_width + 1) as i32,
-      1,
-      "Edgequest"
-    );
-
-    con.print(
-      (self.screen.x - self.panel_width + 1) as i32,
-      2,
-      "This is where we live"
-    );
-
-    con.print(
-      (self.screen.x - self.panel_width + 1) as i32,
-      4,
-      format!("{}: {}", "Biome", tile.biome)
-    );
-
-    let mut npscent = 0;
-    for s in &tile.scents {
-      if &s.scent_type != &tile::Scent::Player { 
-        npscent += s.val; // BUG: Panics here with overflow
-      }
-    }
-
-    con.print(
-      (self.screen.x - self.panel_width + 1) as i32,
-      5,
-      format!("{}: {}", "Non-player Scent", npscent)
-    );
-
-    con.print(
-      (self.screen.x - self.panel_width + 1) as i32,
-      6,
-      format!("{}: {}", "Sound", tile.sound)
-    );
-
-    con.print(
-      (self.screen.x - self.panel_width + 1) as i32,
-      7,
-      format!("{}: {}", "Tile", tile.get_name())
-    );
-
-    con.print(
-      (self.screen.x - self.panel_width + 1) as i32,
-      8,
-      format!("{}: {}", "Floor", world.floor_num)
-    );
 
     //
     // Flush changes to root
@@ -426,6 +271,211 @@ impl Renderer {
     }
 
     drop(log);
+
+  }
+  
+  ///
+  /// Draw UI elements
+  /// 
+  /// NOTE: This function is super basic and is intended to be revised/removed.Option
+  /// 
+  fn draw_ui(&self, con: &mut console::Root, world: &mut World) {
+    
+    // Draw horizontal line to split game from the log console
+    for x in 0..self.screen.x {
+      con.put_char_ex(
+        x as i32,
+        (self.screen.y - self.console_height - 1) as i32,
+        '-',
+        RGB(255, 255, 255).to_tcod(),
+        RGB(0, 0, 0).to_tcod()
+      );
+    }
+
+    // Draw horizontal line to split game from the panel
+    for y in 0..(self.screen.y - self.console_height - 1) {
+      con.put_char_ex(
+        (self.screen.x - self.panel_width - 1) as i32,
+        y as i32,
+        '|',
+        RGB(255, 255, 255).to_tcod(),
+        RGB(0, 0, 0).to_tcod()
+      );
+    }
+
+    // Pretty sure this places a piece at the intersection of the panel and console lines
+    // but god damn
+    con.put_char_ex(
+      (self.screen.x - self.panel_width - 1) as i32,
+      (self.screen.y - self.console_height - 1) as i32,
+      // hyperthonk
+      char::from_u32(193).unwrap(),
+      RGB(255, 255, 255).to_tcod(),
+      RGB(0, 0, 0).to_tcod()
+    );
+
+    // Tile player is on
+    let tile = &world.floor.dun[world.player.actor.pos];
+
+    //
+    //  Draw side panel contents
+    // 
+    
+    // White on black because I'm lazy
+    con.set_default_foreground(RGB(255, 255, 255).to_tcod());
+
+    // Gotta remind people what game theyre playing
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      1,
+      "Edgequest"
+    );
+
+    // Paying my respects to a legend
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      2,
+      "This is where we live"
+    );
+
+    // Biome
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      4,
+      format!("{}: {}", "Biome", tile.biome)
+    );
+
+    // Scent of non-players
+    let mut npscent = 0;
+    for s in &tile.scents {
+      if &s.scent_type != &tile::Scent::Player { 
+        npscent += s.val; // BUG: Panics here with overflow
+      }
+    }
+
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      5,
+      format!("{}: {}", "Non-player Scent", npscent)
+    );
+
+    // Sound
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      6,
+      format!("{}: {}", "Sound", tile.sound)
+    );
+
+    // Tile
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      7,
+      format!("{}: {}", "Tile", tile.get_name())
+    );
+
+    // Floor number
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      8,
+      format!("{}: {}", "Floor", world.floor_num)
+    );
+  }
+
+  ///
+  /// Draw the contents of the world from the player's point of view
+  /// 
+  fn draw_world(&mut self, con: &mut console::Root, world: &mut World) {
+
+    // Draw the world in three steps:
+    //
+    //  1. Place camera on player
+    //  2. Draw tiles
+    //  3. Draw debug information (I want to move this out... if its not here this fn doesn't need to be &mut self)
+    //  (Drawing items should go here)
+    //  4. Draw creatures
+
+    // Move camera to player's position
+    self.camera.move_to(world.player.actor.pos);
+
+    //
+    // Draw tiles
+    //
+
+    // Draw seen tiles
+    for x in 0..world.floor.dun.width {
+      for y in 0..world.floor.dun.height {
+        // If fov is on...
+        if self.fov {
+          // And it's in the FoV
+          if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
+
+            // Update tile if possible
+            match &world.floor.dun[x][y].tiletype {
+              tile::Type::Water => {
+                &world.floor.dun[x][y].set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
+              },
+              _ => {}
+            }
+
+            // Draw a tile slightly more vibrant than it actually is to emulate torchlight
+            self.draw_entity(con, Pos::from_usize(x, y), &yellowish(&world.floor.dun[x][y]));
+
+            // Mark tile as seen if it's in the FoV
+            world.floor.dun[x][y].seen = true;
+
+          }
+
+          // And the tile has been seen...
+          else if world.floor.dun[x][y].seen {
+            // Draw a tile, but darker
+            self.draw_entity(con, Pos::from_usize(x, y), &darken(&world.floor.dun[x][y]));
+          }
+
+        }
+
+        // [Debug] Otherwise just draw all tiles normally
+        else {
+          self.draw_entity(con, Pos::new(x as isize, y as isize), &world.floor.dun[x][y]);
+        }
+        
+      }
+    }
+
+    //
+    // Debug options
+    //
+
+    // We need the Renderer to be &mut here because of the way the Renderer is kept in context
+
+    // Debug scent
+    if self.show_scent {
+      self.debug_render_scent_map(con, &world.floor.dun);
+    }
+
+    // Debug sound
+    if self.show_sound {
+      self.debug_render_sound_map(con, &world.floor.dun);
+    }
+
+    //
+    // Draw creatures
+    //
+
+    for c in &world.floor.creatures {
+      // If fov is on...
+      if self.fov {
+        // And its in the fov...
+        if world.tcod_map.is_in_fov(c.actor.pos.x as i32, c.actor.pos.y as i32) && self.fov {
+          self.draw_creature(con, c.actor.pos, &c.actor, world);
+        }
+      } else {
+        self.draw_creature(con, c.actor.pos, &c.actor, world);
+      }
+    }
+
+    // Draw player. Player is always in the camera since
+    // we move the camera over it.
+    self.draw_creature(con, world.player.actor.pos, &world.player.actor, world);
 
   }
 

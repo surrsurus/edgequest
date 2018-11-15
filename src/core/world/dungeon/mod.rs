@@ -12,7 +12,7 @@ use self::map::{tile, Pos, Tile};
 
 // Privately use filter
 mod filter;
-use self::filter::Filter;
+// use self::filter::Filter;
 
 // Privately use automata
 mod automata;
@@ -61,6 +61,19 @@ impl std::ops::IndexMut<usize> for Dungeon {
   }
 }
 
+impl std::ops::Index<map::Pos> for Dungeon {
+  type Output = Tile;
+  fn index(&self, idx: map::Pos) -> &Self::Output {
+    &self.grid[idx]
+  }
+}
+
+impl std::ops::IndexMut<map::Pos> for Dungeon {
+  fn index_mut(&mut self, idx: map::Pos) -> &mut Tile {
+    &mut self.grid[idx]
+  }
+}
+
 impl Dungeon {
 
   #[inline]
@@ -79,10 +92,10 @@ impl Dungeon {
   /// 
   fn add_tile(&mut self, g: &mut map::Grid<Tile>, t: &mut Tile, pos: Pos) {
     // Get the background color of the tile that the new one will be going on top of
-    let bg_col = g[pos.x as usize][pos.y as usize].get_bg();
+    let bg_col = g[pos].get_bg();
     t.set_bg(bg_col);
     // Replace grid tile with tile
-    g[pos.x as usize][pos.y as usize] = t.clone();
+    g[pos] = t.clone();
   }
 
   ///
@@ -140,11 +153,10 @@ impl Dungeon {
     // though it may be in the future.
     
     // This is geared towards eating walls and replacing them with floors, so mainly just to flesh out the dungeon.
-    let drunk = |chaos: f32, iter: u32, grid: &mut map::Grid<Tile> | -> map::Grid<Tile> {
+    let drunk = |chaos: f32, iter: u32, grid: &mut map::Grid<Tile> | {
       let d = DrunkardsWalk::new(chaos);
-      d.generate(
+      d.apply(
         grid,
-        None,
         None,
         Some(wall.clone()),
         floor.clone(),
@@ -155,13 +167,13 @@ impl Dungeon {
     // Make three passes of this basic walk to carve caves.
 
     // Total randomness - Really centralized areas that are mostly opened since it walks over itself a lot
-    grid = drunk(1.0, 1000, &mut grid);
+    drunk(1.0, 1000, &mut grid);
 
     // Semi random - A mixture of the previous and next option
-    grid = drunk(0.5, 1000, &mut grid);
+    drunk(0.5, 1000, &mut grid);
 
     // Mostly orderly - Long corridors that occassionally deviate
-    grid = drunk(0.25, 1000, &mut grid);
+    drunk(0.25, 1000, &mut grid);
 
     // Add structures
     grid = Structure::new(grid).build();
@@ -443,6 +455,47 @@ impl Dungeon {
         RGB(255, 255, 0), 
         RGB(0, 0, 0), 
         tile::Type::Trap(tile::Trap::MemoryLoss)
+      ),
+      loc
+    );
+
+    // Or two
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Shaft", 
+        '^', 
+        RGB(200, 50, 20), 
+        RGB(0, 0, 0), 
+        tile::Type::Trap(tile::Trap::Shaft)
+      ),
+      loc
+    );
+
+    // Anotha one
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Paint bomb", 
+        '^', 
+        RGB(50, 200, 20), 
+        RGB(0, 0, 0), 
+        tile::Type::Trap(tile::Trap::PaintBomb)
+      ),
+      loc
+    );
+
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Teleport Trap", 
+        '^', 
+        RGB(50, 127, 200), 
+        RGB(0, 0, 0), 
+        tile::Type::Trap(tile::Trap::Teleport)
       ),
       loc
     );

@@ -44,9 +44,10 @@ pub enum Wall {
 ///
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub enum Trap {
-  // NOTE: The only trap I can think about implementing right now, which just causes the player to lose all their
-  // map information. Kind of just a tech demo, but it's not implemented right now
-  MemoryLoss
+  MemoryLoss,
+  Shaft,
+  PaintBomb,
+  Teleport
 }
 
 ///

@@ -170,9 +170,9 @@ impl Engine {
               self.world.player.state = Actions::Move;
             },
 
-            // "Regenerate" current level
+            // Force reload word
             'w' => {
-              self.world.test_traverse();
+              self.world = World::new(Pos::from_tup(init::map_dimensions()));
               self.state = State::Act(Actions::Unknown);
             },
             // Create an empty level for testing
@@ -325,11 +325,21 @@ impl Engine {
 
       // Trying to go up and downstairs prompts the respective response from world
       State::Act(Actions::DownStair) => {
-        self.world.go_down();
+        // No clip through floors
+        if self.noclip {
+          self.world.go_down();
+        } else {
+          self.world.player_go_down();
+        }
       },
 
       State::Act(Actions::UpStair) => {
-        self.world.go_up();
+        // No clip through floors
+        if self.noclip {
+          self.world.go_up();
+        } else {
+          self.world.player_go_up();
+        }
       }
       
       // All other variants are dropped
