@@ -1,4 +1,4 @@
-# Edgequest - Season Two [![Build Status](https://travis-ci.org/surrsurus/edgequest.svg?branch=master)](https://travis-ci.org/surrsurus/edgequest)
+# Edgequest [![Build Status](https://travis-ci.org/surrsurus/edgequest.svg?branch=master)](https://travis-ci.org/surrsurus/edgequest) ![Rust](https://img.shields.io/badge/language-rust-orange.svg)
 
 Under heavy construction.
 
