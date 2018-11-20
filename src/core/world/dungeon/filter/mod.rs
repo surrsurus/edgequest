@@ -1,5 +1,8 @@
 use core::world::dungeon::map;
 
+pub mod structure;
+pub use self::structure::Structure;
+
 ///
 /// `Automaton` trait to define a uniform set of behavior for dungeon generation
 /// 
@@ -10,6 +13,6 @@ pub trait Filter {
   /// 
   type Output : Clone;
 
-  fn apply(grid: &map::Grid<Self::Output>) -> map::Grid<Self::Output>;
+  fn apply(&mut self, grid: &mut map::Grid<Self::Output>);
 
 }

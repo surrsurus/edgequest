@@ -5,7 +5,7 @@ use self::rand::Rng;
 use std::io::prelude::*;
 use std::fs;
 
-use core::world::dungeon::builder::Buildable;
+use core::world::dungeon::filter::Filter;
 
 use core::world::dungeon::map::{self, tile, Tile};
 
@@ -17,18 +17,14 @@ use core::renderer::RGB;
 /// Generate prefab structures based on files and place them on the grid
 ///
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Structure {
-  grid: map::Grid<Tile>,
-  w: usize,
-  h: usize,
-}
+pub struct Structure {}
 
 impl Structure {
 
   ///
   /// Add a random structure
   ///
-  fn add_rand_struct(&mut self) {
+  fn add_rand_struct(&mut self, grid: &mut map::Grid<Tile>) {
 
     // RNG
     let mut rng = rand::thread_rng();
@@ -36,13 +32,11 @@ impl Structure {
     // Create a vector out of collecting the read_dir by mapping the unwrapped paths
     let paths : Vec<_> = fs::read_dir("./strct").unwrap().map(|res| res.unwrap().path()).collect();
 
-    // Choose a random element 
+    // Choose a random element (aka file from paths)
     let mut file = fs::File::open(rng.choose(&paths).unwrap()).unwrap();
 
-    // Create empty string
+    // Create empty string and read to it
     let mut s = String::new();
-
-    // Read to string
     file.read_to_string(&mut s).unwrap();
 
     // Prepare method to store data read from file
@@ -117,16 +111,21 @@ impl Structure {
     let w = strct.len();
     let h = strct[0].len();
 
+    // Read details of map
+    let total_w = grid.len();
+    let total_h = grid[0].len();
+
     // Add to map if possible
     let x = rng.gen_range(0, w + 1);
     let y = rng.gen_range(0, h + 1);
     
-    // Break
-    if x + w > self.w - 1 || y + h > self.h - 1 { return; }
-
+    // Break with no change
+    if x + w > total_w - 1 || y + h > total_h - 1 { return; }
+    
+    // Apply change
     for tx in x..x+w {
       for ty in y..y+h {
-        self.grid[tx][ty] = strct[tx-x][ty-y].clone();
+        grid[tx][ty] = strct[tx-x][ty-y].clone();
       }
     }
 
@@ -135,27 +134,18 @@ impl Structure {
   ///
   /// Return a new `Structure`
   ///
-  pub fn new(grid: map::Grid<Tile>) -> Structure {
-
-    // Make a new dungeon with our fresh grid of size `w` by `h`
-    let s = Structure {
-      grid: grid.clone(),
-      w: grid.len(),
-      h: grid[0].len(),
-    };
-
-    return s;
+  pub fn new() -> Structure {
+    Structure {}
   }
 
 }
 
-impl Buildable for Structure {
+impl Filter for Structure {
 
   type Output = Tile;
 
-  fn build(&mut self) -> map::Grid<Tile> {
-    self.add_rand_struct();
-    return self.grid.clone();
+  fn apply(&mut self, grid: &mut map::Grid<Self::Output>) {
+    self.add_rand_struct(grid);
   }
 
 }

@@ -12,7 +12,7 @@ use self::map::{tile, Pos, Tile};
 
 // Privately use filter
 mod filter;
-// use self::filter::Filter;
+use self::filter::{Filter, Structure};
 
 // Privately use automata
 mod automata;
@@ -20,7 +20,7 @@ use self::automata::{Automaton, DrunkardsWalk};
 
 // Privately use builders
 mod builder;
-use self::builder::{Buildable, Fussy, Simple, Structure};
+use self::builder::{Buildable, Fussy, Simple};
 
 mod dungeon_tests;
 
@@ -167,7 +167,7 @@ impl Dungeon {
     // Make three passes of this basic walk to carve caves.
 
     // Total randomness - Really centralized areas that are mostly opened since it walks over itself a lot
-    drunk(1.0, 1000, &mut grid);
+    drunk(1.0, 800, &mut grid);
 
     // Semi random - A mixture of the previous and next option
     drunk(0.5, 1000, &mut grid);
@@ -176,7 +176,7 @@ impl Dungeon {
     drunk(0.25, 1000, &mut grid);
 
     // Add structures
-    grid = Structure::new(grid).build();
+    Structure::new().apply(&mut grid);
 
     // Biome generation
 

@@ -12,6 +12,3 @@ pub use self::fussy::Fussy;
 
 pub mod simple;
 pub use self::simple::Simple;
-
-pub mod structure;
-pub use self::structure::Structure;
