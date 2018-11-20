@@ -72,7 +72,6 @@ impl Structure {
     }
 
     // Rotate randomly
-    // NOTE: Not done
 
     // (x, y) rotated 90 degrees around (0, 0) is (-y, x).
     // However, vectors are sized in a way that won't allow for negative indexing.
@@ -134,7 +133,7 @@ impl Structure {
   }
 
   ///
-  /// Return a new `Simple`
+  /// Return a new `Structure`
   ///
   pub fn new(grid: map::Grid<Tile>) -> Structure {
 
