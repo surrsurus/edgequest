@@ -527,7 +527,7 @@ impl Renderer {
   /// * `screen` - `Pos` that holds the screen dimensions
   ///
   #[inline]
-  pub fn new(map: Pos, screen: Pos, console_height: isize, panel_width: isize) -> Renderer {
+  pub fn new(map: Pos, screen: Pos, console_height: isize, panel_width: isize) -> Self {
     Renderer { 
       // Camera takes a modified screen value that compensates for the console_height
       // This way the render still knows that that area is "reserved" for the console

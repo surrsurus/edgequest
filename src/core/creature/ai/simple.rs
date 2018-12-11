@@ -16,7 +16,7 @@ use core::creature::{Actions, Creature, Actor, Stats};
 pub struct SimpleAI;
 
 impl SimpleAI {
-  pub fn new() -> SimpleAI {
+  pub fn new() -> Self {
     SimpleAI {}
   }
 }

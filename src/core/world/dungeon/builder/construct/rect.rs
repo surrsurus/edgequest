@@ -49,7 +49,7 @@ impl Rect {
   /// ```
   /// 
   #[inline]
-  pub fn new(x: isize, y: isize, l: isize, w: isize) -> Rect {
+  pub fn new(x: isize, y: isize, l: isize, w: isize) -> Self {
     Rect { x: x, y: y, l: l, w: w }
   }
   

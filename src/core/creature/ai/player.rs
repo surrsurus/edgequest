@@ -10,7 +10,7 @@ use core::creature::{Actions, Creature, Actor, Stats};
 pub struct PlayerAI;
 
 impl PlayerAI {
-  pub fn new() -> PlayerAI {
+  pub fn new() -> Self {
     PlayerAI {}
   }
 }

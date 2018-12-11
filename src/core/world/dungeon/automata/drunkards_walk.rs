@@ -25,7 +25,7 @@ impl DrunkardsWalk {
   /// 
   /// Will panic if chaos is not between the values of [0.0, 1.0] inclusive.
   /// 
-  pub fn new(chaos: f32) -> DrunkardsWalk {
+  pub fn new(chaos: f32) -> Self {
     assert!(chaos >= 0.0 && chaos <= 1.0);
     DrunkardsWalk { chaos: chaos }
   }

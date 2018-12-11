@@ -70,7 +70,7 @@ pub struct Floor {
 }
 
 impl Floor {
-  pub fn new(dun: Dungeon, creatures: Vec<Box<Creature>>) -> Floor {
+  pub fn new(dun: Dungeon, creatures: Vec<Box<Creature>>) -> Self {
     Floor {
       dun: dun,
       creatures: creatures
@@ -442,7 +442,7 @@ impl World {
   ///
   /// Return a new `World`
   ///
-  pub fn new(map_dim: Pos) -> World {
+  pub fn new(map_dim: Pos) -> Self {
 
     // Create a basic dungeon, tcod map from that dungeon, and a grid we can
     // put test creatures on.

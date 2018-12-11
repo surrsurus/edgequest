@@ -73,7 +73,7 @@ impl Camera {
   /// * `screen` - `Pos` that holds the screen dimensions
   /// 
   #[inline]
-  pub fn new(map: Pos, screen: Pos) -> Camera {
+  pub fn new(map: Pos, screen: Pos) -> Self {
     Camera { pos: Pos::origin(), map: map, screen: screen}
   }
 

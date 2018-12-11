@@ -29,7 +29,7 @@ impl BlinkAI {
   ///
   /// Return a new AI
   /// 
-  pub fn new() -> BlinkAI {
+  pub fn new() -> Self {
     BlinkAI {}
   }
 

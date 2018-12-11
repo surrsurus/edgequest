@@ -53,7 +53,7 @@ impl Actor {
   /// Return a new `Actor`
   ///
   #[inline]
-  pub fn new(name: &'static str, glyph: char, pos: Pos, fg: RGB, bg: RGB) -> Actor {
+  pub fn new(name: &'static str, glyph: char, pos: Pos, fg: RGB, bg: RGB) -> Self {
     Actor {
       name: name,
       glyph: glyph, 

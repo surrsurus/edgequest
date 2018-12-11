@@ -11,7 +11,7 @@ pub struct TrackerAI;
 
 impl TrackerAI {
   #[inline]
-  pub fn new() -> TrackerAI {
+  pub fn new() -> Self {
     TrackerAI {}
   }
 }

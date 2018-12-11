@@ -283,7 +283,7 @@ impl Engine {
   ///
   /// Return a new `Engine`
   /// 
-  pub fn new() -> Engine {
+  pub fn new() -> Self {
 
     // Get map height
     let map_dim = Pos::from_tup(init::map_dimensions());

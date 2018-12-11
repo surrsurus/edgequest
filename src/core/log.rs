@@ -57,7 +57,7 @@ impl Log {
   ///
   /// Get a new, empty log
   ///
-  pub fn new() -> Log {
+  pub fn new() -> Self {
     Log { data: vec![] }
   }
 

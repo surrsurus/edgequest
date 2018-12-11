@@ -18,7 +18,7 @@ pub struct TalkerAI;
 
 impl TalkerAI {
   #[inline]
-  pub fn new() -> TalkerAI {
+  pub fn new() -> Self {
     TalkerAI {}
   }
 }

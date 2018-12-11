@@ -186,6 +186,13 @@ pub enum Scent {
   Insectoid,
   Canine,
   Feline,
+  // Untracked scents, as in won't render in debug mode.
+  Reptilian,
+  Decay,
+  Avian,
+  Smoke,
+  Incense,
+  // C like enum construction for defining # of things inside enum
   Num
 }
 
@@ -197,6 +204,11 @@ impl fmt::Display for Scent {
       Scent::Insectoid => write!(f, "Insectoid"),
       Scent::Canine => write!(f, "Canine"),
       Scent::Feline => write!(f, "Feline"),
+      Scent::Reptilian => write!(f, "Reptilian"),
+      Scent::Decay => write!(f, "Decay"),
+      Scent::Avian => write!(f, "Avian"),
+      Scent::Smoke => write!(f, "Smoke"),
+      Scent::Incense => write!(f, "Incense"),
       Scent::Num => write!(f, "Num - Something wrong must have happened"),
     }
   }
@@ -206,12 +218,17 @@ impl fmt::Display for Scent {
 impl Scent {
   pub fn iterator() -> Iter<'static, Scent> {
     static SCENT_TYPES: [Scent;  Scent::Num as usize] = [
-        Scent::Player, 
-        Scent::Insectoid, 
-        Scent::Canine, 
-        Scent::Feline
-      ];
-      SCENT_TYPES.into_iter()
+      Scent::Player, 
+      Scent::Insectoid, 
+      Scent::Canine, 
+      Scent::Feline,
+      Scent::Reptilian,
+      Scent::Decay,
+      Scent::Avian,
+      Scent::Smoke,
+      Scent::Incense
+    ];
+    SCENT_TYPES.into_iter()
   }
 }
 
@@ -224,7 +241,7 @@ pub struct _Scent {
 impl _Scent {
 
   #[inline]
-  pub fn new(value: u8, scent_type: Scent) -> _Scent {
+  pub fn new(value: u8, scent_type: Scent) -> Self {
     _Scent {
       val: value,
       scent_type: scent_type
@@ -255,7 +272,7 @@ impl Tile {
   /// Return a new `Tile`
   /// 
   #[inline]
-  pub fn new(name: &'static str, glyph: char, fg: RGB, bg: RGB, tiletype: Type) -> Tile {
+  pub fn new(name: &'static str, glyph: char, fg: RGB, bg: RGB, tiletype: Type) -> Self {
     Tile { 
       name: name,
       glyph: glyph,

@@ -25,7 +25,7 @@ impl Pos {
   /// Return a new `Pos`
   /// 
   #[inline]
-  pub fn new(x: isize, y: isize) -> Pos {
+  pub fn new(x: isize, y: isize) -> Self {
     Pos { x: x, y: y }
   }
 
@@ -33,7 +33,7 @@ impl Pos {
   /// Return a new `Pos` from usize's
   /// 
   #[inline]
-  pub fn from_usize(x: usize, y: usize) -> Pos {
+  pub fn from_usize(x: usize, y: usize) -> Self {
     Pos { x: x as isize, y: y as isize }
   }
 
@@ -41,7 +41,7 @@ impl Pos {
   /// Return a `Pos` from a tuple
   /// 
   #[inline]
-  pub fn from_tup(pos: (isize, isize)) -> Pos {
+  pub fn from_tup(pos: (isize, isize)) -> Self {
     Pos { x: pos.0, y: pos.1 }
   }
 
@@ -49,7 +49,7 @@ impl Pos {
   /// Return a new `Pos` from a tuple of usizes
   /// 
   #[inline]
-  pub fn from_usize_tup(pos: (usize, usize)) -> Pos {
+  pub fn from_usize_tup(pos: (usize, usize)) -> Self {
    Pos { x: pos.0 as isize, y: pos.1 as isize }
   }
 

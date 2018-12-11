@@ -21,7 +21,7 @@ impl Corr {
   /// Return a new `Corr`
   /// 
   #[inline]
-  pub fn new(start: Pos, end: Pos) -> Corr {
+  pub fn new(start: Pos, end: Pos) -> Self {
     return Corr { start: start, end: end };
   }
 

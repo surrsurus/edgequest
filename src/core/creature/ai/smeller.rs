@@ -15,7 +15,7 @@ use core::creature::{Actions, Creature, Actor, Stats};
 pub struct SmellerAI;
 
 impl SmellerAI {
-  pub fn new() -> SmellerAI {
+  pub fn new() -> Self {
     SmellerAI {}
   }
 }

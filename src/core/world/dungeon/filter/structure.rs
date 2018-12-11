@@ -134,7 +134,7 @@ impl Structure {
   ///
   /// Return a new `Structure`
   ///
-  pub fn new() -> Structure {
+  pub fn new() -> Self {
     Structure {}
   }
 

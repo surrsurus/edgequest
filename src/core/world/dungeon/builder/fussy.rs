@@ -35,7 +35,7 @@ impl Fussy {
   ///
   /// Return a new `Fussy`
   /// 
-  pub fn new(grid: map::Grid<u8>, threshold: f32) -> Fussy {
+  pub fn new(grid: map::Grid<u8>, threshold: f32) -> Self {
 
     // Make a new dungeon with our fresh grid of size `w` by `h`
     let f = Fussy { 

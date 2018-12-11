@@ -554,7 +554,7 @@ impl Dungeon {
   ///
   /// Return a new `Dungeon` that consists of pure walls
   ///
-  pub fn new(map_dim: Pos) -> Dungeon {
+  pub fn new(map_dim: Pos) -> Self {
 
     return Dungeon {
       width: map_dim.x as usize,

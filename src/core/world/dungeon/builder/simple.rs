@@ -175,7 +175,7 @@ impl Simple {
   /// 
   /// Return a new `Simple`
   /// 
-  pub fn new(grid: Grid<Tile>) -> Simple {
+  pub fn new(grid: Grid<Tile>) -> Self {
 
     // Make a new dungeon with our fresh grid of size `w` by `h`
     let s = Simple { 
