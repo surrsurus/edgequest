@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["RANDOM_TRIES",""],["TALK_DISTANCE",""]],"mod":[["blink",""],["player",""],["simple",""],["smeller",""],["talker",""],["tracker",""]],"trait":[["AI","Represents basic actions AI can take in the game"]]});

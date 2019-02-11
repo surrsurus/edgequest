@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["GlobalLog",""],["Log","A log just wraps some strings with a color value to be printed and look pretty"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["load","Load configuration data from a path.  Deserializes data from the file to a `Config` struct with serde."]],"struct":[["Config","A struct to hold data gathered from a config.yml file. You should not need to create your own, instead, get a filled out struct from `load()`"]]});

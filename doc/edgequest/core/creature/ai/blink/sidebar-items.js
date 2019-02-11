@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["BlinkAI","BlinkAI makes monster teleport around the map periodically"]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Actions","All actions are meant to be an intended state for a creature to be in"]]});

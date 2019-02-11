@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["dungeon","Generate a super simple dungeon"]],"struct":[["Floor","Represent a floor in the dungeon"],["World",""]]});

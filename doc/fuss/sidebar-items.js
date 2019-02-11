@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Simplex","Hold the proper permutation tables and methods for generating 2D and 3D noise."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["RGB","One would think that the RGB 'type' we use here is divorced from the actual tcod library, however this construct serves more as a wrapper or converter for tcod colors, because they are pretty ass."]]});

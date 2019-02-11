@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["console_height","Get console height"],["map_dimensions","Get map dimensions as a tuple"],["panel_width","Get panel width"],["root","Initialize the root console."]],"mod":[["config","A module for loading a YAML config file with serde."]]});
