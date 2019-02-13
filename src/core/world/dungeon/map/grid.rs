@@ -1,4 +1,4 @@
-use core::world::dungeon::map::{Pos, Tile};
+use super::{Pos, Tile};
 ///
 /// Hold a 2D vector of `T`s
 /// 

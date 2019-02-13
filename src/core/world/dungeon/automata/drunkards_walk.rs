@@ -4,7 +4,7 @@
 //! A super basic cellular automata
 //! 
 
-use core::world::dungeon::automata::Automaton;
+use super::Automaton;
 use core::world::dungeon::map::{self, Pos, Tile};
 
 ///

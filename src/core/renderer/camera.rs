@@ -2,7 +2,7 @@
 //! Select specific parts of the screen to be rendered
 //!
 
-use core::renderer::Pos;
+use super::Pos;
 
 ///
 /// `Camera` struct. A camera simply holds a position (Where it is looking),
