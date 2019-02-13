@@ -2,6 +2,8 @@
 //! Metapackage to expose an interface to get map objects
 //! 
 
+pub mod construct;
+
 pub mod grid;
 pub use self::grid::Grid;
 

@@ -12,7 +12,7 @@ use self::map::{tile, Pos, Tile};
 
 // Privately use filter
 mod filter;
-use self::filter::{Filter, Structure};
+use self::filter::{Filter, Structure, Simple};
 
 // Privately use automata
 mod automata;
@@ -20,7 +20,7 @@ use self::automata::{Automaton, DrunkardsWalk};
 
 // Privately use builders
 mod builder;
-use self::builder::{Buildable, Fussy, Simple};
+use self::builder::{Buildable, Fussy};
 
 mod dungeon_tests;
 
@@ -128,7 +128,7 @@ impl Dungeon {
 
     // Apply simple builder. This creates a simple corridor/room dungeon based off the simple builder
     // Note how the grid is being consumed to replace itself here, but we don't want this later on.
-    grid = Simple::new(grid).build();
+    Simple::new(&grid).apply(&mut grid);
 
     // Create several reusable constructs for walls and floors. Since passing these directly into functions
     // will cause the references to be lost, clone them first, since Tile derives Clone.

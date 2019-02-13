@@ -3,8 +3,11 @@ use core::world::dungeon::map;
 pub mod structure;
 pub use self::structure::Structure;
 
+pub mod simple;
+pub use self::simple::Simple;
+
 ///
-/// `Automaton` trait to define a uniform set of behavior for dungeon generation
+/// `Filter` trait to define a uniform set of behavior for dungeon generation
 /// 
 pub trait Filter {
 
