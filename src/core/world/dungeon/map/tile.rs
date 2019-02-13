@@ -1,6 +1,6 @@
 use std::slice::Iter;
 
-use core::renderer::{Entity, RGB};
+use core::renderer::{Renderable, RGB};
 
 use std::fmt;
 
@@ -295,7 +295,7 @@ impl Tile {
 
 }
 
-impl Entity for Tile {
+impl Renderable for Tile {
 
   #[inline]
   fn get_bg(&self) -> RGB {
@@ -313,7 +313,7 @@ impl Entity for Tile {
   }
 
   #[inline]
-  fn get_name(&self) -> &'static str {
+  fn get_id(&self) -> &'static str {
     self.name.clone()
   }
 
@@ -333,7 +333,7 @@ impl Entity for Tile {
   }
 
   #[inline]
-  fn set_name(&mut self, name: &'static str) {
+  fn set_id(&mut self, name: &'static str) {
     self.name = name;
   }
 

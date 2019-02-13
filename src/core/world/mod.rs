@@ -15,7 +15,7 @@ use core::tcod::map::{Map, FovAlgorithm};
 
 use core::creature::{ai, Actions, Actor, Creature};
 
-use core::renderer::{Entity, RGB};
+use core::renderer::{Renderable, RGB};
 
 use core::log;
 

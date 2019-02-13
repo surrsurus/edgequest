@@ -3,10 +3,10 @@
 //!
 
 use core::world::dungeon::map::Pos;
-use core::renderer::{Entity, RGB};
+use core::renderer::{Renderable, RGB};
 
 ///
-/// Actor struct. Holds necessary properties that extend from `Entity`
+/// Actor struct. Holds necessary properties that extend from `Renderable`
 ///
 #[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct Actor {
@@ -74,9 +74,9 @@ impl Actor {
 }
 
 ///
-/// Implement the `Entity` trait for `Actor`, mostly just getters and setters
+/// Implement the `Renderable` trait for `Actor`, mostly just getters and setters
 ///
-impl Entity for Actor {
+impl Renderable for Actor {
 
   #[inline]
   fn get_bg(&self) -> RGB {
@@ -94,7 +94,7 @@ impl Entity for Actor {
   }
 
   #[inline]
-  fn get_name(&self) -> &'static str {
+  fn get_id(&self) -> &'static str {
     self.name.clone()
   }
 
@@ -114,7 +114,7 @@ impl Entity for Actor {
   }
 
   #[inline]
-  fn set_name(&mut self, name: &'static str) {
+  fn set_id(&mut self, name: &'static str) {
     self.name = name;
   }
 

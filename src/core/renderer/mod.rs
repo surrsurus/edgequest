@@ -19,8 +19,8 @@ use core::world::dungeon::Dungeon;
 // Used to expliclty reference constants
 use core::world::dungeon::map::{tile, Pos, Tile};
 
-mod entity;
-pub use self::entity::Entity;
+mod renderable;
+pub use self::renderable::Renderable;
 
 // Use camera privately
 mod camera;
@@ -204,7 +204,7 @@ impl Renderer {
   ///
   /// Draw creatures with "transparent" backgrounds
   ///
-  fn draw_creature(&self, con: &mut console::Root, pos: Pos, ce: &Entity, world: &World) {
+  fn draw_creature(&self, con: &mut console::Root, pos: Pos, ce: &Renderable, world: &World) {
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
 
@@ -227,9 +227,9 @@ impl Renderer {
   }
 
   ///
-  /// Put an `Entity` on the console
+  /// Put an `Renderable` on the console
   ///
-  fn draw_entity(&self, con: &mut console::Root, pos: Pos, ce: &Entity) {
+  fn draw_entity(&self, con: &mut console::Root, pos: Pos, ce: &Renderable) {
 
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
@@ -370,7 +370,7 @@ impl Renderer {
     con.print(
       (self.screen.x - self.panel_width + 1) as i32,
       7,
-      format!("{}: {}", "Tile", tile.get_name())
+      format!("{}: {}", "Tile", tile.get_id())
     );
 
     // Floor number

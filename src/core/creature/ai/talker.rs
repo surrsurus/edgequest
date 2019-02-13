@@ -5,7 +5,7 @@ use core::log;
 
 use core::world::dungeon::map::{self, Tile};
 
-use core::renderer::Entity;
+use core::renderer::Renderable;
 
 use core::creature::ai::{AI, TALK_DISTANCE};
 use core::creature::{Actions, Creature, Actor, Stats};

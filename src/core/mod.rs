@@ -38,7 +38,7 @@ use core::world::dungeon::map::Pos;
 // Game objects
 //
 // Objects are essentially what most game-related non-map entities can be boiled down to. Objects encompass
-// the very building blocks of the game such as `Pos`itions, `Creature`s which are combinations of `Actor`s, `Entity`s,
+// the very building blocks of the game such as `Pos`itions, `Creature`s which are combinations of `Actor`s, `Renderable`s,
 // and `Action`s, and AI patterns that help drive monster descicion making.
 //
 // Object is public so that docs are generated for it

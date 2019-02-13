@@ -5,7 +5,7 @@
 extern crate rand;
 use self::rand::Rng;
 
-use core::renderer::{Entity, RGB};
+use core::renderer::{Renderable, RGB};
 
 pub mod map;
 use self::map::{tile, Pos, Tile};
