@@ -3,10 +3,10 @@ use self::rand::Rng;
 
 use core::renderer::RGB;
 
-use core::world::dungeon::filter::Filter;
+use super::Filter;
 
-use core::world::dungeon::map::construct::{Corr, Rect};
-use core::world::dungeon::map::{Grid, Pos, tile, Tile};
+use super::map::construct::{Corr, Rect};
+use super::map::{Grid, Pos, tile, Tile};
 
 ///
 /// Simple dungeon builder
