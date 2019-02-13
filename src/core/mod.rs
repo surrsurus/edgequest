@@ -10,7 +10,7 @@
 extern crate tcod;
 // We use tcod here to create the root console (to give it to the renderer) and to grab inputs from the player
 use self::tcod::{console, Console};
-use core::tcod::input;
+use self::tcod::input;
 
 // The game log
 //
@@ -32,8 +32,8 @@ use self::log::GlobalLog;
 // World is public so that docs are generated for it
 pub mod world;
 // Import world directly so we can make instances of it
-use core::world::World;
-use core::world::dungeon::map::Pos;
+use self::world::World;
+use self::world::dungeon::map::Pos;
 
 // Game objects
 //
@@ -45,7 +45,7 @@ use core::world::dungeon::map::Pos;
 pub mod creature;
 // While normally this module most likely should not have access to objects, we need to see `Action`s as the player's
 // choices changes the state of the game
-use core::creature::actions::Actions;
+use self::creature::actions::Actions;
 
 // Renderer
 //
