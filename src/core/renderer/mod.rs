@@ -120,7 +120,7 @@ impl Renderer {
         // Iterate over scents, context of what scent it is isn't necessary
         for s in 0..tile::Scent::Num as usize {
           if dungeon[x][y].scents[s].val > 0 {
-            self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
+            self.draw_renderable(con, Pos::new(x as isize, y as isize), &Tile::new(
               "Debug Scent",
               ' ',
               RGB(255, 255, 255),
@@ -149,7 +149,7 @@ impl Renderer {
           dungeon[x][y].sound as u8
         );
         if dungeon[x][y].sound > 0 {
-          self.draw_entity(con, Pos::new(x as isize, y as isize), &Tile::new(
+          self.draw_renderable(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Sound",
             ' ',
             RGB(255, 255, 255),
@@ -229,7 +229,7 @@ impl Renderer {
   ///
   /// Put an `Renderable` on the console
   ///
-  fn draw_entity(&self, con: &mut console::Root, pos: Pos, ce: &Renderable) {
+  fn draw_renderable(&self, con: &mut console::Root, pos: Pos, ce: &Renderable) {
 
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
@@ -418,7 +418,7 @@ impl Renderer {
             }
 
             // Draw a tile slightly more vibrant than it actually is to emulate torchlight
-            self.draw_entity(con, Pos::from_usize(x, y), &yellowish(&world.floor.dun[x][y]));
+            self.draw_renderable(con, Pos::from_usize(x, y), &yellowish(&world.floor.dun[x][y]));
 
             // Mark tile as seen if it's in the FoV
             world.floor.dun[x][y].seen = true;
@@ -428,14 +428,14 @@ impl Renderer {
           // And the tile has been seen...
           else if world.floor.dun[x][y].seen {
             // Draw a tile, but darker
-            self.draw_entity(con, Pos::from_usize(x, y), &darken(&world.floor.dun[x][y]));
+            self.draw_renderable(con, Pos::from_usize(x, y), &darken(&world.floor.dun[x][y]));
           }
 
         }
 
         // [Debug] Otherwise just draw all tiles normally
         else {
-          self.draw_entity(con, Pos::new(x as isize, y as isize), &world.floor.dun[x][y]);
+          self.draw_renderable(con, Pos::new(x as isize, y as isize), &world.floor.dun[x][y]);
         }
         
       }
