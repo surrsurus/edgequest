@@ -1,6 +1,6 @@
 use core::world::dungeon::map::{self, Tile};
 
-use core::creature::ai::AI;
+use super::AI;
 use core::creature::{Actions, Creature, Actor, Stats};
 
 ///

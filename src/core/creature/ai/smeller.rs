@@ -3,7 +3,7 @@ use self::rand::Rng;
 
 use core::world::dungeon::map::{self, tile, Tile};
 
-use core::creature::ai::{AI, RANDOM_TRIES};
+use super::{AI, RANDOM_TRIES};
 use core::creature::{Actions, Creature, Actor, Stats};
 
 ///
