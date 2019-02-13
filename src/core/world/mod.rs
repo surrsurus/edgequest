@@ -194,7 +194,7 @@ impl World {
   }
 
   ///
-  /// Return a new player `Entity`
+  /// Return a new player `Creature`
   ///
   #[inline]
   fn new_player() -> Creature {

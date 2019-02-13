@@ -17,7 +17,7 @@
 pub use core::renderer::RGB;
 
 /// 
-/// Holds a position and a character.
+/// Holds a position, a character, colors, and a name.
 /// 
 pub trait Entity {
 

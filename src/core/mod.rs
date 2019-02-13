@@ -1,5 +1,5 @@
 //! 
-//! Hold the `Game` struct and the `play()` function
+//! A game engine based around a state machine
 //! 
 
 // tcod
@@ -80,9 +80,9 @@ pub mod init;
 pub enum State {
   // Game just created
   New,
-  // Player acted
+  // All possible player actions are also valid states for the game to be in
   Act(Actions),
-  // Key was pressed
+  // A key was pressed
   Keypress,
   // Debug command was triggered
   Debug
@@ -102,7 +102,7 @@ pub struct Engine {
   ren: Renderer,
   root: console::Root,
 
-  // Debug
+  // Debug options the engine tracks
   noclip: bool
 
 }
@@ -131,6 +131,7 @@ impl Engine {
           let oldpos = self.world.player.actor.pos.clone();
 
           // In addition, update the game state
+          // Important so that if the game state becomes debug we can leave that state instantly
           self.state = State::Keypress;
 
           // Begin to pattern match the char corresponding to the key pressed
@@ -409,7 +410,7 @@ impl Engine {
     // Some starting messages, will be removed in later versions (hopefully)
     log!(("Welcome to Edgequest",                 RGB(255,   0, 255)));
     log!(("Move with vim keys",                   RGB(255, 255, 255)));
-    log!(("esc to quit, w to regenerate",         RGB(255, 255, 255)));
+    log!(("esc to quit, w to regenerate the map", RGB(255, 255, 255)));
     log!(("r to toggle scent, t to toggle sound", RGB(255, 255, 255)));
     log!(("f to toggle FoV, z to toggle noclip",  RGB(255, 255, 255)));
 
