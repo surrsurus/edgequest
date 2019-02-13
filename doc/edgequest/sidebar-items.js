@@ -1,1 +1,1 @@
-initSidebarItems({"macro":[["log","This macro automates the log mutex process. This whole thing is pretty crazy Oviously if any panics occur here then the mutex becomes poisoned"]],"mod":[["core","Hold the `Game` struct and the `play()` function"]]});
+initSidebarItems({"macro":[["log","This macro automates the log mutex process. This whole thing is pretty crazy Oviously if any panics occur here then the mutex becomes poisoned"]],"mod":[["core","A game engine based around a state machine"]]});

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Actor","Actor struct. Holds necessary properties that extend from `Entity`"]]});
+initSidebarItems({"struct":[["Actor","Actor struct. Holds necessary properties that extend from `Renderable`"]]});

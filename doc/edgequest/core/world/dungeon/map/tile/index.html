@@ -1,149 +1,16 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `tile` mod in crate `edgequest`."><meta name="keywords" content="rust, rustlang, rust-lang, tile"><title>edgequest::core::world::dungeon::map::tile - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../../light.css" id="themeStyle"><script src="../../../../../../storage.js"></script></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><p class='location'>Module tile</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../../index.html'>edgequest</a>::<wbr><a href='../../../../index.html'>core</a>::<wbr><a href='../../../index.html'>world</a>::<wbr><a href='../../index.html'>dungeon</a>::<wbr><a href='../index.html'>map</a></p><script>window.sidebarCurrent = {name: 'tile', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../../../../settings.html"><img src="../../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../../../../../src/edgequest/core/world/dungeon/map/tile.rs.html#1-340' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../../index.html'>edgequest</a>::<wbr><a href='../../../../index.html'>core</a>::<wbr><a href='../../../index.html'>world</a>::<wbr><a href='../../index.html'>dungeon</a>::<wbr><a href='../index.html'>map</a>::<wbr><a class="mod" href=''>tile</a></span></h1><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct.Tile.html"
-                                  title='struct edgequest::core::world::dungeon::map::tile::Tile'>Tile</a></td>
-                           <td class='docblock-short'>
-                                <p>Tile represents an environmental entity</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="struct" href="struct._Scent.html"
-                                  title='struct edgequest::core::world::dungeon::map::tile::_Scent'>_Scent</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Biome.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Biome'>Biome</a></td>
-                           <td class='docblock-short'>
-                                <p>Tiles have biomes</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.DownStair.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::DownStair'>DownStair</a></td>
-                           <td class='docblock-short'>
-                                <p>Up/Down stairs have types</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Floor.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Floor'>Floor</a></td>
-                           <td class='docblock-short'>
-                                <p>Floors have types</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Props.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Props'>Props</a></td>
-                           <td class='docblock-short'>
-                                <p>Properties</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Scent.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Scent'>Scent</a></td>
-                           <td class='docblock-short'>
-                                <p>Scents</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Stair.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Stair'>Stair</a></td>
-                           <td class='docblock-short'>
-                                <p>Stairs have types</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Trap.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Trap'>Trap</a></td>
-                           <td class='docblock-short'>
-                                <p>Traps have types</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Traversability.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Traversability'>Traversability</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Type.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Type'>Type</a></td>
-                           <td class='docblock-short'>
-                                <p>Tiles have types</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.UpStair.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::UpStair'>UpStair</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Visibility.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Visibility'>Visibility</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="enum" href="enum.Wall.html"
-                                  title='enum edgequest::core::world::dungeon::map::tile::Wall'>Wall</a></td>
-                           <td class='docblock-short'>
-                                <p>Walls have types</p>
-
-                           </td>
-                       </tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
-<table>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.generic_floor.html"
-                                  title='fn edgequest::core::world::dungeon::map::tile::generic_floor'>generic_floor</a></td>
-                           <td class='docblock-short'>
-                                <p>Archetypal floor patterns</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.generic_wall.html"
-                                  title='fn edgequest::core::world::dungeon::map::tile::generic_wall'>generic_wall</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.opaque.html"
-                                  title='fn edgequest::core::world::dungeon::map::tile::opaque'>opaque</a></td>
-                           <td class='docblock-short'>
-                                <p>Tile type helper functions</p>
-
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.spawnable.html"
-                                  title='fn edgequest::core::world::dungeon::map::tile::spawnable'>spawnable</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class="fn" href="fn.walkable.html"
-                                  title='fn edgequest::core::world::dungeon::map::tile::walkable'>walkable</a></td>
-                           <td class='docblock-short'>
-                                
-                           </td>
-                       </tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../../";window.currentCrate = "edgequest";</script><script src="../../../../../../aliases.js"></script><script src="../../../../../../main.js"></script><script defer src="../../../../../../search-index.js"></script></body></html>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `tile` mod in crate `edgequest`."><meta name="keywords" content="rust, rustlang, rust-lang, tile"><title>edgequest::core::world::dungeon::map::tile - Rust</title><link rel="stylesheet" type="text/css" href="../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../../../light.css" id="themeStyle"><script src="../../../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../../..//index.html'><img src='../../../../../../rust-logo.png' alt='logo' width='100'></a><p class='location'>Module tile</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><p class='location'><a href='../../../../../index.html'>edgequest</a>::<wbr><a href='../../../../index.html'>core</a>::<wbr><a href='../../../index.html'>world</a>::<wbr><a href='../../index.html'>dungeon</a>::<wbr><a href='../index.html'>map</a></p><script>window.sidebarCurrent = {name: 'tile', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../../../settings.html"><img src="../../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../../../../../../src/edgequest/core/world/dungeon/map/tile.rs.html#1-340' title='goto source code'>[src]</a></span><span class='in-band'>Module <a href='../../../../../index.html'>edgequest</a>::<wbr><a href='../../../../index.html'>core</a>::<wbr><a href='../../../index.html'>world</a>::<wbr><a href='../../index.html'>dungeon</a>::<wbr><a href='../index.html'>map</a>::<wbr><a class="mod" href=''>tile</a></span></h1><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table><tr class='module-item'><td><a class="struct" href="struct.Tile.html" title='edgequest::core::world::dungeon::map::tile::Tile struct'>Tile</a></td><td class='docblock-short'><p>Tile represents an environmental entity</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct._Scent.html" title='edgequest::core::world::dungeon::map::tile::_Scent struct'>_Scent</a></td><td class='docblock-short'></td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table><tr class='module-item'><td><a class="enum" href="enum.Biome.html" title='edgequest::core::world::dungeon::map::tile::Biome enum'>Biome</a></td><td class='docblock-short'><p>Tiles have biomes</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.DownStair.html" title='edgequest::core::world::dungeon::map::tile::DownStair enum'>DownStair</a></td><td class='docblock-short'><p>Up/Down stairs have types</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Floor.html" title='edgequest::core::world::dungeon::map::tile::Floor enum'>Floor</a></td><td class='docblock-short'><p>Floors have types</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Props.html" title='edgequest::core::world::dungeon::map::tile::Props enum'>Props</a></td><td class='docblock-short'><p>Properties</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Scent.html" title='edgequest::core::world::dungeon::map::tile::Scent enum'>Scent</a></td><td class='docblock-short'><p>Scents</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Stair.html" title='edgequest::core::world::dungeon::map::tile::Stair enum'>Stair</a></td><td class='docblock-short'><p>Stairs have types</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Trap.html" title='edgequest::core::world::dungeon::map::tile::Trap enum'>Trap</a></td><td class='docblock-short'><p>Traps have types</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.Traversability.html" title='edgequest::core::world::dungeon::map::tile::Traversability enum'>Traversability</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="enum" href="enum.Type.html" title='edgequest::core::world::dungeon::map::tile::Type enum'>Type</a></td><td class='docblock-short'><p>Tiles have types</p>
+</td></tr><tr class='module-item'><td><a class="enum" href="enum.UpStair.html" title='edgequest::core::world::dungeon::map::tile::UpStair enum'>UpStair</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="enum" href="enum.Visibility.html" title='edgequest::core::world::dungeon::map::tile::Visibility enum'>Visibility</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="enum" href="enum.Wall.html" title='edgequest::core::world::dungeon::map::tile::Wall enum'>Wall</a></td><td class='docblock-short'><p>Walls have types</p>
+</td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table><tr class='module-item'><td><a class="fn" href="fn.generic_floor.html" title='edgequest::core::world::dungeon::map::tile::generic_floor fn'>generic_floor</a></td><td class='docblock-short'><p>Archetypal floor patterns</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.generic_wall.html" title='edgequest::core::world::dungeon::map::tile::generic_wall fn'>generic_wall</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="fn" href="fn.opaque.html" title='edgequest::core::world::dungeon::map::tile::opaque fn'>opaque</a></td><td class='docblock-short'><p>Tile type helper functions</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.spawnable.html" title='edgequest::core::world::dungeon::map::tile::spawnable fn'>spawnable</a></td><td class='docblock-short'></td></tr><tr class='module-item'><td><a class="fn" href="fn.walkable.html" title='edgequest::core::world::dungeon::map::tile::walkable fn'>walkable</a></td><td class='docblock-short'></td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../../../../";window.currentCrate = "edgequest";</script><script src="../../../../../../aliases.js"></script><script src="../../../../../../main.js"></script><script defer src="../../../../../../search-index.js"></script></body></html>

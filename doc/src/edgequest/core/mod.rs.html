@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/core/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/core/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../..//index.html'><img src='../../../rust-logo.png' alt='logo' width='100'></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -439,9 +439,10 @@
 <span id="439">439</span>
 <span id="440">440</span>
 <span id="441">441</span>
+<span id="442">442</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! </span>
-<span class="doccomment">//! Hold the `Game` struct and the `play()` function</span>
+<span class="doccomment">//! A game engine based around a state machine</span>
 <span class="doccomment">//! </span>
 
 <span class="comment">// tcod</span>
@@ -480,7 +481,7 @@
 <span class="comment">// Game objects</span>
 <span class="comment">//</span>
 <span class="comment">// Objects are essentially what most game-related non-map entities can be boiled down to. Objects encompass</span>
-<span class="comment">// the very building blocks of the game such as `Pos`itions, `Creature`s which are combinations of `Actor`s, `Entity`s,</span>
+<span class="comment">// the very building blocks of the game such as `Pos`itions, `Creature`s which are combinations of `Actor`s, `Renderable`s,</span>
 <span class="comment">// and `Action`s, and AI patterns that help drive monster descicion making.</span>
 <span class="comment">//</span>
 <span class="comment">// Object is public so that docs are generated for it</span>
@@ -522,9 +523,9 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">State</span> {
   <span class="comment">// Game just created</span>
   <span class="ident">New</span>,
-  <span class="comment">// Player acted</span>
+  <span class="comment">// All possible player actions are also valid states for the game to be in</span>
   <span class="ident">Act</span>(<span class="ident">Actions</span>),
-  <span class="comment">// Key was pressed</span>
+  <span class="comment">// A key was pressed</span>
   <span class="ident">Keypress</span>,
   <span class="comment">// Debug command was triggered</span>
   <span class="ident">Debug</span>
@@ -544,7 +545,7 @@
   <span class="ident">ren</span>: <span class="ident">Renderer</span>,
   <span class="ident">root</span>: <span class="ident">console</span>::<span class="ident">Root</span>,
 
-  <span class="comment">// Debug</span>
+  <span class="comment">// Debug options the engine tracks</span>
   <span class="ident">noclip</span>: <span class="ident">bool</span>
 
 }
@@ -573,6 +574,7 @@
           <span class="kw">let</span> <span class="ident">oldpos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">world</span>.<span class="ident">player</span>.<span class="ident">actor</span>.<span class="ident">pos</span>.<span class="ident">clone</span>();
 
           <span class="comment">// In addition, update the game state</span>
+          <span class="comment">// Important so that if the game state becomes debug we can leave that state instantly</span>
           <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Keypress</span>;
 
           <span class="comment">// Begin to pattern match the char corresponding to the key pressed</span>
@@ -851,7 +853,7 @@
     <span class="comment">// Some starting messages, will be removed in later versions (hopefully)</span>
     <span class="macro">log</span><span class="macro">!</span>((<span class="string">&quot;Welcome to Edgequest&quot;</span>,                 <span class="ident">RGB</span>(<span class="number">255</span>,   <span class="number">0</span>, <span class="number">255</span>)));
     <span class="macro">log</span><span class="macro">!</span>((<span class="string">&quot;Move with vim keys&quot;</span>,                   <span class="ident">RGB</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)));
-    <span class="macro">log</span><span class="macro">!</span>((<span class="string">&quot;esc to quit, w to regenerate&quot;</span>,         <span class="ident">RGB</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)));
+    <span class="macro">log</span><span class="macro">!</span>((<span class="string">&quot;esc to quit, w to regenerate the map&quot;</span>, <span class="ident">RGB</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)));
     <span class="macro">log</span><span class="macro">!</span>((<span class="string">&quot;r to toggle scent, t to toggle sound&quot;</span>, <span class="ident">RGB</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)));
     <span class="macro">log</span><span class="macro">!</span>((<span class="string">&quot;f to toggle FoV, z to toggle noclip&quot;</span>,  <span class="ident">RGB</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)));
 
@@ -881,4 +883,4 @@
   }
 
 }</pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g. <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g. <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g. <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "edgequest";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script defer src="../../../search-index.js"></script></body></html>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "edgequest";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
