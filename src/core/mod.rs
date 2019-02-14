@@ -254,7 +254,7 @@ impl Engine {
                     self.world.player.state = Actions::Unknown;
                   // Otherwise if the position is valid check to see if there's stuff on the tile
                   } else {
-                    self.world.check_trap();
+                    // Empty for right now
                   }
 
                 }

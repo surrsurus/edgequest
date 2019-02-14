@@ -3,7 +3,7 @@
 
 # Dimensions of screen in characters
 screen_width: 115
-screen_height: 50
+screen_height: 40
 
 # Dimensions of map in characters
 map_width: 89

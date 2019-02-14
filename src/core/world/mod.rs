@@ -244,6 +244,13 @@ impl World {
   }
 
   ///
+  /// Check for dead creatures
+  /// 
+  pub fn check_death(&mut self) {
+    self.floor.creatures.retain( |creature| creature.state != Actions::Die )
+  }
+
+  ///
   /// Check to see if a tile is a trap
   /// 
   /// Should only be called after checking tile validity to avoid OOB errors
@@ -310,6 +317,54 @@ impl World {
 
       },
       _ => {}
+    }
+
+    // Did a creature step on a trap
+    for creature in &mut self.floor.creatures {
+      match &self.floor.dun[creature.actor.pos].tiletype.clone() {
+        // We only care about traps, and this matches every trap
+        tile::Type::Trap(trap) => {
+          // Match the type of trap
+          match trap {
+
+            // Not sure how this affects monsters
+            tile::Trap::MemoryLoss => {},
+
+            // Fall down a floor or three
+            tile::Trap::Shaft => {
+
+              log!(("You hear a trap door open!", RGB(200, 50, 20)));
+              
+              // Not sure what to do with the creature here...
+              creature.state = Actions::Die;
+
+            },
+
+            // Turn creature a new color
+            tile::Trap::PaintBomb => {
+
+              let mut rng = rand::thread_rng();
+
+              let col = RGB(rng.gen_range(1, 255), rng.gen_range(1, 255), rng.gen_range(1, 255));
+
+              log!(("You hear an explosion!", RGB(100, 100, 100)));
+
+              creature.actor.set_fg(col);
+
+            }
+
+            // Move randomly on map
+            tile::Trap::Teleport => {
+
+              log!(("You hear the hum of a teleporter!", RGB(50, 127, 200)));
+
+              creature.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
+
+            }
+          }
+        }
+        _ => ()
+      }
     }
 
   }
@@ -684,7 +739,9 @@ impl World {
     for creature in &mut self.floor.creatures {
       creature.take_turn(&self.floor.dun.grid, &self.player)
     }
+    self.check_trap();
     self.update_sound();
+    self.check_death();
     // self.debug_show_mem();
   }
 
