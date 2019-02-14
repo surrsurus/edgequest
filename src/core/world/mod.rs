@@ -183,14 +183,7 @@ impl World {
   /// Create a basic dungeon for testing
   ///
   fn create_test_dungeon(map_dim: Pos) -> Dungeon {
-
-    let mut dun = Dungeon::new(map_dim);
-
-    // Build is a void method so we do it separately
-    dun.build();
-
-    return dun;
-
+    return Dungeon::new(map_dim).build();
   }
 
   ///
@@ -330,7 +323,7 @@ impl World {
             // Not sure how this affects monsters
             tile::Trap::MemoryLoss => {},
 
-            // Fall down a floor or three
+            // Fall down and die I guess
             tile::Trap::Shaft => {
 
               log!(("You hear a trap door open!", RGB(200, 50, 20)));
@@ -377,9 +370,7 @@ impl World {
   /// so maybe it's not important to have needless code?
   ///
   pub fn get_bg_color_at(&self, pos: Pos) -> RGB {
-
     self.floor.dun[pos].get_bg()
-
   }
 
   ///
@@ -608,29 +599,30 @@ impl World {
       // Return an f32 value that is the average value of `Scent`s surrounding the desired position, with a slight decay factor
       // This is not a "true" average of all neighboring `Scent`s.
       let avg_of_neighbors = |x: usize, y: usize| -> f32 {
+
         // Add all tile values
         (
-        buffer[x - 1][  y  ].scents[scent_type_idx].val as f32 +
-        buffer[x + 1][  y  ].scents[scent_type_idx].val as f32 +
-        buffer[  x  ][y - 1].scents[scent_type_idx].val as f32 +
-        buffer[  x  ][y + 1].scents[scent_type_idx].val as f32 +
-        buffer[x + 1][y + 1].scents[scent_type_idx].val as f32 +
-        buffer[x - 1][y - 1].scents[scent_type_idx].val as f32 +
-        buffer[x + 1][y - 1].scents[scent_type_idx].val as f32 +
-        buffer[x - 1][y + 1].scents[scent_type_idx].val as f32
+          buffer[x - 1][  y  ].scents[scent_type_idx].val as f32 +
+          buffer[x + 1][  y  ].scents[scent_type_idx].val as f32 +
+          buffer[  x  ][y - 1].scents[scent_type_idx].val as f32 +
+          buffer[  x  ][y + 1].scents[scent_type_idx].val as f32 +
+          buffer[x + 1][y + 1].scents[scent_type_idx].val as f32 +
+          buffer[x - 1][y - 1].scents[scent_type_idx].val as f32 +
+          buffer[x + 1][y - 1].scents[scent_type_idx].val as f32 +
+          buffer[x - 1][y + 1].scents[scent_type_idx].val as f32
         ) /
 
         // Divide by num tiles present, to get the average
         // Add some value to reduce size of bloom
         (((
-        filter(&buffer[x - 1][  y  ]) +
-        filter(&buffer[x + 1][  y  ]) +
-        filter(&buffer[  x  ][y - 1]) +
-        filter(&buffer[  x  ][y + 1]) +
-        filter(&buffer[x + 1][y + 1]) +
-        filter(&buffer[x - 1][y - 1]) +
-        filter(&buffer[x + 1][y - 1]) +
-        filter(&buffer[x - 1][y + 1]
+          filter(&buffer[x - 1][  y  ]) +
+          filter(&buffer[x + 1][  y  ]) +
+          filter(&buffer[  x  ][y - 1]) +
+          filter(&buffer[  x  ][y + 1]) +
+          filter(&buffer[x + 1][y + 1]) +
+          filter(&buffer[x - 1][y - 1]) +
+          filter(&buffer[x + 1][y - 1]) +
+          filter(&buffer[x - 1][y + 1]
         )) + SC_BLOOM_CUTOFF)
 
         // Decay factor
@@ -665,18 +657,18 @@ impl World {
 
     // Create initial bloom around player
     match &self.player.state {
-        &Actions::Move => {
-          let px = self.player.actor.pos.x;
-          let py = self.player.actor.pos.y;
-          for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
-            for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
-              if self.is_valid_pos(px - nx, py - ny) {
-                self.get_mut_tile_at(px - nx, py - ny).sound = SO_INC - ((dist(&self.player.actor, px - nx, py - ny)) * (SO_DIAM / 2)) as u8;
-              }
+      &Actions::Move => {
+        let px = self.player.actor.pos.x;
+        let py = self.player.actor.pos.y;
+        for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
+          for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
+            if self.is_valid_pos(px - nx, py - ny) {
+              self.get_mut_tile_at(px - nx, py - ny).sound = SO_INC - ((dist(&self.player.actor, px - nx, py - ny)) * (SO_DIAM / 2)) as u8;
             }
           }
-        },
-        _ => {},
+        }
+      },
+      _ => {},
     }
 
     // Save information about creatures
