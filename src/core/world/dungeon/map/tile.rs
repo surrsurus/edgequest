@@ -281,11 +281,11 @@ impl Tile {
       biome: Biome::Dungeon,
       // Create scents by iterating over ScentTypes
       scents: {
-        let mut sv = vec![];
-        for s in Scent::iterator() {
-          sv.push(_Scent::new(0, s.clone()));
+        let mut scent_vec = vec![];
+        for scent in Scent::iterator() {
+          scent_vec.push(_Scent::new(0, scent.clone()));
         }
-        sv
+        scent_vec
       },
       sound: 0,
       tiletype: tiletype,

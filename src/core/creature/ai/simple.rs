@@ -1,4 +1,5 @@
 extern crate rand;
+
 use self::rand::Rng;
 
 use core::world::dungeon::map::{self, tile, Tile};

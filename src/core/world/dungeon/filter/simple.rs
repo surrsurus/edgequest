@@ -47,16 +47,16 @@ impl Simple {
 
       let x: isize = rng.gen_range(1, self.w as isize - 2);
       let y: isize = rng.gen_range(1, self.h as isize - 2);
-      let l: isize = rng.gen_range(5, 20);
+      let h: isize = rng.gen_range(5, 20);
       let w: isize = rng.gen_range(5, 20);
 
       // Check bounds
-      if w + x >= self.w as isize|| l + y >= self.h as isize {
+      if w + x >= self.w as isize|| h + y >= self.h as isize {
         continue;
       } else {
-        let r = Rect::new(x, y, l, w);
-        self.build_rect(&r, grid);
-        self.rooms.push(r);
+        let rect = Rect::new(x, y, h, w);
+        self.build_rect(&rect, grid);
+        self.rooms.push(rect);
       }
       
     }
@@ -101,10 +101,10 @@ impl Simple {
   /// 
   /// Build a rectangle to the grid
   /// 
-  fn build_rect(&mut self, r: &Rect, grid: &mut Grid<Tile>) {
-    for w in 0..r.w {
-      for l in 0..r.l {
-        grid[(w + r.x) as usize][(l + r.y) as usize] = self.floor.clone();
+  fn build_rect(&mut self, rect: &Rect, grid: &mut Grid<Tile>) {
+    for w in 0..rect.w {
+      for h in 0..rect.h {
+        grid[(w + rect.x) as usize][(h + rect.y) as usize] = self.floor.clone();
       }
     }
   }
@@ -119,25 +119,25 @@ impl Simple {
   /// 
   fn connect_rooms(&mut self, grid: &mut Grid<Tile>) {
 
-    for r in 0..self.rooms.len() - 1 {
+    for room_idx in 0..self.rooms.len() - 1 {
 
-      let c1 : Pos;
-      let c2 : Pos;
+      let start : Pos;
+      let end : Pos;
 
       // Wrap around
-      if r == self.rooms.len() - 1 {
+      if room_idx == self.rooms.len() - 1 {
 
-        c1 = self.rooms[r].center().clone();
-        c2 = self.rooms[0].center().clone();
+        start = self.rooms[room_idx].center().clone();
+        end = self.rooms[0].center().clone();
 
       } else {  
 
-        c1 = self.rooms[r].center().clone();
-        c2 = self.rooms[r + 1].center().clone();
+        start = self.rooms[room_idx].center().clone();
+        end = self.rooms[room_idx + 1].center().clone();
 
       }
 
-      self.build_corr(&Corr::new(c1, c2), grid);
+      self.build_corr(&Corr::new(start, end), grid);
 
     }
 
@@ -150,7 +150,7 @@ impl Simple {
   pub fn new(grid: &Grid<Tile>) -> Self {
 
     // Make a new dungeon with our fresh grid of size `w` by `h`
-    let s = Simple { 
+    let simple = Simple { 
       rooms: Vec::<Rect>::new(), 
       w: grid.len(), 
       h: grid[0].len(),
@@ -158,7 +158,7 @@ impl Simple {
       floor: Tile::new("Floor", ' ', RGB(7, 7, 7),  RGB(0, 0, 0), tile::Type::Floor(tile::Floor::Normal))
     };
     
-    return s;
+    return simple;
 
   }
 

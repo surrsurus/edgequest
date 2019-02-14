@@ -8,7 +8,7 @@ use core::world::dungeon::map::Pos;
 /// 
 /// * `x` - x coordinate
 /// * `y` - y coordinate
-/// * `l` - Length of room (y-axis)
+/// * `h` - Height of room (y-axis)
 /// * `w` - Width of room (x-axis)
 /// 
 /// Note: Has no way of determining by itself whether or not it is out of bounds
@@ -18,7 +18,7 @@ use core::world::dungeon::map::Pos;
 pub struct Rect {
   pub x: isize,
   pub y: isize,
-  pub l: isize,
+  pub h: isize,
   pub w: isize,
 }
 
@@ -31,7 +31,7 @@ impl Rect {
   pub fn center(&self) -> Pos {
     Pos::from_tup((
       (self.w / 2) + self.x, 
-      (self.l / 2) + self.y
+      (self.h / 2) + self.y
     ))
   }
 
@@ -44,13 +44,13 @@ impl Rect {
   /// let r = Rect::new(10, 5, 20, 20);
   /// assert_eq!(r.x, 10);
   /// assert_eq!(r.y, 5);
-  /// assert_eq!(r.l, 20);
+  /// assert_eq!(r.h, 20);
   /// assert_eq!(r.w, 20);
   /// ```
   /// 
   #[inline]
-  pub fn new(x: isize, y: isize, l: isize, w: isize) -> Self {
-    Rect { x: x, y: y, l: l, w: w }
+  pub fn new(x: isize, y: isize, h: isize, w: isize) -> Self {
+    Rect { x: x, y: y, h: h, w: w }
   }
   
 }

@@ -43,8 +43,18 @@ use core::creature::{Actions, Creature, Actor, Stats};
 ///
 /// Represents basic actions AI can take in the game
 /// 
-/// An AI is a trait because we want all AI to follow a similar pattern and thus be Boxable and able to be given
-/// to `Creature`s. Thus, all AI patterns are trait objects.
+/// AIs are intended to be used as trait objects. The idea is that creatures are given some boxed
+/// AI object to hold. This object is then guaranteed to have a `take_turn()` function, meaning
+/// that all creatures have a uniform way of taking a turn without needing to know the exact AI
+/// implementation.
+/// 
+/// This gives us the primary advantage of being able to swap AI objects out at will, and also allow
+/// AIs to track data about themselves such as turns spent asleep, turns spent confused, etc. AIs really are just
+/// the state deciders for creatures, and thus the implementation of the creature's AI and their actual codified data
+/// are separate entities, which is a good thing.
+/// 
+/// This concept of using trait objects for their unified function is similar to abstract classes in other languages,
+/// and directly creates a pseudo ECS system since AI is now simply a component of a creature.
 ///
 pub trait AI {
 
@@ -62,10 +72,8 @@ pub trait AI {
   /// Determine if the AI has gone out of bounds with respect to the given map
   ///
   fn is_oob(&mut self, x: isize, y: isize, map: &map::Grid<Tile>) -> bool { 
-    if x < 0 || y < 0 || y >= (map[0].len() - 1) as isize || x >= (map.len() - 1) as isize {
-      return true;
-    }
-    return false;
+    // Check for below map (< 0) and above map (> map.len() - 1)
+    x < 0 || y < 0 || y >= (map[0].len() - 1) as isize || x >= (map.len() - 1) as isize
   }
 
   ///

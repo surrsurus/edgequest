@@ -64,10 +64,10 @@ impl Log {
   ///
   /// Get a range of the last n items added to the log
   /// 
-  /// The intention of this is that the range is the interated over, and then used as indexes
+  /// The intention of this is that the range is the interated over, and then used as indices
   /// to read the log data
   ///
-  pub fn get_latest_range(&self, n: usize) -> &[(&'static str, RGB)] {
+  pub fn get_last_n_messages(&self, n: usize) -> &[(&'static str, RGB)] {
     // Basically if there are n items in the log, but we want to get > n items, we
     // should make sure rust doesn't have some sort of underflow error
     if n > self.data.len() {
@@ -80,8 +80,8 @@ impl Log {
   ///
   /// Push new data onto the log stack
   ///
-  pub fn push(&mut self, s: (&'static str, RGB)) {
-    self.data.push(s);
+  pub fn push(&mut self, message: (&'static str, RGB)) {
+    self.data.push(message);
   }
 }
 

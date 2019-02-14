@@ -1,10 +1,9 @@
 extern crate rand;
+
 use self::rand::Rng;
 
 use core::log;
-
 use core::world::dungeon::map::{self, Tile};
-
 use core::renderer::Renderable;
 
 use super::{AI, TALK_DISTANCE};

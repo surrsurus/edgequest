@@ -91,7 +91,7 @@ pub struct World {
 impl World {
 
   ///
-  /// Create a set of creatures for testing
+  /// Create a set of creatures for testing. 100% temporary
   ///
   fn create_test_creatures(g: &map::Grid<Tile>) -> Vec<Box<Creature>> {
     
@@ -184,12 +184,12 @@ impl World {
   ///
   fn create_test_dungeon(map_dim: Pos) -> Dungeon {
 
-    let mut d = Dungeon::new(map_dim);
+    let mut dun = Dungeon::new(map_dim);
 
     // Build is a void method so we do it separately
-    d.build();
+    dun.build();
 
-    return d;
+    return dun;
 
   }
 
@@ -220,8 +220,8 @@ impl World {
       }
     }
 
-    let tm = World::new_tcod_map(self.floor.dun.get_bounds_pos(), &self.floor.dun);
-    self.tcod_map = tm;
+    let tcod_map = World::new_tcod_map(self.floor.dun.get_bounds_pos(), &self.floor.dun);
+    self.tcod_map = tcod_map;
 
     self.floor.creatures = Vec::new();
 
@@ -234,15 +234,12 @@ impl World {
   /// Check to see if a specific position is valid, i.e. tile::walkable and in the map bounds
   ///
   pub fn is_valid_pos(&self, x: isize, y: isize) -> bool {
+    
+    // Conversion to usize
+    let ux = x as usize;
+    let uy = y as usize;
 
-    let tx = x as usize;
-    let ty = y as usize;
-
-    if tx > 0 && tx < self.floor.dun.width - 1 && ty > 0 && ty < self.floor.dun.height - 1 && tile::walkable(&self.floor.dun[tx][ty]) {
-      return true;
-    } else {
-      return false;
-    }
+    return ux > 0 && ux < self.floor.dun.width - 1 && uy > 0 && uy < self.floor.dun.height - 1 && tile::walkable(&self.floor.dun[ux][uy]);
 
   }
 
@@ -288,9 +285,9 @@ impl World {
           // Turn creature a new color
           tile::Trap::PaintBomb => {
 
-            let mut r = rand::thread_rng();
+            let mut rng = rand::thread_rng();
 
-            let col = RGB(r.gen_range(1, 255), r.gen_range(1, 255), r.gen_range(1, 255));
+            let col = RGB(rng.gen_range(1, 255), rng.gen_range(1, 255), rng.gen_range(1, 255));
 
             log!(("It's a paint bomb!", RGB(100, 100, 100)));
 
@@ -390,22 +387,27 @@ impl World {
   }
 
   ///
-  /// Temporary function for stair traversal. In the future floors will need to be saved
+  /// Temporary function for stair traversal
   ///
   pub fn test_traverse(&mut self) {
+    
+    // Create floor var
+    let floor;
 
-    let f;
+    // If the floor number that we are on is not a floor in the stack,
+    // we need to add a new floor to the stack
     if self.floor_num > self.floor_stack.len() - 1 {
-      let d = World::create_test_dungeon(self.floor.dun.get_bounds_pos());
-      let g = d.grid.clone();
-      let c = World::create_test_creatures(&g);
-      f = Floor::new(d, c);
-      self.floor_stack.push(f.clone());
+      let dun = World::create_test_dungeon(self.floor.dun.get_bounds_pos());
+      let grid = dun.grid.clone();
+      let creatures = World::create_test_creatures(&grid);
+      floor = Floor::new(dun, creatures);
+      self.floor_stack.push(floor.clone());
+    // Otherwise the floor already exists in the stack and can be brought out
     } else {
-      f = self.floor_stack[self.floor_num].clone();
+      floor = self.floor_stack[self.floor_num].clone();
     }
 
-    self.floor = f;
+    self.floor = floor;
 
     self.tcod_map = World::new_tcod_map(self.floor.dun.get_bounds_pos(), &self.floor.dun);
 
@@ -421,20 +423,20 @@ impl World {
   /// Return a tcod map based on dungeon features (Essentially what walls you can walk and see through)
   ///
   pub fn new_tcod_map(map_dim: Pos, dungeon: &Dungeon) -> Map {
-    let mut tm = Map::new(map_dim.x as i32, map_dim.y as i32);
+    let mut tcod_map = Map::new(map_dim.x as i32, map_dim.y as i32);
 
     // Fill the map in based on what blocks are tile::opaque
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
         if tile::opaque(&dungeon[x][y]) {
-          tm.set(x as i32, y as i32, false, false);
+          tcod_map.set(x as i32, y as i32, false, false);
         } else {
-          tm.set(x as i32, y as i32, true, true);
+          tcod_map.set(x as i32, y as i32, true, true);
         }
       }
     }
 
-    return tm;
+    return tcod_map;
 
   }
 
@@ -446,27 +448,27 @@ impl World {
 
     // Create a basic dungeon, tcod map from that dungeon, and a grid we can
     // put test creatures on.
-    let d = World::create_test_dungeon(map_dim);
-    let g = d.grid.clone();
-    let tm =  World::new_tcod_map(map_dim, &d);
+    let dun = World::create_test_dungeon(map_dim);
+    let grid = dun.grid.clone();
+    let tcod_map =  World::new_tcod_map(map_dim, &dun);
 
-    let floor = Floor::new(d, World::create_test_creatures(&g));
+    let floor = Floor::new(dun, World::create_test_creatures(&grid));
 
     let mut floor_stack = Vec::new();
     floor_stack.push(floor.clone());
 
-    let mut w = World {
+    let mut world = World {
       player: World::new_player(),
       floor: floor,
       floor_stack: floor_stack,
       floor_num: 0,
-      tcod_map: tm
+      tcod_map: tcod_map
     };
 
-    w.player.actor.pos = Dungeon::get_valid_location(&w.floor.dun.grid);
-    w.update_fov();
+    world.player.actor.pos = Dungeon::get_valid_location(&world.floor.dun.grid);
+    world.update_fov();
 
-    return w;
+    return world;
 
   }
 
@@ -486,15 +488,16 @@ impl World {
   fn update_scent(&mut self) {
 
     // Create initial bloom around player
-    let px = self.player.actor.pos.x;
-    let py = self.player.actor.pos.y;
-    for nx in SC_DIAM_LOWER..SC_DIAM_UPPER {
-      for ny in SC_DIAM_LOWER..SC_DIAM_UPPER {
-        if self.is_valid_pos(px - nx, py - ny) {
-          for s in &mut self.get_mut_tile_at(px - nx, py - ny).scents {
-            match s.scent_type {
+    let player_x = self.player.actor.pos.x;
+    let player_y = self.player.actor.pos.y;
+
+    for x in SC_DIAM_LOWER..SC_DIAM_UPPER {
+      for y in SC_DIAM_LOWER..SC_DIAM_UPPER {
+        if self.is_valid_pos(player_x - x, player_y - y) {
+          for scent in &mut self.get_mut_tile_at(player_x - x, player_y - y).scents {
+            match scent.scent_type {
               tile::Scent::Player => {
-                s.val = SC_INC
+                scent.val = SC_INC
               }
               _ => {}
             }
@@ -504,28 +507,27 @@ impl World {
     }
 
     // Save information about creatures
-    // We can't do a self.get_tile_at due to the fact we iterate over a &self
-    // but need a &mut self for that function.
     let mut cinf = vec![];
-    for c in &self.floor.creatures {
-      let cx = c.actor.pos.x;
-      let cy = c.actor.pos.y;
-      let st = c.stats.scent_type.clone();
-      cinf.push((cx, cy, st));
+    for creature in &self.floor.creatures {
+      let creature_x = creature.actor.pos.x;
+      let creature_y = creature.actor.pos.y;
+      let scent_type = creature.stats.scent_type.clone();
+      cinf.push((creature_x, creature_y, scent_type));
     }
 
-    // For pair in creature information
-    for p in &cinf {
+    // For tuple in creature information
+    for tuple in &cinf {
       // Unpack
-      let cx = p.0;
-      let cy = p.1;
-      let st = &p.2;
-      for nx in SC_DIAM_LOWER..SC_DIAM_UPPER {
-        for ny in SC_DIAM_LOWER..SC_DIAM_UPPER {
-          if self.is_valid_pos(cx - nx, cy - ny) {
-            for s in &mut self.get_mut_tile_at(cx - nx, cy - ny).scents {
-              if &s.scent_type == st {
-                s.val = SC_INC
+      let creature_x = tuple.0;
+      let creature_y = tuple.1;
+      let scent_type = &tuple.2;
+
+      for x in SC_DIAM_LOWER..SC_DIAM_UPPER {
+        for y in SC_DIAM_LOWER..SC_DIAM_UPPER {
+          if self.is_valid_pos(creature_x - x, creature_y - y) {
+            for scent in &mut self.get_mut_tile_at(creature_x - x, creature_y - y).scents {
+              if &scent.scent_type == scent_type {
+                scent.val = SC_INC
               }
             }
           }
@@ -539,13 +541,13 @@ impl World {
     // because we never change it
     let buffer = self.floor.dun.grid.clone();
 
-    for s in 0..tile::Scent::Num as usize {
+    for scent_type_idx in 0..tile::Scent::Num as usize {
 
       let filter = |tile: &Tile| -> f32 {
         // So, interestingly, if a tile has no scent and is given 0.0 scent after the filter,
         // it creates square scents that travel further, though for some reason a 0.1 value there creates
         // very nice circular scents... I assume this is due to averages now being fuzzy in terms of accuracy?
-        if tile.scents[s].val == 0 { 0.1 } else { 1.0 }
+        if tile.scents[scent_type_idx].val == 0 { 0.1 } else { 1.0 }
       };
 
       // Return an f32 value that is the average value of `Scent`s surrounding the desired position, with a slight decay factor
@@ -553,14 +555,14 @@ impl World {
       let avg_of_neighbors = |x: usize, y: usize| -> f32 {
         // Add all tile values
         (
-        buffer[x - 1][  y  ].scents[s].val as f32 +
-        buffer[x + 1][  y  ].scents[s].val as f32 +
-        buffer[  x  ][y - 1].scents[s].val as f32 +
-        buffer[  x  ][y + 1].scents[s].val as f32 +
-        buffer[x + 1][y + 1].scents[s].val as f32 +
-        buffer[x - 1][y - 1].scents[s].val as f32 +
-        buffer[x + 1][y - 1].scents[s].val as f32 +
-        buffer[x - 1][y + 1].scents[s].val as f32
+        buffer[x - 1][  y  ].scents[scent_type_idx].val as f32 +
+        buffer[x + 1][  y  ].scents[scent_type_idx].val as f32 +
+        buffer[  x  ][y - 1].scents[scent_type_idx].val as f32 +
+        buffer[  x  ][y + 1].scents[scent_type_idx].val as f32 +
+        buffer[x + 1][y + 1].scents[scent_type_idx].val as f32 +
+        buffer[x - 1][y - 1].scents[scent_type_idx].val as f32 +
+        buffer[x + 1][y - 1].scents[scent_type_idx].val as f32 +
+        buffer[x - 1][y + 1].scents[scent_type_idx].val as f32
         ) /
 
         // Divide by num tiles present, to get the average
@@ -584,7 +586,7 @@ impl World {
       for x in 0..self.floor.dun.width {
         for y in 0..self.floor.dun.height {
           if self.is_valid_pos(x as isize, y as isize) {
-            self.floor.dun[x][y].scents[s].val = avg_of_neighbors(x, y) as u8;
+            self.floor.dun[x][y].scents[scent_type_idx].val = avg_of_neighbors(x, y) as u8;
           }
         }
       }
@@ -679,8 +681,8 @@ impl World {
   pub fn update(&mut self) {
     self.update_fov();
     self.update_scent();
-    for c in &mut self.floor.creatures {
-      c.take_turn(&self.floor.dun.grid, &self.player)
+    for creature in &mut self.floor.creatures {
+      creature.take_turn(&self.floor.dun.grid, &self.player)
     }
     self.update_sound();
     // self.debug_show_mem();

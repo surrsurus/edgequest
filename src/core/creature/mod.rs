@@ -30,7 +30,7 @@ pub struct Creature {
   pub stats: Stats,
   pub state: Actions,
   // Q: Wait, an AI trait object is clonable?
-  // A: A *Boxed* AI trait object is clonable.
+  // A: A *Boxed* AI trait object is clonable, as pointers to objects are clonable
   pub ai: Box<ai::AI>
 }
 

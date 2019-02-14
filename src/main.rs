@@ -5,9 +5,28 @@
 //! of things I want to be in the game, but so far it's a pretty great tech demo of
 //! interesting modern roguelike mechanics.
 //! 
-//! Edgequest leverages rust's fantastic type system to create game systems that are extendable,
-//! modifiable, and (relatively) straightforward while remaining safe and fast. A lot of the core logic
-//! uses the haskell-esque pattern matching to drive the descision making.
+//! The overarching design philosophy of edgequest is to treat the smallest 'atomic' elements as
+//! state machines, where the phrase 'atomic' is simply refering to the fact they cannot be broken down any smaller
+//! than they currently are. These state machines can then interact by the interfaces that own them, and be
+//! processed into complex events and patterns.
+//! 
+//! While this does make things more straightforward conceptually, the implementation is very non-intuitive.
+//! Creatures and tiles are currently the smallest atomic objects with state (though creature is made of several component parts).
+//! Creatures manipulate their state via their AI and the world struct handles their interactions with other atomic elements and the
+//! various other stimuli present. This means that the world really a high-level construct, rather than the very base that one would assume
+//! creatures to interact with. In short, the world owns the creatures, and the creatures own their state.
+//! 
+//! The player is also a creature, but their state is modified and maintained at the highest level possible at the engine to
+//! process key events through tcod, but can still be accessed via the world.
+//! 
+//! Ultimately, this process is very much a top-down approach, and this has it's advantages as it
+//! allows us to avoid a lot of ownership issues traditional OO causes, as objects are manipulated from top-down,
+//! but also introduces the strange way of doing things currently.
+//! 
+//! Edgequest does not use a traditional ECS for managing entities and their components, a pseudo ECS arises from
+//! from the rust type system and it's powerful match syntax. Entities have states and properties which are both enums, meaning that
+//! the world can simply match these enums to functionality. Properties can be added and removed from creatures and tiles easily and on the fly,
+//! and adding new ones is also trivial provided the relevant matches are updated.
 //! 
 
 // Local imports for all game files

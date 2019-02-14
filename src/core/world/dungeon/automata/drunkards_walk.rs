@@ -40,7 +40,7 @@ impl Automaton for DrunkardsWalk {
 
     // Get our starting x and y
 
-    let mut spos = self.unwrap_pos(grid, pos);
+    let mut starting_pos = self.unwrap_pos(grid, pos);
     
     // Store old dice positions. Initialize with whatever
     let mut old_dice = self.get_d4();
@@ -63,25 +63,25 @@ impl Automaton for DrunkardsWalk {
       }
 
       match dice {
-        1 => spos.x += 1,
-        2 => spos.x -= 1,
-        3 => spos.y += 1,
-        4 => spos.y -= 1,
+        1 => starting_pos.x += 1,
+        2 => starting_pos.x -= 1,
+        3 => starting_pos.y += 1,
+        4 => starting_pos.y -= 1,
         _ => unreachable!("DrunkardsWalk - Unreachable dice state reached in movement")
       }
 
       // Place pos inbounds
-      self.place_inbounds(grid, &mut spos);
+      self.place_inbounds(grid, &mut starting_pos);
 
       // Determine what to do based on if `find` is present
       match find.clone() {
         Some(find) => {
-          if grid[spos] == find.clone() {
-            grid[spos] = replace.clone();
+          if grid[starting_pos] == find.clone() {
+            grid[starting_pos] = replace.clone();
           }
         },
         None => {
-          grid[spos] = replace.clone();
+          grid[starting_pos] = replace.clone();
         }
       }
 
