@@ -222,6 +222,7 @@ impl World {
     self.tcod_map = tcod_map;
 
     self.floor.creatures = Vec::new();
+    self.floor.items =     Vec::new();
 
     self.player.actor.pos.x = (self.floor.dun.width / 2) as isize;
     self.player.actor.pos.y = (self.floor.dun.height / 2) as isize;

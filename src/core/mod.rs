@@ -472,7 +472,6 @@ impl Engine {
       log!(("r to toggle scent, t to toggle sound",     RGB(255, 150, 150)));
       log!(("f to toggle FoV, z to toggle noclip",      RGB(255, 150, 150)));
     }
-    
 
     // Initial update
     self.update();
