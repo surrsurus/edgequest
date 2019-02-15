@@ -254,6 +254,12 @@ impl World {
   ///
   pub fn check_items(&mut self) {
 
+    // Don't repeat if we already know what's under foot
+    match self.player.state {
+      Actions::Wait | Actions::Die | Actions::Unknown | Actions::UpStair | Actions::DownStair => return,
+      _ => ()
+    }
+
     // Get all items on the same tile as the player
     let items_at_feet = self.floor.items.iter().filter(|item| item.pos == self.player.actor.pos);
 
