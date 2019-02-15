@@ -94,3 +94,10 @@ pub fn console_height() -> isize {
 pub fn panel_width() -> isize {
   return CFG.panel_width;
 }
+
+///
+/// Get wizard mode
+///
+pub fn wizard() -> bool {
+  return CFG.wizard;
+}

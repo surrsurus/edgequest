@@ -40,3 +40,6 @@ fontlayout: "AsciiInRow"
 # * GLSL
 # * OpenGL
 renderer: "OpenGL"
+
+# Wizard mode
+wizard: true

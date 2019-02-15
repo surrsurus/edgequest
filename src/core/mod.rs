@@ -360,7 +360,7 @@ impl Engine {
 
       // Debug 
       noclip: false,
-      wizard: true
+      wizard: init::wizard()
 
     }
     
