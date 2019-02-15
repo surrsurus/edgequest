@@ -252,7 +252,7 @@ impl Engine {
                   if !self.world.is_valid_pos(self.world.player.actor.pos.x, self.world.player.actor.pos.y) && !self.noclip {
                     self.world.player.actor.pos = oldpos;
                     self.world.player.state = Actions::Unknown;
-                  // Otherwise if the position is valid check to see if there's stuff on the tile
+                  // Otherwise if the position is valid...
                   } else {
                     // Empty for right now
                   }
@@ -269,11 +269,9 @@ impl Engine {
         } 
         
         // Prints keycode to console in case if you're trying to find a key that isn't intutive, or you're debugging
-        /* 
-        else {
-          println!("{:?}", keypress.code);
-        }
-        */
+        // else {
+        //   println!("{:?}", keypress.code);
+        // }
 
       }
 

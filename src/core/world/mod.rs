@@ -553,16 +553,16 @@ impl World {
     }
 
     // Save information about creatures
-    let mut cinf = vec![];
+    let mut creature_information = vec![];
     for creature in &self.floor.creatures {
       let creature_x = creature.actor.pos.x;
       let creature_y = creature.actor.pos.y;
       let scent_type = creature.stats.scent_type.clone();
-      cinf.push((creature_x, creature_y, scent_type));
+      creature_information.push((creature_x, creature_y, scent_type));
     }
 
     // For tuple in creature information
-    for tuple in &cinf {
+    for tuple in &creature_information {
       // Unpack
       let creature_x = tuple.0;
       let creature_y = tuple.1;
@@ -651,7 +651,8 @@ impl World {
       tile.sound = 0;
     }
 
-    let dist = |obj: &Actor, x: isize, y: isize| -> isize {
+    // Distance function
+    let distance = |obj: &Actor, x: isize, y: isize| -> isize {
       (((obj.pos.x - x).pow(2) + (obj.pos.y - y).pow(2)) as f32).sqrt().floor() as isize
     };
 
@@ -663,7 +664,7 @@ impl World {
         for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
           for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
             if self.is_valid_pos(px - nx, py - ny) {
-              self.get_mut_tile_at(px - nx, py - ny).sound = SO_INC - ((dist(&self.player.actor, px - nx, py - ny)) * (SO_DIAM / 2)) as u8;
+              self.get_mut_tile_at(px - nx, py - ny).sound = SO_INC - ((distance(&self.player.actor, px - nx, py - ny)) * (SO_DIAM / 2)) as u8;
             }
           }
         }
@@ -674,37 +675,40 @@ impl World {
     // Save information about creatures
     // We can't do a self.get_tile_at due to the fact we iterate over a &self
     // but need a &mut self for that function.
-    let mut cinf = vec![];
-    for c in &self.floor.creatures {
-      let cx = c.actor.pos.x;
-      let cy = c.actor.pos.y;
-      let f = c.actor.clone();
-      let s = c.state.clone();
-      cinf.push((cx, cy, f, s));
+    let mut creature_information = vec![];
+    for creature in &self.floor.creatures {
+      let x = creature.actor.pos.x;
+      let y = creature.actor.pos.y;
+      let actor = creature.actor.clone();
+      let state = creature.state.clone();
+      creature_information.push((x, y, actor, state));
     }
 
     // For pair in creature information
-    for p in &cinf {
+    for tuple in &creature_information {
       // Unpack
-      let cx = p.0;
-      let cy = p.1;
-      let f = &p.2;
-      let s = &p.3;
-      match s {
+      let creature_x = tuple.0;
+      let creature_y = tuple.1;
+      let actor = &tuple.2;
+      let state = &tuple.3;
+
+      match state {
+
         &Actions::Move => {
-          for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
-            for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
-              if self.is_valid_pos(cx - nx, cy - ny) {
-                self.get_mut_tile_at(cx - nx, cy - ny).sound = SO_INC - ((dist(&f, cx - nx, cy - ny)) * (SO_DIAM / 2)) as u8;
+          for x in SO_DIAM_LOWER..SO_DIAM_UPPER {
+            for y in SO_DIAM_LOWER..SO_DIAM_UPPER {
+              if self.is_valid_pos(creature_x - x, creature_y - y) {
+                self.get_mut_tile_at(creature_x - x, creature_y - y).sound = SO_INC - ((distance(&actor, creature_x - x, creature_y - y)) * (SO_DIAM / 2)) as u8;
               }
             }
           }
         },
+
         &Actions::Talk => {
-          for nx in SO_DIAM_LOWER-2..SO_DIAM_UPPER+2 {
-            for ny in SO_DIAM_LOWER-2..SO_DIAM_UPPER+2 {
-              if self.is_valid_pos(cx - nx, cy - ny) {
-                self.get_mut_tile_at(cx - nx, cy - ny).sound = SO_INC - ((dist(&f, cx - nx, cy - ny)) * (SO_DIAM / 2)) as u8;
+          for x in SO_DIAM_LOWER-2..SO_DIAM_UPPER+2 {
+            for y in SO_DIAM_LOWER-2..SO_DIAM_UPPER+2 {
+              if self.is_valid_pos(creature_x - x, creature_y - y) {
+                self.get_mut_tile_at(creature_x - x, creature_y - y).sound = SO_INC - ((distance(&actor, creature_x - x, creature_y - y)) * (SO_DIAM / 2)) as u8;
               }
             }
           }
