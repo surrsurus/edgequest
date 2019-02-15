@@ -471,6 +471,7 @@ impl Engine {
       log!(("w to regenerate the map, q to destroy it", RGB(255, 150, 150)));
       log!(("r to toggle scent, t to toggle sound",     RGB(255, 150, 150)));
       log!(("f to toggle FoV, z to toggle noclip",      RGB(255, 150, 150)));
+      log!(("Ascend and descend anywhere with < and >", RGB(255, 150, 150)));
     }
 
     // Initial update
