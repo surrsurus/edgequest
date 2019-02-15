@@ -101,7 +101,7 @@ impl Dungeon {
   ///
   /// Make the dungeon
   ///
-  pub fn build(&mut self) {
+  pub fn build(mut self) -> Self {
 
     // The purpose of this function is to create some basic grid object, 
     // and completely fill it out into a dungeon.
@@ -504,6 +504,9 @@ impl Dungeon {
     // suddenly vanished.
     // Don't delete.
     self.grid = grid;
+
+    // Return self
+    return self;
 
   }
 

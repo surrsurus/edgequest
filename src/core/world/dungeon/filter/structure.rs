@@ -5,11 +5,11 @@ use self::rand::Rng;
 use std::io::prelude::*;
 use std::fs;
 
-use core::world::dungeon::filter::Filter;
-
-use core::world::dungeon::map::{self, tile, Tile};
 
 use core::renderer::RGB;
+
+use super::Filter;
+use core::world::dungeon::map::{self, tile, Tile};
 
 ///
 /// Structure placer
@@ -36,24 +36,24 @@ impl Structure {
     let mut file = fs::File::open(rng.choose(&paths).unwrap()).unwrap();
 
     // Create empty string and read to it
-    let mut s = String::new();
-    file.read_to_string(&mut s).unwrap();
+    let mut string = String::new();
+    file.read_to_string(&mut string).unwrap();
 
     // Prepare method to store data read from file
     let mut strct : map::Grid<Tile> = vec![];
     let mut line : Vec<Tile> = vec![];
 
     // Read file as characters
-    for c in s.chars() {
+    for ch in string.chars() {
       // If not a newline
-      if c != '\n' {
+      if ch != '\n' {
         // Match tile based on character
         let tile = {
-          match c {
+          match ch {
             '#' => Tile::new("Wall", ' ', RGB(40, 40, 40), RGB(33, 33, 33), tile::Type::Wall(tile::Wall::Normal)),
             '.' => Tile::new("Floor", ' ', RGB(27, 27, 27), RGB(20, 20, 20), tile::Type::Floor(tile::Floor::Normal)),
             '"' => Tile::new("Tall Grass", '"', RGB(76, 74, 75), RGB(20, 20, 20), tile::Type::TallGrass),
-            _ => panic!("Unknown character: {}", c)
+            _ => panic!("Unknown character: {}", ch)
           }
         };
         // Push character to the line

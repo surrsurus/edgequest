@@ -12,9 +12,7 @@ use std::char;
 use core::tcod::{Console, console};
 
 use core::GlobalLog;
-
 use core::world::World;
-
 use core::world::dungeon::Dungeon;
 // Used to expliclty reference constants
 use core::world::dungeon::map::{tile, Pos, Tile};
@@ -53,35 +51,35 @@ pub const YELLOW_FAC : RGB = RGB(27, 24, 22);
 ///
 /// Modify a tile's fg and bg color
 ///
-fn amplify_col(t: &Tile, factor: RGB) -> Tile {
-  let mut replace = t.clone();
-  replace.fg = t.fg + factor;
-  replace.bg = t.bg + factor;
+fn amplify_col(tile: &Tile, factor: RGB) -> Tile {
+  let mut replace = tile.clone();
+  replace.fg = tile.fg + factor;
+  replace.bg = tile.bg + factor;
   return replace;
 }
 
 ///
 /// Modify a tile's fg and bg color
 ///
-fn reduce_col(t: &Tile, factor: RGB) -> Tile {
-  let mut replace = t.clone();
-  replace.fg = t.fg - factor;
-  replace.bg = t.bg - factor;
+fn reduce_col(tile: &Tile, factor: RGB) -> Tile {
+  let mut replace = tile.clone();
+  replace.fg = tile.fg - factor;
+  replace.bg = tile.bg - factor;
   return replace;
 }
 
 ///
 /// Darken a tile's fg and bg color
 ///
-fn darken(t: &Tile) -> Tile {
-  reduce_col(t, DARKEN_FAC)
+fn darken(tile: &Tile) -> Tile {
+  reduce_col(tile, DARKEN_FAC)
 }
 
 ///
 /// Make a tile's fg and bg color more yellowish
 ///
-fn yellowish(t: &Tile) -> Tile {
-  amplify_col(t, YELLOW_FAC)
+fn yellowish(tile: &Tile) -> Tile {
+  amplify_col(tile, YELLOW_FAC)
 }
 
 ///
@@ -92,7 +90,6 @@ fn yellowish(t: &Tile) -> Tile {
 /// determining whether something should be drawn or not.
 ///
 pub struct Renderer {
-  // Camera object
   camera: Camera,
   screen: Pos,
   console_height: isize,
@@ -118,8 +115,8 @@ impl Renderer {
           dungeon[x][y].scents[2].val + 50 
         );
         // Iterate over scents, context of what scent it is isn't necessary
-        for s in 0..tile::Scent::Num as usize {
-          if dungeon[x][y].scents[s].val > 0 {
+        for scent_type in 0..tile::Scent::Num as usize {
+          if dungeon[x][y].scents[scent_type].val > 0 {
             self.draw_renderable(con, Pos::new(x as isize, y as isize), &Tile::new(
               "Debug Scent",
               ' ',
@@ -202,9 +199,58 @@ impl Renderer {
   }
 
   ///
-  /// Draw creatures with "transparent" backgrounds
+  /// Draw the log
   ///
-  fn draw_creature(&self, con: &mut console::Root, pos: Pos, ce: &Renderable, world: &World) {
+  /// We need to directly manipulate the GlobalLog object so here we use the mutex lock
+  ///
+  fn draw_log(&self, con: &mut console::Root) {
+
+    // Mutable reference to the mutex
+    let log = GlobalLog.lock().unwrap();
+
+    // Enumerate over the last few messages
+    for (idx, pair) in log.get_last_n_messages(self.console_height as usize).iter().enumerate() {
+      // Y value of text is determined by the index
+      let y = self.screen.y - ((log.get_last_n_messages(self.console_height as usize).len() as isize) - idx as isize);
+      // Color and string is determined by the content of the slice at that index
+      let color = pair.1;
+      let string = pair.0;
+      // They are then combined to render to the screen at a specific y axis such that the most
+      // recent message will appear at the bottom
+      con.set_default_foreground(color.to_tcod());
+      con.print(0, y as i32, string);
+    }
+
+    // Explicitly drop ref
+    drop(log);
+
+  }
+  
+  ///
+  /// Put an `Renderable` on the console
+  ///
+  fn draw_renderable(&self, con: &mut console::Root, pos: Pos, renderable: &Renderable) {
+
+    // Check if it's in the camera first
+    if !self.camera.is_in_camera(pos) { return }
+
+    // New pos with respect to camera
+    let pos = pos + self.camera.pos;
+
+    con.put_char_ex(
+      pos.x as i32,
+      pos.y as i32,
+      renderable.get_glyph(),
+      renderable.get_fg().to_tcod(),
+      renderable.get_bg().to_tcod()
+    );
+
+  }
+
+  ///
+  /// Draw renderables with "transparent" backgrounds
+  ///
+  fn draw_renderable_transparent(&self, con: &mut console::Root, pos: Pos, renderable: &Renderable, world: &World) {
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
 
@@ -214,8 +260,8 @@ impl Renderer {
     con.put_char_ex(
       npos.x as i32,
       npos.y as i32,
-      ce.get_glyph(),
-      ce.get_fg().to_tcod(),
+      renderable.get_glyph(),
+      renderable.get_fg().to_tcod(),
       // Backgrounds are just inherited from the world.
       if self.fov {
         (world.get_bg_color_at(pos) + YELLOW_FAC).to_tcod()
@@ -227,57 +273,9 @@ impl Renderer {
   }
 
   ///
-  /// Put an `Renderable` on the console
-  ///
-  fn draw_renderable(&self, con: &mut console::Root, pos: Pos, ce: &Renderable) {
-
-    // Check if it's in the camera first
-    if !self.camera.is_in_camera(pos) { return }
-
-    // New pos with respect to camera
-    let pos = pos + self.camera.pos;
-
-    con.put_char_ex(
-      pos.x as i32,
-      pos.y as i32,
-      ce.get_glyph(),
-      ce.get_fg().to_tcod(),
-      ce.get_bg().to_tcod()
-    );
-
-  }
-
-  ///
-  /// Draw the log
-  ///
-  /// We need to directly manipulate the GlobalLog object so here we use the mutex lock
-  ///
-  fn draw_log(&self, con: &mut console::Root) {
-
-    // Mutable reference to the mutex
-    let log = GlobalLog.lock().unwrap();
-
-    // Enumerate over the last few messages
-    for (i, pair) in log.get_latest_range(self.console_height as usize).iter().enumerate() {
-      // Y value of text is determined by the index
-      let y = self.screen.y - ((log.get_latest_range(self.console_height as usize).len() as isize) - i as isize);
-      // Color and string is determined by the content of the slice at that index
-      let color = pair.1;
-      let s = pair.0;
-      // They are then combined to render to the screen at a specific y axis such that the most
-      // recent message will appear at the bottom
-      con.set_default_foreground(color.to_tcod());
-      con.print(0, y as i32, s);
-    }
-
-    drop(log);
-
-  }
-  
-  ///
   /// Draw UI elements
   /// 
-  /// NOTE: This function is super basic and is intended to be revised/removed.Option
+  /// NOTE: This function is super basic and is intended to be revised/removed
   /// 
   fn draw_ui(&self, con: &mut console::Root, world: &mut World) {
     
@@ -346,17 +344,17 @@ impl Renderer {
     );
 
     // Scent of non-players
-    let mut npscent = 0;
-    for s in &tile.scents {
-      if &s.scent_type != &tile::Scent::Player { 
-        npscent += s.val; // BUG: Panics here with overflow
+    let mut non_player_scent = 0;
+    for scent in &tile.scents {
+      if &scent.scent_type != &tile::Scent::Player { 
+        non_player_scent += scent.val; // BUG: Panics here with overflow
       }
     }
 
     con.print(
       (self.screen.x - self.panel_width + 1) as i32,
       5,
-      format!("{}: {}", "Non-player Scent", npscent)
+      format!("{}: {}", "Non-player Scent", non_player_scent)
     );
 
     // Sound
@@ -379,6 +377,14 @@ impl Renderer {
       8,
       format!("{}: {}", "Floor", world.floor_num)
     );
+
+    // Wallet
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      9,
+      format!("{}: {}", "AU", world.player.wallet)
+    );
+
   }
 
   ///
@@ -407,7 +413,7 @@ impl Renderer {
         // If fov is on...
         if self.fov {
           // And it's in the FoV
-          if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
+          if world.tcod_map.is_in_fov(x as i32, y as i32) {
 
             // Update tile if possible
             match &world.floor.dun[x][y].tiletype {
@@ -441,6 +447,21 @@ impl Renderer {
       }
     }
 
+    // Draw items
+    for item in &world.floor.items {
+      // If fov is on...
+      if self.fov {
+        // And it's in the FoV
+        if world.tcod_map.is_in_fov(item.pos.x as i32, item.pos.y as i32) {
+          self.draw_renderable_transparent(con, item.pos, item, world);
+        }
+      } 
+      // [Debug] Otherwise just draw all tiles normally
+      else {
+        self.draw_renderable(con, item.pos, item);
+      }
+    }
+
     //
     // Debug options
     //
@@ -461,21 +482,21 @@ impl Renderer {
     // Draw creatures
     //
 
-    for c in &world.floor.creatures {
+    for creature in &world.floor.creatures {
       // If fov is on...
       if self.fov {
         // And its in the fov...
-        if world.tcod_map.is_in_fov(c.actor.pos.x as i32, c.actor.pos.y as i32) && self.fov {
-          self.draw_creature(con, c.actor.pos, &c.actor, world);
+        if world.tcod_map.is_in_fov(creature.actor.pos.x as i32, creature.actor.pos.y as i32) {
+          self.draw_renderable_transparent(con, creature.actor.pos, &creature.actor, world);
         }
       } else {
-        self.draw_creature(con, c.actor.pos, &c.actor, world);
+        self.draw_renderable_transparent(con, creature.actor.pos, &creature.actor, world);
       }
     }
 
     // Draw player. Player is always in the camera since
     // we move the camera over it.
-    self.draw_creature(con, world.player.actor.pos, &world.player.actor, world);
+    self.draw_renderable_transparent(con, world.player.actor.pos, &world.player.actor, world);
 
   }
 

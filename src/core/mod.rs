@@ -35,17 +35,18 @@ pub mod world;
 use self::world::World;
 use self::world::dungeon::map::Pos;
 
-// Game objects
+// Creatures
 //
-// Objects are essentially what most game-related non-map entities can be boiled down to. Objects encompass
-// the very building blocks of the game such as `Pos`itions, `Creature`s which are combinations of `Actor`s, `Renderable`s,
-// and `Action`s, and AI patterns that help drive monster descicion making.
+// Creatures are things like monsters
 //
-// Object is public so that docs are generated for it
 pub mod creature;
 // While normally this module most likely should not have access to objects, we need to see `Action`s as the player's
 // choices changes the state of the game
 use self::creature::actions::Actions;
+
+// Items
+pub mod item;
+use self::item::{ItemProperty, money_value};
 
 // Renderer
 //
@@ -57,8 +58,7 @@ use self::creature::actions::Actions;
 // Renderer is public so that docs are generated for it
 pub mod renderer;
 // We import the renderer to create instances of it and RGB so we can color some log outputs
-use self::renderer::Renderer;
-use self::renderer::RGB;
+use self::renderer::{Renderer, Renderable, RGB};
 
 // Initializer
 // 
@@ -101,8 +101,9 @@ pub struct Engine {
   state: State,
   ren: Renderer,
   root: console::Root,
-
+  
   // Debug options the engine tracks
+  wizard: bool,
   noclip: bool
 
 }
@@ -171,14 +172,42 @@ impl Engine {
               self.world.player.state = Actions::Move;
             },
 
+            // Pick up item
+            'g' => {
+              // Player pos
+              let player_pos = self.world.player.actor.pos.clone();
+              // Get items at players feet
+              // let items_at_feet = self.world.floor.items.iter().filter(|item| item.pos == self.world.player.actor.pos.clone());
+              for item in &self.world.floor.items {
+                if item.pos == player_pos {
+                  match item.property {
+                    ItemProperty::Money(ref tender) => self.world.player.wallet += money_value(&tender) * item.quantity as f32
+                  }
+                  if item.quantity > 1 {
+                    log!( (Box::leak(format!("You pick up {} {}s", item.quantity, item.get_id()).into_boxed_str()), item.get_fg()) );
+                  } else {
+                    log!( (Box::leak(format!("You pick up a {}", item.get_id()).into_boxed_str()), item.get_fg()) );
+                  }
+                }
+              }
+              // Prune picked up items
+              self.world.floor.items.retain( |item| item.pos != player_pos );
+            }
+
             // Force reload word
             'w' => {
-              self.world = World::new(Pos::from_tup(init::map_dimensions()));
+              if self.wizard {
+                log!(("You remold the earth like clay." , RGB(255, 0, 0)));
+                self.world = World::new(Pos::from_tup(init::map_dimensions()));
+              }
               self.state = State::Act(Actions::Unknown);
             },
             // Create an empty level for testing
             'q' => {
-              self.world.test_empty();
+              if self.wizard {
+                log!(("You empty the universe.", RGB(255, 0, 0)));
+                self.world.test_empty();
+              }
               self.state = State::Act(Actions::Unknown);
             },
             // Wait
@@ -195,28 +224,52 @@ impl Engine {
 
             // Toggle scent
             'r' => {
-              self.ren.show_scent = !self.ren.show_scent;
-              self.ren.draw_all(&mut self.root, &mut self.world);
+              if self.wizard {
+                match self.ren.show_scent {
+                  true => log!(("Your vision returns to normal.", RGB(255, 0, 0))),
+                  false => log!(("Your eyes percieve scent like light.", RGB(255, 0, 0)))
+                }
+                self.ren.show_scent = !self.ren.show_scent;
+                self.ren.draw_all(&mut self.root, &mut self.world);
+              }
               self.state = State::Debug;
             },
 
             // Toggle sound
             't' => {
-              self.ren.show_sound = !self.ren.show_sound;
-              self.ren.draw_all(&mut self.root, &mut self.world);
+              if self.wizard {
+                match self.ren.show_sound {
+                  true => log!(("Your vision returns to normal.", RGB(255, 0, 0))),
+                  false => log!(("Your eyes percieve sound like light.", RGB(255, 0, 0)))
+                }
+                self.ren.show_sound = !self.ren.show_sound;
+                self.ren.draw_all(&mut self.root, &mut self.world);
+              }
               self.state = State::Debug;
             },
 
             // Toggle FoV
             'f' => {
-              self.ren.fov = !self.ren.fov;
-              self.ren.draw_all(&mut self.root, &mut self.world);
+              if self.wizard {
+                match self.ren.fov {
+                  true => log!(("Your third eye closes, concealing the universe in fog.", RGB(255, 0, 0))),
+                  false => log!(("Your third eye opens, revealing the universe.", RGB(255, 0, 0)))
+                }
+                self.ren.fov = !self.ren.fov;
+                self.ren.draw_all(&mut self.root, &mut self.world);
+              }
               self.state = State::Debug;
             },
 
             // Toggle noclip
             'z' => {
-              self.noclip = !self.noclip;
+              if self.wizard {
+                match self.noclip {
+                  true => log!(("You form becomes tangible.", RGB(255, 0, 0))),
+                  false => log!(("Your form becomes ethereal.", RGB(255, 0, 0)))
+                }
+                self.noclip = !self.noclip;
+              }
               self.state = State::Debug;
             },
 
@@ -252,9 +305,9 @@ impl Engine {
                   if !self.world.is_valid_pos(self.world.player.actor.pos.x, self.world.player.actor.pos.y) && !self.noclip {
                     self.world.player.actor.pos = oldpos;
                     self.world.player.state = Actions::Unknown;
-                  // Otherwise if the position is valid check to see if there's stuff on the tile
+                  // Otherwise if the position is valid...
                   } else {
-                    self.world.check_trap();
+                    // Empty for right now
                   }
 
                 }
@@ -269,11 +322,9 @@ impl Engine {
         } 
         
         // Prints keycode to console in case if you're trying to find a key that isn't intutive, or you're debugging
-        /* 
-        else {
-          println!("{:?}", keypress.code);
-        }
-        */
+        // else {
+        //   println!("{:?}", keypress.code);
+        // }
 
       }
 
@@ -308,7 +359,8 @@ impl Engine {
       root: root,
 
       // Debug 
-      noclip: false
+      noclip: false,
+      wizard: init::wizard()
 
     }
     
@@ -328,6 +380,7 @@ impl Engine {
       State::Act(Actions::DownStair) => {
         // No clip through floors
         if self.noclip {
+          log!(("You lose your physicality, and sink into the floor.", RGB(255, 150, 150)));
           self.world.go_down();
         } else {
           self.world.player_go_down();
@@ -337,6 +390,7 @@ impl Engine {
       State::Act(Actions::UpStair) => {
         // No clip through floors
         if self.noclip {
+          log!(("You lose your physicality, and ascend through the cieling.", RGB(255, 150, 150)));
           self.world.go_up();
         } else {
           self.world.player_go_up();
@@ -410,9 +464,15 @@ impl Engine {
     // Some starting messages, will be removed in later versions (hopefully)
     log!(("Welcome to Edgequest",                 RGB(255,   0, 255)));
     log!(("Move with vim keys",                   RGB(255, 255, 255)));
-    log!(("esc to quit, w to regenerate the map", RGB(255, 255, 255)));
-    log!(("r to toggle scent, t to toggle sound", RGB(255, 255, 255)));
-    log!(("f to toggle FoV, z to toggle noclip",  RGB(255, 255, 255)));
+    log!(("esc to quit",                          RGB(255, 255, 255)));
+
+    if self.wizard {
+      log!(("You are in wizard mode",                   RGB(255,   0,   0)));
+      log!(("w to regenerate the map, q to destroy it", RGB(255, 150, 150)));
+      log!(("r to toggle scent, t to toggle sound",     RGB(255, 150, 150)));
+      log!(("f to toggle FoV, z to toggle noclip",      RGB(255, 150, 150)));
+      log!(("Ascend and descend anywhere with < and > while noclip is activated", RGB(255, 150, 150)));
+    }
 
     // Initial update
     self.update();

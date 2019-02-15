@@ -1,4 +1,5 @@
 extern crate rand;
+
 use self::rand::Rng;
 
 use core::world::dungeon::map::{self, tile, Tile};
@@ -34,7 +35,7 @@ impl AI for SmellerAI {
 
     let mut tx : isize = -1;
     let mut ty : isize = -1;
-    let mut val : isize = 0;
+    let mut scent_val : isize = 0;
 
     // Represents how far the ai can smell
     let mut scent_range = 2;
@@ -49,16 +50,16 @@ impl AI for SmellerAI {
       for sy in y-scent_range..y+scent_range {
         // Scents[1] refers to the insectoid smell via the c-like enum
         // not the best solution
-        if map[sx][sy].scents[1].val as isize > val && (sx, sy) != (x, y) { 
+        if map[sx][sy].scents[1].val as isize > scent_val && (sx, sy) != (x, y) { 
           tx = sx as isize; 
           ty = sy as isize; 
-          val = map[sx][sy].scents[1].val as isize;
+          scent_val = map[sx][sy].scents[1].val as isize;
         }
       }
     }
 
     // If a scent has been picked up behave like a tracker and move towards that tile
-    if val > 0 && val < 80{
+    if scent_val > 0 && scent_val < 80{
 
       // Move x
       if x < tx as usize {

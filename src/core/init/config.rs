@@ -67,7 +67,10 @@ pub struct Config {
   pub fontlayout: String,
 
   // Determines renderer to be used
-  pub renderer: String
+  pub renderer: String,
+
+  // Wizard mode
+  pub wizard: bool
 
 }
 

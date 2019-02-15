@@ -18,6 +18,7 @@ pub use self::stats::Stats;
 
 mod object_tests;
 
+use core::item::Item;
 use core::renderer::RGB;
 use core::world::dungeon::map::{self, Pos, tile, Tile};
 
@@ -29,9 +30,16 @@ pub struct Creature {
   pub actor: Actor,
   pub stats: Stats,
   pub state: Actions,
+
   // Q: Wait, an AI trait object is clonable?
-  // A: A *Boxed* AI trait object is clonable.
-  pub ai: Box<ai::AI>
+  // A: A *Boxed* AI trait object is clonable, as pointers to objects are clonable
+  pub ai: Box<ai::AI>,
+
+  // Items
+  // Hold money
+  pub wallet: f32,
+  // Hold other items
+  pub inventory: Vec<Item>
 }
 
 impl Creature {
@@ -62,7 +70,9 @@ impl Creature {
       actor: Actor::new(name, glyph, pos, fg, bg),
       stats: stats,
       state: Actions::Unknown,
-      ai: Box::new(ai)
+      ai: Box::new(ai),
+      wallet: 0.0,
+      inventory: vec![]
     }
   }
 

@@ -1,8 +1,7 @@
+use std::fmt;
 use std::slice::Iter;
 
 use core::renderer::{Renderable, RGB};
-
-use std::fmt;
 
 ///
 /// Tiles have types
@@ -166,13 +165,13 @@ pub enum Biome {
 
 // Implement ability to turn the enum into a string
 impl fmt::Display for Biome {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+  fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
     match *self {
-      Biome::Dungeon => write!(f, "Dungeon"),
-      Biome::Crypt => write!(f, "Crypt"),
-      Biome::Cave => write!(f, "Cave"),
-      Biome::Sunken => write!(f, "Sunken"),
-      Biome::Crystal => write!(f, "Crystal")
+      Biome::Dungeon => write!(fmt, "Dungeon"),
+      Biome::Crypt   => write!(fmt, "Crypt"),
+      Biome::Cave    => write!(fmt, "Cave"),
+      Biome::Sunken  => write!(fmt, "Sunken"),
+      Biome::Crystal => write!(fmt, "Crystal")
     }
   }
 }
@@ -198,18 +197,18 @@ pub enum Scent {
 
 // Implement ability to turn the enum into a string
 impl fmt::Display for Scent {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+  fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
     match *self {
-      Scent::Player => write!(f, "Player"),
-      Scent::Insectoid => write!(f, "Insectoid"),
-      Scent::Canine => write!(f, "Canine"),
-      Scent::Feline => write!(f, "Feline"),
-      Scent::Reptilian => write!(f, "Reptilian"),
-      Scent::Decay => write!(f, "Decay"),
-      Scent::Avian => write!(f, "Avian"),
-      Scent::Smoke => write!(f, "Smoke"),
-      Scent::Incense => write!(f, "Incense"),
-      Scent::Num => write!(f, "Num - Something wrong must have happened"),
+      Scent::Player    => write!(fmt, "Player"),
+      Scent::Insectoid => write!(fmt, "Insectoid"),
+      Scent::Canine    => write!(fmt, "Canine"),
+      Scent::Feline    => write!(fmt, "Feline"),
+      Scent::Reptilian => write!(fmt, "Reptilian"),
+      Scent::Decay     => write!(fmt, "Decay"),
+      Scent::Avian     => write!(fmt, "Avian"),
+      Scent::Smoke     => write!(fmt, "Smoke"),
+      Scent::Incense   => write!(fmt, "Incense"),
+      Scent::Num       => write!(fmt, "Num - Something wrong must have happened"),
     }
   }
 }
@@ -281,11 +280,11 @@ impl Tile {
       biome: Biome::Dungeon,
       // Create scents by iterating over ScentTypes
       scents: {
-        let mut sv = vec![];
-        for s in Scent::iterator() {
-          sv.push(_Scent::new(0, s.clone()));
+        let mut scent_vec = vec![];
+        for scent in Scent::iterator() {
+          scent_vec.push(_Scent::new(0, scent.clone()));
         }
-        sv
+        scent_vec
       },
       sound: 0,
       tiletype: tiletype,

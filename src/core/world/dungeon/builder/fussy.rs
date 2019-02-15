@@ -38,7 +38,7 @@ impl Fussy {
   pub fn new(grid: map::Grid<u8>, threshold: f32) -> Self {
 
     // Make a new dungeon with our fresh grid of size `w` by `h`
-    let f = Fussy { 
+    let fussy = Fussy { 
       grid: grid.clone(), 
       w: grid.len(), 
       h: grid[0].len(),
@@ -46,7 +46,7 @@ impl Fussy {
       threshold: threshold
     };
 
-    return f;
+    return fussy;
 
   }
 
