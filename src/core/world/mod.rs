@@ -13,7 +13,7 @@ use self::rand::Rng;
 
 use core::tcod::map::{Map, FovAlgorithm};
 
-use core::creature::{ai, Actions, Actor, Creature};
+use core::creature::{ai, Actions, Actor, Creature, Stats};
 
 use core::renderer::{Renderable, RGB};
 
@@ -47,16 +47,6 @@ const SC_DIAM : isize = 3;
 const SC_DIAM_UPPER : isize = ((SC_DIAM / 2) + 1);
 // Lower index for ranges
 const SC_DIAM_LOWER : isize = -(SC_DIAM / 2);
-
-// Sound value, needs to be based on type of sound
-const SO_INC : u8 = 100;
-
-// Diameter of sound travel
-const SO_DIAM : isize = 15;
-// Upper index for ranges
-const SO_DIAM_UPPER : isize = ((SO_DIAM / 2) + 1);
-// Lower index for ranges
-const SO_DIAM_LOWER : isize = -(SO_DIAM / 2);
 
 ///
 /// Represent a floor in the dungeon
@@ -104,7 +94,13 @@ impl World {
           'a',
           Dungeon::get_valid_location(g),
           RGB(150, 0, 0), RGB(0, 0, 0),
-          tile::Scent::Insectoid,
+          Stats::new(
+            0,
+            0,
+            0,
+            0,
+            tile::Scent::Insectoid
+          ),
           ai::SimpleAI::new()
         )
       )
@@ -117,7 +113,13 @@ impl World {
           'b',
           Dungeon::get_valid_location(g),
           RGB(150, 150, 0), RGB(0, 0, 0),
-          tile::Scent::Insectoid,
+          Stats::new(
+            0,
+            0,
+            0,
+            0,
+            tile::Scent::Insectoid
+          ),
           ai::SimpleAI::new()
         )
       )
@@ -130,7 +132,13 @@ impl World {
           'c',
           Dungeon::get_valid_location(g),
           RGB(150, 0, 150), RGB(0, 0, 0),
-          tile::Scent::Feline,
+          Stats::new(
+            0,
+            0,
+            0,
+            5,
+            tile::Scent::Feline
+          ),
           ai::TrackerAI::new()
         )
       )
@@ -143,7 +151,13 @@ impl World {
           'd',
           Dungeon::get_valid_location(g),
           RGB(150, 150, 150), RGB(0, 0, 0),
-          tile::Scent::Canine,
+          Stats::new(
+            0,
+            0,
+            0,
+            20,
+            tile::Scent::Canine
+          ),
           ai::BlinkAI::new()
         )
       )
@@ -156,7 +170,13 @@ impl World {
           '@',
           Dungeon::get_valid_location(g),
           RGB(200, 200, 200), RGB(0, 0, 0),
-          tile::Scent::Canine,
+          Stats::new(
+            0,
+            0,
+            0,
+            50,
+            tile::Scent::Canine
+          ),
           ai::TalkerAI::new()
         )
       )
@@ -169,7 +189,13 @@ impl World {
           'e',
           Dungeon::get_valid_location(g),
           RGB(50, 50, 200), RGB(0, 0, 0),
-          tile::Scent::Canine,
+          Stats::new(
+            0,
+            0,
+            0,
+            15,
+            tile::Scent::Canine
+          ),
           ai::SmellerAI::new()
         )
       )
@@ -203,7 +229,13 @@ impl World {
       '@',
       Pos::new(40, 25),
       RGB(255, 255, 255), RGB(0, 0, 0),
-      tile::Scent::Player,
+      Stats::new(
+        0,
+        0,
+        0,
+        20,
+        tile::Scent::Player
+      ),
       ai::PlayerAI::new()
     )
   }
@@ -589,81 +621,41 @@ impl World {
         }
       }
     }
-
   }
 
   ///
   /// Update the sound map
   /// 
-  fn update_sound(&mut self) {
-
-    // Remove all sound
-    for tile in self.floor.dun.grid.iter_mut().flatten() {
-      tile.sound = 0;
-    }
-
-    let dist = |obj: &Actor, x: isize, y: isize| -> isize {
-      (((obj.pos.x - x).pow(2) + (obj.pos.y - y).pow(2)) as f32).sqrt().floor() as isize
+  pub fn update_sound(&mut self) {
+    let dist = |pos: Pos, x: isize, y: isize| -> usize {
+      (((pos.x - x).pow(2) + (pos.y - y).pow(2)) as f32).sqrt().floor() as usize
     };
+    let mut sounds : Vec<(Pos, usize)> = vec![];
 
-    // Create initial bloom around player
-    match &self.player.state {
-        &Actions::Move => {
-          let px = self.player.actor.pos.x;
-          let py = self.player.actor.pos.y;
-          for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
-            for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
-              if self.is_valid_pos(px - nx, py - ny) {
-                self.get_mut_tile_at(px - nx, py - ny).sound = SO_INC - ((dist(&self.player.actor, px - nx, py - ny)) * (SO_DIAM / 2)) as u8;
-              }
-            }
-          }
-        },
-        _ => {},
+    sounds.append(&mut self.find_movement_sounds());
+    // Other sound generators go here
+
+    // Reset sound to 0
+    for x in 0..self.floor.dun.width {
+        for y in 0..self.floor.dun.height {
+          let mut tile = self.get_mut_tile_at(x as isize, y as isize);
+          tile.sound = 0;
+        }
     }
 
-    // Save information about creatures
-    // We can't do a self.get_tile_at due to the fact we iterate over a &self
-    // but need a &mut self for that function.
-    let mut cinf = vec![];
-    for c in &self.floor.creatures {
-      let cx = c.actor.pos.x;
-      let cy = c.actor.pos.y;
-      let f = c.actor.clone();
-      let s = c.state.clone();
-      cinf.push((cx, cy, f, s));
-    }
-
-    // For pair in creature information
-    for p in &cinf {
-      // Unpack
-      let cx = p.0;
-      let cy = p.1;
-      let f = &p.2;
-      let s = &p.3;
-      match s {
-        &Actions::Move => {
-          for nx in SO_DIAM_LOWER..SO_DIAM_UPPER {
-            for ny in SO_DIAM_LOWER..SO_DIAM_UPPER {
-              if self.is_valid_pos(cx - nx, cy - ny) {
-                self.get_mut_tile_at(cx - nx, cy - ny).sound = SO_INC - ((dist(&f, cx - nx, cy - ny)) * (SO_DIAM / 2)) as u8;
-              }
-            }
-          }
-        },
-        &Actions::Talk => {
-          for nx in SO_DIAM_LOWER-2..SO_DIAM_UPPER+2 {
-            for ny in SO_DIAM_LOWER-2..SO_DIAM_UPPER+2 {
-              if self.is_valid_pos(cx - nx, cy - ny) {
-                self.get_mut_tile_at(cx - nx, cy - ny).sound = SO_INC - ((dist(&f, cx - nx, cy - ny)) * (SO_DIAM / 2)) as u8;
-              }
-            }
+    // Expand each sound point-source
+    // Sound decrases in intensity proportional
+    // to the inverse of distance squared
+    for sound in sounds {
+      for x in 0..self.floor.dun.width {
+        for y in 0..self.floor.dun.height {
+          let mut tile = self.get_mut_tile_at(x as isize, y as isize);
+          if true {
+            tile.sound = tile.sound + (sound.1 / ((dist(sound.0, x as isize, y as isize) + 1).pow(2)));
           }
         }
-        _ => {}
       }
     }
-
   }
 
   ///
@@ -686,4 +678,22 @@ impl World {
     // self.debug_show_mem();
   }
 
+  fn find_movement_sounds(&mut self) -> Vec<(Pos, usize)> {
+    let mut sounds : Vec<(Pos, usize)> = vec![];
+    // Determine if the player made sound by moving
+    match &self.player.state {
+      Actions::Move => sounds.push((self.player.actor.pos, self.player.stats.weight)),
+      Actions::Talk => sounds.push((self.player.actor.pos, 25)),
+      _ => {}
+    }
+    // Determine if any creatures made sound by moving
+    for creature in &self.floor.creatures {
+      match &creature.state {
+        Actions::Move => sounds.push((creature.actor.pos, creature.stats.weight)),
+        Actions::Talk => sounds.push((creature.actor.pos, 25)),
+        _ => {}
+      }
+    }
+    return sounds;
+  }
 }

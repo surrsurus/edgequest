@@ -49,10 +49,18 @@ impl Creature {
   /// What I'm basically proposing is to first turn the game into a nature simulator first, and a game second
   ///
   #[inline]
-  pub fn new<T: ai::AI + 'static>(name: &'static str, glyph: char, pos: Pos, fg: RGB, bg: RGB, scent_type: tile::Scent, ai: T) -> Self {
+  pub fn new<T: ai::AI + 'static> ( 
+      name: &'static str, 
+      glyph: char, 
+      pos: Pos, 
+      fg: RGB, 
+      bg: RGB, 
+      stats: Stats, 
+      ai: T
+    ) -> Self {
     Creature {
       actor: Actor::new(name, glyph, pos, fg, bg),
-      stats: Stats::new(scent_type),
+      stats: stats,
       state: Actions::Unknown,
       ai: Box::new(ai)
     }

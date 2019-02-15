@@ -261,7 +261,7 @@ pub struct Tile {
   pub bg: RGB,
   pub biome: Biome,
   pub scents: Vec<_Scent>,
-  pub sound: u8,
+  pub sound: usize,
   pub tiletype: Type,
   pub seen: bool
 }

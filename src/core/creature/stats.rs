@@ -11,18 +11,26 @@ use core::world::dungeon::map::tile;
 
 #[derive(Clone, Debug)]
 pub struct Stats {
-  pub attack: isize,
-  pub defense: isize,
-  pub speed: isize,
+  pub attack: usize,
+  pub defense: usize,
+  pub speed: usize,
+  pub weight: usize,
   pub scent_type: tile::Scent
 }
 
 impl Stats {
-  pub fn new(scent_type: tile::Scent) -> Stats {
+  pub fn new(
+    attack: usize,
+    defense: usize,
+    speed: usize,
+    weight: usize,
+    scent_type: tile::Scent
+    ) -> Stats {
     Stats {
-      attack: 0,
-      defense: 0,
-      speed: 0,
+      attack: attack,
+      defense: defense,
+      speed: speed,
+      weight: weight,
       scent_type: scent_type
     }
   }
