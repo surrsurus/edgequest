@@ -35,17 +35,18 @@ pub mod world;
 use self::world::World;
 use self::world::dungeon::map::Pos;
 
-// Game objects
+// Creatures
 //
-// Objects are essentially what most game-related non-map entities can be boiled down to. Objects encompass
-// the very building blocks of the game such as `Pos`itions, `Creature`s which are combinations of `Actor`s, `Renderable`s,
-// and `Action`s, and AI patterns that help drive monster descicion making.
+// Creatures are things like monsters
 //
-// Object is public so that docs are generated for it
 pub mod creature;
 // While normally this module most likely should not have access to objects, we need to see `Action`s as the player's
 // choices changes the state of the game
 use self::creature::actions::Actions;
+
+// Items
+pub mod item;
+use self::item::{ItemProperty, money_value};
 
 // Renderer
 //
@@ -170,6 +171,23 @@ impl Engine {
               self.world.player.actor.move_cart(1, 1);
               self.world.player.state = Actions::Move;
             },
+
+            // Pick up item
+            'g' => {
+              // Player pos
+              let player_pos = self.world.player.actor.pos.clone();
+              // Get items at players feet
+              // let items_at_feet = self.world.floor.items.iter().filter(|item| item.pos == self.world.player.actor.pos.clone());
+              for item in &self.world.floor.items {
+                if item.pos == player_pos {
+                  match item.property {
+                    ItemProperty::Money(ref tender) => self.world.player.wallet += money_value(&tender)
+                  }
+                }
+              }
+              // Prune picked up items
+              self.world.floor.items.retain( |item| item.pos != player_pos );
+            }
 
             // Force reload word
             'w' => {

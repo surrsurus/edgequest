@@ -13,6 +13,8 @@ use self::rand::Rng;
 
 use core::tcod::map::{Map, FovAlgorithm};
 
+use core::item::{Item, ItemProperty, Money};
+
 use core::creature::{ai, Actions, Actor, Creature};
 
 use core::renderer::{Renderable, RGB};
@@ -66,14 +68,17 @@ pub struct Floor {
   pub dun: Dungeon,
   // Creatures need to be boxed because they hold a trait object, which has an undefined size.
   // Whenever you create a creature, just slap it into Box::new() and it works
-  pub creatures: Vec<Box<Creature>>
+  pub creatures: Vec<Box<Creature>>,
+  // Items on the floor
+  pub items: Vec<Item>
 }
 
 impl Floor {
   pub fn new(dun: Dungeon, creatures: Vec<Box<Creature>>) -> Self {
     Floor {
       dun: dun,
-      creatures: creatures
+      creatures: creatures,
+      items: vec![]
     }
   }
 
@@ -244,11 +249,46 @@ impl World {
   }
 
   ///
+  /// See if player stepped on items
+  ///
+  pub fn check_items(&mut self) {
+
+    // Get all items on the same tile as the player
+    let items_at_feet = self.floor.items.iter().filter(|item| item.pos == self.player.actor.pos);
+
+    // Possible stuff for stacking items
+
+    // // Proceed to stack like items
+    // let mut stacked_items = HashMap::new();
+
+    // for item in items_at_feet {
+    //   if !stacked_items.contains_key(item.get_id()) {
+    //     stacked_items.insert(item.get_id(), 1);
+    //   } else {
+    //     *stacked_items.get_mut(item.get_id()).unwrap() += 1;
+    //   }
+    // }
+
+    // for (id, value) in &stacked_items {
+    //   log!( (format!() , RGB(200, 200, 130) ) );
+    // }
+
+    for item in items_at_feet {
+      if item.quantity > 1 {
+        log!( (Box::leak(format!("You see {} {}s here", item.quantity, item.get_id()).into_boxed_str()), item.get_fg()) );
+      } else {
+        log!( (Box::leak(format!("You see a {} here", item.get_id()).into_boxed_str()), item.get_fg()) );
+      }
+    }
+
+  } 
+
+  ///
   /// Check to see if a tile is a trap
   /// 
   /// Should only be called after checking tile validity to avoid OOB errors
   /// 
-  pub fn check_trap(&mut self) {
+  pub fn check_traps(&mut self) {
     
     match &self.floor.dun[self.player.actor.pos].tiletype.clone() {
 
@@ -438,7 +478,7 @@ impl World {
   pub fn test_traverse(&mut self) {
     
     // Create floor var
-    let floor;
+    let mut floor;
 
     // If the floor number that we are on is not a floor in the stack,
     // we need to add a new floor to the stack
@@ -447,6 +487,11 @@ impl World {
       let grid = dun.grid.clone();
       let creatures = World::create_test_creatures(&grid);
       floor = Floor::new(dun, creatures);
+      // Create n gold coins at a valid location
+      let gold_loc = Dungeon::get_valid_location(&floor.dun.grid);
+      floor.items.push(
+        Item::new("gold piece", '$', gold_loc, RGB(238, 232, 170), RGB(0, 0, 0), rand::thread_rng().gen_range(10, 40), ItemProperty::Money(Money::Gold))
+      );
       self.floor_stack.push(floor.clone());
     // Otherwise the floor already exists in the stack and can be brought out
     } else {
@@ -498,7 +543,13 @@ impl World {
     let grid = dun.grid.clone();
     let tcod_map =  World::new_tcod_map(map_dim, &dun);
 
-    let floor = Floor::new(dun, World::create_test_creatures(&grid));
+    let mut floor = Floor::new(dun, World::create_test_creatures(&grid));
+
+    // Create n gold coins at a valid location
+    let gold_loc = Dungeon::get_valid_location(&floor.dun.grid);
+    floor.items.push(
+      Item::new("gold piece", '$', gold_loc, RGB(238, 232, 170), RGB(0, 0, 0), rand::thread_rng().gen_range(10, 40), ItemProperty::Money(Money::Gold))
+    );
 
     let mut floor_stack = Vec::new();
     floor_stack.push(floor.clone());
@@ -735,7 +786,8 @@ impl World {
     for creature in &mut self.floor.creatures {
       creature.take_turn(&self.floor.dun.grid, &self.player)
     }
-    self.check_trap();
+    self.check_traps();
+    self.check_items();
     self.update_sound();
     self.check_death();
     // self.debug_show_mem();

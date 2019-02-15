@@ -199,52 +199,6 @@ impl Renderer {
   }
 
   ///
-  /// Draw creatures with "transparent" backgrounds
-  ///
-  fn draw_creature(&self, con: &mut console::Root, pos: Pos, renderable: &Renderable, world: &World) {
-    // Check if it's in the camera first
-    if !self.camera.is_in_camera(pos) { return }
-
-    // New pos with respect to camera
-    let npos = pos + self.camera.pos;
-  
-    con.put_char_ex(
-      npos.x as i32,
-      npos.y as i32,
-      renderable.get_glyph(),
-      renderable.get_fg().to_tcod(),
-      // Backgrounds are just inherited from the world.
-      if self.fov {
-        (world.get_bg_color_at(pos) + YELLOW_FAC).to_tcod()
-      } else {
-        (world.get_bg_color_at(pos)).to_tcod()
-      }
-    );
-
-  }
-
-  ///
-  /// Put an `Renderable` on the console
-  ///
-  fn draw_renderable(&self, con: &mut console::Root, pos: Pos, renderable: &Renderable) {
-
-    // Check if it's in the camera first
-    if !self.camera.is_in_camera(pos) { return }
-
-    // New pos with respect to camera
-    let pos = pos + self.camera.pos;
-
-    con.put_char_ex(
-      pos.x as i32,
-      pos.y as i32,
-      renderable.get_glyph(),
-      renderable.get_fg().to_tcod(),
-      renderable.get_bg().to_tcod()
-    );
-
-  }
-
-  ///
   /// Draw the log
   ///
   /// We need to directly manipulate the GlobalLog object so here we use the mutex lock
@@ -272,6 +226,52 @@ impl Renderer {
 
   }
   
+  ///
+  /// Put an `Renderable` on the console
+  ///
+  fn draw_renderable(&self, con: &mut console::Root, pos: Pos, renderable: &Renderable) {
+
+    // Check if it's in the camera first
+    if !self.camera.is_in_camera(pos) { return }
+
+    // New pos with respect to camera
+    let pos = pos + self.camera.pos;
+
+    con.put_char_ex(
+      pos.x as i32,
+      pos.y as i32,
+      renderable.get_glyph(),
+      renderable.get_fg().to_tcod(),
+      renderable.get_bg().to_tcod()
+    );
+
+  }
+
+  ///
+  /// Draw renderables with "transparent" backgrounds
+  ///
+  fn draw_renderable_transparent(&self, con: &mut console::Root, pos: Pos, renderable: &Renderable, world: &World) {
+    // Check if it's in the camera first
+    if !self.camera.is_in_camera(pos) { return }
+
+    // New pos with respect to camera
+    let npos = pos + self.camera.pos;
+  
+    con.put_char_ex(
+      npos.x as i32,
+      npos.y as i32,
+      renderable.get_glyph(),
+      renderable.get_fg().to_tcod(),
+      // Backgrounds are just inherited from the world.
+      if self.fov {
+        (world.get_bg_color_at(pos) + YELLOW_FAC).to_tcod()
+      } else {
+        (world.get_bg_color_at(pos)).to_tcod()
+      }
+    );
+
+  }
+
   ///
   /// Draw UI elements
   /// 
@@ -377,6 +377,14 @@ impl Renderer {
       8,
       format!("{}: {}", "Floor", world.floor_num)
     );
+
+    // Wallet
+    con.print(
+      (self.screen.x - self.panel_width + 1) as i32,
+      9,
+      format!("{}: {}", "AU", world.player.wallet)
+    );
+
   }
 
   ///
@@ -405,7 +413,7 @@ impl Renderer {
         // If fov is on...
         if self.fov {
           // And it's in the FoV
-          if world.tcod_map.is_in_fov(x as i32, y as i32) && self.fov {
+          if world.tcod_map.is_in_fov(x as i32, y as i32) {
 
             // Update tile if possible
             match &world.floor.dun[x][y].tiletype {
@@ -439,6 +447,21 @@ impl Renderer {
       }
     }
 
+    // Draw items
+    for item in &world.floor.items {
+      // If fov is on...
+      if self.fov {
+        // And it's in the FoV
+        if world.tcod_map.is_in_fov(item.pos.x as i32, item.pos.y as i32) {
+          self.draw_renderable_transparent(con, item.pos, item, world);
+        }
+      } 
+      // [Debug] Otherwise just draw all tiles normally
+      else {
+        self.draw_renderable(con, item.pos, item);
+      }
+    }
+
     //
     // Debug options
     //
@@ -463,17 +486,17 @@ impl Renderer {
       // If fov is on...
       if self.fov {
         // And its in the fov...
-        if world.tcod_map.is_in_fov(creature.actor.pos.x as i32, creature.actor.pos.y as i32) && self.fov {
-          self.draw_creature(con, creature.actor.pos, &creature.actor, world);
+        if world.tcod_map.is_in_fov(creature.actor.pos.x as i32, creature.actor.pos.y as i32) {
+          self.draw_renderable_transparent(con, creature.actor.pos, &creature.actor, world);
         }
       } else {
-        self.draw_creature(con, creature.actor.pos, &creature.actor, world);
+        self.draw_renderable_transparent(con, creature.actor.pos, &creature.actor, world);
       }
     }
 
     // Draw player. Player is always in the camera since
     // we move the camera over it.
-    self.draw_creature(con, world.player.actor.pos, &world.player.actor, world);
+    self.draw_renderable_transparent(con, world.player.actor.pos, &world.player.actor, world);
 
   }
 
