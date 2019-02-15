@@ -226,8 +226,8 @@ impl Engine {
             'r' => {
               if self.wizard {
                 match self.ren.show_scent {
-                  false => log!(("Your eyes percieve scent like light.", RGB(255, 0, 0))),
-                  true => log!(("Your vision returns to normal.", RGB(255, 0, 0)))
+                  true => log!(("Your vision returns to normal.", RGB(255, 0, 0))),
+                  false => log!(("Your eyes percieve scent like light.", RGB(255, 0, 0)))
                 }
                 self.ren.show_scent = !self.ren.show_scent;
                 self.ren.draw_all(&mut self.root, &mut self.world);
@@ -239,8 +239,8 @@ impl Engine {
             't' => {
               if self.wizard {
                 match self.ren.show_sound {
-                  false => log!(("Your eyes percieve sound like light.", RGB(255, 0, 0))),
-                  true => log!(("Your vision returns to normal.", RGB(255, 0, 0)))
+                  true => log!(("Your vision returns to normal.", RGB(255, 0, 0))),
+                  false => log!(("Your eyes percieve sound like light.", RGB(255, 0, 0)))
                 }
                 self.ren.show_sound = !self.ren.show_sound;
                 self.ren.draw_all(&mut self.root, &mut self.world);
@@ -252,8 +252,8 @@ impl Engine {
             'f' => {
               if self.wizard {
                 match self.ren.fov {
-                  false => log!(("Your third eye opens, revealing the universe.", RGB(255, 0, 0))),
-                  true => log!(("Your third eye closes, concealing the universe in fog.", RGB(255, 0, 0)))
+                  true => log!(("Your third eye closes, concealing the universe in fog.", RGB(255, 0, 0))),
+                  false => log!(("Your third eye opens, revealing the universe.", RGB(255, 0, 0)))
                 }
                 self.ren.fov = !self.ren.fov;
                 self.ren.draw_all(&mut self.root, &mut self.world);
@@ -471,7 +471,7 @@ impl Engine {
       log!(("w to regenerate the map, q to destroy it", RGB(255, 150, 150)));
       log!(("r to toggle scent, t to toggle sound",     RGB(255, 150, 150)));
       log!(("f to toggle FoV, z to toggle noclip",      RGB(255, 150, 150)));
-      log!(("Ascend and descend anywhere with < and >", RGB(255, 150, 150)));
+      log!(("Ascend and descend anywhere with < and > while noclip is activated", RGB(255, 150, 150)));
     }
 
     // Initial update
