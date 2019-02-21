@@ -25,7 +25,7 @@ impl Stats {
     speed: usize,
     weight: usize,
     scent_type: tile::Scent
-    ) -> Stats {
+  ) -> Stats {
     Stats {
       attack: attack,
       defense: defense,

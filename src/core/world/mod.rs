@@ -14,7 +14,7 @@ use self::rand::Rng;
 use core::tcod::map::{Map, FovAlgorithm};
 
 
-use core::creature::{ai, Actions, Actor, Creature, Stats};
+use core::creature::{ai, Actions, Creature, Stats};
 
 use core::item::{Item, ItemProperty, Money};
 
@@ -571,7 +571,6 @@ impl World {
 
   }
 
-
   ///
   /// Return a new `World`
   ///
@@ -617,6 +616,33 @@ impl World {
   // Get an immutable reference to a tile at a point on the current dungeon
   pub fn get_tile_at(&self, x: isize, y: isize) -> &Tile {
     &self.floor.dun[x as usize][y as usize]
+  }
+
+  ///
+  /// Find sounds created by creatures
+  /// 
+  fn find_creature_sounds(&mut self) -> Vec<(Pos, usize)> {
+
+    let mut sounds : Vec<(Pos, usize)> = vec![];
+
+    // Determine if the player made sound by moving
+    match &self.player.state {
+      Actions::Move => sounds.push((self.player.actor.pos, self.player.stats.weight)),
+      Actions::Talk => sounds.push((self.player.actor.pos, 25)),
+      _ => {}
+    }
+
+    // Determine if any creatures made sound by moving
+    for creature in &self.floor.creatures {
+      match &creature.state {
+        Actions::Move => sounds.push((creature.actor.pos, creature.stats.weight)),
+        Actions::Talk => sounds.push((creature.actor.pos, 25)),
+        _ => {}
+      }
+    }
+
+    return sounds;
+    
   }
 
   ///
@@ -735,12 +761,15 @@ impl World {
   /// Update the sound map
   /// 
   pub fn update_sound(&mut self) {
+
+    // Distance formula for sounds
     let dist = |pos: Pos, x: isize, y: isize| -> usize {
       (((pos.x - x).pow(2) + (pos.y - y).pow(2)) as f32).sqrt().floor() as usize
     };
-    let mut sounds : Vec<(Pos, usize)> = vec![];
 
-    sounds.append(&mut self.find_movement_sounds());
+    // Analyze events to determine sounds
+    let sounds : Vec<(Pos, usize)> = self.find_creature_sounds();
+
     // Other sound generators go here
 
     // Reset sound to 0
@@ -789,22 +818,4 @@ impl World {
     // self.debug_show_mem();
   }
 
-  fn find_movement_sounds(&mut self) -> Vec<(Pos, usize)> {
-    let mut sounds : Vec<(Pos, usize)> = vec![];
-    // Determine if the player made sound by moving
-    match &self.player.state {
-      Actions::Move => sounds.push((self.player.actor.pos, self.player.stats.weight)),
-      Actions::Talk => sounds.push((self.player.actor.pos, 25)),
-      _ => {}
-    }
-    // Determine if any creatures made sound by moving
-    for creature in &self.floor.creatures {
-      match &creature.state {
-        Actions::Move => sounds.push((creature.actor.pos, creature.stats.weight)),
-        Actions::Talk => sounds.push((creature.actor.pos, 25)),
-        _ => {}
-      }
-    }
-    return sounds;
-  }
 }

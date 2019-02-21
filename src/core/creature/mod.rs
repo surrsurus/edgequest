@@ -20,7 +20,7 @@ mod object_tests;
 
 use core::item::Item;
 use core::renderer::RGB;
-use core::world::dungeon::map::{self, Pos, tile, Tile};
+use core::world::dungeon::map::{self, Pos, Tile};
 
 ///
 /// Creature holds a `Actor` and an `AI`, basically a package that we can create monsters from
@@ -58,14 +58,14 @@ impl Creature {
   ///
   #[inline]
   pub fn new<T: ai::AI + 'static> ( 
-      name: &'static str, 
-      glyph: char, 
-      pos: Pos, 
-      fg: RGB, 
-      bg: RGB, 
-      stats: Stats, 
-      ai: T
-    ) -> Self {
+    name: &'static str, 
+    glyph: char, 
+    pos: Pos, 
+    fg: RGB, 
+    bg: RGB, 
+    stats: Stats, 
+    ai: T
+  ) -> Self {
     Creature {
       actor: Actor::new(name, glyph, pos, fg, bg),
       stats: stats,
