@@ -315,9 +315,9 @@ impl World {
 
     for item in items_at_feet {
       if item.quantity > 1 {
-        log!( (Box::leak(format!("You see {} {}s here", item.quantity, item.get_id()).into_boxed_str()), item.get_fg()) );
+        log!(Box::leak(format!("You see {} {}s here", item.quantity, item.get_id()).into_boxed_str()), item.get_fg());
       } else {
-        log!( (Box::leak(format!("You see a {} here", item.get_id()).into_boxed_str()), item.get_fg()) );
+        log!(Box::leak(format!("You see a {} here", item.get_id()).into_boxed_str()), item.get_fg());
       }
     }
 
@@ -335,7 +335,7 @@ impl World {
       // We only care about traps, and this matches every trap
       tile::Type::Trap(trap) => {
         
-        log!(("You step on a trap!", RGB(255, 0, 0)));
+        log!("You step on a trap!", RGB(255, 0, 0));
 
         // Match the type of trap
         match trap {
@@ -343,7 +343,7 @@ impl World {
           // Memory loss causes all tiles to become unseen, effectively losing all mapping progress
           tile::Trap::MemoryLoss => {
 
-            log!(("You lose your memory", RGB(255, 255, 0)));
+            log!("You lose your memory", RGB(255, 255, 0));
             
             for tile in self.floor.dun.grid.iter_mut().flatten() {
               tile.seen = false;
@@ -354,7 +354,7 @@ impl World {
           // Fall down a floor or three
           tile::Trap::Shaft => {
 
-            log!(("You fall down a shaft!", RGB(200, 50, 20)));
+            log!("You fall down a shaft!", RGB(200, 50, 20));
             
             for _floors in 0..rand::thread_rng().gen_range(1, 4) {
               self.go_down();
@@ -369,9 +369,9 @@ impl World {
 
             let col = RGB(rng.gen_range(1, 255), rng.gen_range(1, 255), rng.gen_range(1, 255));
 
-            log!(("It's a paint bomb!", RGB(100, 100, 100)));
+            log!("It's a paint bomb!", RGB(100, 100, 100));
 
-            log!(("You look different!", col));
+            log!("You look different!", col);
 
             self.player.actor.set_fg(col);
 
@@ -380,7 +380,7 @@ impl World {
           // Move randomly on map
           tile::Trap::Teleport => {
 
-            log!(("It's a teleporter!", RGB(50, 127, 200)));
+            log!("It's a teleporter!", RGB(50, 127, 200));
 
             self.player.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
 
@@ -406,7 +406,7 @@ impl World {
             // Fall down and die I guess
             tile::Trap::Shaft => {
 
-              log!(("You hear a trap door open!", RGB(200, 50, 20)));
+              log!("You hear a trap door open!", RGB(200, 50, 20));
               
               // Not sure what to do with the creature here...
               creature.state = Actions::Die;
@@ -420,7 +420,7 @@ impl World {
 
               let col = RGB(rng.gen_range(1, 255), rng.gen_range(1, 255), rng.gen_range(1, 255));
 
-              log!(("You hear an explosion!", RGB(100, 100, 100)));
+              log!("You hear an explosion!", RGB(100, 100, 100));
 
               creature.actor.set_fg(col);
 
@@ -429,7 +429,7 @@ impl World {
             // Move randomly on map
             tile::Trap::Teleport => {
 
-              log!(("You hear the hum of a teleporter!", RGB(50, 127, 200)));
+              log!("You hear the hum of a teleporter!", RGB(50, 127, 200));
 
               creature.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
 
@@ -489,12 +489,12 @@ impl World {
       tile::Type::Stair(tile::Stair::UpStair(_)) => {
         if self.floor_num != 0 {
           self.go_up();
-          log!(("You bravely venture forth...", RGB(255, 255, 200)));
+          log!("You bravely venture forth...", RGB(255, 255, 200));
         } else {
-          log!(("You are not allowed to turn back now...", RGB(100, 50, 25)));
+          log!("You are not allowed to turn back now...", RGB(100, 50, 25));
         }
       },
-      _ => log!(("You can't go up here", RGB(150, 150, 150)))
+      _ => log!("You can't go up here", RGB(150, 150, 150))
     }
 
   }
@@ -506,9 +506,9 @@ impl World {
     match self.get_tile_at(self.player.actor.pos.x, self.player.actor.pos.y).tiletype {
       tile::Type::Stair(tile::Stair::DownStair(_)) => {
         self.go_down();
-        log!(("You bravely venture forth...", RGB(255, 255, 200)));
+        log!("You bravely venture forth...", RGB(255, 255, 200));
       },
-      _ => log!(("You can't go down here", RGB(150, 150, 150)))
+      _ => log!("You can't go down here", RGB(150, 150, 150))
     }
   }
 

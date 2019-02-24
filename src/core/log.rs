@@ -94,14 +94,14 @@ lazy_static! {
 /// Oviously if any panics occur here then the mutex becomes poisoned
 #[macro_export]
 macro_rules! log {
-  ($msg:expr) => {{
+  ($msg:expr, $col:expr) => {{
     // Import it's own lazy static ref
     use self::log::GlobalLog;
     // Lock the mutex
     let mut log = GlobalLog.lock().unwrap();
     // Push the message
     // Highly implies a correct expression for the push arguments are being supplied
-    log.push($msg);
+    log.push(($msg, $col));
     // Drop the reference
     drop(log);
   }};

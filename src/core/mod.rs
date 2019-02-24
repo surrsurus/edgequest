@@ -184,9 +184,9 @@ impl Engine {
                     ItemProperty::Money(ref tender) => self.world.player.wallet += money_value(&tender) * item.quantity as f32
                   }
                   if item.quantity > 1 {
-                    log!( (Box::leak(format!("You pick up {} {}s", item.quantity, item.get_id()).into_boxed_str()), item.get_fg()) );
+                    log!(Box::leak(format!("You pick up {} {}s", item.quantity, item.get_id()).into_boxed_str()), item.get_fg());
                   } else {
-                    log!( (Box::leak(format!("You pick up a {}", item.get_id()).into_boxed_str()), item.get_fg()) );
+                    log!(Box::leak(format!("You pick up a {}", item.get_id()).into_boxed_str()), item.get_fg());
                   }
                 }
               }
@@ -197,7 +197,7 @@ impl Engine {
             // Force reload word
             'w' => {
               if self.wizard {
-                log!(("You remold the earth like clay." , RGB(255, 0, 0)));
+                log!("You remold the earth like clay." , RGB(255, 0, 0));
                 self.world = World::new(Pos::from_tup(init::map_dimensions()));
               }
               self.state = State::Act(Actions::Unknown);
@@ -205,7 +205,7 @@ impl Engine {
             // Create an empty level for testing
             'q' => {
               if self.wizard {
-                log!(("You empty the universe.", RGB(255, 0, 0)));
+                log!("You empty the universe.", RGB(255, 0, 0));
                 self.world.test_empty();
               }
               self.state = State::Act(Actions::Unknown);
@@ -226,8 +226,8 @@ impl Engine {
             'r' => {
               if self.wizard {
                 match self.ren.show_scent {
-                  true => log!(("Your vision returns to normal.", RGB(255, 0, 0))),
-                  false => log!(("Your eyes percieve scent like light.", RGB(255, 0, 0)))
+                  true => log!("Your vision returns to normal.", RGB(255, 0, 0)),
+                  false => log!("Your eyes percieve scent like light.", RGB(255, 0, 0))
                 }
                 self.ren.show_scent = !self.ren.show_scent;
                 self.ren.draw_all(&mut self.root, &mut self.world);
@@ -239,8 +239,8 @@ impl Engine {
             't' => {
               if self.wizard {
                 match self.ren.show_sound {
-                  true => log!(("Your vision returns to normal.", RGB(255, 0, 0))),
-                  false => log!(("Your eyes percieve sound like light.", RGB(255, 0, 0)))
+                  true => log!("Your vision returns to normal.", RGB(255, 0, 0)),
+                  false => log!("Your eyes percieve sound like light.", RGB(255, 0, 0))
                 }
                 self.ren.show_sound = !self.ren.show_sound;
                 self.ren.draw_all(&mut self.root, &mut self.world);
@@ -252,8 +252,8 @@ impl Engine {
             'f' => {
               if self.wizard {
                 match self.ren.fov {
-                  true => log!(("Your third eye opens, revealing the universe.", RGB(255, 0, 0))),
-                  false => log!(("Your third eye closes, concealing the universe in fog.", RGB(255, 0, 0)))
+                  true => log!("Your third eye opens, revealing the universe.", RGB(255, 0, 0)),
+                  false => log!("Your third eye closes, concealing the universe in fog.", RGB(255, 0, 0))
                 }
                 self.ren.fov = !self.ren.fov;
                 self.ren.draw_all(&mut self.root, &mut self.world);
@@ -265,8 +265,8 @@ impl Engine {
             'z' => {
               if self.wizard {
                 match self.noclip {
-                  true => log!(("You form becomes tangible.", RGB(255, 0, 0))),
-                  false => log!(("Your form becomes ethereal.", RGB(255, 0, 0)))
+                  true => log!("You form becomes tangible.", RGB(255, 0, 0)),
+                  false => log!("Your form becomes ethereal.", RGB(255, 0, 0))
                 }
                 self.noclip = !self.noclip;
               }
@@ -380,7 +380,7 @@ impl Engine {
       State::Act(Actions::DownStair) => {
         // No clip through floors
         if self.noclip {
-          log!(("You lose your physicality, and sink into the floor.", RGB(255, 150, 150)));
+          log!("You lose your physicality, and sink into the floor.", RGB(255, 150, 150));
           self.world.go_down();
         } else {
           self.world.player_go_down();
@@ -390,7 +390,7 @@ impl Engine {
       State::Act(Actions::UpStair) => {
         // No clip through floors
         if self.noclip {
-          log!(("You lose your physicality, and ascend through the cieling.", RGB(255, 150, 150)));
+          log!("You lose your physicality, and ascend through the cieling.", RGB(255, 150, 150));
           self.world.go_up();
         } else {
           self.world.player_go_up();
@@ -462,16 +462,16 @@ impl Engine {
     self.title_screen();
 
     // Some starting messages, will be removed in later versions (hopefully)
-    log!(("Welcome to Edgequest",                 RGB(255,   0, 255)));
-    log!(("Move with vim keys",                   RGB(255, 255, 255)));
-    log!(("esc to quit",                          RGB(255, 255, 255)));
+    log!("Welcome to Edgequest",                 RGB(255,   0, 255));
+    log!("Move with vim keys",                   RGB(255, 255, 255));
+    log!("esc to quit",                          RGB(255, 255, 255));
 
     if self.wizard {
-      log!(("You are in wizard mode",                   RGB(255,   0,   0)));
-      log!(("w to regenerate the map, q to destroy it", RGB(255, 150, 150)));
-      log!(("r to toggle scent, t to toggle sound",     RGB(255, 150, 150)));
-      log!(("f to toggle FoV, z to toggle noclip",      RGB(255, 150, 150)));
-      log!(("Ascend and descend anywhere with < and > while noclip is activated", RGB(255, 150, 150)));
+      log!("You are in wizard mode",                   RGB(255,   0,   0));
+      log!("w to regenerate the map, q to destroy it", RGB(255, 150, 150));
+      log!("r to toggle scent, t to toggle sound",     RGB(255, 150, 150));
+      log!("f to toggle FoV, z to toggle noclip",      RGB(255, 150, 150));
+      log!("Ascend and descend anywhere with < and > while noclip is activated", RGB(255, 150, 150));
     }
 
     // Initial update
