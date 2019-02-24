@@ -252,8 +252,8 @@ impl Engine {
             'f' => {
               if self.wizard {
                 match self.ren.fov {
-                  true => log!(("Your third eye closes, concealing the universe in fog.", RGB(255, 0, 0))),
-                  false => log!(("Your third eye opens, revealing the universe.", RGB(255, 0, 0)))
+                  true => log!(("Your third eye opens, revealing the universe.", RGB(255, 0, 0))),
+                  false => log!(("Your third eye closes, concealing the universe in fog.", RGB(255, 0, 0)))
                 }
                 self.ren.fov = !self.ren.fov;
                 self.ren.draw_all(&mut self.root, &mut self.world);
