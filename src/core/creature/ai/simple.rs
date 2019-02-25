@@ -13,7 +13,7 @@ use core::creature::{Actions, Creature, Actor, Stats};
 /// NOTE: There is really no intention to keep this AI around... Maybe as a confused AI?
 /// Definitely will be replaced/refactored.
 ///
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct SimpleAI;
 
 impl SimpleAI {

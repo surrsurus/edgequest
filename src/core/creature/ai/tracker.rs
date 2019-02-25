@@ -6,7 +6,7 @@ use core::creature::{Actions, Creature, Actor, Stats};
 ///
 /// AI that tracks player
 ///
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct TrackerAI;
 
 impl TrackerAI {

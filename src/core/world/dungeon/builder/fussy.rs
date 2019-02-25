@@ -43,7 +43,7 @@ impl Fussy {
       w: grid.len(), 
       h: grid[0].len(),
       noise: Simplex::new(),
-      threshold: threshold
+      threshold
     };
 
     return fussy;

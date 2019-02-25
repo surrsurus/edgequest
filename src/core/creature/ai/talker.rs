@@ -12,7 +12,7 @@ use core::creature::{Actions, Creature, Actor, Stats};
 ///
 /// AI that talks to the player
 ///
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct TalkerAI;
 
 impl TalkerAI {

@@ -49,6 +49,7 @@ use core::renderer::RGB;
 ///
 /// A log just wraps some strings with a color value to be printed and look pretty
 ///
+#[derive(Default)]
 pub struct Log {
   pub data: Vec<(&'static str, RGB)>,
 }

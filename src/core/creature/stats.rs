@@ -27,11 +27,11 @@ impl Stats {
     scent_type: tile::Scent
   ) -> Stats {
     Stats {
-      attack: attack,
-      defense: defense,
-      speed: speed,
-      weight: weight,
-      scent_type: scent_type
+      attack,
+      defense,
+      speed,
+      weight,
+      scent_type
     }
   }
 }

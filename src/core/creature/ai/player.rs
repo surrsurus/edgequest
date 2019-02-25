@@ -6,7 +6,7 @@ use core::creature::{Actions, Creature, Actor, Stats};
 ///
 /// PlayerAI does nothing
 ///
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct PlayerAI;
 
 impl PlayerAI {
@@ -21,9 +21,7 @@ impl AI for PlayerAI {
   /// Do nothing
   ///
   fn take_turn(&mut self, _map: &map::Grid<Tile>, _player: &Creature, _me: &mut Actor, _stats: &mut Stats) -> Actions {
-
-    return Actions::Unknown;
-
+    Actions::Unknown
   }
 
   ///

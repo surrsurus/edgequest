@@ -26,7 +26,7 @@ impl Pos {
   /// 
   #[inline]
   pub fn new(x: isize, y: isize) -> Self {
-    Pos { x: x, y: y }
+    Pos { x, y }
   }
 
   ///

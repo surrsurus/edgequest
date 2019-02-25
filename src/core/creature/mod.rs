@@ -69,7 +69,7 @@ impl Creature {
   ) -> Self {
     Creature {
       actor: Actor::new(name, glyph, pos, fg, bg),
-      stats: stats,
+      stats,
       state: Actions::Unknown,
       ai: Box::new(ai),
       wallet: 0.0,

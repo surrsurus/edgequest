@@ -10,7 +10,7 @@ use core::creature::{Actions, Creature, Actor, Stats};
 ///
 /// BlinkAI makes monster teleport around the map periodically
 ///
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct BlinkAI;
 
 impl BlinkAI {

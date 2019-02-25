@@ -558,13 +558,11 @@ impl Dungeon {
   /// Return a new `Dungeon` that consists of pure walls
   ///
   pub fn new(map_dim: Pos) -> Self {
-
-    return Dungeon {
+    Dungeon {
       width: map_dim.x as usize,
       height: map_dim.y as usize,
       grid: map::Grid::new()
-    };
-
+    }
   }
 
 }

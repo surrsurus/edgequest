@@ -38,7 +38,7 @@ impl Camera {
   pub fn is_in_camera(&self, pos: Pos) -> bool {
     // New pos to compare things to without totally cluttering the function
     let npos = pos + self.pos;
-    if npos.x >= 0 && npos.x < self.screen.x && npos.y >= 0 && npos.y < (self.screen.y) { true } else { false }
+    return npos.x >= 0 && npos.x < self.screen.x && npos.y >= 0 && npos.y < (self.screen.y);
   }
 
   ///
@@ -49,7 +49,7 @@ impl Camera {
   pub fn move_to(&mut self, pos: Pos) {
 
     // Copy position
-    let mut new_pos = pos.clone();
+    let mut new_pos = pos;
 
     // We want to be somewhere in the middle of the map, but judge based on the max
     // bounds of the screen. This is what pushes the camera to the bottom right of the screen
@@ -74,7 +74,7 @@ impl Camera {
   /// 
   #[inline]
   pub fn new(map: Pos, screen: Pos) -> Self {
-    Camera { pos: Pos::origin(), map: map, screen: screen}
+    Camera { pos: Pos::origin(), map, screen}
   }
 
 }

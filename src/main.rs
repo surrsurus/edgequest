@@ -29,6 +29,11 @@
 //! and adding new ones is also trivial provided the relevant matches are updated.
 //! 
 
+// Clippy config
+#![allow(clippy::needless_return)]
+#![allow(clippy::many_single_char_names)]
+#![allow(clippy::single_match)]
+
 // Local imports for all game files
 //
 // We set as public so docs are generated for them

@@ -127,13 +127,13 @@ impl Simple {
       // Wrap around
       if room_idx == self.rooms.len() - 1 {
 
-        start = self.rooms[room_idx].center().clone();
-        end = self.rooms[0].center().clone();
+        start = self.rooms[room_idx].center();
+        end = self.rooms[0].center();
 
       } else {  
 
-        start = self.rooms[room_idx].center().clone();
-        end = self.rooms[room_idx + 1].center().clone();
+        start = self.rooms[room_idx].center();
+        end = self.rooms[room_idx + 1].center();
 
       }
 

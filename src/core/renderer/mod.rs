@@ -346,7 +346,7 @@ impl Renderer {
     // Scent of non-players
     let mut non_player_scent = 0;
     for scent in &tile.scents {
-      if &scent.scent_type != &tile::Scent::Player { 
+      if scent.scent_type != tile::Scent::Player { 
         non_player_scent += scent.val; // BUG: Panics here with overflow
       }
     }
@@ -418,7 +418,7 @@ impl Renderer {
             // Update tile if possible
             match &world.floor.dun[x][y].tiletype {
               tile::Type::Water => {
-                &world.floor.dun[x][y].set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
+                world.floor.dun[x][y].set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
               },
               _ => {}
             }
@@ -556,8 +556,8 @@ impl Renderer {
         map, 
         Pos::new(screen.x - panel_width - 1, screen.y - console_height - 1)
       ), 
-      console_height: console_height, panel_width: panel_width,
-      screen: screen,
+      console_height, panel_width,
+      screen,
       show_scent: false, fov: true, show_sound: false 
     }
   }

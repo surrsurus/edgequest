@@ -22,7 +22,7 @@ impl Corr {
   /// 
   #[inline]
   pub fn new(start: Pos, end: Pos) -> Self {
-    return Corr { start: start, end: end };
+    return Corr { start, end };
   }
 
 }

@@ -69,13 +69,13 @@ impl Item {
   #[inline]
   pub fn new(name: &'static str, glyph: char, pos: Pos, fg: RGB, bg: RGB, quantity: isize, property: ItemProperty) -> Self {
     Item {
-      name: name,
-      glyph: glyph, 
-      pos: pos, 
-      fg: fg, 
-      bg: bg,
-      quantity: quantity,
-      property: property
+      name,
+      glyph, 
+      pos, 
+      fg, 
+      bg,
+      quantity,
+      property
     }
   }
 }

@@ -39,30 +39,30 @@ impl RGB {
   /// Turn an RGB into a tuple
   /// 
   #[inline]
-  pub fn to_tup(rgb: RGB) -> (u8, u8, u8) {
-    (rgb.r(), rgb.g(), rgb.b())
+  pub fn to_tup(self) -> (u8, u8, u8) {
+    (self.r(), self.g(), self.b())
   }
 
   /// 
   /// Convert an RGB into a tcod Color
   /// 
   #[inline]
-  pub fn to_tcod(&self) -> colors::Color {
+  pub fn to_tcod(self) -> colors::Color {
     colors::Color::new(self.r(), self.g(), self.b())
   }
 
   #[inline]
-  pub fn r(&self) -> u8 {
+  pub fn r(self) -> u8 {
     self.0
   }
 
   #[inline]
-  pub fn g(&self) -> u8 {
+  pub fn g(self) -> u8 {
     self.1
   }
 
   #[inline]
-  pub fn b(&self) -> u8 {
+  pub fn b(self) -> u8 {
     self.2
   }
 

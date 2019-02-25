@@ -227,7 +227,7 @@ impl Scent {
       Scent::Smoke,
       Scent::Incense
     ];
-    SCENT_TYPES.into_iter()
+    SCENT_TYPES.iter()
   }
 }
 
@@ -243,7 +243,7 @@ impl _Scent {
   pub fn new(value: u8, scent_type: Scent) -> Self {
     _Scent {
       val: value,
-      scent_type: scent_type
+      scent_type
     }
   }
 
@@ -273,10 +273,10 @@ impl Tile {
   #[inline]
   pub fn new(name: &'static str, glyph: char, fg: RGB, bg: RGB, tiletype: Type) -> Self {
     Tile { 
-      name: name,
-      glyph: glyph,
-      fg: fg,
-      bg: bg,
+      name,
+      glyph,
+      fg,
+      bg,
       biome: Biome::Dungeon,
       // Create scents by iterating over ScentTypes
       scents: {
@@ -287,7 +287,7 @@ impl Tile {
         scent_vec
       },
       sound: 0,
-      tiletype: tiletype,
+      tiletype,
       seen: false
     }
   }

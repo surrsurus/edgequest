@@ -27,7 +27,7 @@ impl DrunkardsWalk {
   /// 
   pub fn new(chaos: f32) -> Self {
     assert!(chaos >= 0.0 && chaos <= 1.0);
-    DrunkardsWalk { chaos: chaos }
+    DrunkardsWalk { chaos }
   }
 
 }

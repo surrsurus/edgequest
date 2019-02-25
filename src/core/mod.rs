@@ -99,6 +99,7 @@ pub enum State {
 /// between physical user and the game world via the renderer, and in that sense it's more of a steering wheel than an engine, but 
 /// `SteeringWheel` makes pretty much no sense whatsoever and "engine" is already within the common vernacular of game developers
 /// 
+/// 
 pub struct Engine {
   world: World,
   state: State,
@@ -132,7 +133,7 @@ impl Engine {
           // First, make an assumption that the player is affecting their movement as 90% of the game
           // is walking around. We *could* add it to every single one of the vim keypresses to save a trivial ammount of
           // time assigning this variable, but I dislike that.
-          let oldpos = self.world.player.actor.pos.clone();
+          let oldpos = self.world.player.actor.pos;
 
           // In addition, update the game state
           // Important so that if the game state becomes debug we can leave that state instantly
@@ -178,7 +179,8 @@ impl Engine {
             // Pick up item. Will become super buggy at some point guaranteed
             'g' => {
               // Player pos
-              let player_pos = self.world.player.actor.pos.clone();
+              let player_pos = self.world.player.actor.pos;
+              self.state = State::Act(Actions::Unknown);
               // Get items at players feet
               // let items_at_feet = self.world.floor.items.iter().filter(|item| item.pos == self.world.player.actor.pos.clone());
               for item in &self.world.floor.items {
@@ -191,10 +193,12 @@ impl Engine {
                   } else {
                     log!(Box::leak(format!("You pick up a {}", item.get_id()).into_boxed_str()), item.get_fg());
                   }
+                  self.state = State::Act(Actions::Pickup);
                 }
               }
               // Prune picked up items
               self.world.floor.items.retain( |item| item.pos != player_pos );
+              
             }
 
             // Force reload word
@@ -313,7 +317,11 @@ impl Engine {
                     // Empty for right now
                   }
 
-                }
+                },
+
+                Actions::Pickup => {
+                  // Drain AP
+                },
 
                 _ => ()
 
@@ -359,7 +367,7 @@ impl Engine {
         init::panel_width()
       ),
       
-      root: root,
+      root,
 
       // Debug 
       noclip: false,
@@ -414,8 +422,8 @@ impl Engine {
 
     // First part of this pretty much just fills the screen with black
 
-    let w = self.root.width().clone();
-    let h = self.root.height().clone();
+    let w = self.root.width();
+    let h = self.root.height();
 
     for x in 0..w {
       for y in 0..h {
@@ -446,13 +454,7 @@ impl Engine {
     let keypress = self.root.wait_for_keypress(true);
 
     // Escape on title should quit the game
-    match keypress.code {
-      
-      // If the keycode isn't escape we continue checking for important keys
-      input::KeyCode::Escape => panic!("Bye"),
-      _ => {}
-
-    }
+    if let input::KeyCode::Escape = keypress.code { panic!("Bye") }
 
   }
 
@@ -502,4 +504,10 @@ impl Engine {
 
   }
 
+}
+
+impl Default for Engine {
+  fn default() -> Self {
+    Self::new()
+  }
 }

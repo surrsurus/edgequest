@@ -38,7 +38,7 @@ const SC_BLOOM_CUTOFF : f32 = 0.05;
 ///
 /// Currently 255/256
 ///
-const SC_DECAY : f32 = 0.99609375;
+const SC_DECAY : f32 = 0.996_093_75;
 
 ///
 /// Diameter of scent around creatures, should be odd for best effect
@@ -57,16 +57,16 @@ pub struct Floor {
   pub dun: Dungeon,
   // Creatures need to be boxed because they hold a trait object, which has an undefined size.
   // Whenever you create a creature, just slap it into Box::new() and it works
-  pub creatures: Vec<Box<Creature>>,
+  pub creatures: Vec<Creature>,
   // Items on the floor
   pub items: Vec<Item>
 }
 
 impl Floor {
-  pub fn new(dun: Dungeon, creatures: Vec<Box<Creature>>) -> Self {
+  pub fn new(dun: Dungeon, creatures: Vec<Creature>) -> Self {
     Floor {
-      dun: dun,
-      creatures: creatures,
+      dun,
+      creatures,
       items: vec![]
     }
   }
@@ -87,121 +87,109 @@ impl World {
   ///
   /// Create a set of creatures for testing. 100% temporary
   ///
-  fn create_test_creatures(g: &map::Grid<Tile>) -> Vec<Box<Creature>> {
+  fn create_test_creatures(g: &map::Grid<Tile>) -> Vec<Creature> {
     
-    let mut creatures = Vec::<Box<Creature>>::new();
+    let mut creatures = vec![];
 
     creatures.push(
-      Box::new(
-        Creature::new(
-          "ant",
-          'a',
-          Dungeon::get_valid_location(g),
-          RGB(150, 0, 0), RGB(0, 0, 0),
-          Stats::new(
-            0,
-            0,
-            0,
-            0,
-            tile::Scent::Insectoid
-          ),
-          ai::SimpleAI::new()
-        )
+      Creature::new(
+        "ant",
+        'a',
+        Dungeon::get_valid_location(g),
+        RGB(150, 0, 0), RGB(0, 0, 0),
+        Stats::new(
+          0,
+          0,
+          0,
+          0,
+          tile::Scent::Insectoid
+        ),
+        ai::SimpleAI::new()
       )
     );
 
     creatures.push(
-      Box::new(
-        Creature::new(
-          "bee",
-          'b',
-          Dungeon::get_valid_location(g),
-          RGB(150, 150, 0), RGB(0, 0, 0),
-          Stats::new(
-            0,
-            0,
-            0,
-            0,
-            tile::Scent::Insectoid
-          ),
-          ai::SimpleAI::new()
-        )
+      Creature::new(
+        "bee",
+        'b',
+        Dungeon::get_valid_location(g),
+        RGB(150, 150, 0), RGB(0, 0, 0),
+        Stats::new(
+          0,
+          0,
+          0,
+          0,
+          tile::Scent::Insectoid
+        ),
+        ai::SimpleAI::new()
       )
     );
 
     creatures.push(
-      Box::new(
-        Creature::new(
-          "cat",
-          'c',
-          Dungeon::get_valid_location(g),
-          RGB(150, 0, 150), RGB(0, 0, 0),
-          Stats::new(
-            0,
-            0,
-            0,
-            5,
-            tile::Scent::Feline
-          ),
-          ai::TrackerAI::new()
-        )
+      Creature::new(
+        "cat",
+        'c',
+        Dungeon::get_valid_location(g),
+        RGB(150, 0, 150), RGB(0, 0, 0),
+        Stats::new(
+          0,
+          0,
+          0,
+          5,
+          tile::Scent::Feline
+        ),
+        ai::TrackerAI::new()
       )
     );
 
     creatures.push(
-      Box::new(
-        Creature::new(
-          "blink hound",
-          'd',
-          Dungeon::get_valid_location(g),
-          RGB(150, 150, 150), RGB(0, 0, 0),
-          Stats::new(
-            0,
-            0,
-            0,
-            20,
-            tile::Scent::Canine
-          ),
-          ai::BlinkAI::new()
-        )
+      Creature::new(
+        "blink hound",
+        'd',
+        Dungeon::get_valid_location(g),
+        RGB(150, 150, 150), RGB(0, 0, 0),
+        Stats::new(
+          0,
+          0,
+          0,
+          20,
+          tile::Scent::Canine
+        ),
+        ai::BlinkAI::new()
       )
     );
 
     creatures.push(
-      Box::new(
-        Creature::new(
-          "Kurt",
-          '@',
-          Dungeon::get_valid_location(g),
-          RGB(200, 200, 200), RGB(0, 0, 0),
-          Stats::new(
-            0,
-            0,
-            0,
-            50,
-            tile::Scent::Canine
-          ),
-          ai::TalkerAI::new()
-        )
+      Creature::new(
+        "Kurt",
+        '@',
+        Dungeon::get_valid_location(g),
+        RGB(200, 200, 200), RGB(0, 0, 0),
+        Stats::new(
+          0,
+          0,
+          0,
+          50,
+          tile::Scent::Canine
+        ),
+        ai::TalkerAI::new()
       )
     );
 
     creatures.push(
-      Box::new(
-        Creature::new(
-          "Echidna",
-          'e',
-          Dungeon::get_valid_location(g),
-          RGB(50, 50, 200), RGB(0, 0, 0),
-          Stats::new(
-            0,
-            0,
-            0,
-            15,
-            tile::Scent::Canine
-          ),
-          ai::SmellerAI::new()
-        )
+      Creature::new(
+        "Echidna",
+        'e',
+        Dungeon::get_valid_location(g),
+        RGB(50, 50, 200), RGB(0, 0, 0),
+        Stats::new(
+          0,
+          0,
+          0,
+          15,
+          tile::Scent::Canine
+        ),
+        ai::SmellerAI::new()
       )
     );
 
@@ -213,7 +201,7 @@ impl World {
   /// Create a basic dungeon for testing
   ///
   fn create_test_dungeon(map_dim: Pos) -> Dungeon {
-    return Dungeon::new(map_dim).build();
+    Dungeon::new(map_dim).build()
   }
 
   ///
@@ -593,10 +581,10 @@ impl World {
 
     let mut world = World {
       player: World::new_player(),
-      floor: floor,
-      floor_stack: floor_stack,
+      floor,
+      floor_stack,
       floor_num: 0,
-      tcod_map: tcod_map
+      tcod_map
     };
 
     world.player.actor.pos = Dungeon::get_valid_location(&world.floor.dun.grid);
@@ -786,7 +774,7 @@ impl World {
         for y in 0..self.floor.dun.height {
           let mut tile = self.get_mut_tile_at(x as isize, y as isize);
           if true {
-            tile.sound = tile.sound + (sound.1 / ((dist(sound.0, x as isize, y as isize) + 1).pow(2)));
+            tile.sound += sound.1 / ((dist(sound.0, x as isize, y as isize) + 1).pow(2));
           }
         }
       }

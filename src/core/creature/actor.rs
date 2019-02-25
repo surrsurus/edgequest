@@ -46,7 +46,7 @@ impl Actor {
   ///  
   #[inline]
   pub fn move_pos(&mut self, pos: Pos) {
-    self.pos = self.pos + pos;
+    self.pos += pos;
   }
 
   ///
@@ -55,11 +55,11 @@ impl Actor {
   #[inline]
   pub fn new(name: &'static str, glyph: char, pos: Pos, fg: RGB, bg: RGB) -> Self {
     Actor {
-      name: name,
-      glyph: glyph, 
-      pos: pos, 
-      fg: fg, 
-      bg: bg
+      name,
+      glyph, 
+      pos, 
+      fg, 
+      bg
     }
   }
 

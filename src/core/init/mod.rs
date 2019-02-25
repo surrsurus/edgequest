@@ -78,26 +78,26 @@ pub fn root() -> console::Root {
 /// the filesystem loading and tcod for initializing the console
 /// 
 pub fn map_dimensions() -> (isize, isize) {
-  return (CFG.map_width, CFG.map_height);
+  (CFG.map_width, CFG.map_height)
 }
 
 ///
 /// Get console height
 ///
 pub fn console_height() -> isize {
-  return CFG.console_height;
+  CFG.console_height
 }
 
 ///
 /// Get panel width
 ///
 pub fn panel_width() -> isize {
-  return CFG.panel_width;
+  CFG.panel_width
 }
 
 ///
 /// Get wizard mode
 ///
 pub fn wizard() -> bool {
-  return CFG.wizard;
+  CFG.wizard
 }

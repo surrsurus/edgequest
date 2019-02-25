@@ -12,7 +12,7 @@ use core::creature::{Actions, Creature, Actor, Stats};
 ///
 /// NOTE: This is a proof of concept AI
 ///
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Default)]
 pub struct SmellerAI;
 
 impl SmellerAI {
@@ -30,8 +30,8 @@ impl AI for SmellerAI {
 
     let mut state = Actions::Wait;
     
-    let mut x = me.pos.x.clone() as usize;
-    let mut y = me.pos.y.clone() as usize;
+    let mut x = me.pos.x as usize;
+    let mut y = me.pos.y as usize;
 
     let mut tx : isize = -1;
     let mut ty : isize = -1;
