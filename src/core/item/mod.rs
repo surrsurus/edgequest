@@ -1,5 +1,8 @@
+
+use core::creature::Creature;
 use core::renderer::{Renderable, RGB};
-use core::world::dungeon::map::Pos;
+use core::time::Time;
+use core::world::dungeon::map::{self, Pos, Tile};
 
 #[derive(Clone)]
 pub enum Money {
@@ -120,6 +123,14 @@ impl Renderable for Item {
   #[inline]
   fn set_id(&mut self, name: &'static str) {
     self.name = name;
+  }
+
+}
+
+impl Time for Item {
+
+  fn take_turn(&mut self, _map: &map::Grid<Tile>, _player: &Creature) {
+
   }
 
 }

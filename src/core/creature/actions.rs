@@ -26,6 +26,8 @@ pub enum Actions {
   Talk,
   // Creature died
   Die,
+  // Creature picked up an item
+  Pickup,
   // Unknown action (Creature did something weird)
   Unknown
 }

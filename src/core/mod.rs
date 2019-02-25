@@ -48,6 +48,9 @@ use self::creature::actions::Actions;
 pub mod item;
 use self::item::{ItemProperty, money_value};
 
+// Time
+pub mod time;
+
 // Renderer
 //
 // The renderer is the interface by which game objects and constructs are made real through tcod interaction. The central
@@ -172,7 +175,7 @@ impl Engine {
               self.world.player.state = Actions::Move;
             },
 
-            // Pick up item
+            // Pick up item. Will become super buggy at some point guaranteed
             'g' => {
               // Player pos
               let player_pos = self.world.player.actor.pos.clone();

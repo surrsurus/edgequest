@@ -15,12 +15,10 @@ use core::tcod::map::{Map, FovAlgorithm};
 
 
 use core::creature::{ai, Actions, Creature, Stats};
-
 use core::item::{Item, ItemProperty, Money};
-
-use core::renderer::{Renderable, RGB};
-
 use core::log;
+use core::renderer::{Renderable, RGB};
+use core::time::Time;
 
 pub mod dungeon;
 use self::dungeon::{Dungeon, map::{self, Pos, tile, Tile}};

@@ -20,6 +20,7 @@ mod object_tests;
 
 use core::item::Item;
 use core::renderer::RGB;
+use core::time::Time;
 use core::world::dungeon::map::{self, Pos, Tile};
 
 ///
@@ -76,12 +77,21 @@ impl Creature {
     }
   }
 
+
+
+}
+
+///
+/// Timed Creatures
+/// 
+impl Time for Creature {
+
   ///
   /// Passthrough to `AI`
   ///
   /// Essentially allows us to not need to include `AI` when we need to `take_turn()`
   ///
-  pub fn take_turn(&mut self, map: &map::Grid<Tile>, player: &Creature) {
+  fn take_turn(&mut self, map: &map::Grid<Tile>, player: &Creature) {
     self.state = self.ai.take_turn(map, player, &mut self.actor, &mut self.stats);
   }
 
