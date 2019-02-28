@@ -17,6 +17,9 @@ rand = "0.3"
 # Custom noise generator
 fuss = { git = "https://github.com/surrsurus/fuss.git" }
 
+# Images
+image = "*"
+
 # The core APIs, including the Serialize and Deserialize traits. Always
 # required when using Serde.
 serde = "1.0"

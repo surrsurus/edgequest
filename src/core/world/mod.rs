@@ -11,8 +11,9 @@
 extern crate rand;
 use self::rand::Rng;
 
-use core::tcod::map::{Map, FovAlgorithm};
+use image;
 
+use core::tcod::map::{Map, FovAlgorithm};
 
 use core::creature::{ai, Actions, Creature, Stats};
 use core::item::{Item, ItemProperty, Money};
@@ -203,6 +204,32 @@ impl World {
   fn create_test_dungeon(map_dim: Pos) -> Dungeon {
     Dungeon::new(map_dim).build()
   }
+
+  ///
+  /// Draw png img of map
+  ///
+  pub fn debug_make_png_of_map(&mut self) {
+
+    let imgx = self.floor.dun.width() as u32;
+    let imgy = self.floor.dun.height() as u32;
+
+    // Create a new ImgBuf with width: imgx and height: imgy
+    let mut imgbuf = image::ImageBuffer::new(imgx, imgy);
+
+    // Iterate over the coordinates and pixels of the image
+    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
+      let r = self.floor.dun[x as usize][y as usize].get_bg().r();
+      let g = self.floor.dun[x as usize][y as usize].get_bg().g();
+      let b = self.floor.dun[x as usize][y as usize].get_bg().b();
+      *pixel = image::Rgb([r, g, b]);
+    }
+
+    imgbuf = image::imageops::resize(&imgbuf, imgx*8, imgy*8, image::FilterType::Nearest);
+
+    // Save the image as “fractal.png”, the format is deduced from the path
+    imgbuf.save(format!("{}-map.png", self.floor_num)).unwrap();
+
+  } 
 
   ///
   /// Return a new player `Creature`

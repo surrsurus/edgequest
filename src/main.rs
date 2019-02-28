@@ -64,6 +64,9 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 
+// For making images
+extern crate image;
+
 // Defer to game to start playing.
 fn main() {
   core::Engine::new().play();

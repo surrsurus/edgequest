@@ -286,6 +286,12 @@ impl Engine {
               self.state = State::Debug;
             },
 
+            // Make image
+            'p' => {
+              self.world.debug_make_png_of_map();
+              log!("You take a screenshot.", RGB(200, 200, 200));
+            }
+
             // Unbound key, so we just say we don't know what the player did
             _ => { self.world.player.state = Actions::Unknown }
             
