@@ -24,7 +24,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install gcc g++ make libsdl1.2-dev; fi
 
 before_script:
-  - rustup component add clippy
+  - rustup component add clippy --toolchain=nightly || cargo install --git https://github.com/rust-lang/rust-clippy/ --force clippy
 
 script:
   - cargo clippy
