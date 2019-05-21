@@ -109,7 +109,7 @@ impl Renderer {
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
         // Pretty much just random, Player is red, bugs are green, cats are yellow and dogs are blue
-        let mut color = RGB(
+        let color = RGB(
           dungeon[x][y].scents[0].val + 50 + dungeon[x][y].scents[3].val, 
           dungeon[x][y].scents[1].val + 25 + dungeon[x][y].scents[3].val, 
           dungeon[x][y].scents[2].val + 50 
@@ -140,7 +140,7 @@ impl Renderer {
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
         // Color is weighted towards blue
-        let mut color = RGB(
+        let color = RGB(
           dungeon[x][y].get_bg().r(), 
           dungeon[x][y].get_bg().g(), 
           dungeon[x][y].sound as u8
