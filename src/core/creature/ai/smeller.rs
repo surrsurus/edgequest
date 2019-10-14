@@ -39,6 +39,8 @@ impl AI for SmellerAI {
 
     // Represents how far the ai can smell
     let mut scent_range = 2;
+
+    me.prev_pos = me.pos.clone();
   
     // Avoid OOB Errors
     if x < 2 || x > map.len() - 2 || y < 2 || y > map[0].len() - 2 {
@@ -143,7 +145,7 @@ impl AI for SmellerAI {
   ///
   /// Allow Box<AI> cloning
   ///
-  fn box_clone(&self) -> Box<AI> {
+  fn box_clone(&self) -> Box<dyn AI> {
     Box::new((*self).clone())
   }
 

@@ -34,7 +34,7 @@ pub struct Creature {
 
   // Q: Wait, an AI trait object is clonable?
   // A: A *Boxed* AI trait object is clonable, as pointers to objects are clonable
-  pub ai: Box<ai::AI>,
+  pub ai: Box<dyn ai::AI>,
 
   // Items
   // Hold money
@@ -53,7 +53,7 @@ impl Creature {
   /// Mood - How the monster is feeling
   /// Personalities - Helps determine specfic actions based off creature state and mood
   /// Inventory - What the creature is holding
-  /// Illnesses - What afflictions the creature has (affects mood)
+  /// Illnesses - What afflictions the creature has (affects mood, but honestly probably not going to do this one)
   /// 
   /// What I'm basically proposing is to first turn the game into a nature simulator first, and a game second
   ///

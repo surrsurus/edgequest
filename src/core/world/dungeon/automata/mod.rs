@@ -9,8 +9,8 @@ use core::world::dungeon::map;
 
 // Import automatons here
 
-pub mod drunkards_walk;
-pub use self::drunkards_walk::DrunkardsWalk;
+pub mod drunkards_walk_d4;
+pub use self::drunkards_walk_d4::DrunkardsWalkD4;
 
 ///
 /// `Automaton` trait to define a set of behavior for all cellular automatons

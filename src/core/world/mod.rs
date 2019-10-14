@@ -8,6 +8,8 @@
 // use std::fs::File;
 // use std::io::prelude::*;
 
+use std::time::{SystemTime, UNIX_EPOCH};
+
 extern crate rand;
 use self::rand::Rng;
 
@@ -102,7 +104,7 @@ impl World {
           0,
           0,
           0,
-          0,
+          15,
           tile::Scent::Insectoid
         ),
         ai::SimpleAI::new()
@@ -119,7 +121,7 @@ impl World {
           0,
           0,
           0,
-          0,
+          15,
           tile::Scent::Insectoid
         ),
         ai::SimpleAI::new()
@@ -208,7 +210,7 @@ impl World {
   ///
   /// Draw png img of map
   ///
-  pub fn debug_make_png_of_map(&mut self) {
+  pub fn debug_make_png_of_map(&mut self) -> String {
 
     let imgx = self.floor.dun.width() as u32;
     let imgy = self.floor.dun.height() as u32;
@@ -223,11 +225,17 @@ impl World {
       let b = self.floor.dun[x as usize][y as usize].get_bg().b();
       *pixel = image::Rgb([r, g, b]);
     }
-
+    
+    // Resize image by 8x (since we literally were only dealing with pixels before)
     imgbuf = image::imageops::resize(&imgbuf, imgx*8, imgy*8, image::FilterType::Nearest);
 
-    // Save the image as “fractal.png”, the format is deduced from the path
-    imgbuf.save(format!("{}-map.png", self.floor_num)).unwrap();
+    // Generate a name for the file with the floor num and timestamp
+    let name = format!("{}-{:?}-map.png", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(), self.floor_num);
+
+    // Save the image
+    imgbuf.save(&name).unwrap();
+
+    return name;
 
   } 
 
@@ -343,86 +351,36 @@ impl World {
   /// 
   pub fn check_traps(&mut self) {
     
-    match &self.floor.dun[self.player.actor.pos].tiletype.clone() {
+    if self.player.actor.prev_pos != self.player.actor.pos {
+      match &self.floor.dun[self.player.actor.pos].tiletype.clone() {
 
-      // We only care about traps, and this matches every trap
-      tile::Type::Trap(trap) => {
-        
-        log!("You step on a trap!", RGB(255, 0, 0));
-
-        // Match the type of trap
-        match trap {
-
-          // Memory loss causes all tiles to become unseen, effectively losing all mapping progress
-          tile::Trap::MemoryLoss => {
-
-            log!("You lose your memory", RGB(255, 255, 0));
-            
-            for tile in self.floor.dun.grid.iter_mut().flatten() {
-              tile.seen = false;
-            }
-
-          },
-
-          // Fall down a floor or three
-          tile::Trap::Shaft => {
-
-            log!("You fall down a shaft!", RGB(200, 50, 20));
-            
-            for _floors in 0..rand::thread_rng().gen_range(1, 4) {
-              self.go_down();
-            }
-
-          },
-
-          // Turn creature a new color
-          tile::Trap::PaintBomb => {
-
-            let mut rng = rand::thread_rng();
-
-            let col = RGB(rng.gen_range(1, 255), rng.gen_range(1, 255), rng.gen_range(1, 255));
-
-            log!("It's a paint bomb!", RGB(100, 100, 100));
-
-            log!("You look different!", col);
-
-            self.player.actor.set_fg(col);
-
-          }
-
-          // Move randomly on map
-          tile::Trap::Teleport => {
-
-            log!("It's a teleporter!", RGB(50, 127, 200));
-
-            self.player.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
-
-          }
-
-        }
-
-      },
-      _ => {}
-    }
-
-    // Did a creature step on a trap
-    for creature in &mut self.floor.creatures {
-      match &self.floor.dun[creature.actor.pos].tiletype.clone() {
         // We only care about traps, and this matches every trap
         tile::Type::Trap(trap) => {
+          
+          log!("You step on a trap!", RGB(255, 0, 0));
+
           // Match the type of trap
           match trap {
 
-            // Not sure how this affects monsters
-            tile::Trap::MemoryLoss => {},
+            // Memory loss causes all tiles to become unseen, effectively losing all mapping progress
+            tile::Trap::MemoryLoss => {
 
-            // Fall down and die I guess
+              log!("You lose your memory", RGB(255, 255, 0));
+              
+              for tile in self.floor.dun.grid.iter_mut().flatten() {
+                tile.seen = false;
+              }
+
+            },
+
+            // Fall down a floor or three
             tile::Trap::Shaft => {
 
-              log!("You hear a trap door open!", RGB(200, 50, 20));
+              log!("You fall down a shaft!", RGB(200, 50, 20));
               
-              // Not sure what to do with the creature here...
-              creature.state = Actions::Die;
+              for _floors in 0..rand::thread_rng().gen_range(1, 4) {
+                self.go_down();
+              }
 
             },
 
@@ -433,24 +391,80 @@ impl World {
 
               let col = RGB(rng.gen_range(1, 255), rng.gen_range(1, 255), rng.gen_range(1, 255));
 
-              log!("You hear an explosion!", RGB(100, 100, 100));
+              log!("It's a paint bomb!", RGB(100, 100, 100));
 
-              creature.actor.set_fg(col);
+              log!("You look different!", col);
+
+              self.player.actor.set_fg(col);
 
             }
 
             // Move randomly on map
             tile::Trap::Teleport => {
 
-              log!("You hear the hum of a teleporter!", RGB(50, 127, 200));
+              log!("It's a teleporter!", RGB(50, 127, 200));
 
-              creature.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
+              self.player.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
 
             }
+
           }
-        }
-        _ => ()
+
+        },
+        _ => {}
       }
+    }
+    
+
+    // Did a creature step on a trap
+    for creature in &mut self.floor.creatures {
+      if creature.actor.prev_pos != creature.actor.pos {
+        match &self.floor.dun[creature.actor.pos].tiletype.clone() {
+          // We only care about traps, and this matches every trap
+          tile::Type::Trap(trap) => {
+            // Match the type of trap
+            match trap {
+
+              // Not sure how this affects monsters
+              tile::Trap::MemoryLoss => {},
+
+              // Fall down and die I guess
+              tile::Trap::Shaft => {
+
+                log!("You hear a trap door open!", RGB(200, 50, 20));
+                
+                // Not sure what to do with the creature here...
+                creature.state = Actions::Die;
+
+              },
+
+              // Turn creature a new color
+              tile::Trap::PaintBomb => {
+
+                let mut rng = rand::thread_rng();
+
+                let col = RGB(rng.gen_range(1, 255), rng.gen_range(1, 255), rng.gen_range(1, 255));
+
+                log!("You hear an explosion!", RGB(100, 100, 100));
+
+                creature.actor.set_fg(col);
+
+              }
+
+              // Move randomly on map
+              tile::Trap::Teleport => {
+
+                log!("You hear the hum of a teleporter!", RGB(50, 127, 200));
+
+                creature.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
+
+              }
+            }
+          }
+          _ => ()
+        }
+      }
+      
     }
 
   }

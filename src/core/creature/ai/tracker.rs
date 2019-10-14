@@ -30,6 +30,8 @@ impl AI for TrackerAI {
     let mut x = me.pos.x;
     let mut y = me.pos.y;
 
+    me.prev_pos = me.pos.clone();
+
     if distance < 20.0 && distance > 2.00 {
 
       // Move x
@@ -72,7 +74,7 @@ impl AI for TrackerAI {
   ///
   /// Allow Box<AI> cloning
   ///
-  fn box_clone(&self) -> Box<AI> {
+  fn box_clone(&self) -> Box<dyn AI> {
     Box::new((*self).clone())
   }
 

@@ -20,14 +20,15 @@ impl AI for PlayerAI {
   ///
   /// Do nothing
   ///
-  fn take_turn(&mut self, _map: &map::Grid<Tile>, _player: &Creature, _me: &mut Actor, _stats: &mut Stats) -> Actions {
+  fn take_turn(&mut self, _map: &map::Grid<Tile>, _player: &Creature, me: &mut Actor, _stats: &mut Stats) -> Actions {
+    //me.prev_pos = me.pos.clone();
     Actions::Unknown
   }
 
   ///
   /// Allow Box<AI> cloning
   ///
-  fn box_clone(&self) -> Box<AI> {
+  fn box_clone(&self) -> Box<dyn AI> {
     Box::new((*self).clone())
   }
 

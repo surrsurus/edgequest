@@ -144,34 +144,42 @@ impl Engine {
 
             // Movement keys are bound to vim-like controls (hjklyubn)
             'h' => { 
+              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
               self.world.player.actor.move_cart(-1, 0);
               self.world.player.state = Actions::Move;
             },
             'j' => { 
+              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
               self.world.player.actor.move_cart(0, 1);
               self.world.player.state = Actions::Move;
             },
             'k' => {
+              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
               self.world.player.actor.move_cart(0, -1);
               self.world.player.state = Actions::Move;
             },
             'l' => {
+              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
               self.world.player.actor.move_cart(1, 0);
               self.world.player.state = Actions::Move;
             },
             'y' => {
+              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
               self.world.player.actor.move_cart(-1, -1);
               self.world.player.state = Actions::Move;
             },
             'u' => {
+              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
               self.world.player.actor.move_cart(1, -1);
               self.world.player.state = Actions::Move;
             },
             'b' => {
+              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
               self.world.player.actor.move_cart(-1, 1);
               self.world.player.state = Actions::Move;
             },
             'n' => { 
+              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
               self.world.player.actor.move_cart(1, 1);
               self.world.player.state = Actions::Move;
             },
@@ -219,6 +227,7 @@ impl Engine {
             },
             // Wait
             '.' => { 
+              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
               self.world.player.state = Actions::Wait;
             },
 
@@ -288,8 +297,12 @@ impl Engine {
 
             // Make image
             'p' => {
-              self.world.debug_make_png_of_map();
+              let name = self.world.debug_make_png_of_map();
               log!("You take a screenshot.", RGB(200, 200, 200));
+              // So, String -> &'static str... involves leaking the memory of String.
+              // Kind of wild, gets the job done though, wish there was a better way to do this
+              let name_msg = format!("Image saved as {}", name);
+              log!(Box::leak(name_msg.into_boxed_str()), RGB(200, 200, 200));
             }
 
             // Unbound key, so we just say we don't know what the player did
@@ -397,7 +410,7 @@ impl Engine {
       State::Act(Actions::DownStair) => {
         // No clip through floors
         if self.noclip {
-          log!("You lose your physicality, and sink into the floor.", RGB(255, 150, 150));
+          log!("You sink into the floor.", RGB(255, 150, 150));
           self.world.go_down();
         } else {
           self.world.player_go_down();
@@ -407,7 +420,7 @@ impl Engine {
       State::Act(Actions::UpStair) => {
         // No clip through floors
         if self.noclip {
-          log!("You lose your physicality, and ascend through the cieling.", RGB(255, 150, 150));
+          log!("You ascend through the cieling.", RGB(255, 150, 150));
           self.world.go_up();
         } else {
           self.world.player_go_up();
@@ -473,9 +486,9 @@ impl Engine {
     self.title_screen();
 
     // Some starting messages, will be removed in later versions (hopefully)
-    log!("Welcome to Edgequest",                 RGB(255,   0, 255));
-    log!("Move with vim keys",                   RGB(255, 255, 255));
-    log!("esc to quit",                          RGB(255, 255, 255));
+    log!("Welcome to Edgequest",                       RGB(255,   0, 255));
+    log!("Move with vim keys, g to pick up items",     RGB(255, 255, 255));
+    log!("esc to quit",                                RGB(255, 255, 255));
 
     if self.wizard {
       log!("You are in wizard mode",                   RGB(255,   0,   0));

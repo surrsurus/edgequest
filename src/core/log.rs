@@ -51,7 +51,7 @@ use core::renderer::RGB;
 ///
 #[derive(Default)]
 pub struct Log {
-  pub data: Vec<(&'static str, RGB)>,
+  pub data: Vec<(&'static str, RGB, u32)>,
 }
 
 impl Log {
@@ -68,7 +68,7 @@ impl Log {
   /// The intention of this is that the range is the interated over, and then used as indices
   /// to read the log data
   ///
-  pub fn get_last_n_messages(&self, n: usize) -> &[(&'static str, RGB)] {
+  pub fn get_last_n_messages(&self, n: usize) -> &[(&'static str, RGB, u32)] {
     // Basically if there are n items in the log, but we want to get > n items, we
     // should make sure rust doesn't have some sort of underflow error
     if n > self.data.len() {
@@ -81,8 +81,20 @@ impl Log {
   ///
   /// Push new data onto the log stack
   ///
-  pub fn push(&mut self, message: (&'static str, RGB)) {
+  pub fn push(&mut self, message: (&'static str, RGB, u32)) {
+    // If there are elements in the log
+    if self.data.len() > 0 {
+      // If the last message string is the same, update the counter instead of pushing.
+      let last_pos = self.data.len() - 1;
+      if &self.data[last_pos].0 == &message.0 {
+        self.data[last_pos].2 += 1;
+        return;
+      }
+    } 
+
+    // Push message
     self.data.push(message);
+    
   }
 }
 
@@ -102,9 +114,19 @@ macro_rules! log {
     let mut log = GlobalLog.lock().unwrap();
     // Push the message
     // Highly implies a correct expression for the push arguments are being supplied
-    log.push(($msg, $col));
+    log.push(($msg, $col, 1));
     // Drop the reference
     drop(log);
   }};
 }
 
+// Macro for debugging information
+#[macro_export]
+macro_rules! debugln {
+  ($id:expr, $msg:expr) => {{
+    use core::init::debug;
+    if debug() {
+      println!("[{}] {}", $id, $msg);
+    }
+  }};
+}

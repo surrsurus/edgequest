@@ -37,6 +37,8 @@ impl AI for SimpleAI {
     let mut y : usize;
     let mut count : usize = 0;
 
+    me.prev_pos = me.pos.clone();
+
     // Try to move around until we find a good spot to land
     loop {
 
@@ -83,7 +85,7 @@ impl AI for SimpleAI {
   ///
   /// Allow Box<AI> cloning
   ///
-  fn box_clone(&self) -> Box<AI> {
+  fn box_clone(&self) -> Box<dyn AI> {
     Box::new((*self).clone())
   }
 

@@ -1,7 +1,7 @@
 //!
-//! Drunkard's Walk
+//! Drunkard's Walk D4
 //! 
-//! A super basic cellular automata
+//! A super basic cellular automata that moves in 4 directions (NSEW)
 //! 
 
 use super::Automaton;
@@ -14,25 +14,25 @@ use core::world::dungeon::map::{self, Pos, Tile};
 /// 1.0 represents total chaos, 0.0 represents total order. Going over 1.0 or under 0.0 causes a panic.
 /// 
 #[derive(Clone, PartialEq, Debug, Default)]
-pub struct DrunkardsWalk {
+pub struct DrunkardsWalkD4 {
   pub chaos: f32
 }
 
-impl DrunkardsWalk {
+impl DrunkardsWalkD4 {
 
   ///
-  /// Return a new `DrunkardsWalk`
+  /// Return a new `DrunkardsWalkD4`
   /// 
   /// Will panic if chaos is not between the values of [0.0, 1.0] inclusive.
   /// 
   pub fn new(chaos: f32) -> Self {
     assert!(chaos >= 0.0 && chaos <= 1.0);
-    DrunkardsWalk { chaos }
+    DrunkardsWalkD4 { chaos }
   }
 
 }
 
-impl Automaton for DrunkardsWalk {
+impl Automaton for DrunkardsWalkD4 {
 
   type Output = Tile;
 
@@ -67,7 +67,7 @@ impl Automaton for DrunkardsWalk {
         2 => starting_pos.x -= 1,
         3 => starting_pos.y += 1,
         4 => starting_pos.y -= 1,
-        _ => unreachable!("DrunkardsWalk - Unreachable dice state reached in movement")
+        _ => unreachable!("DrunkardsWalkD4 - Unreachable dice state reached in movement")
       }
 
       // Place pos inbounds

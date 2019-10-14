@@ -33,7 +33,10 @@ impl Structure {
     let paths : Vec<_> = fs::read_dir("./strct").unwrap().map(|res| res.unwrap().path()).collect();
 
     // Choose a random element (aka file from paths)
-    let mut file = fs::File::open(rng.choose(&paths).unwrap()).unwrap();
+    let fname = rng.choose(&paths).unwrap();
+    let mut file = fs::File::open(fname).unwrap();
+
+    debugln!("struct", format!("adding struct {}", fname.display()));
 
     // Create empty string and read to it
     let mut string = String::new();
@@ -51,8 +54,13 @@ impl Structure {
         let tile = {
           match ch {
             '#' => Tile::new("Wall", ' ', RGB(40, 40, 40), RGB(33, 33, 33), tile::Type::Wall(tile::Wall::Normal)),
-            '.' => Tile::new("Floor", ' ', RGB(27, 27, 27), RGB(20, 20, 20), tile::Type::Floor(tile::Floor::Normal)),
+            // So on windows I've noticed that in the text files for structures, random escape characters get added in so might as well
+            // just make them floors.
+            '.' | ' ' | '\t' | '\r' => Tile::new("Floor", ' ', RGB(27, 27, 27), RGB(20, 20, 20), tile::Type::Floor(tile::Floor::Normal)),
             '"' => Tile::new("Tall Grass", '"', RGB(76, 74, 75), RGB(20, 20, 20), tile::Type::TallGrass),
+            '&' => Tile::new("Fountain", '&', RGB(201, 195, 195), RGB(20, 20, 20), tile::Type::ArtStructure),
+            '<' => Tile::new("Up Stair", '<', RGB(255, 255, 255), RGB(0, 0, 0), tile::Type::Stair(tile::Stair::UpStair(tile::UpStair::Normal))),
+            '>' => Tile::new("Down Stair", '>', RGB(255, 255, 255), RGB(0, 0, 0), tile::Type::Stair(tile::Stair::DownStair(tile::DownStair::Normal))),
             _ => panic!("Unknown character: {}", ch)
           }
         };

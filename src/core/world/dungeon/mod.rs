@@ -16,7 +16,7 @@ use self::filter::{Filter, Structure, Simple};
 
 // Privately use automata
 mod automata;
-use self::automata::{Automaton, DrunkardsWalk};
+use self::automata::{Automaton, DrunkardsWalkD4};
 
 // Privately use builders
 mod builder;
@@ -114,6 +114,8 @@ impl Dungeon {
     // the world should be able to access it to generate items and monsters in the type/biome combinations
     // that will appear
 
+    debugln!("dungeon", "building floor...");
+
     // We start with a basic grid object. We will pass references of this object into various functions to carve out a dungeon.
     let mut grid : map::Grid<Tile>;
 
@@ -153,8 +155,8 @@ impl Dungeon {
     // though it may be in the future.
     
     // This is geared towards eating walls and replacing them with floors, so mainly just to flesh out the dungeon.
-    let drunk = |chaos: f32, iter: u32, grid: &mut map::Grid<Tile> | {
-      let d = DrunkardsWalk::new(chaos);
+    let drunk_d4 = |chaos: f32, iter: u32, grid: &mut map::Grid<Tile> | {
+      let d = DrunkardsWalkD4::new(chaos);
       d.apply(
         grid,
         None,
@@ -167,16 +169,27 @@ impl Dungeon {
     // Make three passes of this basic walk to carve caves.
 
     // Total randomness - Really centralized areas that are mostly opened since it walks over itself a lot
-    drunk(1.0, 800, &mut grid);
+    drunk_d4(1.0, 800, &mut grid);
 
     // Semi random - A mixture of the previous and next option
-    drunk(0.5, 1000, &mut grid);
+    drunk_d4(0.5, 1000, &mut grid);
 
     // Mostly orderly - Long corridors that occassionally deviate
-    drunk(0.25, 1000, &mut grid);
+    drunk_d4(0.25, 1000, &mut grid);
 
-    // Add structures
-    Structure::new().apply(&mut grid);
+    // Add 1 - 3 structures, weighted towards 1
+    // So like a normal person would use a normal distribution or something
+    // but I could not get it to work for the life of me, probably due to a version mismatch in rand
+    // This is like, pretty good, and I like the results, so, why not.
+    // ---
+    // An interesting property of dungeon generation is that, more often than not, structures get "corrupted"
+    // or "eroded" by the way generation occurs. The earlier something appears in the generation stage,
+    // the more likely it is to not make it out 100% intact.
+    // So, if structures need to be "preserved" better, move it down, and the same principle holds for all
+    // features/filters/whatever
+    for _ in 0..*rand::thread_rng().choose(&[1, 1, 1, 1, 2, 3]).unwrap() {
+      Structure::new().apply(&mut grid);
+    }
 
     // Biome generation
 
@@ -307,6 +320,7 @@ impl Dungeon {
             }
             _ => {}
           }
+          grid[x][y].biome = tile::Biome::Crystal;
         }
       }
     }
@@ -397,10 +411,10 @@ impl Dungeon {
               tile::Biome::Cave => {
                 let foliage_chance = rng.gen_range(1, 100);
                 match foliage_chance {
-                  1...5 => grid[x][y].set_fg(RGB(76, 74, 45)),
-                  6...10 => grid[x][y].set_fg(RGB(35, 30, 30)),
-                  11...15 => grid[x][y].set_fg(RGB(76, 74, 45)),
-                  16...20 => grid[x][y].set_fg(RGB(76, 74, 45)),
+                  1..=5 => grid[x][y].set_fg(RGB(76, 74, 45)),
+                  6..=10 => grid[x][y].set_fg(RGB(35, 30, 30)),
+                  11..=15 => grid[x][y].set_fg(RGB(76, 74, 45)),
+                  16..=20 => grid[x][y].set_fg(RGB(76, 74, 45)),
                   _ => {}
                 };
               }

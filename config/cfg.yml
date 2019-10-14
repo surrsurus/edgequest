@@ -39,7 +39,10 @@ fontlayout: "AsciiInRow"
 # * SDL
 # * GLSL
 # * OpenGL
-renderer: "OpenGL"
+renderer: "SDL"
 
 # Wizard mode
 wizard: true
+
+# Enable/disable debug logs
+debug: true

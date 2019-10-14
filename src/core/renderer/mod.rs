@@ -104,28 +104,18 @@ impl Renderer {
   ///
   /// Render for each monster as a visible colored entity
   ///
-  fn debug_render_scent_map(&mut self, con: &mut console::Root, dungeon: &Dungeon) {
+  fn debug_render_scent_map(&mut self, con: &mut console::Root, world: &World, dungeon: &Dungeon) {
 
     for x in 0..dungeon.width {
       for y in 0..dungeon.height {
-        // Pretty much just random, Player is red, bugs are green, cats are yellow and dogs are blue
-        let color = RGB(
-          dungeon[x][y].scents[0].val + 50 + dungeon[x][y].scents[3].val, 
-          dungeon[x][y].scents[1].val + 25 + dungeon[x][y].scents[3].val, 
-          dungeon[x][y].scents[2].val + 50 
-        );
-        // Iterate over scents, context of what scent it is isn't necessary
-        for scent_type in 0..tile::Scent::Num as usize {
-          if dungeon[x][y].scents[scent_type].val > 0 {
-            self.draw_renderable(con, Pos::new(x as isize, y as isize), &Tile::new(
-              "Debug Scent",
-              ' ',
-              RGB(255, 255, 255),
-              color,
-              tile::Type::Debug
-            ));
-            break;
+        // If fov is on...
+        if self.fov {
+          // And it's in the FoV
+          if world.tcod_map.is_in_fov(x as i32, y as i32) {
+            self.draw_scent(con, dungeon, x, y);
           }
+        } else {
+          self.draw_scent(con, dungeon, x, y);
         }
       }
     }
@@ -189,7 +179,6 @@ impl Renderer {
     
     self.draw_ui(con, world);
 
-
     //
     // Flush changes to root
     //
@@ -215,10 +204,19 @@ impl Renderer {
       // Color and string is determined by the content of the slice at that index
       let color = pair.1;
       let string = pair.0;
+      let message;
+
+      // Determine if the counter must be added
+      if pair.2 > 1 {
+        message = format!("{} (x{})", string, pair.2).to_owned();
+      } else {
+        message = string.to_string();
+      }
+
       // They are then combined to render to the screen at a specific y axis such that the most
       // recent message will appear at the bottom
       con.set_default_foreground(color.to_tcod());
-      con.print(0, y as i32, string);
+      con.print(0, y as i32, message);
     }
 
     // Explicitly drop ref
@@ -229,7 +227,7 @@ impl Renderer {
   ///
   /// Put an `Renderable` on the console
   ///
-  fn draw_renderable(&self, con: &mut console::Root, pos: Pos, renderable: &Renderable) {
+  fn draw_renderable(&self, con: &mut console::Root, pos: Pos, renderable: &dyn Renderable) {
 
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
@@ -250,7 +248,7 @@ impl Renderer {
   ///
   /// Draw renderables with "transparent" backgrounds
   ///
-  fn draw_renderable_transparent(&self, con: &mut console::Root, pos: Pos, renderable: &Renderable, world: &World) {
+  fn draw_renderable_transparent(&self, con: &mut console::Root, pos: Pos, renderable: &dyn Renderable, world: &World) {
     // Check if it's in the camera first
     if !self.camera.is_in_camera(pos) { return }
 
@@ -270,6 +268,29 @@ impl Renderer {
       }
     );
 
+  }
+
+  /// Draw scent
+  fn draw_scent(&self, con: &mut console::Root, dungeon: &Dungeon, x: usize, y: usize) {
+    // Pretty much just random, Player is red, bugs are green, cats are yellow and dogs are blue
+    let color = RGB(
+      dungeon[x][y].scents[0].val + 50 + dungeon[x][y].scents[3].val, 
+      dungeon[x][y].scents[1].val + 25 + dungeon[x][y].scents[3].val, 
+      dungeon[x][y].scents[2].val + 50 
+    );
+    // Iterate over scents, context of what scent it is isn't necessary
+    for scent_type in 0..tile::Scent::Num as usize {
+      if dungeon[x][y].scents[scent_type].val > 0 {
+        self.draw_renderable(con, Pos::new(x as isize, y as isize), &Tile::new(
+          "Debug Scent",
+          ' ',
+          RGB(255, 255, 255),
+          color,
+          tile::Type::Debug
+        ));
+        break;
+      }
+    }
   }
 
   ///
@@ -470,7 +491,7 @@ impl Renderer {
 
     // Debug scent
     if self.show_scent {
-      self.debug_render_scent_map(con, &world.floor.dun);
+      self.debug_render_scent_map(con, &world, &world.floor.dun);
     }
 
     // Debug sound

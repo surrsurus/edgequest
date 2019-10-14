@@ -79,7 +79,7 @@ pub trait AI {
   ///
   /// Allow boxed trait objects to be cloned
   /// 
-  fn box_clone(&self) -> Box<AI>;
+  fn box_clone(&self) -> Box<dyn AI>;
 
 }
 
@@ -89,8 +89,8 @@ pub trait AI {
 /// https://users.rust-lang.org/t/solved-is-it-possible-to-clone-a-boxed-trait-object/1714
 /// 
 /// The downside is that all things that impl AI need to have a very similar box clone, but that's not an issue
-impl Clone for Box<AI> {
-  fn clone(&self) -> Box<AI> {
+impl Clone for Box<dyn AI> {
+  fn clone(&self) -> Box<dyn AI> {
     self.box_clone()
   }
 }

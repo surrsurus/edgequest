@@ -34,6 +34,8 @@ impl AI for TalkerAI {
     // ^ is overridden to be the distance formula, this isn't xor
     let distance = me.pos ^ player.actor.pos;
 
+    me.prev_pos = me.pos.clone();
+
     if distance < TALK_DISTANCE {
 
       let mut rng = rand::thread_rng();
@@ -41,7 +43,7 @@ impl AI for TalkerAI {
 
       // Match dice for voiceline
       match dice {
-        1...10 => (),
+        1..=10 => (),
         11 => log!("'This is where we live'", me.get_fg()),
         12 => log!("'This is where we get work done'", me.get_fg()),
         13 => log!("'Don't touch the arrow keys'", me.get_fg()),
@@ -51,7 +53,7 @@ impl AI for TalkerAI {
 
       // Match dice for action
       match dice {
-        1...10 => (),
+        1..=10 => (),
         _ => state = Actions::Talk
       }
       
@@ -64,7 +66,7 @@ impl AI for TalkerAI {
   ///
   /// Allow Box<AI> cloning
   ///
-  fn box_clone(&self) -> Box<AI> {
+  fn box_clone(&self) -> Box<dyn AI> {
     Box::new((*self).clone())
   }
 

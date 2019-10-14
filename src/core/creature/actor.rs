@@ -13,6 +13,7 @@ pub struct Actor {
   name: &'static str,
   glyph: char,
   pub pos: Pos,
+  pub prev_pos: Pos,
   fg: RGB,
   bg: RGB
 }
@@ -55,11 +56,12 @@ impl Actor {
   #[inline]
   pub fn new(name: &'static str, glyph: char, pos: Pos, fg: RGB, bg: RGB) -> Self {
     Actor {
-      name,
-      glyph, 
-      pos, 
-      fg, 
-      bg
+      name: name,
+      glyph: glyph, 
+      pos: pos,
+      prev_pos: pos,
+      fg: fg, 
+      bg: bg
     }
   }
 

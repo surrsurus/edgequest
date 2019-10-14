@@ -101,3 +101,10 @@ pub fn panel_width() -> isize {
 pub fn wizard() -> bool {
   CFG.wizard
 }
+
+///
+/// Get debug mode
+///
+pub fn debug() -> bool {
+  CFG.debug
+}

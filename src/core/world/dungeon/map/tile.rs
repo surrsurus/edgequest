@@ -16,6 +16,7 @@ pub enum Type {
   Water,
   Unseen,
   Trap(Trap),
+  ArtStructure,
   Debug
 }
 
@@ -106,7 +107,7 @@ pub enum Traversability {
 // Does the tile block vision?
 pub fn opaque(t: &Tile) -> bool {
   match t.tiletype {
-    Type::Wall(_) | Type::TallGrass => true,
+    Type::Wall(_) | Type::TallGrass | Type::ArtStructure => true,
     _ => false
   }
 }

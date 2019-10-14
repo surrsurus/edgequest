@@ -70,7 +70,10 @@ pub struct Config {
   pub renderer: String,
 
   // Wizard mode
-  pub wizard: bool
+  pub wizard: bool,
+
+  // Debug logs
+  pub debug: bool
 
 }
 
