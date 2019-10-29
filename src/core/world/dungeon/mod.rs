@@ -199,6 +199,8 @@ impl Dungeon {
     let mut f1 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.2);
     let bin_grid1 = f1.build();
 
+    debugln!("biome", "applying cave biomes...");
+
     // Iterate over the grid
     for x in 0..self.width {
       for y in 0..self.height {
@@ -228,6 +230,8 @@ impl Dungeon {
     let mut f2 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.2);
     let bin_grid2 = f2.build();
 
+    debugln!("biome", "applying crypt biomes...");
+
     for x in 0..self.width {
       for y in 0..self.height {
         if bin_grid2[x][y] == 1 {
@@ -252,6 +256,8 @@ impl Dungeon {
     // Apply noise for Sunken biome
     let mut f3 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.4);
     let bin_grid3 = f3.build();
+
+    debugln!("biome", "applying sunken biomes...");
 
     for x in 0..self.width {
       for y in 0..self.height {
@@ -278,6 +284,8 @@ impl Dungeon {
     let mut f4 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.4);
     let bin_grid4 = f4.build();
 
+    debugln!("biome", "applying water...");
+
     for x in 0..self.width {
       for y in 0..self.height {
         if bin_grid4[x][y] == 1 {
@@ -295,6 +303,8 @@ impl Dungeon {
     // Apply noise for crystal biome
     let mut f5 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.67);
     let bin_grid5 = f5.build();
+
+    debugln!("biome", "applying crystal biomes...");
 
     for x in 0..self.width {
       for y in 0..self.height {
@@ -329,6 +339,8 @@ impl Dungeon {
     let mut f6 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.5);
     let bin_grid6 = f6.build();
 
+    debugln!("biome", "applying tall grass...");
+
     for x in 0..self.width {
       for y in 0..self.height {
         if bin_grid6[x][y] == 1 {
@@ -352,6 +364,8 @@ impl Dungeon {
     let mut f7 = Fussy::new(Dungeon::generate_grid(self.width, self.height, 0_u8), 1.55);
     let bin_grid7 = f7.build();
 
+    debugln!("biome", "applying vines...");
+
     for x in 0..self.width {
       for y in 0..self.height {
         if bin_grid7[x][y] == 1 {
@@ -372,6 +386,8 @@ impl Dungeon {
     }
 
     // Add pretty details last.
+
+    debugln!("details", "applying details...");
 
     // Add some hard walls
     for x in 0..self.width {
@@ -430,6 +446,8 @@ impl Dungeon {
 
     // So I know that get_valid_location() should be deprecated since we started adding stairs
     // but we're just gonna have to live with it for now
+
+    debugln!("stairs", "adding stairs...");
     
     // Downstair location
     let loc = Dungeon::get_valid_location(&grid);
@@ -458,6 +476,8 @@ impl Dungeon {
       ),
       loc
     );
+
+    debugln!("trap", "setting traps...");
 
     // Add a trap
     let loc = Dungeon::get_valid_location(&grid);
@@ -515,12 +535,15 @@ impl Dungeon {
     );
 
     // Apply viscera
+
     Viscera::new().apply(&mut grid);
 
     // Spent 300 million years wondering why the map was all walls until I realized this CRUCIAL piece of code
     // suddenly vanished.
     // Don't delete.
     self.grid = grid;
+
+    debugln!("dungeon", "done!");
 
     // Return self
     return self;

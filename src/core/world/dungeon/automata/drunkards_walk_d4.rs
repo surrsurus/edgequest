@@ -38,6 +38,8 @@ impl Automaton for DrunkardsWalkD4 {
 
   fn apply(&self, grid: &mut map::Grid<Tile>, pos: Option<Pos>, find: Option<Tile>, replace: Tile, iterations: u32) {
 
+    debugln!("drunkard d4", "stumbling around...");
+
     // Get our starting x and y
 
     let mut starting_pos = self.unwrap_pos(grid, pos);

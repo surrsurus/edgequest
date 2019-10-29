@@ -170,6 +170,8 @@ impl Filter for Simple {
 
   fn apply(&mut self, grid: &mut Grid<Self::Output>) {
 
+    debugln!("simple", "building a simple dungeon...");
+
     // Generate the dungeon
     self.add_rooms(grid);
     self.connect_rooms(grid);

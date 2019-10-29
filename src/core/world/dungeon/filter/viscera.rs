@@ -94,6 +94,8 @@ impl Filter for Viscera {
 
   fn apply(&mut self, grid: &mut Grid<Self::Output>) {
 
+    debugln!("viscera", "spreading gore randomly...");
+
     // Generate the dungeon
     self.add_blood_random(grid);
 
