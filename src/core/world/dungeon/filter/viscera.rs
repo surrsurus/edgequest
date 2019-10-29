@@ -5,7 +5,7 @@ use core::renderer::RGB;
 
 use super::Filter;
 
-use super::map::{Grid, Pos, tile, Tile};
+use super::map::{Grid, tile, Tile};
 
 // Configuration
 
@@ -18,9 +18,7 @@ const RADIUS : usize = 4;
 /// Place a slightly randomized viscera on a certain point
 /// 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Viscera {
-
-}
+pub struct Viscera;
 
 impl Viscera {
 

@@ -7,6 +7,8 @@ use core::world::dungeon::map::{self, Pos, tile, Tile};
 use super::{AI, RANDOM_TRIES};
 use core::creature::{Actions, Creature, Actor, Stats};
 
+const BLINK_RANGE : isize = 8;
+
 ///
 /// BlinkAI makes monster teleport around the map periodically
 ///
@@ -16,15 +18,13 @@ pub struct BlinkAI;
 impl BlinkAI {
 
   ///
-  /// Get a random tile nearby
+  /// Return a `Pos` to a random tile nearby
   /// 
   pub fn blink(&mut self, me: &mut Actor) -> Pos {
     let mut rng = rand::thread_rng();
-    let mut x = me.pos.x;
-    let mut y = me.pos.y;
-    x += rng.gen_range(-8, 8);
-    y += rng.gen_range(-8, 8);
-    return Pos::new(x, y);
+    let mut pos = me.pos.clone();
+    pos += Pos::new(rng.gen_range(-BLINK_RANGE, BLINK_RANGE), rng.gen_range(-BLINK_RANGE, BLINK_RANGE));
+    return pos;
   }
 
   ///
@@ -47,8 +47,7 @@ impl AI for BlinkAI {
 
     me.prev_pos = me.pos.clone();
     
-    let mut x = me.pos.x;
-    let mut y = me.pos.y;
+    let mut pos = me.pos.clone();
     let mut count : usize = 0;
     // Start out in a movement state since the only other state this AI can be in is Blink or Wait
     // which are updated accordingly
@@ -64,15 +63,13 @@ impl AI for BlinkAI {
 
       // Match dice for movement
       match dice {
-        1 => x += 1,
-        2 => x -= 1,
-        3 => y += 1,
-        4 => y -= 1,
+        1 => pos.x += 1,
+        2 => pos.x -= 1,
+        3 => pos.y += 1,
+        4 => pos.y -= 1,
         // Blink
         5 => {
-          let bpos = self.blink(me);
-          x = bpos.x;
-          y = bpos.y;
+          pos = self.blink(me);
           state = Actions::Blink;
         },
         // If the rng breaks something is very wrong
@@ -80,26 +77,25 @@ impl AI for BlinkAI {
       }
 
       // Check map bounds of previous action since this AI can pretty much just glitch straight OOB via
-      // what ammounts to this game's version of the BLJ
-      if x < 0 {
-        x = 0;
+      // what amounts to this game's version of the BLJ
+      if pos.x < 0 {
+        pos.x = 0;
       }
-      if y < 0 {
-        y = 0;
+      if pos.y < 0 {
+        pos.y = 0;
       }
-      if y >= (map[0].len() - 1) as isize {
-        y = (map[0].len() - 1) as isize;
+      if pos.y >= (map[0].len() - 1) as isize {
+        pos.y = (map[0].len() - 1) as isize;
       }
-      if x >= (map.len() - 1) as isize {
-        x = (map.len() - 1) as isize;
+      if pos.x >= (map.len() - 1) as isize {
+        pos.x = (map.len() - 1) as isize;
       }
 
-      if tile::walkable(&map[x as usize][y as usize]) {
+      if tile::walkable(&map[pos.x as usize][pos.y as usize]) {
         break;
       // If we make a lot of attempts and still can't find a tile::walkable tile, just stop
       } else if count > RANDOM_TRIES {
-        x = me.pos.x;
-        y = me.pos.y;
+        pos = me.pos.clone();
         state = Actions::Wait;
         break; 
       }
@@ -107,8 +103,7 @@ impl AI for BlinkAI {
     }
     
     // Update creature position
-    me.pos.x = x as isize;
-    me.pos.y = y as isize;
+    me.pos = pos;
 
     return state;
 
