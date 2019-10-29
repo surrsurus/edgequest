@@ -47,7 +47,8 @@ pub enum Trap {
   MemoryLoss,
   Shaft,
   PaintBomb,
-  Teleport
+  Teleport,
+  Spike
 }
 
 ///

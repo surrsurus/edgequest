@@ -27,28 +27,32 @@ pub mod dungeon;
 use self::dungeon::{Dungeon, map::{self, Pos, tile, Tile}};
 
 ///
-/// What value the player sets the scent of nearby tiles to
-///
+/// Configurations
+/// 
+
+/// FOV conf
+
+// FOV Radius
+const FOV_RADIUS : i32 = 15;
+
+/// Scent conf
+
+// What value the player sets the scent of nearby tiles to
 const SC_INC : u8 = 100;
 
-///
-/// Affects bloom distance. Higher values means less bloom
-///
+// Affects bloom distance. Higher values means less bloom
 const SC_BLOOM_CUTOFF : f32 = 0.05;
 
-///
-/// Decay value applied to tiles inheriting scent from neighbors
-///
-/// Currently 255/256
-///
+// Decay value applied to tiles inheriting scent from neighbors
+// Currently 255/256
 const SC_DECAY : f32 = 0.996_093_75;
 
-///
-/// Diameter of scent around creatures, should be odd for best effect
-///
+// Diameter of scent around creatures, should be odd for best effect
 const SC_DIAM : isize = 3;
+
 // Upper index for ranges
 const SC_DIAM_UPPER : isize = ((SC_DIAM / 2) + 1);
+
 // Lower index for ranges
 const SC_DIAM_LOWER : isize = -(SC_DIAM / 2);
 
@@ -376,7 +380,7 @@ impl World {
 
               self.player.actor.set_fg(col);
 
-            }
+            },
 
             // Move randomly on map
             tile::Trap::Teleport => {
@@ -384,6 +388,15 @@ impl World {
               log!("It's a teleporter!", RGB(50, 127, 200));
 
               self.player.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
+
+            },
+
+            // Bleed
+            tile::Trap::Spike => {
+
+              log!("You impale yourself on a spike!", RGB(200, 200, 200));
+
+              self.floor.dun.add_blood(self.player.actor.pos);
 
             }
 
@@ -436,6 +449,13 @@ impl World {
                 log!("You hear the hum of a teleporter!", RGB(50, 127, 200));
 
                 creature.actor.pos = Dungeon::get_valid_location(&self.floor.dun.grid);
+
+              }
+
+              // Bleed
+              tile::Trap::Spike => {
+
+                self.floor.dun.add_blood(creature.actor.pos);
 
               }
             }
@@ -805,7 +825,7 @@ impl World {
   /// Update the fov map from the player's perspective
   /// 
   pub fn update_fov(&mut self) {
-    self.tcod_map.compute_fov(self.player.actor.pos.x as i32, self.player.actor.pos.y as i32, 20, true, FovAlgorithm::Shadow);
+    self.tcod_map.compute_fov(self.player.actor.pos.x as i32, self.player.actor.pos.y as i32, FOV_RADIUS, true, FovAlgorithm::Shadow);
   }
 
   ///

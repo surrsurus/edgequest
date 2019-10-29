@@ -24,12 +24,18 @@ use self::builder::{Buildable, Fussy};
 
 mod dungeon_tests;
 
+///
+/// Configuration
+/// 
+
+// Various colors for grass
 const GRASS_COLORS : [RGB; 3] = [
   RGB(76, 74, 75),
   RGB(76, 79, 75),
   RGB(80, 74, 75)
 ];
 
+// What symbol vines will use to represent themselves
 const VINE_GLYPHS : [char; 5] = [
   '/', '|', '\\', '-', '~'
 ];
@@ -521,6 +527,20 @@ impl Dungeon {
       loc
     );
 
+    // And antoha one
+    let loc = Dungeon::get_valid_location(&grid);
+    self.add_tile(
+      &mut grid,
+      &mut Tile::new(
+        "Spike", 
+        '^', 
+        RGB(200, 200, 200), 
+        RGB(0, 0, 0), 
+        tile::Type::Trap(tile::Trap::Spike)
+      ),
+      loc
+    );
+
     let loc = Dungeon::get_valid_location(&grid);
     self.add_tile(
       &mut grid,
@@ -569,6 +589,19 @@ impl Dungeon {
     }
 
     return grid;
+
+  }
+
+  ///
+  /// Add some blood
+  /// 
+  pub fn add_blood(&mut self, pos: Pos) {
+
+    for i in 0..filter::viscera::RADIUS {
+      for j in 0..filter::viscera::RADIUS {
+        Viscera::viscerize(pos.x as usize + i, pos.y as usize + j, &mut self.grid);
+      }
+    }
 
   }
 
