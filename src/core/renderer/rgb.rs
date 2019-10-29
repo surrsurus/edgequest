@@ -66,6 +66,68 @@ impl RGB {
     self.2
   }
 
+  ///
+  /// Take two RGBs. Compute a color between each of them.
+  /// Amount is a float between 0 and 1, and specifies how far
+  /// in between the two colors the new color should be.
+  ///
+  pub fn transition_between(rgb1: &RGB, rgb2: &RGB, amount: f32) -> RGB {
+    let diff : (isize, isize, isize) = (
+      (rgb2.r() as isize) - (rgb1.r() as isize),
+      (rgb2.g() as isize) - (rgb1.g() as isize), 
+      (rgb2.b() as isize) - (rgb1.b() as isize)
+    );
+    let change : (isize, isize, isize) = (
+      (diff.0 as f32 * amount).round() as isize,
+      (diff.1 as f32 * amount).round() as isize,
+      (diff.2 as f32 * amount).round() as isize
+    );
+    let result : RGB = RGB(
+      (rgb1.r() as isize + change.0) as u8,
+      (rgb1.g() as isize + change.1) as u8,
+      (rgb1.b() as isize + change.2) as u8
+    );
+    return result;
+  }
+
+  ///
+  /// Take three RGBs. Compute how far in between 
+  /// rgb1 and rgb2 rgb3 is.
+  ///
+  pub fn transition_distance(rgb1: &RGB, rgb2: &RGB, rgb3 : &RGB) -> f32 {
+    // We need to go through each r, g, and b value seperately, as RGB / RGB is not well defined.
+    // We also need to be careful to avoid zero values - we do not want divide by zero errors.
+
+    // Starting with red.
+    let change_r : isize = (rgb3.r() as isize) - (rgb1.r() as isize);
+    let diff_r   : isize = (rgb2.r() as isize) - (rgb1.r() as isize);
+    // If the difference in red value between rgb1 and rgb2 is 0,
+    // EVERY DISTANCE between those two colors would provide the same result.
+    // This is identified mathematically as some number over 0, and is why we
+    // need the conditional logic here.
+    if diff_r != 0 {
+      let amount : f32 = (change_r as f32) / (diff_r as f32);
+      return amount;
+    }
+
+    // Green.
+    let change_g : isize = (rgb3.g() as isize) - (rgb1.g() as isize);
+    let diff_g   : isize = (rgb2.g() as isize) - (rgb1.g() as isize);
+    if diff_g != 0 {
+      let amount : f32 = (change_g as f32) / (diff_g as f32);
+      return amount;
+    }
+
+    // Blue.
+    let change_b : isize = (rgb3.b() as isize) - (rgb1.b() as isize);
+    let diff_b   : isize = (rgb2.b() as isize) - (rgb1.b() as isize);
+    if diff_b != 0 {
+      let amount : f32 = (change_b as f32) / (diff_b as f32);
+      return amount;
+    }
+    // The rgb1 and rgb2 values were the same. Just return zero.
+    return 0.0
+  }
 }
 
 /// 
