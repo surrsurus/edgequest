@@ -10,7 +10,7 @@ use super::map::{Grid, Measurable, tile, Tile};
 // Configuration
 
 // Should be divisible by 2
-const RADIUS : usize = 4;
+pub const RADIUS : usize = 4;
 
 ///
 /// Viscera generator
@@ -25,7 +25,7 @@ impl Viscera {
   ///
   /// Add viscera on a tile
   ///
-  fn viscerize(&self, x: usize, y: usize, grid: &mut Grid<Tile>) {
+  pub fn viscerize(x: usize, y: usize, grid: &mut Grid<Tile>) {
 
     let mut rng = rand::thread_rng();
 
@@ -67,7 +67,7 @@ impl Viscera {
       // So we want to cover a 3x3 area and randomly decide if there is blood there and what color it will be
       for i in 0..RADIUS {
         for j in 0..RADIUS {
-          self.viscerize(x + i, y + j, grid);
+          Viscera::viscerize(x + i, y + j, grid);
         }
       }
 

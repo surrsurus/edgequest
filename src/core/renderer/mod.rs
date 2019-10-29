@@ -29,19 +29,16 @@ pub mod rgb;
 pub use self::rgb::RGB;
 
 ///
-/// Tile colors
+/// Configuration
 ///
 
 /// Water color range
 const WATER_MIN : RGB = RGB(25, 75, 80);
 const WATER_MAX : RGB = RGB(20, 85, 85);
 
-///
-/// Tile color manipulation
-/// 
-
 // Used to darken tiles that are out of sight
 pub const DARKEN_FAC : RGB = RGB(10, 10, 10);
+
 // Used to lighten tiles that are in the FoV
 pub const YELLOW_FAC : RGB = RGB(27, 24, 22);
 
