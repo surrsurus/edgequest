@@ -138,8 +138,8 @@ impl Renderer {
         if dungeon[x][y].sound > 0 {
           self.draw_renderable(con, Pos::new(x as isize, y as isize), &Tile::new(
             "Debug Sound",
-            ' ',
-            RGB(255, 255, 255),
+            dungeon[x][y].get_glyph(),
+            dungeon[x][y].get_fg(),
             color,
             tile::Type::Debug
           ));
