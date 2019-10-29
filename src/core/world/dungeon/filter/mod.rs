@@ -1,5 +1,8 @@
 use core::world::dungeon::map;
 
+pub mod viscera;
+pub use self::viscera::Viscera;
+
 pub mod structure;
 pub use self::structure::Structure;
 

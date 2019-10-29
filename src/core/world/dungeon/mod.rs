@@ -12,7 +12,7 @@ use self::map::{tile, Pos, Tile};
 
 // Privately use filter
 mod filter;
-use self::filter::{Filter, Structure, Simple};
+use self::filter::{Filter, Structure, Simple, Viscera};
 
 // Privately use automata
 mod automata;
@@ -513,6 +513,9 @@ impl Dungeon {
       ),
       loc
     );
+
+    // Apply viscera
+    Viscera::new().apply(&mut grid);
 
     // Spent 300 million years wondering why the map was all walls until I realized this CRUCIAL piece of code
     // suddenly vanished.
