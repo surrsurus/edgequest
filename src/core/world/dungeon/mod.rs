@@ -8,7 +8,7 @@ use self::rand::Rng;
 use core::renderer::{Renderable, RGB};
 
 pub mod map;
-use self::map::{tile, Pos, Tile};
+use self::map::{tile, Pos, Tile, Measurable};
 
 // Privately use filter
 mod filter;
@@ -78,12 +78,12 @@ impl Dungeon {
 
   #[inline]
   pub fn width(&self) -> usize {
-    self.grid.len()
+    self.grid.width()
   }
 
   #[inline]
   pub fn height(&self) -> usize {
-    self.grid[0].len()
+    self.grid.height()
   }
 
 
@@ -584,8 +584,8 @@ impl Dungeon {
   pub fn get_valid_location(grid: &map::Grid<Tile>) -> Pos {
     loop {
       let mut rng = rand::thread_rng();
-      let x : usize = rng.gen_range(1, grid.len() - 2);
-      let y : usize = rng.gen_range(1, grid[0].len() - 2);
+      let x : usize = rng.gen_range(1, grid.width() - 2);
+      let y : usize = rng.gen_range(1, grid.height() - 2);
 
       if tile::spawnable(&grid[x][y]) {
         return Pos::from_usize(x, y);

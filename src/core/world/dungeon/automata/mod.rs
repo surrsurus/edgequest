@@ -6,6 +6,7 @@ extern crate rand;
 use self::rand::Rng;
 
 use core::world::dungeon::map;
+use core::world::dungeon::map::Measurable;
 
 // Import automatons here
 
@@ -44,7 +45,7 @@ pub trait Automaton {
   fn unwrap_pos(&self, grid: &map::Grid<Self::Output>, pos: Option<map::Pos>) -> map::Pos {
     match pos {
       Some(pos) => pos,
-      None => map::Pos::from_usize(rand::thread_rng().gen_range(1, grid.len() - 2), rand::thread_rng().gen_range(1, grid[0].len() - 2))
+      None => map::Pos::from_usize(rand::thread_rng().gen_range(1, grid.width() - 2), rand::thread_rng().gen_range(1, grid.height() - 2))
     }
   } 
 
@@ -56,8 +57,8 @@ pub trait Automaton {
     // Obviously if your grid is a 1x1 this will cause an issue.
     if pos.x < 1 { pos.x = 1; }
     if pos.y < 1 { pos.y = 1; }
-    if pos.x >= (grid.len() - 2) as isize { pos.x = (grid.len() - 2) as isize; }
-    if pos.y >= (grid[0].len() - 2) as isize { pos.y = (grid[0].len() - 2) as isize; }
+    if pos.x >= (grid.width() - 2) as isize { pos.x = (grid.width() - 2) as isize; }
+    if pos.y >= (grid.height() - 2) as isize { pos.y = (grid.height() - 2) as isize; }
   }
 
   ///

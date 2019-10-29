@@ -3,6 +3,7 @@ use self::fuss::Simplex;
 
 use core::world::dungeon::builder::Buildable;
 use core::world::dungeon::map;
+use core::world::dungeon::map::Measurable;
 
 ///
 /// Builder for generating noise maps
@@ -40,8 +41,8 @@ impl Fussy {
     // Make a new dungeon with our fresh grid of size `w` by `h`
     let fussy = Fussy { 
       grid: grid.clone(), 
-      w: grid.len(), 
-      h: grid[0].len(),
+      w: grid.width(), 
+      h: grid.height(),
       noise: Simplex::new(),
       threshold
     };

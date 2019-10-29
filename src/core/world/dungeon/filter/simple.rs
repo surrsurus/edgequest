@@ -6,7 +6,7 @@ use core::renderer::RGB;
 use super::Filter;
 
 use super::map::construct::{Corr, Rect};
-use super::map::{Grid, Pos, tile, Tile};
+use super::map::{Grid, Measurable, Pos, tile, Tile};
 
 ///
 /// Simple dungeon builder
@@ -152,8 +152,8 @@ impl Simple {
     // Make a new dungeon with our fresh grid of size `w` by `h`
     let simple = Simple { 
       rooms: Vec::<Rect>::new(), 
-      w: grid.len(), 
-      h: grid[0].len(),
+      w: grid.width(), 
+      h: grid.height(),
       // Floor type. Doesn't need to be changed right now, after all this is the 'simple' dungeon builder
       floor: Tile::new("Floor", ' ', RGB(7, 7, 7),  RGB(0, 0, 0), tile::Type::Floor(tile::Floor::Normal))
     };

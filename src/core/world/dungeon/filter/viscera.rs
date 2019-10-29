@@ -5,7 +5,7 @@ use core::renderer::RGB;
 
 use super::Filter;
 
-use super::map::{Grid, tile, Tile};
+use super::map::{Grid, Measurable, tile, Tile};
 
 // Configuration
 
@@ -57,8 +57,8 @@ impl Viscera {
     for _ in 0..rng.gen_range(5, 15) {
 
       // Read details of grid
-      let total_w = grid.len();
-      let total_h = grid[0].len();
+      let total_w = grid.width();
+      let total_h = grid.height();
 
       // Get a random x y
       let x = rng.gen_range(RADIUS, total_w - RADIUS - 1);

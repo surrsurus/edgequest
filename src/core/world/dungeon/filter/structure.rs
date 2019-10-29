@@ -9,7 +9,7 @@ use std::fs;
 use core::renderer::RGB;
 
 use super::Filter;
-use core::world::dungeon::map::{self, tile, Tile};
+use core::world::dungeon::map::{self, Measurable, tile, Tile};
 
 ///
 /// Structure placer
@@ -86,17 +86,17 @@ impl Structure {
       let mut rot_grid = map::Grid::<Tile>::new();
 
       // Measure x on y axis
-      for x in 0..grid[0].len() {
+      for x in 0..grid.height() {
 
         // Fill new vecs with init
         let mut vec = Vec::<Tile>::new();
 
         // Measure y on x axis
-        for y in 0..grid.len() {
+        for y in 0..grid.width() {
           vec.push(
             
             // Rotation performed by following above function
-            grid[grid.len() - 1 - y][x].clone()
+            grid[grid.width() - 1 - y][x].clone()
 
           );
         }
@@ -120,8 +120,8 @@ impl Structure {
     let h = strct[0].len();
 
     // Read details of map
-    let total_w = grid.len();
-    let total_h = grid[0].len();
+    let total_w = grid.width();
+    let total_h = grid.height();
 
     // Add to map if possible
     let x = rng.gen_range(0, w + 1);

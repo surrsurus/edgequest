@@ -22,7 +22,7 @@ impl std::ops::IndexMut<Pos> for Grid<Tile> {
 }
 
 // Create a trait to allow the grid to have a width() and height() method
-trait Measurable {
+pub trait Measurable {
   fn width(&self) -> usize;
   fn height(&self) -> usize;
 }
