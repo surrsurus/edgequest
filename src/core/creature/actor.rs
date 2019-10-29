@@ -24,11 +24,11 @@ impl Actor {
   /// Move the `Actor` by `x` in the x direction and `y` in
   /// the y direction.
   /// 
-  /// This does not overwrite the positon, only add to it.
+  /// This does not overwrite the position, only add to it.
   /// `x` and `y` can be positive or negative.
   /// 
-  /// * `x` - ammount to move in the x direction
-  /// * `y` - ammount to move in the y direction
+  /// * `x` - amount to move in the x direction
+  /// * `y` - amount to move in the y direction
   /// 
   #[inline]
   pub fn move_cart(&mut self, x: isize, y: isize) {
@@ -38,11 +38,11 @@ impl Actor {
   /// 
   /// Move the `Actor` by adding a new `Pos` to it
   /// 
-  /// This does not overwrite the positon, only add to it.
+  /// This does not overwrite the positron, only add to it.
   /// If values in `Pos` are negative, 
   /// this will then just subtract the appropriate values.
   /// 
-  /// * `pos` - `Pos` struct of ammount to
+  /// * `pos` - `Pos` struct of amount to
   /// move in both x and y directions 
   ///  
   #[inline]

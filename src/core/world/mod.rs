@@ -100,10 +100,7 @@ impl World {
         'a',
         Dungeon::get_valid_location(g),
         RGB(150, 0, 0), RGB(0, 0, 0),
-        Stats::new(
-          0,
-          0,
-          0,
+        Stats::debug_new(
           15,
           tile::Scent::Insectoid
         ),
@@ -117,10 +114,7 @@ impl World {
         'b',
         Dungeon::get_valid_location(g),
         RGB(150, 150, 0), RGB(0, 0, 0),
-        Stats::new(
-          0,
-          0,
-          0,
+        Stats::debug_new(
           15,
           tile::Scent::Insectoid
         ),
@@ -134,10 +128,7 @@ impl World {
         'c',
         Dungeon::get_valid_location(g),
         RGB(150, 0, 150), RGB(0, 0, 0),
-        Stats::new(
-          0,
-          0,
-          0,
+        Stats::debug_new(
           5,
           tile::Scent::Feline
         ),
@@ -151,10 +142,7 @@ impl World {
         'd',
         Dungeon::get_valid_location(g),
         RGB(150, 150, 150), RGB(0, 0, 0),
-        Stats::new(
-          0,
-          0,
-          0,
+        Stats::debug_new(
           20,
           tile::Scent::Canine
         ),
@@ -168,10 +156,7 @@ impl World {
         '@',
         Dungeon::get_valid_location(g),
         RGB(200, 200, 200), RGB(0, 0, 0),
-        Stats::new(
-          0,
-          0,
-          0,
+        Stats::debug_new(
           50,
           tile::Scent::Canine
         ),
@@ -185,10 +170,7 @@ impl World {
         'e',
         Dungeon::get_valid_location(g),
         RGB(50, 50, 200), RGB(0, 0, 0),
-        Stats::new(
-          0,
-          0,
-          0,
+        Stats::debug_new(
           15,
           tile::Scent::Canine
         ),
@@ -212,14 +194,14 @@ impl World {
   ///
   pub fn debug_make_png_of_map(&mut self) -> String {
 
-    let imgx = self.floor.dun.width() as u32;
-    let imgy = self.floor.dun.height() as u32;
+    let img_x = self.floor.dun.width() as u32;
+    let img_y = self.floor.dun.height() as u32;
 
-    // Create a new ImgBuf with width: imgx and height: imgy
-    let mut imgbuf = image::ImageBuffer::new(imgx, imgy);
+    // Create a new img_buf with width: img_x and height: img_y
+    let mut img_buf = image::ImageBuffer::new(img_x, img_y);
 
     // Iterate over the coordinates and pixels of the image
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
+    for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
       let r = self.floor.dun[x as usize][y as usize].get_bg().r();
       let g = self.floor.dun[x as usize][y as usize].get_bg().g();
       let b = self.floor.dun[x as usize][y as usize].get_bg().b();
@@ -227,13 +209,13 @@ impl World {
     }
     
     // Resize image by 8x (since we literally were only dealing with pixels before)
-    imgbuf = image::imageops::resize(&imgbuf, imgx*8, imgy*8, image::FilterType::Nearest);
+    img_buf = image::imageops::resize(&img_buf, img_x*8, img_y*8, image::FilterType::Nearest);
 
     // Generate a name for the file with the floor num and timestamp
     let name = format!("{}-{:?}-map.png", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs(), self.floor_num);
 
     // Save the image
-    imgbuf.save(&name).unwrap();
+    img_buf.save(&name).unwrap();
 
     return name;
 
@@ -249,10 +231,7 @@ impl World {
       '@',
       Pos::new(40, 25),
       RGB(255, 255, 255), RGB(0, 0, 0),
-      Stats::new(
-        0,
-        0,
-        0,
+      Stats::debug_new(
         20,
         tile::Scent::Player
       ),
@@ -808,7 +787,7 @@ impl World {
     }
 
     // Expand each sound point-source
-    // Sound decrases in intensity proportional
+    // Sound decreases in intensity proportional
     // to the inverse of distance squared
     for sound in sounds {
       for x in 0..self.floor.dun.width {

@@ -153,7 +153,7 @@ impl Dungeon {
     // Closure for generating drunkards walks. Basically just makes the process of adding these
     // easy. And since we don't use it anywhere else, it doesn't really make sense to turn it into a function,
     // though it may be in the future.
-    
+    //
     // This is geared towards eating walls and replacing them with floors, so mainly just to flesh out the dungeon.
     let drunk_d4 = |chaos: f32, iter: u32, grid: &mut map::Grid<Tile> | {
       let d = DrunkardsWalkD4::new(chaos);
@@ -174,7 +174,7 @@ impl Dungeon {
     // Semi random - A mixture of the previous and next option
     drunk_d4(0.5, 1000, &mut grid);
 
-    // Mostly orderly - Long corridors that occassionally deviate
+    // Mostly orderly - Long corridors that occasionally deviate
     drunk_d4(0.25, 1000, &mut grid);
 
     // Add 1 - 3 structures, weighted towards 1

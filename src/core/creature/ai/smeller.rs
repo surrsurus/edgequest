@@ -2,7 +2,7 @@ extern crate rand;
 
 use self::rand::Rng;
 
-use core::world::dungeon::map::{self, tile, Tile};
+use core::world::dungeon::map::{self, Measurable, tile, Tile};
 
 use super::{AI, RANDOM_TRIES};
 use core::creature::{Actions, Creature, Actor, Stats};
@@ -43,7 +43,7 @@ impl AI for SmellerAI {
     me.prev_pos = me.pos.clone();
   
     // Avoid OOB Errors
-    if x < 2 || x > map.len() - 2 || y < 2 || y > map[0].len() - 2 {
+    if x < 2 || x > map.width() - 2 || y < 2 || y > map.height() - 2 {
       // NOTE: scent_range one 1 has weird behaviors...
       scent_range = 1;
     }

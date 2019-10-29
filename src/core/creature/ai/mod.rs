@@ -33,7 +33,7 @@ pub use self::talker::TalkerAI;
 pub mod tracker;
 pub use self::tracker::TrackerAI;
 
-use core::world::dungeon::map::{self, Tile};
+use core::world::dungeon::map::{self, Measurable, Tile};
 
 use core::creature::{Actions, Creature, Actor, Stats};
 
@@ -72,8 +72,8 @@ pub trait AI {
   /// Determine if the AI has gone out of bounds with respect to the given map
   ///
   fn is_oob(&mut self, x: isize, y: isize, map: &map::Grid<Tile>) -> bool { 
-    // Check for below map (< 0) and above map (> map.len() - 1)
-    x < 0 || y < 0 || y >= (map[0].len() - 1) as isize || x >= (map.len() - 1) as isize
+    // Check for below map (< 0) and above map (> map.width() - 1)
+    x < 0 || y < 0 || y >= (map.height() - 1) as isize || x >= (map.width() - 1) as isize
   }
 
   ///

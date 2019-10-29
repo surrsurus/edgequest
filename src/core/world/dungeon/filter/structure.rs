@@ -116,8 +116,8 @@ impl Structure {
     }
 
     // Read details of vector
-    let w = strct.len();
-    let h = strct[0].len();
+    let w = strct.width();
+    let h = strct.height();
 
     // Read details of map
     let total_w = grid.width();

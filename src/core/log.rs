@@ -25,12 +25,12 @@
 /// So here's the breakdown.
 ///
 /// A Mutex is a "mutual exclusion primitive useful for protecting shared data", which is essentially just an RAII construct
-/// that guarantees that the resource is available to any function that may access the object. In order to access the static refernece,
+/// that guarantees that the resource is available to any function that may access the object. In order to access the static reference,
 /// we must `lock` the mutex, which simply blocks the current thread until the mutex is able to be acquired.
 /// Since we are single-threaded, this is a non-issue in terms of runtime.
 ///
 /// This mutex then provides a static, mutable reference to the log which then can have it's methods called. After the log is done being used,
-/// the reference to the log must be dropped. This does not remove the static referece, but merely allows the mutex to be freed and thus
+/// the reference to the log must be dropped. This does not remove the static reference, but merely allows the mutex to be freed and thus
 /// used later by another resource.
 ///
 /// Note that rust mutexes can be poisoned. Essentially, if I lock the mutex then panic a thread, that mutex is no longer considered safe and
@@ -98,13 +98,13 @@ impl Log {
   }
 }
 
-// Make a mutex availible
+// Make a mutex available
 lazy_static! {
   pub static ref GlobalLog: Mutex<Log> = Mutex::new(Log::new());
 }
 
 /// This macro automates the log mutex process. This whole thing is pretty crazy
-/// Oviously if any panics occur here then the mutex becomes poisoned
+/// Obviously if any panics occur here then the mutex becomes poisoned
 #[macro_export]
 macro_rules! log {
   ($msg:expr, $col:expr) => {{

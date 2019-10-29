@@ -13,7 +13,7 @@ use core::tcod::colors;
 /// this construct serves more as a wrapper or converter for tcod colors, because they are pretty ass.
 /// 
 /// Tcod colors cannot be cloned, cannot be compared, and other basic functions a normal human being
-/// would assume would be availible are simply not. I assume this is not the doings of the rust
+/// would assume would be available are simply not. I assume this is not the doings of the rust
 /// maintainers, but the original author of libtcod combined with whatever necessary evils and/or evil rituals
 /// that must have taken place in order to get tcod-rs working.
 /// 

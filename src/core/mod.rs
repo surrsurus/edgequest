@@ -54,7 +54,7 @@ pub mod time;
 // Renderer
 //
 // The renderer is the interface by which game objects and constructs are made real through tcod interaction. The central
-// idea is that if tcod is ever abandoned, minimal ammounts of code outside of the renderer should have to be changed.
+// idea is that if tcod is ever abandoned, minimal amounts of code outside of the renderer should have to be changed.
 // This hasn't *really* been the case as `World` depends on tcod lighting maps, the `Engine` holds a tcod root, and init creates
 // said root.
 //
@@ -131,9 +131,9 @@ impl Engine {
         if keypress.printable != ' ' {
           
           // First, make an assumption that the player is affecting their movement as 90% of the game
-          // is walking around. We *could* add it to every single one of the vim keypresses to save a trivial ammount of
+          // is walking around. We *could* add it to every single one of the vim keypresses to save a trivial amount of
           // time assigning this variable, but I dislike that.
-          let oldpos = self.world.player.actor.pos;
+          let old_pos = self.world.player.actor.pos;
 
           // In addition, update the game state
           // Important so that if the game state becomes debug we can leave that state instantly
@@ -231,7 +231,7 @@ impl Engine {
               self.world.player.state = Actions::Wait;
             },
 
-            // Go downstars (if possible)
+            // Go downstairs (if possible)
             '>' => { self.world.player.state = Actions::DownStair },
             // Go upstairs (if possible)
             '<' => { self.world.player.state = Actions::UpStair },
@@ -243,7 +243,7 @@ impl Engine {
               if self.wizard {
                 match self.ren.show_scent {
                   true => log!("Your vision returns to normal.", RGB(255, 0, 0)),
-                  false => log!("Your eyes percieve scent like light.", RGB(255, 0, 0))
+                  false => log!("Your eyes perceive scent like light.", RGB(255, 0, 0))
                 }
                 self.ren.show_scent = !self.ren.show_scent;
                 self.ren.draw_all(&mut self.root, &mut self.world);
@@ -256,7 +256,7 @@ impl Engine {
               if self.wizard {
                 match self.ren.show_sound {
                   true => log!("Your vision returns to normal.", RGB(255, 0, 0)),
-                  false => log!("Your eyes percieve sound like light.", RGB(255, 0, 0))
+                  false => log!("Your eyes perceive sound like light.", RGB(255, 0, 0))
                 }
                 self.ren.show_sound = !self.ren.show_sound;
                 self.ren.draw_all(&mut self.root, &mut self.world);
@@ -329,7 +329,7 @@ impl Engine {
 
                   // Make sure player doesn't do anything dumb
                   if !self.world.is_valid_pos(self.world.player.actor.pos.x, self.world.player.actor.pos.y) && !self.noclip {
-                    self.world.player.actor.pos = oldpos;
+                    self.world.player.actor.pos = old_pos;
                     self.world.player.state = Actions::Unknown;
                   // Otherwise if the position is valid...
                   } else {
@@ -351,7 +351,7 @@ impl Engine {
 
         } 
         
-        // Prints keycode to console in case if you're trying to find a key that isn't intutive, or you're debugging
+        // Prints keycode to console in case if you're trying to find a key that isn't intuitive, or you're debugging
         // else {
         //   println!("{:?}", keypress.code);
         // }
@@ -420,7 +420,7 @@ impl Engine {
       State::Act(Actions::UpStair) => {
         // No clip through floors
         if self.noclip {
-          log!("You ascend through the cieling.", RGB(255, 150, 150));
+          log!("You ascend through the ceiling.", RGB(255, 150, 150));
           self.world.go_up();
         } else {
           self.world.player_go_up();

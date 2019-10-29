@@ -493,7 +493,7 @@
 <span class="comment">// Renderer</span>
 <span class="comment">//</span>
 <span class="comment">// The renderer is the interface by which game objects and constructs are made real through tcod interaction. The central</span>
-<span class="comment">// idea is that if tcod is ever abandoned, minimal ammounts of code outside of the renderer should have to be changed.</span>
+<span class="comment">// idea is that if tcod is ever abandoned, minimal amounts of code outside of the renderer should have to be changed.</span>
 <span class="comment">// This hasn&#39;t *really* been the case as `World` depends on tcod lighting maps, the `Engine` holds a tcod root, and init creates</span>
 <span class="comment">// said root.</span>
 <span class="comment">//</span>
@@ -569,7 +569,7 @@
         <span class="kw">if</span> <span class="ident">keypress</span>.<span class="ident">printable</span> <span class="op">!=</span> <span class="string">&#39; &#39;</span> {
           
           <span class="comment">// First, make an assumption that the player is affecting their movement as 90% of the game</span>
-          <span class="comment">// is walking around. We *could* add it to every single one of the vim keypresses to save a trivial ammount of</span>
+          <span class="comment">// is walking around. We *could* add it to every single one of the vim keypresses to save a trivial amount of</span>
           <span class="comment">// time assigning this variable, but I dislike that.</span>
           <span class="kw">let</span> <span class="ident">oldpos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">world</span>.<span class="ident">player</span>.<span class="ident">actor</span>.<span class="ident">pos</span>.<span class="ident">clone</span>();
 

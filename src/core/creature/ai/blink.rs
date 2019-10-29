@@ -2,7 +2,7 @@ extern crate rand;
 
 use self::rand::Rng;
 
-use core::world::dungeon::map::{self, Pos, tile, Tile};
+use core::world::dungeon::map::{self, Measurable, Pos, tile, Tile};
 
 use super::{AI, RANDOM_TRIES};
 use core::creature::{Actions, Creature, Actor, Stats};
@@ -84,11 +84,11 @@ impl AI for BlinkAI {
       if pos.y < 0 {
         pos.y = 0;
       }
-      if pos.y >= (map[0].len() - 1) as isize {
-        pos.y = (map[0].len() - 1) as isize;
+      if pos.y >= (map.height() - 1) as isize {
+        pos.y = (map.height() - 1) as isize;
       }
-      if pos.x >= (map.len() - 1) as isize {
-        pos.x = (map.len() - 1) as isize;
+      if pos.x >= (map.width() - 1) as isize {
+        pos.x = (map.width() - 1) as isize;
       }
 
       if tile::walkable(&map[pos.x as usize][pos.y as usize]) {

@@ -8,15 +8,15 @@ the y direction.</p>
 <p>This does not overwrite the positon, only add to it.
 <code>x</code> and <code>y</code> can be positive or negative.</p>
 <ul>
-<li><code>x</code> - ammount to move in the x direction</li>
-<li><code>y</code> - ammount to move in the y direction</li>
+<li><code>x</code> - amount to move in the x direction</li>
+<li><code>y</code> - amount to move in the y direction</li>
 </ul>
 </div><h4 id='method.move_pos' class="method"><code id='move_pos.v'>pub fn <a href='#method.move_pos' class='fnname'>move_pos</a>(&amp;mut self, pos: <a class="struct" href="../../../../edgequest/core/world/dungeon/map/pos/struct.Pos.html" title="struct edgequest::core::world::dungeon::map::pos::Pos">Pos</a>)</code><a class='srclink' href='../../../../src/edgequest/core/creature/actor.rs.html#48-50' title='goto source code'>[src]</a></h4><div class='docblock'><p>Move the <code>Actor</code> by adding a new <code>Pos</code> to it</p>
 <p>This does not overwrite the positon, only add to it.
 If values in <code>Pos</code> are negative,
 this will then just subtract the appropriate values.</p>
 <ul>
-<li><code>pos</code> - <code>Pos</code> struct of ammount to
+<li><code>pos</code> - <code>Pos</code> struct of amount to
 move in both x and y directions</li>
 </ul>
 </div><h4 id='method.new' class="method"><code id='new.v'>pub fn <a href='#method.new' class='fnname'>new</a>(name: &amp;'static <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, glyph: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.char.html">char</a>, pos: <a class="struct" href="../../../../edgequest/core/world/dungeon/map/pos/struct.Pos.html" title="struct edgequest::core::world::dungeon::map::pos::Pos">Pos</a>, fg: <a class="struct" href="../../../../edgequest/core/renderer/rgb/struct.RGB.html" title="struct edgequest::core::renderer::rgb::RGB">RGB</a>, bg: <a class="struct" href="../../../../edgequest/core/renderer/rgb/struct.RGB.html" title="struct edgequest::core::renderer::rgb::RGB">RGB</a>) -&gt; Self</code><a class='srclink' href='../../../../src/edgequest/core/creature/actor.rs.html#56-64' title='goto source code'>[src]</a></h4><div class='docblock'><p>Return a new <code>Actor</code></p>
