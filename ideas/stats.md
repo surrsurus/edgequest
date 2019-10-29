@@ -47,8 +47,6 @@ The ability to use logic and think formally.
 The ability to use intuition and understand the world.
 
   - Affects total sanity points
-  - Affects sanity recovery rate
-  - Affects the ability to discern hallucinations
 
 ## Finite Attributes
 These attributes are finite and have severe consequences for running out of them
