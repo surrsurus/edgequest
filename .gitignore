@@ -1,3 +1,7 @@
+# Ignore local config #
+#######################
+config/*
+
 # Rust generated files #
 ########################
 /target/
