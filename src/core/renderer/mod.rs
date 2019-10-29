@@ -32,12 +32,9 @@ pub use self::rgb::RGB;
 /// Tile colors
 ///
 
-// Water colors
-const WATER_COLORS : [RGB; 3] = [
-  RGB(51, 133, 200),
-  RGB(57, 144, 200),
-  RGB(54, 138, 200)
-];
+/// Water color range
+const WATER_MIN : RGB = RGB(25, 75, 80);
+const WATER_MAX : RGB = RGB(20, 85, 85);
 
 ///
 /// Tile color manipulation
@@ -439,7 +436,9 @@ impl Renderer {
             // Update tile if possible
             match &world.floor.dun[x][y].tiletype {
               tile::Type::Water => {
-                world.floor.dun[x][y].set_bg(*rand::thread_rng().choose(&WATER_COLORS).unwrap());
+                world.floor.dun[x][y].set_bg(
+                  RGB::transition_between(&WATER_MIN, &WATER_MAX, rand::thread_rng().gen::<f32>())
+                );
               },
               _ => {}
             }

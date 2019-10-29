@@ -292,7 +292,7 @@ impl Dungeon {
           match grid[x][y].tiletype {
             tile::Type::Wall(_) | tile::Type::Stair(_) => {},
             _ => {
-              grid[x][y].set_bg(RGB(57, 144, 255));
+              grid[x][y].set_bg(RGB(25, 75, 80));
               grid[x][y].tiletype = tile::Type::Water;
             }
           }
