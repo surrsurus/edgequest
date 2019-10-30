@@ -143,174 +143,189 @@ impl Engine {
           self.state = State::Keypress;
 
           // Begin to pattern match the char corresponding to the key pressed
-          match keypress.printable {
 
-            // Movement keys are bound to vim-like controls (hjklyubn)
-            'h' => { 
-              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
-              self.world.player.actor.move_cart(-1, 0);
-              self.world.player.state = Actions::Move;
-            },
-            'j' => { 
-              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
-              self.world.player.actor.move_cart(0, 1);
-              self.world.player.state = Actions::Move;
-            },
-            'k' => {
-              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
-              self.world.player.actor.move_cart(0, -1);
-              self.world.player.state = Actions::Move;
-            },
-            'l' => {
-              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
-              self.world.player.actor.move_cart(1, 0);
-              self.world.player.state = Actions::Move;
-            },
-            'y' => {
-              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
-              self.world.player.actor.move_cart(-1, -1);
-              self.world.player.state = Actions::Move;
-            },
-            'u' => {
-              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
-              self.world.player.actor.move_cart(1, -1);
-              self.world.player.state = Actions::Move;
-            },
-            'b' => {
-              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
-              self.world.player.actor.move_cart(-1, 1);
-              self.world.player.state = Actions::Move;
-            },
-            'n' => { 
-              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
-              self.world.player.actor.move_cart(1, 1);
-              self.world.player.state = Actions::Move;
-            },
+          // If shift is held
+          if keypress.shift == true {
 
-            // Pick up item. Will become super buggy at some point guaranteed
-            'g' => {
-              // Player pos
-              let player_pos = self.world.player.actor.pos;
-              self.state = State::Act(Actions::Unknown);
-              // Get items at players feet
-              // let items_at_feet = self.world.floor.items.iter().filter(|item| item.pos == self.world.player.actor.pos.clone());
-              for item in &self.world.floor.items {
-                if item.pos == player_pos {
-                  match item.property {
-                    ItemProperty::Money(ref tender) => self.world.player.wallet += money_value(&tender) * item.quantity as f32
+            match keypress.printable {
+              
+              // Go downstairs (if possible)
+              '.' => { self.world.player.state = Actions::DownStair },
+              // Go upstairs (if possible)
+              ',' => { self.world.player.state = Actions::UpStair },
+
+              _ => ()
+
+            }
+          
+          // No shift held
+          } else {
+
+            match keypress.printable {
+
+              // Movement keys are bound to vim-like controls (hjklyubn)
+              'h' => { 
+                self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
+                self.world.player.actor.move_cart(-1, 0);
+                self.world.player.state = Actions::Move;
+              },
+              'j' => { 
+                self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
+                self.world.player.actor.move_cart(0, 1);
+                self.world.player.state = Actions::Move;
+              },
+              'k' => {
+                self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
+                self.world.player.actor.move_cart(0, -1);
+                self.world.player.state = Actions::Move;
+              },
+              'l' => {
+                self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
+                self.world.player.actor.move_cart(1, 0);
+                self.world.player.state = Actions::Move;
+              },
+              'y' => {
+                self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
+                self.world.player.actor.move_cart(-1, -1);
+                self.world.player.state = Actions::Move;
+              },
+              'u' => {
+                self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
+                self.world.player.actor.move_cart(1, -1);
+                self.world.player.state = Actions::Move;
+              },
+              'b' => {
+                self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
+                self.world.player.actor.move_cart(-1, 1);
+                self.world.player.state = Actions::Move;
+              },
+              'n' => { 
+                self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
+                self.world.player.actor.move_cart(1, 1);
+                self.world.player.state = Actions::Move;
+              },
+
+              // Pick up item. Will become super buggy at some point guaranteed
+              'g' => {
+                // Player pos
+                let player_pos = self.world.player.actor.pos;
+                self.state = State::Act(Actions::Unknown);
+                // Get items at players feet
+                // let items_at_feet = self.world.floor.items.iter().filter(|item| item.pos == self.world.player.actor.pos.clone());
+                for item in &self.world.floor.items {
+                  if item.pos == player_pos {
+                    match item.property {
+                      ItemProperty::Money(ref tender) => self.world.player.wallet += money_value(&tender) * item.quantity as f32
+                    }
+                    if item.quantity > 1 {
+                      log!(Box::leak(format!("You pick up {} {}s", item.quantity, item.get_id()).into_boxed_str()), item.get_fg());
+                    } else {
+                      log!(Box::leak(format!("You pick up a {}", item.get_id()).into_boxed_str()), item.get_fg());
+                    }
+                    self.state = State::Act(Actions::Pickup);
                   }
-                  if item.quantity > 1 {
-                    log!(Box::leak(format!("You pick up {} {}s", item.quantity, item.get_id()).into_boxed_str()), item.get_fg());
-                  } else {
-                    log!(Box::leak(format!("You pick up a {}", item.get_id()).into_boxed_str()), item.get_fg());
-                  }
-                  self.state = State::Act(Actions::Pickup);
                 }
+                // Prune picked up items
+                self.world.floor.items.retain( |item| item.pos != player_pos );
+                
               }
-              // Prune picked up items
-              self.world.floor.items.retain( |item| item.pos != player_pos );
+
+              // Force reload word
+              'w' => {
+                if self.wizard {
+                  log!("You remold the earth like clay." , RGB(255, 0, 0));
+                  self.world = World::new(Pos::from_tup(init::map_dimensions()));
+                }
+                self.state = State::Act(Actions::Unknown);
+              },
+              // Create an empty level for testing
+              'q' => {
+                if self.wizard {
+                  log!("You empty the universe.", RGB(255, 0, 0));
+                  self.world.test_empty();
+                }
+                self.state = State::Act(Actions::Unknown);
+              },
+              // Wait
+              '.' => { 
+                self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
+                self.world.player.state = Actions::Wait;
+              },
+
+              // Debug keypresses
+
+              // Toggle scent
+              'r' => {
+                if self.wizard {
+                  match self.ren.show_scent {
+                    true => log!("Your vision returns to normal.", RGB(255, 0, 0)),
+                    false => log!("Your eyes perceive scent like light.", RGB(255, 0, 0))
+                  }
+                  self.ren.show_scent = !self.ren.show_scent;
+                  self.ren.draw_all(&mut self.root, &mut self.world);
+                }
+                self.state = State::Debug;
+              },
+
+              // Toggle sound
+              't' => {
+                if self.wizard {
+                  match self.ren.show_sound {
+                    true => log!("Your vision returns to normal.", RGB(255, 0, 0)),
+                    false => log!("Your eyes perceive sound like light.", RGB(255, 0, 0))
+                  }
+                  self.ren.show_sound = !self.ren.show_sound;
+                  self.ren.draw_all(&mut self.root, &mut self.world);
+                }
+                self.state = State::Debug;
+              },
+
+              // Toggle FoV
+              'f' => {
+                if self.wizard {
+                  match self.ren.fov {
+                    true => log!("Your third eye opens, revealing the universe.", RGB(255, 0, 0)),
+                    false => log!("Your third eye closes, concealing the universe in fog.", RGB(255, 0, 0))
+                  }
+                  self.ren.fov = !self.ren.fov;
+                  self.ren.draw_all(&mut self.root, &mut self.world);
+                }
+                self.state = State::Debug;
+              },
+
+              // Toggle noclip
+              'z' => {
+                if self.wizard {
+                  match self.noclip {
+                    true => log!("You form becomes tangible.", RGB(255, 0, 0)),
+                    false => log!("Your form becomes ethereal.", RGB(255, 0, 0))
+                  }
+                  self.noclip = !self.noclip;
+                }
+                self.state = State::Debug;
+              },
+
+              // Tcod test
+              'c' => {
+                self.ren.tcod_test(&mut self.root);
+                self.state = State::Debug;
+              },
+
+              // Make image
+              'p' => {
+                let name = self.world.debug_make_png_of_map();
+                log!("You take a screenshot.", RGB(200, 200, 200));
+                // So, String -> &'static str... involves leaking the memory of String.
+                // Kind of wild, gets the job done though, wish there was a better way to do this
+                let name_msg = format!("Image saved as {}", name);
+                log!(Box::leak(name_msg.into_boxed_str()), RGB(200, 200, 200));
+              }
+
+              // Unbound key, so we just say we don't know what the player did
+              _ => { self.world.player.state = Actions::Unknown }
               
             }
 
-            // Force reload word
-            'w' => {
-              if self.wizard {
-                log!("You remold the earth like clay." , RGB(255, 0, 0));
-                self.world = World::new(Pos::from_tup(init::map_dimensions()));
-              }
-              self.state = State::Act(Actions::Unknown);
-            },
-            // Create an empty level for testing
-            'q' => {
-              if self.wizard {
-                log!("You empty the universe.", RGB(255, 0, 0));
-                self.world.test_empty();
-              }
-              self.state = State::Act(Actions::Unknown);
-            },
-            // Wait
-            '.' => { 
-              self.world.player.actor.prev_pos = self.world.player.actor.pos.clone();
-              self.world.player.state = Actions::Wait;
-            },
-
-            // Go downstairs (if possible)
-            '>' => { self.world.player.state = Actions::DownStair },
-            // Go upstairs (if possible)
-            '<' => { self.world.player.state = Actions::UpStair },
-
-            // Debug keypresses
-
-            // Toggle scent
-            'r' => {
-              if self.wizard {
-                match self.ren.show_scent {
-                  true => log!("Your vision returns to normal.", RGB(255, 0, 0)),
-                  false => log!("Your eyes perceive scent like light.", RGB(255, 0, 0))
-                }
-                self.ren.show_scent = !self.ren.show_scent;
-                self.ren.draw_all(&mut self.root, &mut self.world);
-              }
-              self.state = State::Debug;
-            },
-
-            // Toggle sound
-            't' => {
-              if self.wizard {
-                match self.ren.show_sound {
-                  true => log!("Your vision returns to normal.", RGB(255, 0, 0)),
-                  false => log!("Your eyes perceive sound like light.", RGB(255, 0, 0))
-                }
-                self.ren.show_sound = !self.ren.show_sound;
-                self.ren.draw_all(&mut self.root, &mut self.world);
-              }
-              self.state = State::Debug;
-            },
-
-            // Toggle FoV
-            'f' => {
-              if self.wizard {
-                match self.ren.fov {
-                  true => log!("Your third eye opens, revealing the universe.", RGB(255, 0, 0)),
-                  false => log!("Your third eye closes, concealing the universe in fog.", RGB(255, 0, 0))
-                }
-                self.ren.fov = !self.ren.fov;
-                self.ren.draw_all(&mut self.root, &mut self.world);
-              }
-              self.state = State::Debug;
-            },
-
-            // Toggle noclip
-            'z' => {
-              if self.wizard {
-                match self.noclip {
-                  true => log!("You form becomes tangible.", RGB(255, 0, 0)),
-                  false => log!("Your form becomes ethereal.", RGB(255, 0, 0))
-                }
-                self.noclip = !self.noclip;
-              }
-              self.state = State::Debug;
-            },
-
-            // Tcod test
-            'c' => {
-              self.ren.tcod_test(&mut self.root);
-              self.state = State::Debug;
-            },
-
-            // Make image
-            'p' => {
-              let name = self.world.debug_make_png_of_map();
-              log!("You take a screenshot.", RGB(200, 200, 200));
-              // So, String -> &'static str... involves leaking the memory of String.
-              // Kind of wild, gets the job done though, wish there was a better way to do this
-              let name_msg = format!("Image saved as {}", name);
-              log!(Box::leak(name_msg.into_boxed_str()), RGB(200, 200, 200));
-            }
-
-            // Unbound key, so we just say we don't know what the player did
-            _ => { self.world.player.state = Actions::Unknown }
-            
           }
 
           // Now the game state needs to be properly re-oriented based on the (potential) player action.
