@@ -12,7 +12,7 @@ use self::map::{tile, Pos, Tile, Measurable};
 
 // Privately use filter
 mod filter;
-use self::filter::{Filter, Structure, Simple, Viscera};
+use self::filter::{Filter, Structure, Simple, Stain};
 
 // Privately use automata
 mod automata;
@@ -554,9 +554,9 @@ impl Dungeon {
       loc
     );
 
-    // Apply viscera
+    // Apply stain
 
-    Viscera::new().apply(&mut grid);
+    Stain::new().apply(&mut grid);
 
     // Spent 300 million years wondering why the map was all walls until I realized this CRUCIAL piece of code
     // suddenly vanished.
@@ -597,11 +597,7 @@ impl Dungeon {
   /// 
   pub fn add_blood(&mut self, pos: Pos) {
 
-    for i in 0..filter::viscera::RADIUS {
-      for j in 0..filter::viscera::RADIUS {
-        Viscera::viscerize(pos.x as usize + i, pos.y as usize + j, &mut self.grid);
-      }
-    }
+    Stain::add_viscera(pos.x as usize, pos.y as usize, filter::stain::VISCERA_DIAMETER, &mut self.grid);
 
   }
 

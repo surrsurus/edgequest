@@ -33,7 +33,7 @@ use self::dungeon::{Dungeon, map::{self, Pos, tile, Tile}};
 /// FOV conf
 
 // FOV Radius
-const FOV_RADIUS : i32 = 15;
+const FOV_DIAMETER : i32 = 15;
 
 /// Scent conf
 
@@ -825,7 +825,7 @@ impl World {
   /// Update the fov map from the player's perspective
   /// 
   pub fn update_fov(&mut self) {
-    self.tcod_map.compute_fov(self.player.actor.pos.x as i32, self.player.actor.pos.y as i32, FOV_RADIUS, true, FovAlgorithm::Shadow);
+    self.tcod_map.compute_fov(self.player.actor.pos.x as i32, self.player.actor.pos.y as i32, FOV_DIAMETER, true, FovAlgorithm::Shadow);
   }
 
   ///

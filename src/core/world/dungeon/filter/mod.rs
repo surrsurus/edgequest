@@ -1,7 +1,7 @@
 use core::world::dungeon::map;
 
-pub mod viscera;
-pub use self::viscera::Viscera;
+pub mod stain;
+pub use self::stain::Stain;
 
 pub mod structure;
 pub use self::structure::Structure;

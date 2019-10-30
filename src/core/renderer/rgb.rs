@@ -3,7 +3,7 @@
 //! 
 
 // Operator overloading
-use std::ops::{Add, AddAssign, Sub};
+use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 // Tcod colors for conversion
 use core::tcod::colors;
@@ -171,6 +171,17 @@ impl Sub<RGB> for RGB {
     let g = { if (self.g() as isize) - (other.1 as isize) < 0 { 0 } else { self.g() - other.1 } };
     let b = { if (self.b() as isize) - (other.2 as isize) < 0 { 0 } else { self.b() - other.2 } };
     return RGB(r, g, b);
+  }
+
+}
+
+impl SubAssign<RGB> for RGB {
+  
+  #[inline]
+  fn sub_assign(&mut self, other: Self) {
+    if (self.r() as isize) - (other.0 as isize) < 0 { self.0 = 0; } else { self.0 -= other.0 }
+    if (self.g() as isize) - (other.1 as isize) < 0 { self.1 = 0; } else { self.1 -= other.1 }
+    if (self.b() as isize) - (other.2 as isize) < 0 { self.2 = 0; } else { self.2 -= other.2 }
   }
 
 }
