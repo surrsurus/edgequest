@@ -48,11 +48,11 @@ You will probably need to change your default renderer in `config/cfg.yml`. At t
 OSX:
 
 ```
-$ brew install sdl2
+$ brew install pkg-config sdl2
 $ cargo run
 ```
 
 #### Note for Mojave Users
 
-This will not work if you have an xcode version above 9 installed. For some reason, sdl just flat out doesn't render but the game still technically works.
+This should work fine with the `SDL` renderer if you have sdl2 installed, but the font might be slightly blurry sadly. Looking for a fix.
 
