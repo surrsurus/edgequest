@@ -9,6 +9,16 @@ use super::map::construct::{Corr, Rect};
 use super::map::{Grid, Measurable, Pos, tile, Tile};
 
 ///
+/// Configuration
+///
+
+// Minimum length to any side of a room
+const MIN_ROOM_DIM: isize = 3;
+
+// Maximum length to any side of a room
+const MAX_ROOM_DIM: isize = 12;
+
+///
 /// Simple dungeon builder
 /// 
 /// This builder places a number of small rooms (respective to map size)
@@ -47,8 +57,8 @@ impl Simple {
 
       let x: isize = rng.gen_range(1, self.w as isize - 2);
       let y: isize = rng.gen_range(1, self.h as isize - 2);
-      let h: isize = rng.gen_range(5, 20);
-      let w: isize = rng.gen_range(5, 20);
+      let h: isize = rng.gen_range(MIN_ROOM_DIM, MAX_ROOM_DIM);
+      let w: isize = rng.gen_range(MIN_ROOM_DIM, MAX_ROOM_DIM);
 
       // Check bounds
       if w + x >= self.w as isize|| h + y >= self.h as isize {
