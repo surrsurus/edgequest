@@ -18,7 +18,7 @@ const VISCERA_BG : u8 = 50;
 const MOSS_FG : u8 = 5;
 const MOSS_BG : u8 = 10;
 
-const FUNGUS_FG : u8 = 30;
+const FUNGUS_FG : u8 = 20;
 const FUNGUS_BG : u8 = 40;
 
 const CORRUPTION_FG : u8 = 100;
@@ -58,20 +58,24 @@ impl Stain {
           match stain_type {
 
             StainType::Viscera => {
+              grid[x - (d/2)][y - (d/2)].set_name("Bloody Floor");
               grid[x - (d/2)][y - (d/2)].fg += RGB(12 + rng.gen_range(0, VISCERA_FG), 0, 0);
               grid[x - (d/2)][y - (d/2)].bg += RGB(22 + rng.gen_range(0, VISCERA_BG), 0, 0);
             },
             StainType::Moss => {
+              grid[x - (d/2)][y - (d/2)].set_name("Mossy Floor");
               grid[x - (d/2)][y - (d/2)].fg += RGB(0, rng.gen_range(0, MOSS_FG), 0);
               grid[x - (d/2)][y - (d/2)].bg += RGB(0, rng.gen_range(0, MOSS_BG), 0);
             },
             StainType::Fungus => {
+              grid[x - (d/2)][y - (d/2)].set_name("Fungal Bloom");
               let fg = rng.gen_range(0, FUNGUS_FG);
               let bg = rng.gen_range(0, FUNGUS_BG);
               grid[x - (d/2)][y - (d/2)].fg += RGB(fg, 0, fg);
               grid[x - (d/2)][y - (d/2)].bg += RGB(fg, 0, bg);
             },
             StainType::Corruption => {
+              grid[x - (d/2)][y - (d/2)].set_name("Corrupted Floor");
               let fg = rng.gen_range(0, CORRUPTION_FG);
               let bg = rng.gen_range(0, CORRUPTION_BG);
               grid[x - (d/2)][y - (d/2)].fg -= RGB(fg, fg, fg);
@@ -86,20 +90,18 @@ impl Stain {
           match stain_type {
 
             StainType::Viscera => {
+              grid[x - (d/2)][y - (d/2)].set_name("Bloody Wall");
               grid[x - (d/2)][y - (d/2)].fg += RGB(rng.gen_range(0, VISCERA_FG), 0, 0);
               grid[x - (d/2)][y - (d/2)].bg += RGB(rng.gen_range(0, VISCERA_BG), 0, 0);
             },
             StainType::Moss => {
+              grid[x - (d/2)][y - (d/2)].set_name("Mossy Wall");
               grid[x - (d/2)][y - (d/2)].fg += RGB(0, rng.gen_range(0, MOSS_FG), 0);
               grid[x - (d/2)][y - (d/2)].bg += RGB(0, rng.gen_range(0, MOSS_BG), 0);
             },
-            StainType::Fungus => {
-              let fg = rng.gen_range(0, FUNGUS_FG);
-              let bg = rng.gen_range(0, FUNGUS_BG);
-              grid[x - (d/2)][y - (d/2)].fg += RGB(fg, 0, fg);
-              grid[x - (d/2)][y - (d/2)].bg += RGB(fg, 0, bg);
-            },
+            StainType::Fungus => (),
             StainType::Corruption => {
+              grid[x - (d/2)][y - (d/2)].set_name("Corrupted Wall");
               let fg = rng.gen_range(0, CORRUPTION_FG);
               let bg = rng.gen_range(0, CORRUPTION_BG);
               grid[x - (d/2)][y - (d/2)].fg -= RGB(fg, fg, fg);

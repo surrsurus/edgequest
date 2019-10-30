@@ -294,6 +294,10 @@ impl Tile {
     }
   }
 
+  pub fn set_name(&mut self, name: &'static str) {
+    self.name = name;
+  }
+
 }
 
 impl Renderable for Tile {
