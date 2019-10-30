@@ -48,7 +48,7 @@ You will probably need to change your default renderer in `config/cfg.yml`. At t
 OSX:
 
 ```
-$ brew install pkg-config sdl
+$ brew install sdl2
 $ cargo run
 ```
 
