@@ -43,7 +43,7 @@ impl AI for SmellerAI {
     me.prev_pos = me.pos.clone();
   
     // Avoid OOB Errors
-    if x < 2 || x > map.width() - 2 || y < 2 || y > map.height() - 2 {
+    if x <= 2 || x > map.width() - 2 || y <= 2 || y > map.height() - 2 {
       // NOTE: scent_range one 1 has weird behaviors...
       scent_range = 1;
     }
