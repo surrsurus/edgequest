@@ -6,7 +6,7 @@ authors = ["surrsurus"]
 [dependencies]
 
 # Main library used
-tcod = "0.12"
+tcod = "0.15"
 
 # Macro for global logging
 lazy_static = "1.0.1"
