@@ -4,5 +4,6 @@
       There are many ways to do the same thing and the code should adhere to just one of them.
       - Indexing grid with `Pos`
       - Getter/Setter mixups
+      - Process keypress should return a state
   - Lore
       Plot needs work, races need work, stats need work. Classes don't exist. Monsters need to be designed, aesthetics need to be defined, same for items.

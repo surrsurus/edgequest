@@ -154,7 +154,8 @@ impl Engine {
               // Go upstairs (if possible)
               ',' => { self.world.player.state = Actions::UpStair },
 
-              _ => ()
+              // Unbound key, so we just say we don't know what the player did
+              _ => { self.world.player.state = Actions::Unknown }
 
             }
           
