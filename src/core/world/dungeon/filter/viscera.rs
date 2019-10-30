@@ -10,7 +10,7 @@ use super::map::{Grid, Measurable, tile, Tile};
 // Configuration
 
 // Should be divisible by 2
-pub const RADIUS : usize = 4;
+pub const RADIUS : usize = 5;
 
 ///
 /// Viscera generator
@@ -34,12 +34,12 @@ impl Viscera {
       // Match walls or floors only
       match grid[x - (RADIUS/2)][y - (RADIUS/2)].tiletype {
         tile::Type::Wall(_) => {
-          grid[x - (RADIUS/2)][y - (RADIUS/2)].fg += RGB(22 + rng.gen_range(0, 40), rng.gen_range(0, 10), 0);
-          grid[x - (RADIUS/2)][y - (RADIUS/2)].bg += RGB(12 + rng.gen_range(0, 50), rng.gen_range(0, 10), 0);
+          grid[x - (RADIUS/2)][y - (RADIUS/2)].fg += RGB(22 + rng.gen_range(0, 40), 0, 0);
+          grid[x - (RADIUS/2)][y - (RADIUS/2)].bg += RGB(12 + rng.gen_range(0, 50), 0, 0);
         },
         tile::Type::Floor(_) => {
-          grid[x - (RADIUS/2)][y - (RADIUS/2)].fg += RGB(rng.gen_range(0, 40), rng.gen_range(0, 10), 0);
-          grid[x - (RADIUS/2)][y - (RADIUS/2)].bg += RGB(rng.gen_range(0, 50), rng.gen_range(0, 10), 0);
+          grid[x - (RADIUS/2)][y - (RADIUS/2)].fg += RGB(rng.gen_range(0, 40), 0, 0);
+          grid[x - (RADIUS/2)][y - (RADIUS/2)].bg += RGB(rng.gen_range(0, 50), 0, 0);
         },
         _ => {}
       }
@@ -54,7 +54,7 @@ impl Viscera {
 
     let mut rng = rand::thread_rng();
 
-    for _ in 0..rng.gen_range(5, 15) {
+    for _ in 0..rng.gen_range(0, 8) {
 
       // Read details of grid
       let total_w = grid.width();
@@ -79,9 +79,7 @@ impl Viscera {
   /// Return a new `Viscera`
   /// 
   pub fn new() -> Self {
-
-    return Viscera {}
-
+    Viscera {}
   }
 
 }
