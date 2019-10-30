@@ -2,6 +2,8 @@
 //! A game engine based around a state machine
 //! 
 
+use std::path::Path;
+
 // tcod
 //
 // This library helps us create a window to render to, gives us functions for pathing, FOV, and 
@@ -11,6 +13,7 @@ extern crate tcod;
 // We use tcod here to create the root console (to give it to the renderer) and to grab inputs from the player
 use self::tcod::{console, Console};
 use self::tcod::input;
+use self::tcod::image;
 
 // The game log
 //
@@ -461,11 +464,15 @@ impl Engine {
     let title = "Edgequest";
     let subtitle = "Press any key to start.";
 
+    // Image blit test
+    image::blit_2x(&image::Image::from_file(Path::new("./media/bigman.png")).unwrap(), (0, 0), (-1, -1), &mut self.root, (80, 22));
+    image::blit_2x(&image::Image::from_file(Path::new("./media/guyman.png")).unwrap(), (0, 0), (-1, -1), &mut self.root, (5, 22));
+
     self.root.set_default_foreground(RGB(255, 255, 255).to_tcod());
     // i32 conversion is a pain since I'd rather store stuff as isize and the tcod lib wants i32 since it's
     // pretty much just a C++ interface which is annoying
-    self.root.print((w / 2 - (title.len() / 2) as i32) as i32, (h / 2 - 1) as i32, title);
-    self.root.print((w / 2 - (subtitle.len() / 2) as i32) as i32, (h / 2 + 1) as i32, subtitle);
+    self.root.print((w / 2 - (title.len() / 2) as i32) as i32, (h / 3 - 1) as i32, title);
+    self.root.print((w / 2 - (subtitle.len() / 2) as i32) as i32, (h / 3 + 1) as i32, subtitle);
 
     self.root.flush();
 
