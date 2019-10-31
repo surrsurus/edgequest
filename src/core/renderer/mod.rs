@@ -36,6 +36,11 @@ pub use self::rgb::RGB;
 const WATER_MIN : RGB = RGB(25, 75, 80);
 const WATER_MAX : RGB = RGB(20, 85, 85);
 
+// Crystal color factors
+const CRYSTAL_FLOOR_MIN: RGB = RGB(143, 101, 172);
+const CRYSTAL_WALL_MIN : RGB = RGB(176, 157, 204);
+const CRYSTAL_FAC : u8 = 10;
+
 // Used to darken tiles that are out of sight
 pub const DARKEN_FAC : RGB = RGB(10, 10, 10);
 
@@ -434,7 +439,19 @@ impl Renderer {
             match &world.floor.dun[x][y].tiletype {
               tile::Type::Water => {
                 world.floor.dun[x][y].set_bg(
-                  RGB::transition_between(&WATER_MIN, &WATER_MAX, rand::thread_rng().gen::<f32>())
+                  RGB::transition_between(&WATER_MIN, &WATER_MAX, rand::thread_rng().gen())
+                );
+              },
+              tile::Type::Wall(tile::Wall::Crystal) => {
+                let r = rand::thread_rng().gen_range(0, CRYSTAL_FAC);
+                world.floor.dun[x][y].set_bg(
+                  RGB::transition_between(&CRYSTAL_WALL_MIN, &(RGB(r, r, r) + CRYSTAL_WALL_MIN), rand::thread_rng().gen())
+                );
+              },
+              tile::Type::Floor(tile::Floor::Crystal) => {
+                let r = rand::thread_rng().gen_range(0, CRYSTAL_FAC);
+                world.floor.dun[x][y].set_bg(
+                  RGB::transition_between(&CRYSTAL_FLOOR_MIN, &(RGB(r, r, r) + CRYSTAL_FLOOR_MIN), rand::thread_rng().gen())
                 );
               },
               _ => {}

@@ -6,8 +6,8 @@ screen_width: 115
 screen_height: 40
 
 # Dimensions of map in characters
-map_width: 89
-map_height: 39
+map_width: 99
+map_height: 49
 
 # Height of console
 console_height: 10

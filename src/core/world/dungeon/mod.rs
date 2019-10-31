@@ -321,7 +321,7 @@ impl Dungeon {
                 "Crystaline Floor", 
                 ' ', 
                 RGB(0, 0, 0), 
-                RGB(183, 141, 212), 
+                RGB(143, 101, 172), 
                 tile::Type::Floor(tile::Floor::Crystal)
               );
             },
@@ -330,7 +330,7 @@ impl Dungeon {
                 "Crystaline Wall", 
                 ' ', 
                 RGB(0, 0, 0), 
-                RGB(216, 197, 244), 
+                RGB(176, 157, 204), 
                 tile::Type::Wall(tile::Wall::Crystal)
               );
             }
